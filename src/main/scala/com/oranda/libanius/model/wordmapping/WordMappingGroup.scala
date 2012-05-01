@@ -16,10 +16,12 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.util.Random
-import scala.collection.mutable
 import scala.collection.immutable.HashSet
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable
+import scala.util.Random
+
+import android.util.Log
 
 case class WordMappingGroup(val keyType: String, val valueType: String) {
   // keyType example: "English word"
@@ -76,32 +78,30 @@ case class WordMappingGroup(val keyType: String, val valueType: String) {
   
   def findPresentableQuizItem(numCorrectAnswersInARowDesired: Int,
       diffInPromptNumMinimum: Int, currentPromptNumber: Int): 
-      Option[QuizItemViewWithOptions] = {
+      Option[QuizItemViewWithOptions] =
     wordMappings.iterator.map(entry => 
         findPresentableQuizItem(entry._1, entry._2, numCorrectAnswersInARowDesired,
             diffInPromptNumMinimum, currentPromptNumber)).find(_.isDefined).getOrElse(None)
-  }
+
   
   def findPresentableQuizItem(key: String, wordMappingValues: WordMappingValueSet,
       numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int, 
       currentPromptNumber: Int): Option[QuizItemViewWithOptions] = {
-    
+
     val wordMappingValueOpt = wordMappingValues.findPresentableWordMappingValue(
-        numCorrectAnswersInARowDesired, diffInPromptNumMinimum, currentPromptNumber)
-      
+        numCorrectAnswersInARowDesired, diffInPromptNumMinimum, currentPromptNumber) 
     wordMappingValueOpt match {
       case Some(wordMappingValue) => Some(quizItemWithOptions(key, 
           wordMappingValues, wordMappingValue))
-      case None => None
+      case _ => None
     }
   }
       
   private def quizItemWithOptions(key: String, wordMappingValues: WordMappingValueSet, 
       wordMappingValueCorrect: WordMappingValue): QuizItemViewWithOptions = {
-    
     val numCorrectAnswers = wordMappingValueCorrect.numCorrectAnswersInARow
     val falseAnswers = makeFalseAnswers(key, wordMappingValues, 
-        wordMappingValueCorrect, numCorrectAnswers)
+        wordMappingValueCorrect, numCorrectAnswers)  
     new QuizItemViewWithOptions(key, wordMappingValueCorrect, 
         keyType, valueType, falseAnswers, numCorrectAnswers)
   }
@@ -124,9 +124,10 @@ case class WordMappingGroup(val keyType: String, val valueType: String) {
     // try again to fill the falseAnswers
     var totalTries = 20 // to stop any infinite loop
     while (falseAnswers.size < numFalseAnswersRequired && totalTries > 0) {
-       val randomAnswer = findRandomWordValue(allWordMappingValues)
-       if (!wordMappingCorrectValues.containsValue(randomAnswer))
-          falseAnswers += randomAnswer
+      totalTries = totalTries - 1
+      val randomAnswer = findRandomWordValue(allWordMappingValues)
+      if (!wordMappingCorrectValues.containsValue(randomAnswer))
+         falseAnswers += randomAnswer
     }
     while (falseAnswers.size < numFalseAnswersRequired)
       falseAnswers += ""

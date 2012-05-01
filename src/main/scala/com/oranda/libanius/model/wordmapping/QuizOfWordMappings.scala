@@ -67,15 +67,14 @@ class QuizOfWordMappings(_currentPromptNumber: Int) extends Quiz(_currentPromptN
   }
 
   def findQuizItem(numCorrectAnswersInARowDesired: Int, diffInPromptNum: Int): 
-      Option[QuizItemViewWithOptions] = {
+      Option[QuizItemViewWithOptions] =
     /*
      * Just find the first "presentable" word mapping and return it immediately
      * .iterator is considered to be more efficient than .view here 
      */
     wordMappingGroups.iterator.map(_.findPresentableQuizItem(
         numCorrectAnswersInARowDesired, diffInPromptNum, currentPromptNumber)).
-        find(_.isDefined).getOrElse(None)   
-  }
+        find(_.isDefined).getOrElse(None)  
 
   def numGroups = wordMappingGroups.size
   

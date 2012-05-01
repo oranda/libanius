@@ -77,7 +77,7 @@ class QuizOfWordMappingsSpec extends Specification {
       wmg.isDefined mustEqual true
     }
     
-    "be able to present a quiz item" in {
+    "find a presentable quiz item" in {
       val quizItem = quiz.findQuizItem(numCorrectAnswersInARowDesired = 0, 
           diffInPromptNum = 0)
       quizItem.isDefined mustEqual true

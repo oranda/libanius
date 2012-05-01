@@ -10,3 +10,8 @@ The implementation is in Scala. The primary target platform is Android.
 Suggestions for new features and code improvements will be happily received by:
 
 James McCabe <jamesc@oranda.com>
+
+
+Screenshot
+==========
+![Libanius](https://github.com/oranda/libanius/raw/master//docs/screenshot.png)

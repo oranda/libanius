@@ -51,9 +51,8 @@ class Libanius extends Activity with TypedActivity {
   
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
-    
 	initGui
-    quiz = readQuiz
+    quiz = readQuiz    
     testUserWithQuizItem 
   }
   
@@ -92,29 +91,32 @@ class Libanius extends Activity with TypedActivity {
   }
   
   
-  def testUserWithQuizItem(): Unit = { 
-        
+  def testUserWithQuizItem() { 
+    
     val quizItemOpt = findNextQuizItem
     
-    if (quizItemOpt == None || quiz.scoreSoFar > 0.9999) {
+    if (!quizItemOpt.isDefined || quiz.scoreSoFar > 0.9999)      
       printStatus("No more questions found! Done!")
-      return
-    }
-    
+    else {
+      currentQuizItem = quizItemOpt.get
+      showNextQuizItem()
+    } 
+  }
+  
+  def showNextQuizItem() {
     quiz.incPromptNumber
     
     answerOption1Button.setBackgroundColor(Color.LTGRAY)
     answerOption2Button.setBackgroundColor(Color.LTGRAY)
     answerOption3Button.setBackgroundColor(Color.LTGRAY)
 
-    currentQuizItem = quizItemOpt.get
-    
     questionLabel.setText(currentQuizItem.keyWord)
     var questionNotesText = "What is the " + currentQuizItem.valueType + "?"
     if (currentQuizItem.numCorrectAnswersInARow > 0)
       questionNotesText += " (already answered correctly " + 
           currentQuizItem.numCorrectAnswersInARow + " times)"
     questionNotesLabel.setText(questionNotesText)
+        
     val optionsIter = currentQuizItem.optionsInRandomOrder().iterator
     answerOption1Button.setText(optionsIter.next)
     answerOption2Button.setText(optionsIter.next)
@@ -124,7 +126,6 @@ class Libanius extends Activity with TypedActivity {
       saveQuiz()
   }
   
-  
   def findNextQuizItem: Option[QuizItemViewWithOptions] = {
     /*
      * Try to find a quiz item that meets defined criteria: how many times 
@@ -133,10 +134,9 @@ class Libanius extends Activity with TypedActivity {
      */
     val criteriaSets = Seq((1, 4), (2, 20), (3, 200), (4, 2000), (0, -1), (-1, -1))
     
-    criteriaSets.iterator.map(criteria => 
-        quiz.findQuizItem(
-          numCorrectAnswersInARowDesired = criteria._1, diffInPromptNum = criteria._2)).
-          find(_.isDefined).getOrElse(None)
+    criteriaSets.iterator.map(criteria =>
+        quiz.findQuizItem(numCorrectAnswersInARowDesired = criteria._1, 
+            diffInPromptNum = criteria._2)).find(_.isDefined).getOrElse(None)
   }
   
   def answerOption1Clicked(v: View) { processUserAnswer(answerOption1Button) }
