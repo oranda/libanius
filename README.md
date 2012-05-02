@@ -14,4 +14,4 @@ James McCabe <jamesc@oranda.com>
 
 Screenshot
 ==========
-![Libanius](https://github.com/oranda/libanius/raw/master//docs/screenshot.png)
+![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshot.png)
