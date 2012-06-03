@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -61,28 +61,17 @@ abstract class ReadVocabFileToWordMappings {
   }
   
   def readQuiz : QuizOfWordMappings = {
-    val fileText = StandardIO.readFile(Props.fileQuiz)      
+    val fileText = StandardIO.readFile(getQuizFilename)      
     QuizOfWordMappings.fromXML(xml.XML.loadString(fileText))
   }
     
   def main(args: Array[String]) {
     println("Reading (quiz and) vocab file...")
     val quiz = readQuizAndVocabFile
-    println("Finished reading (quiz and) vocab file... Now writing quiz...")
-    StandardIO.save(getQuizFilename, new PrettyPrinter(999, 2).format(quiz.toXML))
+    println("Finished reading (quiz and) vocab file... Now writing quiz to " +
+        getQuizFilename + "...")
+    StandardIO.save(getQuizFilename, quiz.toCustomFormat.toString)
     println("Finished writing " + quiz.numKeyWords 
         + " words with their translations!")
   }
-  
-    /*
-    def processLine(line: String) : Boolean = {
-    	val r = ";"
-      	val items = line.split(r)
-    	if (items.length > 4) {
-    		println(items(0) + ": " + items(4));
-    		return true;
-    	}
-    	return false;
-    }
-    */
 }

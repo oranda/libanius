@@ -14,25 +14,33 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.model
+package com.oranda.libanius.util
+
+import scala.collection.JavaConverters._
+import java.util.HashMap
 import com.oranda.libanius.Props
+import java.util.Iterator
+import android.text.TextUtils
 import android.util.Log
 
-abstract class Quiz(var currentPromptNumber: Int) extends ModelComponent {
-  
-  def incPromptNumber {
-    currentPromptNumber = currentPromptNumber + 1
-  }
-  
-  def scoreSoFar : BigDecimal = {  // out of 1.0
-    val availableScorePerItem = (1.0 / numItems) / 
-        Props.NUM_CORRECT_ANSWERS_REQUIRED : BigDecimal
-    availableScorePerItem * numCorrectAnswers
-  }  
-  
-  def numItems: Int
-  
-  def numCorrectAnswers: Int  
-  
-  
+/*
+ * Encapsulate platform-specific code.
+ */
+trait Platform {
+      
+}
+
+object Platform {
+ 
+  def getSplitter(char: java.lang.Character): StringSplitter =
+    if (Props.ANDROID)
+      new StringSplitterAndroid(char)
+    else 
+      new StringSplitterDefault(char)
+   
+  def log(module: String, message: String) =
+    if (Props.ANDROID)
+      Log.d(module, message)
+    else
+      System.out.println(module + ": " + message)
 }

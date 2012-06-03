@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -21,11 +21,13 @@ object Props {
   
   var ANDROID = true
   
-  val fileVocab = "vocab.txt"
+  val fileVocab = "vocabGer10k.txt"
   
-  val fileQuiz : String = "quizTestData.xml"
+  val fileQuizRoot = "quizGer10k" //"quizTestData.xml"
   
-  val fileQuizLastBackup : String = "quizTestData.xml"
+  val fileQuiz = fileQuizRoot + ".qui"
   
-  val NUM_CORRECT_ANSWERS_REQUIRED = 5
+  val fileQuizLastBackup = "quizTestData.xml"
+  
+  val NUM_CORRECT_ANSWERS_REQUIRED = 4 // 5
 }

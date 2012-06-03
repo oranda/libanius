@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -17,11 +17,25 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
+import com.oranda.libanius.Props
 
 class WordMappingGroupSpec extends Specification {
 
   "a word-mapping group" should {
     
+    val wmgCustomFormat =
+        "wordMappingGroup keyType=\"English word\" valueType=\"German word\"\n" +
+        "against|wider\n" +
+        "entertain|unterhalten\n" +
+        "teach|unterrichten\n" +
+        "winner|Siegerin\n" +
+        "en route|unterwegs\n" +
+        "full|satt/voll\n" +
+        "interrupted|unterbrochen\n" +
+        "contract|Vertrag\n" +
+        "rides|reitet\n" +
+        "sweeps|streicht"
+        
     val wmgXml = 
   <wordMappingGroup keyType="English word" valueType="German word">
     <wordMapping key="against">  
@@ -57,33 +71,46 @@ class WordMappingGroupSpec extends Specification {
     </wordMapping>
   </wordMappingGroup>
   
-    val wmg = WordMappingGroup.fromXML(wmgXml)
-     
-    "be parseable from XML" in {
+    Props.ANDROID = false
+    
+    val wmg = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
+    val wmgFromXml = WordMappingGroup.fromXML(wmgXml)
+    
+    "be parseable from custom format" in {
       wmg.keyType mustEqual "English word"
       wmg.valueType mustEqual "German word"
+      wmg.toCustomFormat(new StringBuilder()).toString mustEqual wmgCustomFormat
       wmg.numKeyWords mustEqual 10
     }
     
+    "be parseable from XML" in {
+      wmgFromXml.keyType mustEqual "English word"
+      wmgFromXml.valueType mustEqual "German word"
+      wmgFromXml.numKeyWords mustEqual 10
+    }
+    
     "accept the addition of a new word-mapping" in {
-      val wmgLocal = WordMappingGroup.fromXML(wmgXml)
+      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
       wmgLocal.contains("good") mustEqual false
       wmgLocal.addWordMapping("good", "gut")
       wmgLocal.contains("good") mustEqual true
     }
     
     "accept new values for an existing word-mapping" in {
-      val wmgLocal = WordMappingGroup.fromXML(wmgXml)
-      wmgLocal.findValuesFor("against").get.size mustEqual 1
+      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
+      val valuesForAgainst = wmgLocal.findValuesFor("against")
+      valuesForAgainst.isDefined mustEqual true
+      valuesForAgainst.get.size mustEqual 1
       wmgLocal.addWordMapping("against", "gegen")
       wmgLocal.findValuesFor("against").get.size mustEqual 2
     }
     
     "generate false answers similar to a correct answer" in {
       val wmvs = new WordMappingValueSet
-      wmvs.addWordMappingValue(Some(new WordMappingValue("unterhalten")))
-      val falseAnswers = wmg.makeFalseSimilarAnswers(wordMappingCorrectValues = wmvs,
-          wordMappingValueCorrect = new WordMappingValue("unterhalten"), 
+      wmvs.addValue(new WordMappingValue("unterhalten"))
+      val falseAnswers = wmg.makeFalseSimilarAnswers(
+          wordMappingCorrectValues = wmvs,
+          correctValue = new WordMappingValue("unterhalten"), 
           numCorrectAnswersSoFar = 2, numFalseAnswersRequired = 5)
       falseAnswers.contains("unterrichten") mustEqual true
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -16,80 +16,167 @@
 
 package com.oranda.libanius.model.wordmapping
 
+import scala.collection.JavaConversions.mapAsScalaMap
 import scala.collection.immutable.HashSet
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable
 import scala.util.Random
-
 import android.util.Log
+import com.oranda.libanius.util.StringUtil
+import com.sun.xml.internal.ws.util.StringUtils
+import android.text.TextUtils
+import com.oranda.libanius.util.Util
+import com.oranda.libanius.util.Platform
 
-case class WordMappingGroup(val keyType: String, val valueType: String) {
+import com.oranda.libanius.model.ModelComponent
+
+case class WordMappingGroup(val keyType: String, val valueType: String) 
+    extends ModelComponent {
   // keyType example: "English word"
   // valueType example: "German word"
   
-  // When building a map from a large amount of data, the mutable collection is faster 
-  private[this] val wordMappings = new mutable.HashMap[String, WordMappingValueSet]
+  // When populating, the java.util map is faster than the mutable Scala map
+  private val wordMappings = new java.util.LinkedHashMap[String, WordMappingValueSet]
+  
+  // ... but apart from that we want a Scala version of the map so as to use Scala syntax
+  def wordMappingsAsScala: mutable.Map[String, WordMappingValueSet] = wordMappings
   
   def toXML =
     <wordMappingGroup keyType={keyType} valueType={valueType}>
       {wordMappings map (keyValue => 
           <wordMapping key={keyValue._1}>{keyValue._2.toXML}</wordMapping> ) }
-    </wordMappingGroup>
+    </wordMappingGroup>  
   
+  /*
+   * Example of custom format:
+   * 
+   * wordMappingGroup keyType="English word" valueType="German word"
+   *    against|wider
+   *    entertain|unterhalten
+   */
+  def toCustomFormat(strBuilder: StringBuilder) = {
+    strBuilder.append("wordMappingGroup keyType=\"").append(keyType).
+        append("\" valueType=\"").append(valueType).append("\"")
+    val iter = wordMappings.iterator
+    while (iter.hasNext) {
+      val wordMapping = iter.next
+      strBuilder.append('\n').append(wordMapping._1).append('|')
+      wordMapping._2.toCustomFormat(strBuilder)
+    }      
+    strBuilder
+  }
+
+    
   def numKeyWords = wordMappings.size
 
-  def numValues = wordMappings.values.foldLeft(0)(_ + _.size)
+  def numValues = wordMappingsAsScala.values.iterator.foldLeft(0)(_ + _.size)
   
-  def numCorrectAnswers : Int = 
-    wordMappings.values.foldLeft(0)(_ + _.numCorrectAnswers)
-  
+  def numItemsAndCorrectAnswers = {
+    /*
+     * The functional version (commented) is about 50% slower than the imperative version
+     *  
+     * wordMappingsAsScala.values.iterator.foldLeft(Pair(0, 0))((acc, value) =>
+     *    (acc._1 + value.numItemsAndCorrectAnswers._1, 
+     *     acc._2 + value.numItemsAndCorrectAnswers._2))
+     */
+    var numItems = 0
+    var numCorrectAnswers = 0        
+    for (wmvs <- wordMappingsAsScala.values) {
+      val _numItemsAndCorrectAnswers = wmvs.numItemsAndCorrectAnswers
+      numItems += _numItemsAndCorrectAnswers._1
+      numCorrectAnswers +=_numItemsAndCorrectAnswers._2
+    }
+    Pair(numItems, numCorrectAnswers)
+  }
+    
+         
   def contains(wordMapping: String): Boolean = wordMappings.contains(wordMapping)
 
-  // not a lazy val because values can be deleted
-  def allWordMappingValues =
-    wordMappings.values.foldLeft(new ArrayBuffer[WordMappingValue]()) {          
-        (acc, wm) => acc ++ wm.values
-    }
-  
+  // probably too slow to be useful  (and not a lazy val because values can be deleted)
+  // def allWordMappingValues = combineValueSets(wordMappingsAsScala.values)          
+          
   def addWordMapping(key: String, value: String) {
     if (key.toLowerCase == value.toLowerCase)
       return
-    val existingValuesOpt = wordMappings.get(key)
+    val existingValuesOpt = wordMappingsAsScala.get(key)
     val existingValues = existingValuesOpt match {
         case Some(existingValues) => existingValues
         case None => val wmvs = new WordMappingValueSet()
           wordMappings.put(key, wmvs)
           wmvs
     }          
-    existingValues.addWordMappingValue(Some(new WordMappingValue(value)))
+    existingValues.addValue(new WordMappingValue(value))
   }
   
-  def addWordMapping(key: String, wordMappingValueSetOpt: Option[WordMappingValueSet]) {
+  def addWordMapping(key: String, wordMappingValueSetOpt: Option[WordMappingValueSet]) =
     if (wordMappingValueSetOpt.isDefined)
       wordMappings.put(key, wordMappingValueSetOpt.get)
-  }
- 
-  def remove(key: String): Option[WordMappingValueSet] = wordMappings.remove(key)
   
+  def addWordMapping(key: String, wordMappingValueSet: WordMappingValueSet) =
+    wordMappings.put(key, wordMappingValueSet)
+  
+  def remove(key: String): Option[WordMappingValueSet] = wordMappingsAsScala.remove(key)
+  
+  
+  def deleteWordMappingValue(keyWord: String, 
+      wordMappingValue: WordMappingValue): Boolean = {
+    val wmvs = wordMappings.get(keyWord)
+    wmvs != null && wmvs.deleteValue(wordMappingValue)
+  }
   
   def findValuesFor(keyWord: String): Option[WordMappingValueSet] = 
-    wordMappings.get(keyWord)
+    wordMappingsAsScala.get(keyWord)
   
   
-  def findPresentableQuizItem(numCorrectAnswersInARowDesired: Int,
-      diffInPromptNumMinimum: Int, currentPromptNumber: Int): 
-      Option[QuizItemViewWithOptions] =
-    wordMappings.iterator.map(entry => 
-        findPresentableQuizItem(entry._1, entry._2, numCorrectAnswersInARowDesired,
-            diffInPromptNumMinimum, currentPromptNumber)).find(_.isDefined).getOrElse(None)
-
-  
+  def findPresentableQuizItem(currentPromptNumber: Int): 
+      Option[QuizItemViewWithOptions] = {  
+    /*
+     * To ensure we are not retrieving the same value set each time, split the
+     * wordMappings by creating iterators at random points. If the user is near
+     * finishing the quiz, then potentially all iterators can be traversed
+     * until one of the last presentable quiz items is found.
+     */
+    /*val preferredIterGroupSize = Random.nextInt(wordMappingsAsScala.size) / 4
+    val minIterGroupSize = wordMappingsAsScala.size / 40
+    val randomPartitionPoint = Math.max(minIterGroupSize, preferredIterGroupSize)
+    val iterGroups = wordMappingsAsScala.iterator.grouped(randomPartitionPoint)
+    iterGroups.map(iterGroup => 
+        findPresentableQuizItem(iterGroup, currentPromptNumber)).find(_.isDefined).get
+        
+    map(entry => 
+          findPresentableQuizItem(entry._1, entry._2, currentPromptNumber)).
+          find(_.isDefined).get
+    */
+    wordMappingsAsScala.iterator.map(entry => 
+          findPresentableQuizItem(entry._1, entry._2, currentPromptNumber)).
+          find(_.isDefined).get  
+      
+    /*
+    Fallback: imperative version:
+    
+    for (iterGroup <- iterGroups.toList) {
+      val quizItemOpt = iterGroup.reverseIterator.map(entry => 
+          findPresentableQuizItem(entry._1, entry._2, currentPromptNumber)).
+          find(_.isDefined)
+      if (quizItemOpt.get.isDefined)
+        return quizItemOpt.get
+    } 
+    None
+    */    
+  }
+  /*
+  def findPresentableQuizItem(iterGroup: Seq[(String, WordMappingValueSet)],
+      currentPromptNumber: Int): Option[QuizItemViewWithOptions] =
+    iterGroup.reverseIterator.map(entry => 
+          findPresentableQuizItem(entry._1, entry._2, currentPromptNumber)).
+          find(_.isDefined).get
+  */
   def findPresentableQuizItem(key: String, wordMappingValues: WordMappingValueSet,
-      numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int, 
       currentPromptNumber: Int): Option[QuizItemViewWithOptions] = {
 
+    Platform.log("Libanius", "findPresentableQuizItem " + key)
     val wordMappingValueOpt = wordMappingValues.findPresentableWordMappingValue(
-        numCorrectAnswersInARowDesired, diffInPromptNumMinimum, currentPromptNumber) 
+        currentPromptNumber)
     wordMappingValueOpt match {
       case Some(wordMappingValue) => Some(quizItemWithOptions(key, 
           wordMappingValues, wordMappingValue))
@@ -101,14 +188,14 @@ case class WordMappingGroup(val keyType: String, val valueType: String) {
       wordMappingValueCorrect: WordMappingValue): QuizItemViewWithOptions = {
     val numCorrectAnswers = wordMappingValueCorrect.numCorrectAnswersInARow
     val falseAnswers = makeFalseAnswers(key, wordMappingValues, 
-        wordMappingValueCorrect, numCorrectAnswers)  
+        wordMappingValueCorrect, numCorrectAnswers)
     new QuizItemViewWithOptions(key, wordMappingValueCorrect, 
         keyType, valueType, falseAnswers, numCorrectAnswers)
   }
 
   def makeFalseAnswers(key: String, wordMappingCorrectValues: WordMappingValueSet, 
-      wordMappingValueCorrect: WordMappingValue,
-      numCorrectAnswers: Int): Set[String] = {
+      wordMappingValueCorrect: WordMappingValue, numCorrectAnswersSoFar: Int): 
+      Set[String] = {
     
     var falseAnswers = new HashSet[String]
     val numFalseAnswersRequired = 2
@@ -117,15 +204,17 @@ case class WordMappingGroup(val keyType: String, val valueType: String) {
      * If the user has already been having success with this word, first try to
      * fill the falseAnswers with similar-looking words.
      */
-    if (numCorrectAnswers >= 2)
-      falseAnswers ++ makeFalseSimilarAnswers(wordMappingCorrectValues,
-          wordMappingValueCorrect, numCorrectAnswers, numFalseAnswersRequired)
-      
+    if (numCorrectAnswersSoFar >= 1) 
+      falseAnswers ++= Util.stopwatch(makeFalseSimilarAnswers(wordMappingCorrectValues,
+          wordMappingValueCorrect, numCorrectAnswersSoFar, numFalseAnswersRequired), 
+          "makeFalseSimilarAnswers")
+    
     // try again to fill the falseAnswers
     var totalTries = 20 // to stop any infinite loop
     while (falseAnswers.size < numFalseAnswersRequired && totalTries > 0) {
+      Platform.log("Libanius", "looking for random word")
       totalTries = totalTries - 1
-      val randomAnswer = findRandomWordValue(allWordMappingValues)
+      val randomAnswer = findRandomWordValue(randomValues(100))
       if (!wordMappingCorrectValues.containsValue(randomAnswer))
          falseAnswers += randomAnswer
     }
@@ -135,66 +224,96 @@ case class WordMappingGroup(val keyType: String, val valueType: String) {
   }
   
   def makeFalseSimilarAnswers(wordMappingCorrectValues: WordMappingValueSet,
-      wordMappingValueCorrect: WordMappingValue, 
-      numCorrectAnswersSoFar: Int, numFalseAnswersRequired: Int): Set[String] = {
-    var falseAnswers = new HashSet[String]
-    var totalTries = 20 // to stop any infinite loop
-    
-    while (falseAnswers.size < numFalseAnswersRequired && totalTries > 0) {
-      totalTries = totalTries - 1
-      val correctAnswer = wordMappingValueCorrect.value
-      
-      val similarityFunction = 
-          if (numCorrectAnswersSoFar % 2 == 0) hasSameStart else hasSameEnd
-      val randomAnswer = findSimilarValue(correctAnswer, similarityFunction)
-      
-      /* 
-       * Avoid taking a value from the same wordMapping as the correct answer
-       * E.g. if the correct answer for "full" is "voll" don't show "satt" as an option
-       */
-      if (!wordMappingCorrectValues.containsValue(randomAnswer))
-        falseAnswers += randomAnswer
-    }
-    falseAnswers
+      correctValue: WordMappingValue, numCorrectAnswersSoFar: Int, 
+      numFalseAnswersRequired: Int): Set[String] = {
+    var similarWords = new HashSet[String]
+    val similarityFunction = 
+          if (numCorrectAnswersSoFar % 2 == 1) hasSameStart else hasSameEnd
+    var numValueSetsSearched = 0
+    wordMappingsAsScala.values.iterator.takeWhile(
+        _ => similarWords.size < numFalseAnswersRequired).
+            foreach(
+              wmvs => {
+                numValueSetsSearched = numValueSetsSearched + 1
+                // Avoid selecting values belonging to the "correct" value set
+                if (wmvs ne wordMappingCorrectValues) {
+                  val numSimilarLetters = 2
+                  for (wmv <- wmvs.values)
+                    if (similarWords.size < numFalseAnswersRequired &&
+                        similarityFunction(wmv, correctValue.value)(numSimilarLetters))
+                      similarWords += wmv.value
+                }
+            })
+    Platform.log("Libanius", "numValueSetsSearched: " + numValueSetsSearched)
+
+    similarWords
   }  
   
   def hasSameStart = (wmv: WordMappingValue, value: String) => wmv.hasSameStart(value)
   def hasSameEnd = (wmv: WordMappingValue, value: String) => wmv.hasSameEnd(value)
   
-  private def findSimilarValue(value: String, 
-      similarityFunction: (WordMappingValue, String) => (Int => Boolean)): String = {
-    
-    val wordMappingValues = allWordMappingValues
-      
-    var similarWords = wordMappingValues.filter(
-        wmv => similarityFunction(wmv, value)(5))
-        
-    // we need enough words to make a good random selection
-    for (numOfLetters <- 4 to 0)
-      if (similarWords.length < 5) 
-        similarWords = wordMappingValues.filter(
-            wmv => similarityFunction(wmv, value)(numOfLetters))
-    
-    val wordSelectionPool = 
-      if (!similarWords.isEmpty) similarWords else allWordMappingValues 
-    findRandomWordValue(wordSelectionPool)
-  }
   
   def findRandomWordValue(wordMappingValues: ArrayBuffer[WordMappingValue]): String = {
     val randomIndex = Random.nextInt(wordMappingValues.length)
     wordMappingValues(randomIndex).value
   } 
+  
+  def randomValues(sliceSize: Int) = combineValueSets(randomSliceOfValueSets(sliceSize))
+  
+  def randomSliceOfValueSets(sliceSize: Int) = {
+    val actualSliceSize = scala.math.min(wordMappingsAsScala.values.size, sliceSize)
+    val randomStart = Random.nextInt(wordMappingsAsScala.values.size - actualSliceSize)
+    wordMappingsAsScala.values.slice(randomStart, randomStart + actualSliceSize).
+        toArray[WordMappingValueSet]
+  }
+  
+  def combineValueSets(valueSets: Iterable[WordMappingValueSet]) =  
+    valueSets.foldLeft(new ArrayBuffer[WordMappingValue]()) {          
+        (acc, wm) => acc ++ wm.values/*AsScala*/
+    }
 }
 
 
 object WordMappingGroup {
+  
+      
+  val lines = Platform.getSplitter('\n')
+  val linesSplit = Platform.getSplitter('|')
+      
+  /*
+   * Example:
+   * 
+   * wordMappingGroup keyType="English word" valueType="German word"
+   *    against|wider
+   *    entertain|unterhalten
+   */
+  def fromCustomFormat(str: String): WordMappingGroup =
+    new WordMappingGroup(keyType = parseKeyType(str), valueType = parseValueType(str)) {
+      
+      lines.setString(str);
+      lines.next // skip the first line, which has already been parsed
+      
+      while (lines.hasNext) {
+        linesSplit.setString(lines.next)
+        
+        if (linesSplit.hasNext) {
+          val strKey = linesSplit.next
+          val strValues = linesSplit.next
+          addWordMapping(strKey, WordMappingValueSet.fromCustomFormat(strValues))
+        }
+      }
+    }
+    
+  def parseKeyType(str: String) = StringUtil.parseValue(str, "keyType=\"", "\"")  
+  def parseValueType(str: String) = StringUtil.parseValue(str, "valueType=\"", "\"")
+  
   def fromXML(node: xml.Node): WordMappingGroup = {
 	new WordMappingGroup(keyType = (node \ "@keyType").text, 
 	    valueType = (node \ "@valueType").text) {  
-	  for (val wordMappingXml <- node \\ "wordMapping") {
+	  for (wordMappingXml <- node \\ "wordMapping") {
 	    val wmvs = WordMappingValueSet.fromXML(wordMappingXml)
 	    addWordMapping((wordMappingXml \ "@key").text, Some(wmvs))
 	  }
 	}  
-  }  
+  }
 }

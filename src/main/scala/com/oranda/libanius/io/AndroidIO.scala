@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -52,12 +52,11 @@ object AndroidIO {
   }
   
   
-  def save(ctx: Context, fileName: String, fileNameBackup: String, 
-      strToSave: String) {
+  def save(ctx: Context, fileName: String, fileNameBackup: String, strToSave: String) {
 	val file = new File(fileName);
 	val file2 = new File(fileNameBackup);
 	file2.delete();
-	//Log.d("AndroidIO.save", "Renaming " + fileName + " to " + fileNameBackup)
+	//Platform.log("AndroidIO.save", "Renaming " + fileName + " to " + fileNameBackup)
 	file.renameTo(file2); // Doesn't seem to work, but not crucial
 
 	writeToFile(Props.fileQuiz, strToSave, ctx)

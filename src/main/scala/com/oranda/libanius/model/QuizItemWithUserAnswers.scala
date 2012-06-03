@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -16,50 +16,76 @@
 
 package com.oranda.libanius.model
 import com.oranda.libanius.Props
+import android.util.Log
+import com.oranda.libanius.util.StringSplitter
 
-// TODO: this is an old class, to be updated
-trait QuizItemWithUserAnswers {
+trait QuizItemWithUserAnswers extends ModelComponent {
 
-  var userAnswers = List[UserAnswer]()
+  protected var correctAnswersInARow = List[UserAnswer]()
+  protected var incorrectAnswers = List[UserAnswer]()
+  
+  // Answers that were correct before a mistake was made: do not store for now
+  // protected var correctAnswersOld = List[UserAnswer]()
          
-  def addUserAnswer(userAnswerOpt : Option[UserAnswer]) {
-    userAnswerOpt match {
-      case Some(userAnswer) => userAnswers :+= userAnswer
-      case None =>
+  def userAnswers = /*correctAnswersOld ++*/ correctAnswersInARow ++ incorrectAnswers
+  
+  def addUserAnswer(userAnswer : UserAnswer) {
+    if (userAnswer.wasCorrect) {
+      correctAnswersInARow :+= userAnswer 
+    } else {
+      //correctAnswersOld ++= correctAnswersInARow
+      correctAnswersInARow = List()
+      incorrectAnswers :+= userAnswer
     }
-  } 
-      
-  def isPresentable(numCorrectAnswersInARowDesired : Int, 
-      diffInPromptNumMinimum : Int, currentPromptNum : Int) : Boolean = {
-    
+  }
+  
+  def addUserAnswersBatch(correctPromptNumStrs: List[String], 
+      incorrectPromptNumStrs: List[String]) {
+    // TODO: see if an imperative version is faster
+    correctAnswersInARow = correctPromptNumStrs.map(correctPromptNum =>
+        new UserAnswer(wasCorrect = false, promptNumber = correctPromptNum.toInt))
+    incorrectAnswers = incorrectPromptNumStrs.map(incorrectPromptNum =>
+        new UserAnswer(wasCorrect = false, promptNumber = incorrectPromptNum.toInt))
+  }
+  
+  def isPresentable(currentPromptNum : Int): Boolean = {
+  
+    /*
+     * See if this quiz item meets defined criteria: how many times 
+     * it has been answered correctly, and how long ago it was last answered.
+     * Try different pairs of values for these criteria until a quiz item fits.
+     */
+    val criteriaSets = Seq((1, 5), (2, 40), (3, 800), /*(4, 5000),*/ (0, -1)/*, (-1, -1)*/)
+    criteriaSets.exists(criteria => 
+      isPresentable(currentPromptNum, criteria._1, criteria._2))
+  }
+  
+  def isPresentable(currentPromptNum : Int, 
+      numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int): Boolean = { 
+    /*
     if (numCorrectAnswersInARowDesired == -1    // special case: pick any
         && numCorrectAnswersInARow < Props.NUM_CORRECT_ANSWERS_REQUIRED)
-      return true
+      return true*/
     if (numCorrectAnswersInARow != numCorrectAnswersInARowDesired)
       return false
-    if (userAnswers.isEmpty)
+    if (correctAnswersInARow.isEmpty && incorrectAnswers.isEmpty)
       return true
    
     val diffInPromptNum = currentPromptNum - promptNumInLastAnswer
     return diffInPromptNum >= diffInPromptNumMinimum
   }
   
-  def numCorrectAnswersInARow: Int = {
-    var count = 0
-    val iter = userAnswers.reverse.elements
-    var stop = false
-    while (iter.hasNext && !stop) {
-      val userAnswer = iter.next
-      if (userAnswer.wasCorrect)
-        count = count + 1
-      else
-        stop = true
-    }
-    return count
-  }
-    
-  def promptNumInLastAnswer : Int = {
-    val lastUserAnswer = userAnswers.last
-    return lastUserAnswer.promptNumber
+  def numCorrectAnswersInARow = correctAnswersInARow.length
+  
+  //def numCorrectAndIncorrectAnswers = Pair(correctAnswersInARow.length, 
+  //    incorrectAnswers.length)
+  
+  def promptNumInLastAnswer: Int = {
+    if (!correctAnswersInARow.isEmpty)
+      correctAnswersInARow.last.promptNumber
+    else if (!incorrectAnswers.isEmpty)
+      incorrectAnswers.last.promptNumber
+    else
+      Int.MinValue
   }
 }

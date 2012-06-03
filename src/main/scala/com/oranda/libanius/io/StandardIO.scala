@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -16,12 +16,12 @@
 
 package com.oranda.libanius.io
 
-import _root_.java.io.FileOutputStream
-import _root_.java.io.OutputStreamWriter
-import _root_.java.io.FileInputStream
-import _root_.java.io.InputStreamReader
-import _root_.java.io.BufferedReader
-import _root_.java.io.IOException
+import java.io.FileOutputStream
+import java.io.OutputStreamWriter
+import java.io.FileInputStream
+import java.io.InputStreamReader
+import java.io.BufferedReader
+import java.io.IOException
 import java.io.File
 import java.io.FileWriter
 import com.oranda.libanius.model.Quiz

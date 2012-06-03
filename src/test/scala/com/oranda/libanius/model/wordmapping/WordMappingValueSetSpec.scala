@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -17,36 +17,67 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
+import com.oranda.libanius.Props
+import org.specs2.specification.Scope
 
 class WordMappingValueSetSpec extends Specification {
 
   "a word-mapping-value-set" should {
     
-    val wmvXml = <wordMapping key="Vertrag">
-      <wordMappingValue value="contract"><userAnswers><userAnswer wasCorrect="TRUE" promptNumber="1"/></userAnswers></wordMappingValue>
-      <wordMappingValue value="treaty"><userAnswers></userAnswers></wordMappingValue>
+    val wmvsCustomFormat = "contract:696,698;697/treaty:796;798"
+      
+    val wmvsXml = <wordMapping key="Vertrag">
+      <wordMappingValue value="contract">
+        <userAnswers>
+          <userAnswer wasCorrect="true" promptNumber="696"/>
+          <userAnswer wasCorrect="false" promptNumber="697"/>
+          <userAnswer wasCorrect="true" promptNumber="698"/>
+        </userAnswers>
+      </wordMappingValue>
+      <wordMappingValue value="treaty">
+        <userAnswers>
+          <userAnswer wasCorrect="true" promptNumber="796"/>
+          <userAnswer wasCorrect="false" promptNumber="798"/>
+        </userAnswers>
+      </wordMappingValue>
     </wordMapping>
-  
-    val wmvs = WordMappingValueSet.fromXML(wmvXml)
+        
     
-    "be parseable from XML" in {
+    Props.ANDROID = false
+    
+    val wmvs = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat) 
+    val wmvsFromXml = WordMappingValueSet.fromXML(wmvsXml)
+    
+    
+    "be parseable from custom format" in {
       wmvs.containsValue("treaty")
-      wmvs.size mustEqual 2 // ?? 
+      wmvs.size mustEqual 2
+      wmvs.toCustomFormat(new StringBuilder("")).toString mustEqual wmvsCustomFormat
+    }
+     
+    "be parseable from XML" in {
+      wmvsFromXml.containsValue("treaty")
+      wmvsFromXml.size mustEqual 2  
     }
       
     "allow a word-mapping-value to be added" in {
-      val wmvsLocal = WordMappingValueSet.fromXML(wmvXml)
-      wmvsLocal.addWordMappingValue(Some(new WordMappingValue("agreement")))
+      val wmvsLocal = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
+      wmvsLocal.addValue(new WordMappingValue("agreement"))
       wmvsLocal.size mustEqual 3
-    }    
-   
-    "identify a word-mapping-value that is presentable in the context of the quiz" in {
-      val wmv = wmvs.findPresentableWordMappingValue(numCorrectAnswersInARowDesired = 1,
-          diffInPromptNumMinimum = 2, currentPromptNumber = 3)
-      wmv.get.value mustEqual "contract"
     }
+    
+   
+    /* TODO
+    "identify a word-mapping-value that is presentable in the context of the quiz" in {
+      val wmvsLocal = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
+      val correctAnswers = wmvsLocal.numCorrectAnswers
+      val wmvOpt = wmvsLocal.findPresentableWordMappingValue(
+          numCorrectAnswersInARowDesired = 1, diffInPromptNumMinimum = 2, 
+          currentPromptNumber = 700)
+      wmvOpt.isDefined mustEqual true
+      wmvOpt.get.value mustEqual "contract"
+    }*/
       
   }
   
-  
-}
+}  

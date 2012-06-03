@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -16,8 +16,8 @@
 
 package com.oranda.libanius.model.questions
 
-import _root_.scala.collection.mutable.ListBuffer
-import _root_.scala.xml.Node
+import scala.collection.mutable.ListBuffer
+import scala.xml.Node
 import com.oranda.libanius.Props
 import com.oranda.libanius.model.UserAnswer
 import scala.util.matching.Regex
@@ -39,9 +39,6 @@ class QuestionItem extends QuizItemWithUserAnswers {
     addUserAnswer(newAnswer)
   }
   
-  def addUserAnswer(userAnswer : UserAnswer) {
-    userAnswers :+= userAnswer
-  }
   
   def evaluateUserAnswer(promptNum : Int, userAnswerStr : String) : Boolean = {
 
@@ -118,17 +115,6 @@ class QuestionItem extends QuizItemWithUserAnswers {
       customFormat = customFormat + (userAnswers map (u => u.toCustomFormat + ":")).reduceLeft[String](_+_)
     return customFormat
   }  
-  /*
-  def main(args: Array[String]) {
-    	
-      val userAnswerXml = 
-		  <userAnswer>
-    	  		<wasCorrect>TRUE</wasCorrect>
-    	    <promptNumber>1</promptNumber>
-    	  </userAnswer>;
-      val userAnswer = UserAnswer.fromXML(userAnswerXml)
-      println(userAnswer.toXML)
-  }*/
 }
 
 
@@ -138,7 +124,7 @@ object QuestionItem {
 	    question = (node \ "question").text
 	    correctAnswer = (node \ "answer").text
 	    val answers = (node \ "userAnswers")
-	    for (val userAnswer <- answers \\ "userAnswer")
+	    for (userAnswer <- answers \\ "userAnswer")
 	      addUserAnswer(userAnswer)
        
 	    //val userAnswers = ((node \ "userAnswers") map (node => UserAnswer.fromXML(node)))
@@ -155,21 +141,4 @@ object QuestionItem {
           answersStrings.foreach(answerString => addUserAnswer(UserAnswer.fromCustomFormat(answerString)))
         }
     }
-        
-  def main(args: Array[String]) {
-    	
-    val qiXml = 
-<quizItem>
-  <question>What is the name for the system of linked documents on the Internet?</question>
-  <answer>(The World Wide) Web</answer>
-  <userAnswers></userAnswers>
-</quizItem>
-  
-    val qi = QuestionItem.fromXML(qiXml)
-     
-    val isCorrect = qi.isCorrect("Web")
-  }  
- //     val question: String
- // val correctAnswer: String
- // val userAnswers: ListBuffer[UserAnswer] = ListBuffer()
 }

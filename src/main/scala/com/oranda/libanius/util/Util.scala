@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.model
-import com.oranda.libanius.Props
-import android.util.Log
+package com.oranda.libanius.util
 
-abstract class Quiz(var currentPromptNumber: Int) extends ModelComponent {
+import android.util.Log
+import java.lang.Character
+
+trait Util {
+
+}
+
+object Util {
   
-  def incPromptNumber {
-    currentPromptNumber = currentPromptNumber + 1
+  def stopwatch[X](fn: => X, actionDescription: String): X = {
+    val start = System.currentTimeMillis()
+    val result = fn
+    val end = System.currentTimeMillis()
+    Platform.log("Libanius", "time taken for " + actionDescription + " was " +
+        (end - start) + "ms")
+    result
   }
-  
-  def scoreSoFar : BigDecimal = {  // out of 1.0
-    val availableScorePerItem = (1.0 / numItems) / 
-        Props.NUM_CORRECT_ANSWERS_REQUIRED : BigDecimal
-    availableScorePerItem * numCorrectAnswers
-  }  
-  
-  def numItems: Int
-  
-  def numCorrectAnswers: Int  
-  
-  
 }

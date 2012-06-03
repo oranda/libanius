@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -16,18 +16,23 @@
 
 package com.oranda.libanius
 
-import scala.xml.PrettyPrinter
+import java.lang.CharSequence
+import java.lang.Runnable
+import java.lang.System
 import com.oranda.libanius.io.AndroidIO
-import com.oranda.libanius.model.wordmapping._
+import com.oranda.libanius.model.wordmapping.QuizItemViewWithOptions
+import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
 import com.oranda.libanius.model.UserAnswer
+import com.oranda.libanius.util.Platform
+import com.oranda.libanius.util.Util
 import android.app.Activity
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import android.util.Log
 
 class Libanius extends Activity with TypedActivity {
 
@@ -44,7 +49,7 @@ class Libanius extends Activity with TypedActivity {
   private[this] var speedLabel : TextView = _
   private[this] var statusLabel : TextView = _
 
-  private[this] var quiz: QuizOfWordMappings = _
+  private[this] var quiz: QuizOfWordMappings = new QuizOfWordMappings
   private[this] var currentQuizItem: QuizItemViewWithOptions = _
 
   private[this] var timestampsLastCorrectAnswers = List[Long]()
@@ -52,14 +57,25 @@ class Libanius extends Activity with TypedActivity {
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
 	initGui
-    quiz = readQuiz    
+	if (quiz.numGroups == 0)
+      quiz = readQuiz    
     testUserWithQuizItem 
   }
   
-  override def onPause() { 
+  override def onPause() {
     super.onPause()
+    Platform.log("Libanius", "onPause")
     saveQuiz
   }
+  
+  /*
+   * This does not work: the QuizOfWordMappings can be re-instantiated 
+   * without onDestroy being called.
+   * 
+  override def onDestroy() { 
+    super.onDestroy()
+    saveQuiz
+  }*/
   
   def initGui {
     
@@ -84,8 +100,9 @@ class Libanius extends Activity with TypedActivity {
     printStatus("Reading quiz data...")
     val fileText = AndroidIO.readFile(this, Props.fileQuiz)
       
-    val quiz = QuizOfWordMappings.fromXML(xml.XML.loadString(fileText))
-      
+    val quiz = Util.stopwatch(QuizOfWordMappings.fromCustomFormat(fileText), 
+        "reading and parsing quiz")      
+    
     printStatus("Finished reading " + quiz.numItems + " quiz items!")
     return quiz
   }
@@ -93,14 +110,20 @@ class Libanius extends Activity with TypedActivity {
   
   def testUserWithQuizItem() { 
     
-    val quizItemOpt = findNextQuizItem
+    val quizItemOpt = Util.stopwatch(quiz.findQuizItem, "find quiz item")
     
-    if (!quizItemOpt.isDefined || quiz.scoreSoFar > 0.9999)      
+    if (!quizItemOpt.isDefined)      
       printStatus("No more questions found! Done!")
     else {
       currentQuizItem = quizItemOpt.get
       showNextQuizItem()
     } 
+  }
+  
+  def testUserWithQuizItemAgain() { 
+    showScore()
+    showSpeed()
+    testUserWithQuizItem()
   }
   
   def showNextQuizItem() {
@@ -122,21 +145,8 @@ class Libanius extends Activity with TypedActivity {
     answerOption2Button.setText(optionsIter.next)
     answerOption3Button.setText(optionsIter.next)
     
-    if (quiz.currentPromptNumber % 500 == 0)
-      saveQuiz()
-  }
-  
-  def findNextQuizItem: Option[QuizItemViewWithOptions] = {
-    /*
-     * Try to find a quiz item that meets defined criteria: how many times 
-     * it has been answered correctly, and how long ago it was last answered.
-     * Try different pairs of values for these criteria until a quiz item fits.
-     */
-    val criteriaSets = Seq((1, 4), (2, 20), (3, 200), (4, 2000), (0, -1), (-1, -1))
-    
-    criteriaSets.iterator.map(criteria =>
-        quiz.findQuizItem(numCorrectAnswersInARowDesired = criteria._1, 
-            diffInPromptNum = criteria._2)).find(_.isDefined).getOrElse(None)
+    //if (quiz.currentPromptNumber % 5000 == 0)
+    //  saveQuiz()
   }
   
   def answerOption1Clicked(v: View) { processUserAnswer(answerOption1Button) }
@@ -144,10 +154,11 @@ class Libanius extends Activity with TypedActivity {
   def answerOption3Clicked(v: View) { processUserAnswer(answerOption3Button) }
   
   def deleteCurrentWord(v: View) {
-    if (quiz.deleteWord(currentQuizItem.keyWord, currentQuizItem.keyType, 
+    if (quiz.deleteWordMappingValue(currentQuizItem.keyWord, 
+        currentQuizItem.wordMappingValue, currentQuizItem.keyType, 
         currentQuizItem.valueType))
       printStatus("Deleted word " + currentQuizItem.keyWord)
-    testUserWithQuizItem()    
+    testUserWithQuizItemAgain()    
   }
   
   def updateTimestamps(thereJustOccurredACorrectAnswer: Boolean) {
@@ -172,7 +183,7 @@ class Libanius extends Activity with TypedActivity {
     updateTimestamps(isCorrect)
       
     val userAnswer = new UserAnswer(isCorrect, quiz.currentPromptNumber)
-    currentQuizItem.wordMappingValue.addUserAnswer(Some(userAnswer))
+    currentQuizItem.wordMappingValue.addUserAnswer(userAnswer)
     
     var prevQuestionText = "PREV: " + questionLabel.getText
     val maxAnswers = Props.NUM_CORRECT_ANSWERS_REQUIRED
@@ -193,13 +204,11 @@ class Libanius extends Activity with TypedActivity {
     
     for (buttonToLabel <- buttonsToLabels)
       setColorOnAnswer(buttonToLabel._1, buttonToLabel._2, correctButton, clickedButton)
+      
     
-    showScore()
-    showSpeed()
-    
-    val delayMillis = if (isCorrect) 250 else 2500
+    val delayMillis = if (isCorrect) 50 else 500
     val handler = new Handler
-    handler.postDelayed(new Runnable() { def run() = testUserWithQuizItem() }, 
+    handler.postDelayed(new Runnable() { def run() = testUserWithQuizItemAgain() }, 
         delayMillis)
   }
   
@@ -230,19 +239,19 @@ class Libanius extends Activity with TypedActivity {
   
   def saveQuiz() {
     printStatus("Saving quiz data...")
-    
-    AndroidIO.save(this, Props.fileQuiz, Props.fileQuizLastBackup, 
-        new PrettyPrinter(999, 2).format(quiz.toXML)) 
+    val str = Util.stopwatch(quiz.toCustomFormat, "serialize the quiz")
+    AndroidIO.save(this, Props.fileQuiz, Props.fileQuizLastBackup, str.toString)
     printStatus("Finished saving quiz data!")
   }  
   
-  def showScore() = {
+  def showScore() {
+    val scoreSoFar = Util.stopwatch(quiz.scoreSoFar, "scoreSoFar")
     val quizStr = (quiz.scoreSoFar * 100).toString()
-    val quizStrMaxIndex = Math.min(quizStr.length(), 6)
+    val quizStrMaxIndex = scala.math.min(quizStr.length(), 6)
     printScore(quizStr.substring(0, quizStrMaxIndex) + "%")
   }
   
-  def showSpeed() = {
+  def showSpeed() {
     speedLabel.setText("Speed: " + answerSpeed + "/min")
   }  
   

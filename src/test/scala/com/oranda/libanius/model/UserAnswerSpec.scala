@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -16,18 +16,20 @@
 
 package com.oranda.libanius.model
 
-import org.specs2.mutable.Specification
 import com.oranda.libanius.model.wordmapping.WordMappingValue
+import org.specs2.mutable.Specification
+import com.oranda.libanius.Props
 
 class UserAnswerSpec extends Specification {
 
   "a user answer" should {
     
-    val uaXml = 
-          <userAnswer wasCorrect="true" promptNumber="1"></userAnswer>
+    Props.ANDROID = false
+    
+    val uaXml = <userAnswer wasCorrect="true" promptNumber="1"></userAnswer>
   
     val ua = UserAnswer.fromXML(uaXml)
-     
+    
     "be parseable from XML" in {
       ua.wasCorrect == true
       ua.promptNumber == 1

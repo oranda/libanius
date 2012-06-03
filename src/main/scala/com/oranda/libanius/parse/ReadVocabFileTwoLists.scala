@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -37,7 +37,7 @@ object ReadVocabTwoLists extends ReadVocabFileToWordMappings {
     val wmGroupGerToEng = quiz.findOrAddWordMappingGroup(
         keyType="German word", valueType="English word")
     
-    src.getLines.foreach(line => readQuizItemFrequency(line))
+    src.getLines.foreach(line => readQuizItemFrequency(line.trim))
     println("germanWords length: " + germanWords.size)
     println("englishWords length: " + englishWords.size)
     val combinedWords = germanWords zip englishWords
@@ -48,13 +48,13 @@ object ReadVocabTwoLists extends ReadVocabFileToWordMappings {
   
   def readQuizItemFrequency(word: String) = {
     
-    if (word.startsWith("-"))
+    if (word.startsWith("--"))
       germanMode = false
     else
       if (germanMode)
         germanWords += word
       else
-        englishWords += word  
+        englishWords += word
   }
 
 }

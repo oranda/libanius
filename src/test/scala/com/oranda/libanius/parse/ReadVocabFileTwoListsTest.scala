@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -18,6 +18,7 @@ package com.oranda.libanius.parse
 
 import scala.xml.PrettyPrinter
 import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
+import com.oranda.libanius.Props
 
 object ReadVocabFileTwoListsTest {
 
@@ -69,9 +70,12 @@ object ReadVocabFileTwoListsTest {
   </wordMappingGroup>
 </quizOfWordMappings>
 
-    val quiz = QuizOfWordMappings.fromXML(quizXml)
-    val quizXmlNew = new PrettyPrinter(999, 2).format(quiz.toXML)
+    Props.ANDROID = false
     
-    print(quizXmlNew) // just an eyeball test for now
+    val quiz = QuizOfWordMappings.fromXML(quizXml)
+    
+    val quizXmlNew: xml.Node = quiz.toXML
+    
+    print(new PrettyPrinter(999, 2).format(quizXmlNew)) // just an eyeball test for now
   }
 }

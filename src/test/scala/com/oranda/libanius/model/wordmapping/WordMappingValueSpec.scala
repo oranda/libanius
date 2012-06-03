@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -17,26 +17,38 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
+import com.oranda.libanius.Props
 
 class WordMappingValueSpec extends Specification {
 
   "a word-mapping-value" should {
     
+    val wmvCustomFormat = "nachlösen:7,9;6" 
+    
     val wmvXml = 
       <wordMappingValue value="nachlösen">
         <userAnswers>
-          <userAnswer wasCorrect="true" promptNumber="1"></userAnswer>
           <userAnswer wasCorrect="false" promptNumber="6"></userAnswer>
           <userAnswer wasCorrect="true" promptNumber="7"></userAnswer>
           <userAnswer wasCorrect="true" promptNumber="9"></userAnswer>
         </userAnswers>
       </wordMappingValue>
   
-    val wmv = WordMappingValue.fromXML(wmvXml)
-     
-    "be parseable from XML" in {
+    Props.ANDROID = false
+    
+    val wmv = WordMappingValue.fromCustomFormat(wmvCustomFormat)
+    val wmvFromXml = WordMappingValue.fromXML(wmvXml)
+    
+    "be parseable from custom format" in {
       wmv.value mustEqual "nachlösen"
-      wmv.userAnswers.length mustEqual 4
+      wmv.userAnswers.length mustEqual 3
+      wmv.numCorrectAnswersInARow mustEqual 2
+      wmv.toCustomFormat(new StringBuilder()).toString mustEqual wmvCustomFormat
+    }
+    
+    "be parseable from XML" in {
+      wmvFromXml.value mustEqual "nachlösen"
+      wmvFromXml.userAnswers.length mustEqual 3
     }
     
     "be matchable against another by the first few letters" in {

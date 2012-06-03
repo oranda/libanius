@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -17,6 +17,8 @@
 package com.oranda.libanius.model.questions
 
 import org.specs2.mutable.Specification
+import com.oranda.libanius.Props
+
 
 class QuizOfQuestionsSpec extends Specification {
 
@@ -39,8 +41,11 @@ class QuizOfQuestionsSpec extends Specification {
   </quizItems>
 </quiz>
   
+    Props.ANDROID = false
+    
     val quiz = QuizOfQuestions.fromXML(quizXml)
      
+    
     "be parseable from XML" in {
       quiz.currentPromptNumber mustEqual 0
       quiz.numQuestionItems mustEqual 2

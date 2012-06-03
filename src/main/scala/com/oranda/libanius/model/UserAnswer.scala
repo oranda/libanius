@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -18,12 +18,12 @@ package com.oranda.libanius.model
 
 import com.oranda.libanius.Props
 
-class UserAnswer(val wasCorrect: Boolean, val promptNumber: Int) {
+case class UserAnswer(val wasCorrect: Boolean, val promptNumber: Int) extends ModelComponent {
   
   def toXML =
     <userAnswer wasCorrect={"" + wasCorrect} promptNumber={"" + promptNumber}/>
    
-  def toCustomFormat : String = wasCorrect + "_" + promptNumber
+  def toCustomFormat: String = wasCorrect + "_" + promptNumber
 }
 
 object UserAnswer {

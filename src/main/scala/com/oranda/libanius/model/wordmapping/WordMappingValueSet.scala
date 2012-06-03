@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -16,36 +16,75 @@
 
 package com.oranda.libanius.model.wordmapping
 
+import scala.collection.JavaConversions.collectionAsScalaIterable
+import scala.collection.mutable
 import scala.xml.Unparsed
 import scala.xml.Text
 import scala.util.Random
-import scala.collection.immutable.HashSet
+import android.text.TextUtils
+import android.util.Log
+import com.oranda.libanius.util.StringUtil
+import com.sun.xml.internal.ws.util.StringUtils
+import com.oranda.libanius.util.Platform
+import com.oranda.libanius.model.ModelComponent
 
-case class WordMappingValueSet {
+case class WordMappingValueSet() extends ModelComponent {
     
-  // There will only be a small number of values
-  var values: Set[WordMappingValue] = new HashSet()
+  // A List is a bit faster than a Set when deserializing. High performance is required.
+  var values = List[WordMappingValue]()
   
-  def toXML = {values map (wmv => wmv.toXML ) }   
+  override def toString = values.toString
   
-  def strings: Set[String] = {values map (wmv => wmv.toString ) }
+  def toXML = values map (wmv => wmv.toXML )
+    
+  // Example: contract:696,697;698/treaty:796;798
+  def toCustomFormat(strBuilder: StringBuilder) =
+    StringUtil.mkString(strBuilder, values, wmvToCustomFormat, '/')
+  
+  def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue) =
+    wmv.toCustomFormat(strBuilder)
+    
+  def strings: Iterable[String] = values map (wmv => wmv.toString ) 
   
   def size = values.size
   
-  def numCorrectAnswers : Int = values.foldLeft(0)(_ + _.numCorrectAnswersInARow) 
-    
-  def addWordMappingValue(wordMappingValueOpt: Option[WordMappingValue]) {
-    values += wordMappingValueOpt.getOrElse(wordMappingValueOpt.get)
+  def numItemsAndCorrectAnswers = Pair(size, numCorrectAnswers)
+  
+  def numCorrectAnswers = {
+    /*
+     * This functional version is about twice as slow as the imperative version
+     * 
+     * values.iterator.foldLeft(0)(_ + _.numCorrectAnswersInARow)
+     */
+    var numCorrectAnswers = 0        
+    for (wmv <- values)
+      numCorrectAnswers += wmv.numCorrectAnswersInARow
+    numCorrectAnswers
+  }
+  
+  def addValue(wordMappingValue: WordMappingValue) {
+    if (!values.contains(wordMappingValue))
+      values :+= wordMappingValue
   } 
   
-  def findPresentableWordMappingValue(numCorrectAnswersInARowDesired: Int,
-      diffInPromptNumMinimum: Int, currentPromptNumber: Int): 
-      Option[WordMappingValue] = {
-                
-    values.find(wmv => wmv.isPresentable(
-        numCorrectAnswersInARowDesired, diffInPromptNumMinimum, currentPromptNumber))
+  def deleteValue(wordMappingValue: WordMappingValue): Boolean = {
+    val existed = values.contains(wordMappingValue)
+    values = values.filterNot(_ == wordMappingValue) // values -= wordMappingValue    
+    existed
+  } 
+  
+  def findPresentableWordMappingValue(currentPromptNumber: Int): 
+      Option[WordMappingValue] = {    
+ 
+    def presentableItem(wmv: WordMappingValue, currentPromptNumber: Int): 
+       Option[WordMappingValue] = 
+      if (wmv.isPresentable(currentPromptNumber)) Some(wmv) else None
+   
+    //values.find(_.isPresentable(currentPromptNumber))
+    values.iterator.map(presentableItem(_, currentPromptNumber)).
+        find(_.isDefined).getOrElse(None)
   }
-
+  
     
   def findRandomWordValue(): String = {
     val randomIndex = Random.nextInt(values.size)
@@ -54,15 +93,25 @@ case class WordMappingValueSet {
   }
   
   def containsValue(value: String): Boolean = values.find(_.value == value).isDefined
-  
 }
 
+
+
 object WordMappingValueSet {
+  
+  val wmvSplitter = Platform.getSplitter('/');
+  // Example: contract:696,697;698/treaty:796;798
+  def fromCustomFormat(str: String): WordMappingValueSet =
+    new WordMappingValueSet() {
+      wmvSplitter.setString(str)
+      while (wmvSplitter.hasNext)
+        addValue(WordMappingValue.fromCustomFormat(wmvSplitter.next))
+    }
+    
   def fromXML(node: xml.Node): WordMappingValueSet = {
 	new WordMappingValueSet() {
-	  for (val wordMappingValueXml <- node \\ "wordMappingValue")
-	    addWordMappingValue(Some(WordMappingValue.fromXML(wordMappingValueXml)))
+	  for (wordMappingValueXml <- node \\ "wordMappingValue")
+	    addValue(WordMappingValue.fromXML(wordMappingValueXml))
 	}
   }
-  
 }

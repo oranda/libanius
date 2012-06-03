@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -24,14 +24,14 @@ import com.oranda.libanius.Props
 import com.oranda.libanius.model.Quiz
 
 // This class is old, needs updating
-class QuizOfQuestions(currentPromptNumber: Int) extends Quiz(currentPromptNumber)  {
+class QuizOfQuestions(_currentPromptNumber: Int) extends Quiz(_currentPromptNumber) {
   private[this] val questionItems : LinkedHashSet[QuestionItem] = new LinkedHashSet()
   
   def numQuestionItems = questionItems.size
   
   def toXML =
     <quiz>
-      <currentPromptNumber>{currentPromptNumber}</currentPromptNumber>
+      <currentPromptNumber>{_currentPromptNumber}</currentPromptNumber>
       <QuestionItems>{questionItems map (q => q.toXML) }</QuestionItems>
     </quiz>
 
@@ -79,14 +79,14 @@ class QuizOfQuestions(currentPromptNumber: Int) extends Quiz(currentPromptNumber
 object QuizOfQuestions {
   def fromXML(node: xml.Node): QuizOfQuestions =
 	new QuizOfQuestions(
-	    currentPromptNumber = (node \ "currentPromptNumber").text.toInt) {	    
+	    _currentPromptNumber = (node \ "currentPromptNumber").text.toInt) {	    
 	  val quizItemsXml = (node \ "quizItems")
-	  for (val quizItemXml <- quizItemsXml \\ "quizItem")
+	  for (quizItemXml <- quizItemsXml \\ "quizItem")
 	    addItem(Some(QuestionItem.fromXML(quizItemXml)))
 	}
     
   def fromCustomFormat(strCustomFormat: String): QuizOfQuestions = 
-    new QuizOfQuestions(currentPromptNumber = 0) {
+    new QuizOfQuestions(_currentPromptNumber = 0) {
       val lines = strCustomFormat.split("\\n")
       currentPromptNumber = lines(0).toInt
       lines.foreach(line => if (line.contains("§§")) addItem(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 James McCabe <jamesc@oranda.com>
+ * Copyright 2012 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -17,6 +17,7 @@
 package com.oranda.libanius.model.questions
 
 import org.specs2.mutable.Specification
+import com.oranda.libanius.Props
 
 class QuestionItemSpec extends Specification {
 
@@ -29,6 +30,8 @@ class QuestionItemSpec extends Specification {
   <userAnswers></userAnswers>
 </quizItem>
   
+    step(Props.ANDROID = false)
+    
     val qi = QuestionItem.fromXML(qiXml)
      
     "be parseable from XML" in {

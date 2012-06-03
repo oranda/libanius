@@ -15,24 +15,7 @@
  */
 
 package com.oranda.libanius.model
-import com.oranda.libanius.Props
-import android.util.Log
 
-abstract class Quiz(var currentPromptNumber: Int) extends ModelComponent {
-  
-  def incPromptNumber {
-    currentPromptNumber = currentPromptNumber + 1
-  }
-  
-  def scoreSoFar : BigDecimal = {  // out of 1.0
-    val availableScorePerItem = (1.0 / numItems) / 
-        Props.NUM_CORRECT_ANSWERS_REQUIRED : BigDecimal
-    availableScorePerItem * numCorrectAnswers
-  }  
-  
-  def numItems: Int
-  
-  def numCorrectAnswers: Int  
-  
-  
+abstract class ModelComponent {
+
 }
