@@ -1,0 +1,12 @@
+quizOfWordMappings currentPromptNumber="0"
+wordMappingGroup keyType="English word" valueType="German word"
+en route|unterwegs
+contract|Vertrag
+treaty|Vertrag
+against|wider
+entertain|unterhalten
+wordMappingGroup keyType="German word" valueType="English word"
+unterwegs|en route
+Vertrag|contract/treaty
+wider|against
+unterhalten|entertain
