@@ -101,8 +101,8 @@ class QuizOfWordMappings(_currentPromptNumber: Int)
   def findQuizItem(/*numCorrectAnswersInARowDesired: Int, diffInPromptNum: Int*/): 
       Option[QuizItemViewWithOptions] =
     /*
-     * Just find the first "presentable" word mapping and return it immediately
-     * .iterator is considered to be more efficient than .view here 
+     * Just find the first "presentable" word mapping and return it immediately.
+     * .iterator is considered to be more efficient than .view here.
      */
     wordMappingGroups.iterator.map(_.findPresentableQuizItem(currentPromptNumber)).
         find(_.isDefined).getOrElse(None)  

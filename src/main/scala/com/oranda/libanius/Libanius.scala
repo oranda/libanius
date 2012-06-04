@@ -68,15 +68,6 @@ class Libanius extends Activity with TypedActivity {
     saveQuiz
   }
   
-  /*
-   * This does not work: the QuizOfWordMappings can be re-instantiated 
-   * without onDestroy being called.
-   * 
-  override def onDestroy() { 
-    super.onDestroy()
-    saveQuiz
-  }*/
-  
   def initGui {
     
     setContentView(R.layout.main)
@@ -246,7 +237,7 @@ class Libanius extends Activity with TypedActivity {
   
   def showScore() {
     val scoreSoFar = Util.stopwatch(quiz.scoreSoFar, "scoreSoFar")
-    val quizStr = (quiz.scoreSoFar * 100).toString()
+    val quizStr = (scoreSoFar * 100).toString()
     val quizStrMaxIndex = scala.math.min(quizStr.length(), 6)
     printScore(quizStr.substring(0, quizStrMaxIndex) + "%")
   }

@@ -18,10 +18,6 @@ package com.oranda.libanius.util
 
 import java.lang.Character
 
-trait StringUtil {
-
-}
-
 object StringUtil {
     
   def parseValue(str: String, beginStr: String, endStr: String) = {

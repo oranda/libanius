@@ -24,17 +24,13 @@ trait QuizItemWithUserAnswers extends ModelComponent {
   protected var correctAnswersInARow = List[UserAnswer]()
   protected var incorrectAnswers = List[UserAnswer]()
   
-  // Answers that were correct before a mistake was made: do not store for now
-  // protected var correctAnswersOld = List[UserAnswer]()
-         
-  def userAnswers = /*correctAnswersOld ++*/ correctAnswersInARow ++ incorrectAnswers
+  def userAnswers = correctAnswersInARow ++ incorrectAnswers
   
   def addUserAnswer(userAnswer : UserAnswer) {
     if (userAnswer.wasCorrect) {
       correctAnswersInARow :+= userAnswer 
     } else {
-      //correctAnswersOld ++= correctAnswersInARow
-      correctAnswersInARow = List()
+      correctAnswersInARow = List() // old correct answers are discarded
       incorrectAnswers :+= userAnswer
     }
   }
@@ -55,17 +51,13 @@ trait QuizItemWithUserAnswers extends ModelComponent {
      * it has been answered correctly, and how long ago it was last answered.
      * Try different pairs of values for these criteria until a quiz item fits.
      */
-    val criteriaSets = Seq((1, 5), (2, 40), (3, 800), /*(4, 5000),*/ (0, -1)/*, (-1, -1)*/)
+    val criteriaSets = Seq((1, 5), (2, 40), (3, 800), /*(4, 5000),*/ (0, -1))
     criteriaSets.exists(criteria => 
       isPresentable(currentPromptNum, criteria._1, criteria._2))
   }
   
   def isPresentable(currentPromptNum : Int, 
       numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int): Boolean = { 
-    /*
-    if (numCorrectAnswersInARowDesired == -1    // special case: pick any
-        && numCorrectAnswersInARow < Props.NUM_CORRECT_ANSWERS_REQUIRED)
-      return true*/
     if (numCorrectAnswersInARow != numCorrectAnswersInARowDesired)
       return false
     if (correctAnswersInARow.isEmpty && incorrectAnswers.isEmpty)
@@ -75,10 +67,10 @@ trait QuizItemWithUserAnswers extends ModelComponent {
     return diffInPromptNum >= diffInPromptNumMinimum
   }
   
-  def numCorrectAnswersInARow = correctAnswersInARow.length
+  def isUnfinished: Boolean = 
+    numCorrectAnswersInARow < Props.NUM_CORRECT_ANSWERS_REQUIRED
   
-  //def numCorrectAndIncorrectAnswers = Pair(correctAnswersInARow.length, 
-  //    incorrectAnswers.length)
+  def numCorrectAnswersInARow = correctAnswersInARow.length
   
   def promptNumInLastAnswer: Int = {
     if (!correctAnswersInARow.isEmpty)

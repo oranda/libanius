@@ -6,3 +6,6 @@ resolvers ++= Seq("snapshots" at "http://oss.sonatype.org/content/repositories/s
 addSbtPlugin("org.scala-sbt" % "sbt-android-plugin" % "0.6.1")
 
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.0.0")
+
+
+

@@ -35,7 +35,7 @@ case class WordMappingValueSet() extends ModelComponent {
   
   override def toString = values.toString
   
-  def toXML = values map (wmv => wmv.toXML )
+  def toXML = values map (wmv => wmv.toXML)
     
   // Example: contract:696,697;698/treaty:796;798
   def toCustomFormat(strBuilder: StringBuilder) =
@@ -74,17 +74,11 @@ case class WordMappingValueSet() extends ModelComponent {
   } 
   
   def findPresentableWordMappingValue(currentPromptNumber: Int): 
-      Option[WordMappingValue] = {    
- 
-    def presentableItem(wmv: WordMappingValue, currentPromptNumber: Int): 
-       Option[WordMappingValue] = 
-      if (wmv.isPresentable(currentPromptNumber)) Some(wmv) else None
-   
-    //values.find(_.isPresentable(currentPromptNumber))
-    values.iterator.map(presentableItem(_, currentPromptNumber)).
-        find(_.isDefined).getOrElse(None)
-  }
+      Option[WordMappingValue] = 
+    values.iterator.find(_.isPresentable(currentPromptNumber))
   
+  def findAnyUnfinishedWordMappingValue: Option[WordMappingValue] = 
+    values.iterator.find(_.isUnfinished)    
     
   def findRandomWordValue(): String = {
     val randomIndex = Random.nextInt(values.size)
@@ -94,7 +88,6 @@ case class WordMappingValueSet() extends ModelComponent {
   
   def containsValue(value: String): Boolean = values.find(_.value == value).isDefined
 }
-
 
 
 object WordMappingValueSet {

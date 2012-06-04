@@ -21,6 +21,10 @@ class StringSplitterAndroid(_char: Character) extends StringSplitter(_char) {
   override def next: String = splitter.next
 }
 
+/*
+ * Created to have a similar interface to the Android splitter, but done in
+ * regular Scala/Java. It will be slower, but will work for unit tests.
+ */
 class StringSplitterDefault(_char: Character) extends StringSplitter(_char) {
 
   private var iter: Iterator[String] = _

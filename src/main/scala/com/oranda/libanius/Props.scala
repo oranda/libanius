@@ -17,17 +17,16 @@
 package com.oranda.libanius
 
 object Props {
-  val TEST = false
   
   var ANDROID = true
   
   val fileVocab = "vocabGer10k.txt"
   
-  val fileQuizRoot = "quizGer10k" //"quizTestData.xml"
+  val fileQuizRoot = "quizGer10k" //"quizGer10k" 
   
   val fileQuiz = fileQuizRoot + ".qui"
   
-  val fileQuizLastBackup = "quizTestData.xml"
+  val fileQuizLastBackup = fileQuizRoot + "Backup" + ".qui"
   
   val NUM_CORRECT_ANSWERS_REQUIRED = 4 // 5
 }

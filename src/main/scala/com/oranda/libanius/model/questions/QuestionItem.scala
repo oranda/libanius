@@ -39,7 +39,6 @@ class QuestionItem extends QuizItemWithUserAnswers {
     addUserAnswer(newAnswer)
   }
   
-  
   def evaluateUserAnswer(promptNum : Int, userAnswerStr : String) : Boolean = {
 
     val wasCorrectAnswer = isCorrect(userAnswerStr);
@@ -55,9 +54,7 @@ class QuestionItem extends QuizItemWithUserAnswers {
     if (userAnswerStr == correctAnswer)
       return true
     var correctAnswerMod = correctAnswer
-    //if (correctAnswerMod.contains("(")) {
-    //  correctAnswerMod = correctAnswerMod.substring(0, correctAnswerMod.indexOf("("))
-    //}
+    
     if (correctAnswerMod.contains("/")) {
       correctAnswerMod = correctAnswerMod.substring(0, correctAnswerMod.indexOf("/"))
     }
@@ -71,16 +68,13 @@ class QuestionItem extends QuizItemWithUserAnswers {
     userAnswerStrMod = userAnswerStrMod.trim
     correctAnswerMod = correctAnswerMod.trim
     
-    //if (correctAnswerMod.contains(" ")) {
-      correctAnswerMod = correctAnswerMod.toLowerCase()
-      userAnswerStrMod = userAnswerStrMod.toLowerCase()      
-    //}
+    correctAnswerMod = correctAnswerMod.toLowerCase()
+    userAnswerStrMod = userAnswerStrMod.toLowerCase()  
       
     // Capture all Strings outside brackets. It will be the 1st group in each match.
     // Test here:  http://blog.logiclabz.com/tools/online-regex-checker.aspx
     val pattern = new Regex("""([\s|\w]+)(\(|\z)""")
     val matchIter = pattern.findAllIn(correctAnswerMod)
-    //val data = matchIter.matchData.toList
     val correctAnswerRequiredParts 
     		= matchIter.matchData.toList map { m => m.subgroups(0).trim()}
     var userAnswerRemainder = userAnswerStrMod

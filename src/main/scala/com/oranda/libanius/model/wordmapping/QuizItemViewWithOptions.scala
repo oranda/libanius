@@ -31,5 +31,4 @@ case class QuizItemViewWithOptions(val keyWord: String,
     val allOptions = otherOptions + wordMappingValue.value
     Random.shuffle(allOptions)
   }
-  
 }

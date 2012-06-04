@@ -1,0 +1,24 @@
+== 0.4  June 4 2012
+
+ * Removed performance bottlenecks, allowing Libanius to work comfortably with 20,000 quiz items, 
+  not just 1,000:
+
+  1. Experimented with various collections to find the fastest ones. E.g. the Java HashMap 
+    is faster than the Scala mutable HashMap 
+  2. For persistence, moved from using XML (very slow on Android) to a custom format. 
+    (Also considered using SQLite, but the paradigm shift for this app would be too great.)
+  3. Parsing the custom format uses Android's own StringSplitter rather than the slow String.split()
+  4. The writing of the custom format uses a single StringBuilder which is passed to all model objects.
+
+
+== 0.3  May 2012
+
+ * Overhauled the Android GUI to a multiple choice format
+
+== 0.2  late 2011
+
+ * Quiz functionality in Scala on Android
+
+== 0.1  mid-2011
+
+ * Quiz functionality in Scala on a desktop

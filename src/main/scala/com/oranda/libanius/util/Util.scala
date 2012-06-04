@@ -19,10 +19,6 @@ package com.oranda.libanius.util
 import android.util.Log
 import java.lang.Character
 
-trait Util {
-
-}
-
 object Util {
   
   def stopwatch[X](fn: => X, actionDescription: String): X = {

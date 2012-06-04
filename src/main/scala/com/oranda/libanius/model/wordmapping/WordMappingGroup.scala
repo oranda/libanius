@@ -66,7 +66,7 @@ case class WordMappingGroup(val keyType: String, val valueType: String)
     strBuilder
   }
 
-    
+  def size = wordMappings.size  
   def numKeyWords = wordMappings.size
 
   def numValues = wordMappingsAsScala.values.iterator.foldLeft(0)(_ + _.size)
@@ -129,61 +129,38 @@ case class WordMappingGroup(val keyType: String, val valueType: String)
   
   
   def findPresentableQuizItem(currentPromptNumber: Int): 
-      Option[QuizItemViewWithOptions] = {  
-    /*
-     * To ensure we are not retrieving the same value set each time, split the
-     * wordMappings by creating iterators at random points. If the user is near
-     * finishing the quiz, then potentially all iterators can be traversed
-     * until one of the last presentable quiz items is found.
-     */
-    /*val preferredIterGroupSize = Random.nextInt(wordMappingsAsScala.size) / 4
-    val minIterGroupSize = wordMappingsAsScala.size / 40
-    val randomPartitionPoint = Math.max(minIterGroupSize, preferredIterGroupSize)
-    val iterGroups = wordMappingsAsScala.iterator.grouped(randomPartitionPoint)
-    iterGroups.map(iterGroup => 
-        findPresentableQuizItem(iterGroup, currentPromptNumber)).find(_.isDefined).get
-        
-    map(entry => 
-          findPresentableQuizItem(entry._1, entry._2, currentPromptNumber)).
-          find(_.isDefined).get
-    */
+      Option[QuizItemViewWithOptions] = 
     wordMappingsAsScala.iterator.map(entry => 
           findPresentableQuizItem(entry._1, entry._2, currentPromptNumber)).
-          find(_.isDefined).get  
-      
-    /*
-    Fallback: imperative version:
-    
-    for (iterGroup <- iterGroups.toList) {
-      val quizItemOpt = iterGroup.reverseIterator.map(entry => 
-          findPresentableQuizItem(entry._1, entry._2, currentPromptNumber)).
-          find(_.isDefined)
-      if (quizItemOpt.get.isDefined)
-        return quizItemOpt.get
-    } 
-    None
-    */    
-  }
-  /*
-  def findPresentableQuizItem(iterGroup: Seq[(String, WordMappingValueSet)],
-      currentPromptNumber: Int): Option[QuizItemViewWithOptions] =
-    iterGroup.reverseIterator.map(entry => 
-          findPresentableQuizItem(entry._1, entry._2, currentPromptNumber)).
-          find(_.isDefined).get
-  */
-  def findPresentableQuizItem(key: String, wordMappingValues: WordMappingValueSet,
-      currentPromptNumber: Int): Option[QuizItemViewWithOptions] = {
+          find(_.isDefined).getOrElse(findAnyUnfinishedQuizItem)
 
-    Platform.log("Libanius", "findPresentableQuizItem " + key)
+  private def findPresentableQuizItem(key: String, wordMappingValues: WordMappingValueSet,
+      currentPromptNumber: Int): Option[QuizItemViewWithOptions] = {
     val wordMappingValueOpt = wordMappingValues.findPresentableWordMappingValue(
         currentPromptNumber)
+    wordMappingValueOpt match {
+      case Some(wordMappingValue) => Some(Util.stopwatch(quizItemWithOptions(key, 
+          wordMappingValues, wordMappingValue), 
+          "quizItemWithOptions for " + wordMappingValue))
+      case _ => None
+    }
+  }
+  
+  def findAnyUnfinishedQuizItem: Option[QuizItemViewWithOptions] =
+    wordMappingsAsScala.iterator.map(entry => 
+          findAnyUnfinishedQuizItem(entry._1,  entry._2)).
+          find(_.isDefined).getOrElse(None)
+
+  private def findAnyUnfinishedQuizItem(key: String, 
+      wordMappingValues: WordMappingValueSet): Option[QuizItemViewWithOptions] = {
+    val wordMappingValueOpt = wordMappingValues.findAnyUnfinishedWordMappingValue
     wordMappingValueOpt match {
       case Some(wordMappingValue) => Some(quizItemWithOptions(key, 
           wordMappingValues, wordMappingValue))
       case _ => None
     }
   }
-      
+    
   private def quizItemWithOptions(key: String, wordMappingValues: WordMappingValueSet, 
       wordMappingValueCorrect: WordMappingValue): QuizItemViewWithOptions = {
     val numCorrectAnswers = wordMappingValueCorrect.numCorrectAnswersInARow
@@ -212,9 +189,8 @@ case class WordMappingGroup(val keyType: String, val valueType: String)
     // try again to fill the falseAnswers
     var totalTries = 20 // to stop any infinite loop
     while (falseAnswers.size < numFalseAnswersRequired && totalTries > 0) {
-      Platform.log("Libanius", "looking for random word")
       totalTries = totalTries - 1
-      val randomAnswer = findRandomWordValue(randomValues(100))
+      val randomAnswer = findRandomWordValue(randomValues(100)) 
       if (!wordMappingCorrectValues.containsValue(randomAnswer))
          falseAnswers += randomAnswer
     }
@@ -244,7 +220,7 @@ case class WordMappingGroup(val keyType: String, val valueType: String)
                       similarWords += wmv.value
                 }
             })
-    Platform.log("Libanius", "numValueSetsSearched: " + numValueSetsSearched)
+    //Platform.log("Libanius", "numValueSetsSearched: " + numValueSetsSearched)
 
     similarWords
   }  
@@ -260,11 +236,14 @@ case class WordMappingGroup(val keyType: String, val valueType: String)
   
   def randomValues(sliceSize: Int) = combineValueSets(randomSliceOfValueSets(sliceSize))
   
-  def randomSliceOfValueSets(sliceSize: Int) = {
-    val actualSliceSize = scala.math.min(wordMappingsAsScala.values.size, sliceSize)
-    val randomStart = Random.nextInt(wordMappingsAsScala.values.size - actualSliceSize)
-    wordMappingsAsScala.values.slice(randomStart, randomStart + actualSliceSize).
-        toArray[WordMappingValueSet]
+  def randomSliceOfValueSets(sliceSize: Int): Iterable[WordMappingValueSet] = {
+    if (sliceSize >= size)
+      wordMappingsAsScala.values
+    else {
+      val randomStart = Random.nextInt(size - sliceSize)
+      wordMappingsAsScala.values.slice(randomStart, randomStart + sliceSize).
+          toArray[WordMappingValueSet]
+    }
   }
   
   def combineValueSets(valueSets: Iterable[WordMappingValueSet]) =  
@@ -298,8 +277,10 @@ object WordMappingGroup {
         
         if (linesSplit.hasNext) {
           val strKey = linesSplit.next
-          val strValues = linesSplit.next
-          addWordMapping(strKey, WordMappingValueSet.fromCustomFormat(strValues))
+          if (linesSplit.hasNext) {
+            val strValues = linesSplit.next
+            addWordMapping(strKey, WordMappingValueSet.fromCustomFormat(strValues))
+          }
         }
       }
     }

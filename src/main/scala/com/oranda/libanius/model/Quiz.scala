@@ -33,6 +33,4 @@ abstract class Quiz(var currentPromptNumber: Int) extends ModelComponent {
   def numItems: Int
   
   def numCorrectAnswers: Int  
-  
-  
 }

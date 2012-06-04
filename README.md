@@ -9,7 +9,7 @@ The implementation is in Scala. The primary target platform is Android.
 
 Suggestions for new features and code improvements will be happily received by:
 
-James McCabe <jamesc@oranda.com>
+James McCabe <james@oranda.com>
 
 
 Screenshot

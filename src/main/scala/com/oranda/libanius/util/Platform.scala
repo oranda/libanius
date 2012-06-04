@@ -26,10 +26,6 @@ import android.util.Log
 /*
  * Encapsulate platform-specific code.
  */
-trait Platform {
-      
-}
-
 object Platform {
  
   def getSplitter(char: java.lang.Character): StringSplitter =

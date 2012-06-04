@@ -58,16 +58,7 @@ case class WordMappingValue(val value: String) extends QuizItemWithUserAnswers {
   def hasSameEnd(otherValue: String) = 
     (numOfLetters: Int) => otherValue != value && 
         value.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
-  
-  /*
-  def parseAndAddAnswers(strAnswers: String, isCorrect: Boolean,
-      answersSplitter: StringSplitter) = {
-    answersSplitter.setString(strAnswers)
-    while (answersSplitter.hasNext)
-      addUserAnswer(UserAnswer(
-          wasCorrect = isCorrect, promptNumber = answersSplitter.next.toInt))
-  }
-  */
+
 }
 
 object WordMappingValue {
@@ -100,17 +91,6 @@ object WordMappingValue {
             } else
               List()
         addUserAnswersBatch(correctAnswers, incorrectAnswers)    
-        
-        /* 
-         * Approach of adding the answers one at a time:
-         * 
-        // correctAnswers:
-        parseAndAddAnswers(allAnswersSplitter.next, true, answersSplitter) 
-        // incorrectAnswers:
-        if (allAnswersSplitter.hasNext) {
-          parseAndAddAnswers(allAnswersSplitter.next, false, answersSplitter) 
-        }
-        */
       }
     }
   }
