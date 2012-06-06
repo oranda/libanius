@@ -33,6 +33,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import java.io.File
 
 class Libanius extends Activity with TypedActivity {
 
@@ -82,22 +83,37 @@ class Libanius extends Activity with TypedActivity {
     prevQuestionLabel = findView(TR.prevQuestion)
     prevAnswerOption1Label = findView(TR.prevAnswerOption1)
     prevAnswerOption2Label = findView(TR.prevAnswerOption2)
-    prevAnswerOption3Label = findView(TR.prevAnswerOption3)
-    
+    prevAnswerOption3Label = findView(TR.prevAnswerOption3)    
   }
   
-  def readQuiz : QuizOfWordMappings = {
-      
-    printStatus("Reading quiz data...")
-    val fileText = AndroidIO.readFile(this, Props.fileQuiz)
-      
-    val quiz = Util.stopwatch(QuizOfWordMappings.fromCustomFormat(fileText), 
-        "reading and parsing quiz")      
+  def readQuiz: QuizOfWordMappings = {
     
-    printStatus("Finished reading " + quiz.numItems + " quiz items!")
+    printStatus("Reading quiz data...")
+    val fileText =
+      if (new File(Props.fileQuiz).exists)
+        try {
+          // TODO: consider changing to Platform.readFile
+          AndroidIO.readFile(this, Props.fileQuiz)
+        } catch { 
+          // for security access exceptions or anything else unexpected
+          case e: Exception => makeDemoQuiz 
+        }
+      else
+        makeDemoQuiz
+      
+    val quiz = Util.stopwatch(QuizOfWordMappings.fromCustomFormat(fileText),
+        "reading and parsing quiz")      
+    val msg = "Finished reading " + quiz.numItems + " quiz items!"
+    Platform.log("Libanius", msg)
+    printStatus(msg)
     return quiz
   }
   
+  def makeDemoQuiz: String = {
+    Platform.log("Libanius", "Problem accessing " + Props.fileQuiz + ". Using demo data")
+    printStatus("No file: using demo data")
+    QuizOfWordMappings.demoDataInCustomFormat
+  }
   
   def testUserWithQuizItem() { 
     

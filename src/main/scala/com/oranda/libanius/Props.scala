@@ -22,7 +22,7 @@ object Props {
   
   val fileVocab = "vocabGer10k.txt"
   
-  val fileQuizRoot = "quizGer10k" //"quizGer10k" 
+  val fileQuizRoot = "quizGer10k"  // "quizTestData"
   
   val fileQuiz = fileQuizRoot + ".qui"
   

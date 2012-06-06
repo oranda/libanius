@@ -137,6 +137,22 @@ object QuizOfWordMappings {
         addWordMappingGroup(WordMappingGroup.fromCustomFormat(wmgStr)) 
     }
 
+  // Demo data to use as a fallback if no file is available
+  def demoDataInCustomFormat =
+    "quizOfWordMappings currentPromptNumber=\"0\"\n" +
+    "wordMappingGroup keyType=\"English word\" valueType=\"German word\"\n" +
+    "en route|unterwegs\n" +
+    "contract|Vertrag\n" +
+    "treaty|Vertrag\n" +
+    "against|wider\n" +
+    "entertain|unterhalten\n" +
+    "wordMappingGroup keyType=\"German word\" valueType=\"English word\"\n" +
+    "unterwegs|en route\n" +
+    "Vertrag|contract/treaty\n" +
+    "wider|against\n" +
+    "unterhalten|entertain"
+ 
+  
   def parseCurrentPromptNumber(str: String) = 
     StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt
     

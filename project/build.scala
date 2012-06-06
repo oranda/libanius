@@ -17,8 +17,8 @@ object General {
 
   val settings = Defaults.defaultSettings ++ Seq (
     name := "Libanius",
-    version := "0.4",
-    versionCode := 0,
+    version := "0.42",
+    versionCode := 42,
     scalaVersion := "2.9.1",
     platformName in Android := "android-8",
     scalacOptions += "-deprecation"
@@ -26,9 +26,8 @@ object General {
     //libraryDependencies += robospecs
   )
 
-
   val proguardSettings = Seq (
-    useProguard in Android := false  // enable for deploy to device
+    useProguard in Android := true  // enable for deploy to device
   )
 
   lazy val fullAndroidSettings =
@@ -38,7 +37,7 @@ object General {
     proguardSettings ++
     AndroidManifestGenerator.settings ++
     AndroidMarketPublish.settings ++ Seq (
-      keyalias in Android := "change-me",
+      keyalias in Android := "alias_name",
       libraryDependencies ++= Seq("org.specs2" %% "specs2" % "1.9" % "test")
     )
 

@@ -12,6 +12,15 @@ Suggestions for new features and code improvements will be happily received by:
 James McCabe <james@oranda.com>
 
 
+Install
+=======
+
+On your Android phone, use Play Store to search for Libanius, and follow the instructions. In
+case you don't find it, the URL is:
+
+https://play.google.com/store/apps/details?id=com.oranda.libanius
+
+
 Screenshot
 ==========
 ![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshot.png)
