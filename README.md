@@ -20,6 +20,8 @@ case you don't find it, the URL is:
 
 https://play.google.com/store/apps/details?id=com.oranda.libanius
 
+This includes demo data.
+
 
 Screenshot
 ==========
