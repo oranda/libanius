@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+  <LinearLayout
+    android:id="@+id/searchLayout"
+    android:orientation="horizontal"
+	android:layout_width="fill_parent"
+    android:layout_height="wrap_content" 
+  >
+    <TextView
+      android:id="@+id/searchLabel"
+      android:singleLine="true"
+   	  android:layout_width="wrap_content"
+      android:layout_height="wrap_content" 
+      android:text="Search dictionary: "
+    />
+    <EditText
+	  android:id="@+id/searchInput"
+	  android:singleLine="true"
+	  android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+    />
+  </LinearLayout>
+  <TextView
+    android:id="@+id/status"
+    android:singleLine="true"
+	android:layout_width="fill_parent"
+    android:layout_height="wrap_content" 
+    android:text=" "
+  />
+  <LinearLayout
+    android:id="@+id/searchResults0"
+    android:orientation="horizontal"
+	android:layout_width="fill_parent"
+    android:layout_height="wrap_content" 
+  />	
+  <LinearLayout
+    android:id="@+id/searchResults1"
+    android:orientation="horizontal"
+	android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+  />
+  <LinearLayout
+    android:id="@+id/searchResults2"
+    android:orientation="horizontal"
+	android:layout_width="fill_parent"
+    android:layout_height="wrap_content" 
+  />	 
+</LinearLayout>
+
