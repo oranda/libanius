@@ -1,3 +1,9 @@
+== 0.5  July 20 2012
+
+ * Added a dictionary screen, so that words can be looked up and added to the 
+  (front of the) quiz by the user.
+ 
+ 
 == 0.4  June 4 2012
 
  * Removed performance bottlenecks, allowing Libanius to work comfortably with 20,000 quiz items, 
@@ -15,9 +21,11 @@
 
  * Overhauled the Android GUI to a multiple choice format
 
+
 == 0.2  late 2011
 
  * Quiz functionality in Scala on Android
+
 
 == 0.1  mid-2011
 
