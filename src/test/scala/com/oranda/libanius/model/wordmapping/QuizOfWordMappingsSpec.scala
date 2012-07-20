@@ -21,7 +21,7 @@ import com.oranda.libanius.io.StandardIO
 import com.oranda.libanius.Props
 
 class QuizOfWordMappingsSpec extends Specification {
-
+  
   "a quiz of word-mappings" should {
     
     val quizCustomFormat = "quizOfWordMappings currentPromptNumber=\"0\"\n" +
@@ -106,6 +106,8 @@ class QuizOfWordMappingsSpec extends Specification {
     val quiz = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
     val quizFromXml = QuizOfWordMappings.fromXML(quizXml)
     
+    sequential 
+    
     "be parseable from custom format" in {
       quiz.currentPromptNumber mustEqual 0
       val wmg = quiz.findWordMappingGroup(keyType = "German word", 
@@ -137,7 +139,7 @@ class QuizOfWordMappingsSpec extends Specification {
     
     "allow key-words to be deleted from a particular group" in {
       val quizLocal = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
-      quizLocal.deleteWord("full", "English word", "German word")
+      quizLocal.removeWord("full", "English word", "German word")
       val wmg = quizLocal.findWordMappingGroup(keyType = "English word", 
           valueType = "German word").get
       wmg.contains("full") mustEqual false
@@ -146,7 +148,7 @@ class QuizOfWordMappingsSpec extends Specification {
     "contain unique groups only" in {
       val quizLocal = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
       quizLocal.numGroups mustEqual 2 // precondition
-      val wmg = WordMappingGroup("English word", "German word")
+      val wmg = WordMappingGroupReadWrite("English word", "German word")
       quizLocal.addWordMappingGroup(wmg) // should have no effect
       quizLocal.numGroups mustEqual 2
     }
@@ -164,7 +166,7 @@ class QuizOfWordMappingsSpec extends Specification {
       val quiz = QuizOfWordMappings.fromCustomFormat(fileText)        
       val endParse = System.currentTimeMillis()
       println("Time to parse: " + (endParse - startParse))
-      endParse - startParse must be<(2000L)
+      endParse - startParse must be<(2500L)
     }
   }
 }

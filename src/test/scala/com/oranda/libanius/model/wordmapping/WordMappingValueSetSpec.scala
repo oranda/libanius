@@ -48,6 +48,7 @@ class WordMappingValueSetSpec extends Specification {
     val wmvs = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat) 
     val wmvsFromXml = WordMappingValueSet.fromXML(wmvsXml)
     
+    sequential 
     
     "be parseable from custom format" in {
       wmvs.containsValue("treaty")
@@ -66,18 +67,14 @@ class WordMappingValueSetSpec extends Specification {
       wmvsLocal.size mustEqual 3
     }
     
-   
-    /* TODO
     "identify a word-mapping-value that is presentable in the context of the quiz" in {
       val wmvsLocal = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
       val correctAnswers = wmvsLocal.numCorrectAnswers
       val wmvOpt = wmvsLocal.findPresentableWordMappingValue(
-          numCorrectAnswersInARowDesired = 1, diffInPromptNumMinimum = 2, 
-          currentPromptNumber = 700)
+          currentPromptNumber = 800)
       wmvOpt.isDefined mustEqual true
       wmvOpt.get.value mustEqual "contract"
-    }*/
-      
+    }      
   }
   
 }  

@@ -1,29 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--  
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content">
-
-  <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-</LinearLayout>
-
-  -->
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >    
- 
+    >
   <LinearLayout 
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="20px" 
+    android:layout_weight="5"
     >
 	<TextView
 	  android:id="@+id/status"
@@ -31,41 +17,91 @@
 	  android:layout_width="0dp"
 	  android:layout_weight="72"
 	  android:layout_height="wrap_content"
-      android:textSize="20px"
-	  android:textColor="#7777FF"
-	 /> <!--  status is used also for the score -->
+      android:textSize="13sp"
+	  android:textColor="#9999FF"
+	/> <!--  status is used also for the score -->
 	<TextView
 	  android:id="@+id/speed"
 	  android:singleLine="true"
 	  android:layout_width="0dp"
 	  android:layout_weight="28"
 	  android:layout_height="wrap_content"
-      android:textSize="20px"
-	  android:textColor="#7777FF"
-	 />
+      android:textSize="13sp"
+	  android:textColor="#9999FF"
+	/>
   </LinearLayout>
-  <LinearLayout 
+  <LinearLayout
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"    
-    android:layout_weight="2"
+    android:layout_weight="75"
     android:layout_gravity="center_horizontal"
     >
-    <TextView
-      android:id="@+id/question"
-      android:singleLine="true"
-	  android:layout_width="fill_parent"
-      android:layout_height="wrap_content"  
-      android:layout_weight="1"
-      android:gravity="center_horizontal"
-      android:textSize="30px"
-      android:padding="0px"      
-      android:layout_marginBottom="10px" 
-    />
+    <!--  <View
+      android:layout_width="fill_parent"
+      android:layout_height="1dp"
+      android:background="@android:color/darker_gray"
+      android:layout_marginBottom="10px"
+    />-->
+    <LinearLayout 
+      android:orientation="horizontal"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="5dp"
+      >
+      <Button
+        android:id="@+id/gotoDictionaryButton"
+        style="?android:attr/buttonStyleSmall"
+	    android:layout_width="0dp"
+	    android:layout_weight="15"
+        android:layout_height="wrap_content"
+        android:text="DICT"
+        android:textSize="12sp"
+	    android:textColor="#AAAA00"	    
+        android:textStyle="bold"
+        android:onClick="gotoDictionary" 
+      />  <!--  
+      <Button
+        android:id="@+id/saveButton"
+        style="?android:attr/buttonStyleSmall"
+	    android:layout_width="0dp"
+	    android:layout_weight="15"
+        android:layout_height="wrap_content"
+        android:text="SAVE"
+        android:textSize="12sp"
+	    android:textColor="#AAAA00"	    
+        android:textStyle="bold"
+        android:onClick="saveQuiz" 
+      />  -->
+      <TextView
+        android:id="@+id/question"
+        android:singleLine="true"
+	    android:layout_width="0dp"
+	    android:layout_weight="55"
+        android:layout_height="wrap_content" 
+        android:gravity="center_horizontal"
+        android:textSize="20sp"
+        android:padding="0px"      
+        android:layout_marginBottom="5dp" 
+      />    
+	  <Button
+        android:id="@+id/deleteButton"
+        style="?android:attr/buttonStyleSmall"
+	    android:layout_width="0dp"
+	    android:layout_weight="15"
+        android:layout_height="wrap_content"
+        android:text="DEL"
+        android:textSize="12sp"
+	    android:textColor="#FF8888"	    
+        android:textStyle="bold"
+        android:onClick="removeCurrentWord" 
+      />
+    </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
       android:layout_width="fill_parent"
       android:layout_height="20dp"
-      android:layout_marginBottom="20px">   
+      android:layout_marginBottom="10dp"
+      android:layout_weight="5">
       <TextView
         android:id="@+id/questionNotes"
         android:singleLine="true"
@@ -73,18 +109,7 @@
         android:layout_height="wrap_content"  
         android:layout_weight="1"
         android:gravity="center_horizontal"
-        android:textSize="15px"
-      />
-	 <Button
-        android:id="@+id/deleteButton"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_height="fill_parent"
-        android:layout_width="wrap_content"
-        android:text="X"
-        android:textSize="10px"
-	    android:textColor="#ff0000"	    
-        android:textStyle="bold"
-        android:onClick="deleteCurrentWord" 
+        android:textSize="12sp"
       />
     </LinearLayout>
 
@@ -92,82 +117,84 @@
       android:id="@+id/answerOption1"
       android:layout_height="wrap_content"
       android:layout_width="fill_parent"
-      android:layout_weight="1"
-      android:gravity="center_horizontal"
-      android:padding="40px"
-      android:textSize="30px"
+      android:layout_weight="20"
+      android:gravity="center"
+      android:textSize="20sp"
 	  android:textColor="#000000"
-      android:layout_marginBottom="30px" 
+      android:layout_marginBottom="18dp"
       android:onClick="answerOption1Clicked" 
     />
     <Button
       android:id="@+id/answerOption2"
       android:layout_height="wrap_content"
       android:layout_width="fill_parent"
-      android:layout_weight="1"
-      android:gravity="center_horizontal"
-      android:padding="40px"
-      android:textSize="30px"
+      android:layout_weight="20"
+      android:gravity="center"
+      android:textSize="20sp"
 	  android:textColor="#000000"
-      android:layout_marginBottom="30px" 
-      android:onClick="answerOption2Clicked" />
+      android:layout_marginBottom="18dp"
+      android:onClick="answerOption2Clicked" 
+    />
     <Button
       android:id="@+id/answerOption3"
       android:layout_height="wrap_content"
       android:layout_width="fill_parent"
-      android:layout_weight="1"
-      android:gravity="center_horizontal"
-      android:padding="40px"
-      android:textSize="30px"
+      android:layout_weight="20"
+      android:gravity="center"
+      android:textSize="20sp"
 	  android:textColor="#000000"
-      android:layout_marginBottom="10px" 
-      android:onClick="answerOption3Clicked" />
-      
+      android:layout_marginBottom="18dp"
+      android:onClick="answerOption3Clicked" 
+    />
   </LinearLayout>
   <LinearLayout 
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"   
-    android:layout_weight="1"
-    android:layout_gravity="center_horizontal"
-    >    
+    android:layout_height="wrap_content"
+    android:layout_weight="20"
+  >
     <TextView
       android:id="@+id/prevQuestion"
-      android:singleLine="true"
-	  android:layout_width="fill_parent"
+	  android:layout_width="0dp"
       android:layout_height="wrap_content"  
-      android:layout_weight="1"
+      android:layout_weight="40"        
+      android:layout_marginRight="5px" 
       android:textStyle="italic"
-      android:gravity="center_horizontal"
-      android:padding="10px"
-    />      
-    <TextView
-	  android:id="@+id/prevAnswerOption1"
-  	  android:singleLine="true"
-	  android:layout_width="fill_parent"
-	  android:layout_height="wrap_content"
-	  android:textStyle="italic"
-      android:gravity="center_horizontal"
-	  android:textColor="#FFFFFF"
-    /> 
-    <TextView
-	  android:id="@+id/prevAnswerOption2"
-	  android:singleLine="true"
-	  android:layout_width="fill_parent"
-	  android:layout_height="wrap_content"
-	  android:textStyle="italic"
-      android:gravity="center_horizontal"
-	  android:textColor="#FFFFFF"
-    /> 
-    <TextView
-	  android:id="@+id/prevAnswerOption3"
-	  android:singleLine="true"
-	  android:layout_width="fill_parent"
-	  android:layout_height="wrap_content"
-	  android:textStyle="italic"
-      android:gravity="center_horizontal"
-	  android:textColor="#FFFFFF"
-    /> 
+    />   
+    <LinearLayout 
+      android:orientation="vertical"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"   
+      android:layout_weight="60"
+    >    
+      <TextView
+	    android:id="@+id/prevAnswerOption1"
+  	    android:singleLine="true"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+        android:textSize="14sp"
+	    android:textStyle="italic"
+	    android:textColor="#FFFFFF"
+      /> 
+      <TextView
+	    android:id="@+id/prevAnswerOption2"
+	    android:singleLine="true"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+        android:textSize="14sp"
+	    android:textStyle="italic"
+	    android:textColor="#FFFFFF"
+      /> 
+      <TextView
+	    android:id="@+id/prevAnswerOption3"
+	    android:singleLine="true"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+        android:textSize="14sp"
+	    android:textStyle="italic"
+	    android:textColor="#FFFFFF"
+      /> 
+    </LinearLayout>
   </LinearLayout>
 </LinearLayout>
 

@@ -45,6 +45,7 @@ class QuizOfQuestionsSpec extends Specification {
     
     val quiz = QuizOfQuestions.fromXML(quizXml)
      
+    sequential 
     
     "be parseable from XML" in {
       quiz.currentPromptNumber mustEqual 0

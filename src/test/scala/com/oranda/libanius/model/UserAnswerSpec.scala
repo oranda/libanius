@@ -21,7 +21,7 @@ import org.specs2.mutable.Specification
 import com.oranda.libanius.Props
 
 class UserAnswerSpec extends Specification {
-
+  
   "a user answer" should {
     
     Props.ANDROID = false
@@ -29,6 +29,8 @@ class UserAnswerSpec extends Specification {
     val uaXml = <userAnswer wasCorrect="true" promptNumber="1"></userAnswer>
   
     val ua = UserAnswer.fromXML(uaXml)
+    
+    sequential 
     
     "be parseable from XML" in {
       ua.wasCorrect == true

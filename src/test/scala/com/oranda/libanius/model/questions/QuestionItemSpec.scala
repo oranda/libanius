@@ -30,10 +30,12 @@ class QuestionItemSpec extends Specification {
   <userAnswers></userAnswers>
 </quizItem>
   
-    step(Props.ANDROID = false)
+    Props.ANDROID = false
     
     val qi = QuestionItem.fromXML(qiXml)
-     
+    
+    sequential 
+    
     "be parseable from XML" in {
       qi.question mustEqual "What is the name for the system of linked documents on the Internet?"
       qi.correctAnswer mustEqual "(The World Wide) Web"

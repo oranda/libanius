@@ -20,7 +20,7 @@ import org.specs2.mutable.Specification
 import com.oranda.libanius.Props
 
 class WordMappingValueSpec extends Specification {
-
+  
   "a word-mapping-value" should {
     
     val wmvCustomFormat = "nachlösen:7,9;6" 
@@ -38,6 +38,8 @@ class WordMappingValueSpec extends Specification {
     
     val wmv = WordMappingValue.fromCustomFormat(wmvCustomFormat)
     val wmvFromXml = WordMappingValue.fromXML(wmvXml)
+    
+    sequential 
     
     "be parseable from custom format" in {
       wmv.value mustEqual "nachlösen"
