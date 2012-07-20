@@ -8,14 +8,13 @@ object GlobalState {
   var quiz: Option[QuizOfWordMappings] = None
   var dictionary: Option[WordMappingGroupReadOnly] = None
   
-  def initQuiz(quiz: QuizOfWordMappings) {
+  def initQuiz(fn: => QuizOfWordMappings) {
 	if (!GlobalState.quiz.isDefined)
-	  this.quiz = Some(quiz)
+	  this.quiz = Some(fn)
   }
   
-  def initDictionary(dictionary: WordMappingGroupReadOnly) {
+  def initDictionary(fn: => WordMappingGroupReadOnly) {
 	if (!GlobalState.dictionary.isDefined)
-	  this.dictionary = Some(dictionary)    
-  }
-  
+	  this.dictionary = Some(fn)    
+  } 
 }
