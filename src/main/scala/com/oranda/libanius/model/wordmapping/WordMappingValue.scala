@@ -31,7 +31,6 @@ case class WordMappingValue(val value: String) extends QuizItemWithUserAnswers {
         <userAnswers>{userAnswers map (u => u.toXML) }</userAnswers>
       </wordMappingValue>
   
-        
   // Example: nachlösen:1,7,9;6
   def toCustomFormat(strBuilder: StringBuilder): StringBuilder = {
     strBuilder.append(value)
@@ -61,16 +60,15 @@ case class WordMappingValue(val value: String) extends QuizItemWithUserAnswers {
 
 }
 
-object WordMappingValue {
+object WordMappingValue extends Platform {
   
   /**
    * The String processing here needs to be very fast. 
    * The Android splitter utilities are faster than String.split()
    */
-  
-  val wmvSplitter = Platform.getSplitter(':');
-  val allAnswersSplitter = Platform.getSplitter(';');
-  val answersSplitter = Platform.getSplitter(',');
+  val wmvSplitter = getSplitter(':')
+  val allAnswersSplitter = getSplitter(';')
+  val answersSplitter = getSplitter(',')
   
   // Example: str = "nachlösen:1,7,9;6"
   def fromCustomFormat(str: String): WordMappingValue = {

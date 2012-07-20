@@ -17,6 +17,7 @@
 package com.oranda.libanius.util
 
 import java.lang.Character
+import java.util.zip.Deflater
 
 object StringUtil {
     
@@ -33,7 +34,7 @@ object StringUtil {
   def mkString[S <: StringBuilder, T](str: S, iterable: Iterable[T], 
       fn: (S, T) => StringBuilder, separator: Character): S = {
     val iter = iterable.iterator
-    while (iter.hasNext) {
+    while (iter.hasNext) {      
       fn(str, iter.next)
       if (iter.hasNext)
         str.append(separator)

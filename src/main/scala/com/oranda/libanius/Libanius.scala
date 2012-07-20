@@ -13,122 +13,111 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.oranda.libanius
 
+import java.io.File
 import java.lang.CharSequence
 import java.lang.Runnable
 import java.lang.System
 import com.oranda.libanius.io.AndroidIO
 import com.oranda.libanius.model.wordmapping.QuizItemViewWithOptions
 import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
+import com.oranda.libanius.model.wordmapping.WordMappingGroupReadOnly
 import com.oranda.libanius.model.UserAnswer
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.util.Util
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
+import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import java.io.File
+import scala.io.Source
 
-class Libanius extends Activity with TypedActivity {
+class Libanius extends Activity with TypedActivity with Platform with DataStore 
+    with Timestamps {
 
-  private[this] var questionLabel : TextView = _
-  private[this] var questionNotesLabel : TextView = _
-  private[this] var answerOption1Button : Button = _
-  private[this] var answerOption2Button : Button = _
-  private[this] var answerOption3Button : Button = _
+  private[this] lazy val questionLabel: TextView = findView(TR.question)
+  private[this] lazy val questionNotesLabel: TextView = findView(TR.questionNotes)
+  private[this] lazy val answerOption1Button: Button = findView(TR.answerOption1)
+  private[this] lazy val answerOption2Button: Button = findView(TR.answerOption2)
+  private[this] lazy val answerOption3Button: Button = findView(TR.answerOption3)
     
-  private[this] var prevQuestionLabel : TextView = _
-  private[this] var prevAnswerOption1Label : TextView = _
-  private[this] var prevAnswerOption2Label : TextView = _
-  private[this] var prevAnswerOption3Label : TextView = _
-  private[this] var speedLabel : TextView = _
-  private[this] var statusLabel : TextView = _
-
-  private[this] var quiz: QuizOfWordMappings = new QuizOfWordMappings
+  private[this] lazy val prevQuestionLabel: TextView = findView(TR.prevQuestion)
+  private[this] lazy val prevAnswerOption1Label: TextView = findView(TR.prevAnswerOption1)
+  private[this] lazy val prevAnswerOption2Label: TextView = findView(TR.prevAnswerOption2)
+  private[this] lazy val prevAnswerOption3Label: TextView = findView(TR.prevAnswerOption3)
+  private[this] lazy val speedLabel: TextView = findView(TR.speed)
+  private[this] lazy val statusLabel: TextView = findView(TR.status)
+  
   private[this] var currentQuizItem: QuizItemViewWithOptions = _
 
-  private[this] var timestampsLastCorrectAnswers = List[Long]()
+  def quiz = GlobalState.quiz.get
+  def dictionaryIsDefined = GlobalState.dictionary.isDefined
+  def dictionary = GlobalState.dictionary.get
   
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
-	initGui
-	if (quiz.numGroups == 0)
-      quiz = readQuiz    
-    testUserWithQuizItem 
+    log("Libanius", "onCreate")
+    setContentView(R.layout.main) 
+	initQuiz()
+	loadDictionaryInBackground()
+    testUserWithQuizItem
   }
   
+  def initQuiz() {
+    GlobalState.initQuiz(readQuizUi)
+    val extrasOpt = Option(getIntent().getExtras()) // values from SearchDictionary activity
+    extrasOpt.foreach { extras =>
+	  val keyWord = extras.getString(Props.KEY_WORD)
+      val value = extras.getString(Props.VALUE)
+      log("Libanius", "received vars " + keyWord + " " + value)
+      if (dictionaryIsDefined)
+        quiz.addWordMappingToFrontOfTwoGroups(dictionary._keyType, 
+            dictionary._valueType, keyWord, value)   
+	}
+  }
+  
+  def loadDictionaryInBackground() {
+    val ctx = this
+    new AsyncTask[Object, Object, Object] {      
+      override def doInBackground(args: Object*): Object = {
+        GlobalState.initDictionary(readDictionary(ctx))
+	    None
+      }
+    }.execute()
+  }
+
   override def onPause() {
     super.onPause()
-    Platform.log("Libanius", "onPause")
-    saveQuiz
+    log("Libanius", "onPause")
+    saveQuizUi
   }
   
-  def initGui {
-    
-    setContentView(R.layout.main)
-    questionLabel = findView(TR.question)
-    questionNotesLabel = findView(TR.questionNotes)
-    answerOption1Button = findView(TR.answerOption1)
-    answerOption2Button = findView(TR.answerOption2)
-    answerOption3Button = findView(TR.answerOption3)
-    speedLabel = findView(TR.speed)
-    statusLabel = findView(TR.status)
-    
-    prevQuestionLabel = findView(TR.prevQuestion)
-    prevAnswerOption1Label = findView(TR.prevAnswerOption1)
-    prevAnswerOption2Label = findView(TR.prevAnswerOption2)
-    prevAnswerOption3Label = findView(TR.prevAnswerOption3)    
-  }
-  
-  def readQuiz: QuizOfWordMappings = {
-    
+  def readQuizUi: QuizOfWordMappings = {    
     printStatus("Reading quiz data...")
-    val fileText =
-      if (new File(Props.fileQuiz).exists)
-        try {
-          // TODO: consider changing to Platform.readFile
-          AndroidIO.readFile(this, Props.fileQuiz)
-        } catch { 
-          // for security access exceptions or anything else unexpected
-          case e: Exception => makeDemoQuiz 
-        }
-      else
-        makeDemoQuiz
-      
-    val quiz = Util.stopwatch(QuizOfWordMappings.fromCustomFormat(fileText),
-        "reading and parsing quiz")      
+    val quiz = readQuiz(this)
     val msg = "Finished reading " + quiz.numItems + " quiz items!"
-    Platform.log("Libanius", msg)
+    log("Libanius", msg)
     printStatus(msg)
-    return quiz
-  }
-  
-  def makeDemoQuiz: String = {
-    Platform.log("Libanius", "Problem accessing " + Props.fileQuiz + ". Using demo data")
-    printStatus("No file: using demo data")
-    QuizOfWordMappings.demoDataInCustomFormat
+    quiz
   }
   
   def testUserWithQuizItem() { 
-    
-    val quizItemOpt = Util.stopwatch(quiz.findQuizItem, "find quiz item")
-    
-    if (!quizItemOpt.isDefined)      
-      printStatus("No more questions found! Done!")
-    else {
-      currentQuizItem = quizItemOpt.get
-      showNextQuizItem()
-    } 
+    Util.stopwatch(quiz.findQuizItem, "find quiz item") match {
+      case Some(quizItem) =>       
+        currentQuizItem = quizItem
+        showNextQuizItem()
+      case _ =>
+        printStatus("No more questions found! Done!")
+    }
   }
   
   def testUserWithQuizItemAgain() { 
-    showScore()
+    showScoreAsync() // The score takes a second to calculate, so do it in the background
     showSpeed()
     testUserWithQuizItem()
   }
@@ -143,7 +132,7 @@ class Libanius extends Activity with TypedActivity {
     questionLabel.setText(currentQuizItem.keyWord)
     var questionNotesText = "What is the " + currentQuizItem.valueType + "?"
     if (currentQuizItem.numCorrectAnswersInARow > 0)
-      questionNotesText += " (already answered correctly " + 
+      questionNotesText += " (correctly answered " + 
           currentQuizItem.numCorrectAnswersInARow + " times)"
     questionNotesLabel.setText(questionNotesText)
         
@@ -151,37 +140,24 @@ class Libanius extends Activity with TypedActivity {
     answerOption1Button.setText(optionsIter.next)
     answerOption2Button.setText(optionsIter.next)
     answerOption3Button.setText(optionsIter.next)
-    
-    //if (quiz.currentPromptNumber % 5000 == 0)
-    //  saveQuiz()
   }
   
   def answerOption1Clicked(v: View) { processUserAnswer(answerOption1Button) }
   def answerOption2Clicked(v: View) { processUserAnswer(answerOption2Button) }
   def answerOption3Clicked(v: View) { processUserAnswer(answerOption3Button) }
   
-  def deleteCurrentWord(v: View) {
-    if (quiz.deleteWordMappingValue(currentQuizItem.keyWord, 
+  def removeCurrentWord(v: View) {
+    if (quiz.removeWordMappingValue(currentQuizItem.keyWord, 
         currentQuizItem.wordMappingValue, currentQuizItem.keyType, 
         currentQuizItem.valueType))
       printStatus("Deleted word " + currentQuizItem.keyWord)
     testUserWithQuizItemAgain()    
   }
   
-  def updateTimestamps(thereJustOccurredACorrectAnswer: Boolean) {
-    if (thereJustOccurredACorrectAnswer) {
-      val currentTime = System.currentTimeMillis
-      timestampsLastCorrectAnswers :+= currentTime
-      /* 
-       * Purge timestamps older than one minute. This leaves the length of the 
-       * list as a measure of the number of correct answers per minute.
-       */
-      timestampsLastCorrectAnswers = timestampsLastCorrectAnswers.filter(
-          timestamp => timestamp > currentTime - 60000)
-    } 
+  def gotoDictionary(v: View) {
+    val dictScreen = new Intent(getApplicationContext(), classOf[SearchDictionary])
+    startActivity(dictScreen)
   }
-  
-  def answerSpeed = timestampsLastCorrectAnswers.size
   
   def processUserAnswer(clickedButton: Button) {
     val userAnswerTxt = clickedButton.getText.toString
@@ -204,14 +180,15 @@ class Libanius extends Activity with TypedActivity {
         prevAnswerOption3Label)  
     val buttonsToLabels = answerOptionButtons zip prevOptionsLabels
     
-    for (buttonToLabel <- buttonsToLabels)
+    buttonsToLabels.foreach { buttonToLabel =>
       setPrevOptionsText(buttonToLabel._2, buttonToLabel._1.getText)
+    }  
     
     val correctButton = answerOptionButtons.find(_.getText == correctAnswer).get
     
-    for (buttonToLabel <- buttonsToLabels)
+    buttonsToLabels.foreach { buttonToLabel =>
       setColorOnAnswer(buttonToLabel._1, buttonToLabel._2, correctButton, clickedButton)
-      
+    }  
     
     val delayMillis = if (isCorrect) 50 else 500
     val handler = new Handler
@@ -244,18 +221,25 @@ class Libanius extends Activity with TypedActivity {
     }
   }
   
-  def saveQuiz() {
+  def saveQuizUi() {
     printStatus("Saving quiz data...")
-    val str = Util.stopwatch(quiz.toCustomFormat, "serialize the quiz")
-    AndroidIO.save(this, Props.fileQuiz, Props.fileQuizLastBackup, str.toString)
+    saveQuiz(this, quiz)
     printStatus("Finished saving quiz data!")
   }  
   
-  def showScore() {
-    val scoreSoFar = Util.stopwatch(quiz.scoreSoFar, "scoreSoFar")
-    val quizStr = (scoreSoFar * 100).toString()
-    val quizStrMaxIndex = scala.math.min(quizStr.length(), 6)
-    printScore(quizStr.substring(0, quizStrMaxIndex) + "%")
+  def showScoreAsync() {
+    new AsyncTask[Object, Object, String] {
+      
+      override def doInBackground(args: Object*): String = {
+        val scoreSoFar = Util.stopwatch(quiz.scoreSoFar, "scoreSoFar")
+        (scoreSoFar * 100).toString()
+      }
+      
+      override def onPostExecute(strScore: String) {
+        val strScoreMaxIndex = scala.math.min(strScore.length(), 6)
+        printScore(strScore.substring(0, strScoreMaxIndex) + "%")
+      }
+    }.execute()
   }
   
   def showSpeed() {

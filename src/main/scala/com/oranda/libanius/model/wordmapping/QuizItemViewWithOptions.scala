@@ -27,7 +27,7 @@ case class QuizItemViewWithOptions(val keyWord: String,
     val keyType: String, val valueType: String, otherOptions: Set[String], 
     val numCorrectAnswersInARow: Int) {
   
-  def optionsInRandomOrder() : Set[String] = {
+  def optionsInRandomOrder(): Set[String] = {
     val allOptions = otherOptions + wordMappingValue.value
     Random.shuffle(allOptions)
   }

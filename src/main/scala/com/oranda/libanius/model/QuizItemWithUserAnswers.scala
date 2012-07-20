@@ -28,10 +28,10 @@ trait QuizItemWithUserAnswers extends ModelComponent {
   
   def addUserAnswer(userAnswer : UserAnswer) {
     if (userAnswer.wasCorrect) {
-      correctAnswersInARow :+= userAnswer 
+      correctAnswersInARow ::= userAnswer 
     } else {
       correctAnswersInARow = List() // old correct answers are discarded
-      incorrectAnswers :+= userAnswer
+      incorrectAnswers ::= userAnswer
     }
   }
   
@@ -45,7 +45,6 @@ trait QuizItemWithUserAnswers extends ModelComponent {
   }
   
   def isPresentable(currentPromptNum : Int): Boolean = {
-  
     /*
      * See if this quiz item meets defined criteria: how many times 
      * it has been answered correctly, and how long ago it was last answered.
@@ -57,14 +56,11 @@ trait QuizItemWithUserAnswers extends ModelComponent {
   }
   
   def isPresentable(currentPromptNum : Int, 
-      numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int): Boolean = { 
-    if (numCorrectAnswersInARow != numCorrectAnswersInARowDesired)
-      return false
-    if (correctAnswersInARow.isEmpty && incorrectAnswers.isEmpty)
-      return true
-   
-    val diffInPromptNum = currentPromptNum - promptNumInLastAnswer
-    return diffInPromptNum >= diffInPromptNumMinimum
+      numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int): Boolean = {
+    def diffInPromptNum = currentPromptNum - promptNumInLastAnswer
+    numCorrectAnswersInARow == numCorrectAnswersInARowDesired &&
+      (correctAnswersInARow.isEmpty && incorrectAnswers.isEmpty ||
+      diffInPromptNum >= diffInPromptNumMinimum)
   }
   
   def isUnfinished: Boolean = 

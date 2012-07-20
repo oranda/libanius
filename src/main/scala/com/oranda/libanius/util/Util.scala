@@ -19,13 +19,13 @@ package com.oranda.libanius.util
 import android.util.Log
 import java.lang.Character
 
-object Util {
+object Util extends Platform {
   
   def stopwatch[X](fn: => X, actionDescription: String): X = {
     val start = System.currentTimeMillis()
     val result = fn
     val end = System.currentTimeMillis()
-    Platform.log("Libanius", "time taken for " + actionDescription + " was " +
+    log("Libanius", "time taken for " + actionDescription + " was " +
         (end - start) + "ms")
     result
   }

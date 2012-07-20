@@ -17,47 +17,56 @@
 package com.oranda.libanius.io
 
 import com.oranda.libanius.Props
-
 import _root_.android.content.Context
 import _root_.java.io._
-
 import _root_.android.util.Log
+import scala.io.Source
 
 object AndroidIO {
 
+  def readFile(ctx: Context, fileName: String): String = {
+    def fileToInputStream(ctx: Context) = ctx.openFileInput(fileName)
+    readInputStream(ctx, fileToInputStream)
+  }
   
-  def readFile(ctx: Context, fileName: String) : String = {
-
-    var fis: FileInputStream = null
+  def readResource(ctx: Context, resID: Int): String = {    
+    def resourceToInputStream(ctx: Context) = ctx.getResources().openRawResource(resID)
+    readInputStream(ctx, resourceToInputStream)
+  }
+  
+  // This is much faster than using Scala's Source functionality
+  def readInputStream(ctx: Context, inStreamGetter: Context => InputStream): String = {
     
-    var allText = ""
-    try {
-      fis = ctx.openFileInput(fileName)
-      val reader = new Array[Byte](fis.available)
-      while (fis.read(reader) != -1) {}
+    var allText = ""    
+    var is: InputStream = null
+    
+    try { 
+      val is = inStreamGetter(ctx)
+      val reader = new Array[Byte](is.available)
+      while (is.read(reader) != -1) {}
         allText = allText + new String(reader)
     } catch {
       case e: IOException =>
         Log.e("IO Exception", e.getMessage, e)
     } finally {
-      if (fis != null) {
+      if (is != null) {
         try {
-          fis.close();
+          is.close()
         } catch {
           case e: IOException => // swallow
         }
       }
     }
-    return allText
+    allText
   }
-  
+          
   
   def save(ctx: Context, fileName: String, fileNameBackup: String, strToSave: String) {
-	val file = new File(fileName);
-	val file2 = new File(fileNameBackup);
-	file2.delete();
+	val file = new File(fileName)
+	val file2 = new File(fileNameBackup)
+	file2.delete()
 	//Platform.log("AndroidIO.save", "Renaming " + fileName + " to " + fileNameBackup)
-	file.renameTo(file2); // Doesn't seem to work, but not crucial
+	file.renameTo(file2) // Doesn't seem to work, but not crucial
 
 	writeToFile(Props.fileQuiz, strToSave, ctx)
   }

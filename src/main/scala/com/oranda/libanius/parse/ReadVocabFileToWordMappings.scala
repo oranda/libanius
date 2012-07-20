@@ -17,26 +17,25 @@
 package com.oranda.libanius.parse
 
 import java.io.File
-
 import scala.io.BufferedSource
 import scala.io.Source
 import scala.xml.PrettyPrinter
-
 import com.oranda.libanius.io.StandardIO
 import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
 import com.oranda.libanius.model.wordmapping.WordMappingGroup
 import com.oranda.libanius.Props
+import com.oranda.libanius.model.wordmapping.WordMappingGroupReadWrite
 
 abstract class ReadVocabFileToWordMappings {
   
-  def getVocabFilename = "data/" + Props.fileVocab
-  def getQuizFilename = "data/" + Props.fileQuiz
+  def pathVocab = "data/" + Props.fileVocab
+  def pathQuiz = "data/" + Props.fileQuiz
   
   def readQuizAndVocabFile(): QuizOfWordMappings = {
     var quiz = new QuizOfWordMappings(_currentPromptNumber = 0) 
      
-    if (new File(getQuizFilename).exists) {
-      val fileText = StandardIO.readFile(getQuizFilename)      
+    if (new File(pathQuiz).exists) {
+      val fileText = StandardIO.readFile(pathQuiz)      
       quiz = QuizOfWordMappings.fromXML(xml.XML.loadString(fileText))
     }
     println("key words before vocab file: " + quiz.numKeyWords)
@@ -46,22 +45,22 @@ abstract class ReadVocabFileToWordMappings {
   }
   
   def readVocabFile(quiz: QuizOfWordMappings): QuizOfWordMappings = {
-    val myFile = new File(getVocabFilename)
+    val myFile = new File(pathVocab)
     val src = Source.fromFile(myFile)
-    return readIntoQuiz(src, quiz)
+    readIntoQuiz(src, quiz)
   }
   
   def readIntoQuiz(src: BufferedSource, quiz: QuizOfWordMappings): QuizOfWordMappings
   
-  def addWordMappings(wmGroupEngToGer: WordMappingGroup, 
-      wmGroupGerToEng: WordMappingGroup,
+  def addWordMappings(wmGroupEngToGer: WordMappingGroupReadWrite, 
+      wmGroupGerToEng: WordMappingGroupReadWrite,
       englishWord: String, germanWord: String) = {
     wmGroupEngToGer.addWordMapping(englishWord, germanWord)
     wmGroupGerToEng.addWordMapping(germanWord, englishWord)
   }
   
   def readQuiz : QuizOfWordMappings = {
-    val fileText = StandardIO.readFile(getQuizFilename)      
+    val fileText = StandardIO.readFile(pathQuiz)      
     QuizOfWordMappings.fromXML(xml.XML.loadString(fileText))
   }
     
@@ -69,8 +68,8 @@ abstract class ReadVocabFileToWordMappings {
     println("Reading (quiz and) vocab file...")
     val quiz = readQuizAndVocabFile
     println("Finished reading (quiz and) vocab file... Now writing quiz to " +
-        getQuizFilename + "...")
-    StandardIO.save(getQuizFilename, quiz.toCustomFormat.toString)
+        pathQuiz + "...")
+    StandardIO.save(pathQuiz, quiz.toCustomFormat.toString)
     println("Finished writing " + quiz.numKeyWords 
         + " words with their translations!")
   }

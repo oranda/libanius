@@ -38,7 +38,7 @@ object StandardIO {
   }    
   
   def save(fileName: String, strToSave: String) {
-	val file = new File(fileName);
+	val file = new File(fileName)
 	writeToFile(fileName, strToSave)
   }
   

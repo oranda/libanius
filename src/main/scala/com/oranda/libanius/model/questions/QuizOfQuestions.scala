@@ -16,10 +16,9 @@
 
 package com.oranda.libanius.model.questions
 
-import _root_.scala.collection.mutable.ListBuffer
-import _root_.java.io.File
-import _root_.scala.collection.mutable.LinkedHashSet
-import _root_.java.io.FileOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import scala.collection.mutable.LinkedHashSet
 import com.oranda.libanius.Props
 import com.oranda.libanius.model.Quiz
 
@@ -45,30 +44,27 @@ class QuizOfQuestions(_currentPromptNumber: Int) extends Quiz(_currentPromptNumb
   }  
   
   def addItems(questionItemsOpt : Option[Tuple2[QuestionItem, QuestionItem]]) {
-    questionItemsOpt match {
-      case Some((item1, item2)) => 
-        questionItems += item1  
-        questionItems += item2
-      case None => 
+    questionItemsOpt.foreach { twoQuestionItems =>
+        questionItems += twoQuestionItems._1  
+        questionItems += twoQuestionItems._2
     }
   }
   
   def findQuestionItem(numCorrectAnswersInARowDesired : Int, diffInPromptNum : Int): 
-      Option[QuestionItem] = {
-    return questionItems.find(questionItem => questionItem.isPresentable(
+      Option[QuestionItem] =
+    questionItems.find(questionItem => questionItem.isPresentable(
         numCorrectAnswersInARowDesired, diffInPromptNum, currentPromptNumber))
-  }
     
-  def delete(QuestionItem : QuestionItem) {
+  def remove(QuestionItem : QuestionItem) {
     questionItems -= QuestionItem
   }
   
   override def scoreSoFar : BigDecimal = {  // out of 1
-    val availableScorePerItem = ( 1.0 / numQuestionItems) : BigDecimal
-    var score = 0 : BigDecimal
+    val availableScorePerItem = ( 1.0 / numQuestionItems): BigDecimal
+    var score = 0: BigDecimal
     questionItems.foreach(questionItem => 
         score = score + (questionItem.scoreSoFar * availableScorePerItem))
-    return score
+    score
   }
   
   def numItems: Int = questionItems.size    
@@ -89,7 +85,8 @@ object QuizOfQuestions {
     new QuizOfQuestions(_currentPromptNumber = 0) {
       val lines = strCustomFormat.split("\\n")
       currentPromptNumber = lines(0).toInt
-      lines.foreach(line => if (line.contains("§§")) addItem(
-          Some(QuestionItem.fromCustomFormat(line))))
+      lines.foreach(line => 
+        if (line.contains("§§")) 
+          addItem(Some(QuestionItem.fromCustomFormat(line))))
     }
 }

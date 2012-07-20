@@ -22,11 +22,22 @@ object Props {
   
   val fileVocab = "vocabGer10k.txt"
   
-  val fileQuizRoot = "quizGer10k"  // "quizTestData"
+  var fileQuizRoot = "quizGer10k"  // "quizTestData"
   
   val fileQuiz = fileQuizRoot + ".qui"
   
   val fileQuizLastBackup = fileQuizRoot + "Backup" + ".qui"
   
+  val fileDictionary = "dictccGerEng.dct"
+  
+  val resQuizPublic = R.raw.quizger10kpublicqui
+  
+  val resDictPublic = R.raw.quizger10kpublicdct
+  
   val NUM_CORRECT_ANSWERS_REQUIRED = 4 // 5
+  
+  // Variables passed between activities
+  val KEY_WORD = "keyWord"
+  val VALUE = "value"
+  
 }

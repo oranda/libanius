@@ -18,7 +18,6 @@ package com.oranda.libanius.model.wordmapping
 
 import scala.collection.JavaConversions.mapAsScalaMap
 import scala.collection.immutable.HashSet
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable
 import scala.util.Random
 import android.util.Log

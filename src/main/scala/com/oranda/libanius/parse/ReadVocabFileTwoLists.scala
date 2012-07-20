@@ -29,7 +29,7 @@ object ReadVocabTwoLists extends ReadVocabFileToWordMappings {
   val englishWords = ListBuffer[String]()
   val germanWords = ListBuffer[String]()
     
-  override def readIntoQuiz(src: BufferedSource, quiz : QuizOfWordMappings): 
+  override def readIntoQuiz(src: BufferedSource, quiz: QuizOfWordMappings): 
       QuizOfWordMappings = {
 
     val wmGroupEngToGer = quiz.findOrAddWordMappingGroup(
@@ -43,18 +43,19 @@ object ReadVocabTwoLists extends ReadVocabFileToWordMappings {
     val combinedWords = germanWords zip englishWords
     combinedWords.foreach(pair => addWordMappings(
         wmGroupEngToGer, wmGroupGerToEng, pair._2, pair._1))
-    return quiz
+    quiz
   }
   
   def readQuizItemFrequency(word: String) = {
-    
-    if (word.startsWith("--"))
-      germanMode = false
-    else
-      if (germanMode)
-        germanWords += word
-      else
-        englishWords += word
+    word match {
+      case w if w.startsWith("--") =>
+        germanMode = false
+      case _ =>
+        if (germanMode)
+          germanWords += word
+        else
+          englishWords += word
+    }
   }
 
 }

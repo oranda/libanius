@@ -27,6 +27,7 @@ import com.oranda.libanius.util.StringUtil
 import com.sun.xml.internal.ws.util.StringUtils
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.model.ModelComponent
+import scala.collection.mutable.ArrayBuffer
 
 case class WordMappingValueSet() extends ModelComponent {
     
@@ -35,16 +36,16 @@ case class WordMappingValueSet() extends ModelComponent {
   
   override def toString = values.toString
   
-  def toXML = values map (wmv => wmv.toXML)
+  def toXML = values map (_.toXML)
     
   // Example: contract:696,697;698/treaty:796;798
-  def toCustomFormat(strBuilder: StringBuilder) =
+  def toCustomFormat(strBuilder: StringBuilder) = 
     StringUtil.mkString(strBuilder, values, wmvToCustomFormat, '/')
   
   def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue) =
     wmv.toCustomFormat(strBuilder)
     
-  def strings: Iterable[String] = values map (wmv => wmv.toString ) 
+  def strings: Iterable[String] = values map (_.toString ) 
   
   def size = values.size
   
@@ -52,22 +53,26 @@ case class WordMappingValueSet() extends ModelComponent {
   
   def numCorrectAnswers = {
     /*
-     * This functional version is about twice as slow as the imperative version
+     * This functional version is about twice as slow as the version actually used:
      * 
      * values.iterator.foldLeft(0)(_ + _.numCorrectAnswersInARow)
      */
     var numCorrectAnswers = 0        
-    for (wmv <- values)
-      numCorrectAnswers += wmv.numCorrectAnswersInARow
+    values.foreach { wmv => numCorrectAnswers += wmv.numCorrectAnswersInARow }
     numCorrectAnswers
   }
   
   def addValue(wordMappingValue: WordMappingValue) {
     if (!values.contains(wordMappingValue))
-      values :+= wordMappingValue
+      values ::= wordMappingValue
   } 
   
-  def deleteValue(wordMappingValue: WordMappingValue): Boolean = {
+  def filterOut(value: String) = { 
+    values = values.filterNot(_.value == value)
+    this
+  }
+  
+  def removeValue(wordMappingValue: WordMappingValue): Boolean = {
     val existed = values.contains(wordMappingValue)
     values = values.filterNot(_ == wordMappingValue) // values -= wordMappingValue    
     existed
@@ -86,19 +91,30 @@ case class WordMappingValueSet() extends ModelComponent {
     valueArray(randomIndex).value
   }
   
-  def containsValue(value: String): Boolean = values.find(_.value == value).isDefined
+  def findValue(value: String): Option[WordMappingValue] = values.find(_.value == value)
+  
+  def containsValue(value: String): Boolean = findValue(value).isDefined
+  
+  def valueBeginningWith(valueStart: String) = 
+    values.find(_.value.startsWith(valueStart))
 }
 
 
-object WordMappingValueSet {
+object WordMappingValueSet extends Platform {
   
-  val wmvSplitter = Platform.getSplitter('/');
+  def combineValueSets(valueSets: Iterable[WordMappingValueSet]) =  
+    valueSets.foldLeft(new ArrayBuffer[WordMappingValue]()) {          
+        (acc, wm) => acc ++ wm.values/*AsScala*/
+    }
+  
+  val wmvSplitter = getSplitter('/')
   // Example: contract:696,697;698/treaty:796;798
   def fromCustomFormat(str: String): WordMappingValueSet =
     new WordMappingValueSet() {
       wmvSplitter.setString(str)
       while (wmvSplitter.hasNext)
         addValue(WordMappingValue.fromCustomFormat(wmvSplitter.next))
+      values = values.reverse
     }
     
   def fromXML(node: xml.Node): WordMappingValueSet = {

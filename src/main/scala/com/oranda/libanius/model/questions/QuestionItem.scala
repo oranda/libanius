@@ -16,7 +16,6 @@
 
 package com.oranda.libanius.model.questions
 
-import scala.collection.mutable.ListBuffer
 import scala.xml.Node
 import com.oranda.libanius.Props
 import com.oranda.libanius.model.UserAnswer
@@ -39,25 +38,25 @@ class QuestionItem extends QuizItemWithUserAnswers {
     addUserAnswer(newAnswer)
   }
   
-  def evaluateUserAnswer(promptNum : Int, userAnswerStr : String) : Boolean = {
+  def evaluateUserAnswer(promptNum: Int, userAnswerStr: String): Boolean = {
 
-    val wasCorrectAnswer = isCorrect(userAnswerStr);
+    val wasCorrectAnswer = isCorrect(userAnswerStr)
 
     val userAnswer = new UserAnswer(wasCorrect = wasCorrectAnswer,
         promptNumber = promptNum)
     addUserAnswer(userAnswer)
     
-    return wasCorrectAnswer
+    wasCorrectAnswer
   }
   
-  def isCorrect(userAnswerStr : String) : Boolean = {
-    if (userAnswerStr == correctAnswer)
-      return true
+  def isCorrect(userAnswerStr: String): Boolean =    
+    userAnswerStr == correctAnswer || isSimilarToCorrectAnswer(userAnswerStr)
+    
+  def isSimilarToCorrectAnswer(userAnswerStr: String): Boolean = {
     var correctAnswerMod = correctAnswer
     
-    if (correctAnswerMod.contains("/")) {
+    if (correctAnswerMod.contains("/"))
       correctAnswerMod = correctAnswerMod.substring(0, correctAnswerMod.indexOf("/"))
-    }
     
     var userAnswerStrMod = userAnswerStr.replaceAll(",", "")
     correctAnswerMod = correctAnswerMod.replaceAll(",", "")
@@ -77,24 +76,24 @@ class QuestionItem extends QuizItemWithUserAnswers {
     val matchIter = pattern.findAllIn(correctAnswerMod)
     val correctAnswerRequiredParts 
     		= matchIter.matchData.toList map { m => m.subgroups(0).trim()}
-    var userAnswerRemainder = userAnswerStrMod
-    for (correctAnswerPart <- correctAnswerRequiredParts) {
-      if (userAnswerRemainder.contains(correctAnswerPart)) {
-        val indexOfPartEnd = userAnswerRemainder.indexOf(correctAnswerPart) + correctAnswerPart.length
-        userAnswerRemainder = userAnswerRemainder.substring(indexOfPartEnd)
-      }      
-      else 
-        return false
-    }
-    
-    return true
+    allPartsHaveMatchIn(correctAnswerRequiredParts, userAnswerStrMod)
   }
   
-  def scoreSoFar : BigDecimal = {  // out of 1
-    var numAnswers = numCorrectAnswersInARow
-    var score = numAnswers.toFloat / Props.NUM_CORRECT_ANSWERS_REQUIRED : BigDecimal
-    return score
+  protected def allPartsHaveMatchIn(parts: List[String], str: String): Boolean = {
+    var strVar = str
+    parts.foreach { part =>
+      strVar match {
+        case s if s.contains(part) => 
+          val indexOfPartEnd = s.indexOf(part) + part.length
+          strVar = s.substring(indexOfPartEnd)
+        case _ => return false 
+      }        
+    }
+    true
   }
+  
+  def scoreSoFar : BigDecimal =  // out of 1
+    numCorrectAnswersInARow.toFloat / Props.NUM_CORRECT_ANSWERS_REQUIRED : BigDecimal
     
   def toXML =
 <quizItem>
@@ -105,9 +104,12 @@ class QuestionItem extends QuizItemWithUserAnswers {
  
   def toCustomFormat : String = {
     var customFormat = question + "§§" + correctAnswer + "§§"
-    if (!(userAnswers.isEmpty)) 
-      customFormat = customFormat + (userAnswers map (u => u.toCustomFormat + ":")).reduceLeft[String](_+_)
-    return customFormat
+    userAnswers.toSeq match {
+      case Nil => 
+      case _ => customFormat += 
+        (userAnswers map (u => u.toCustomFormat + ":")).reduceLeft[String](_+_)
+    }
+    customFormat
   }  
 }
 
@@ -120,8 +122,6 @@ object QuestionItem {
 	    val answers = (node \ "userAnswers")
 	    for (userAnswer <- answers \\ "userAnswer")
 	      addUserAnswer(userAnswer)
-       
-	    //val userAnswers = ((node \ "userAnswers") map (node => UserAnswer.fromXML(node)))
 	  }
     
     def fromCustomFormat(strCustomFormat: String): QuestionItem = 
@@ -132,7 +132,8 @@ object QuestionItem {
         if (parts.length > 2) {
           val answersText = parts(2)
           val answersStrings = answersText.split(":")
-          answersStrings.foreach(answerString => addUserAnswer(UserAnswer.fromCustomFormat(answerString)))
+          answersStrings.foreach(answerString => 
+            addUserAnswer(UserAnswer.fromCustomFormat(answerString)))
         }
     }
 }

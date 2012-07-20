@@ -18,16 +18,11 @@ package com.oranda.libanius.model.wordmapping
 
 import scala.collection.JavaConversions.mapAsScalaMap
 import scala.collection.immutable.HashSet
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.LinkedHashMap
 import scala.collection.mutable
 import scala.util.Random
-import android.util.Log
-import com.oranda.libanius.util.StringUtil
-import com.sun.xml.internal.ws.util.StringUtils
-import android.text.TextUtils
+
 import com.oranda.libanius.util.Util
-import com.oranda.libanius.model.ModelComponent
-import scala.collection.mutable.LinkedHashMap
 
 case class WordMappingGroupReadWrite(_keyType: String, _valueType: String) 
     extends WordMappingGroup(_keyType, _valueType) {
@@ -150,10 +145,10 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
   def removeWordMapping(key: String): Option[WordMappingValueSet] = 
     wordMappingsAsScala.remove(key)
 
-  def deleteWordMappingValue(keyWord: String, 
+  def removeWordMappingValue(keyWord: String, 
       wordMappingValue: WordMappingValue): Boolean = {
     val wmvs = wordMappings.get(keyWord)
-    wmvs != null && wmvs.deleteValue(wordMappingValue)
+    wmvs != null && wmvs.removeValue(wordMappingValue)
   }
   
   def findValuesFor(keyWord: String): Option[WordMappingValueSet] = 
@@ -179,8 +174,8 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
   
   def findAnyUnfinishedQuizItem: Option[QuizItemViewWithOptions] =
     wordMappingsAsScala.iterator.map(entry => 
-          findAnyUnfinishedQuizItem(entry._1,  entry._2)).
-          find(_.isDefined).getOrElse(None)
+        findAnyUnfinishedQuizItem(entry._1,  entry._2)).
+        find(_.isDefined).getOrElse(None)
 
   private def findAnyUnfinishedQuizItem(key: String, 
       wordMappingValues: WordMappingValueSet): Option[QuizItemViewWithOptions] =
@@ -253,8 +248,7 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
   def hasSameStart = (wmv: WordMappingValue, value: String) => wmv.hasSameStart(value)
   def hasSameEnd = (wmv: WordMappingValue, value: String) => wmv.hasSameEnd(value)
   
-  
-  def findRandomWordValue(wordMappingValues: ArrayBuffer[WordMappingValue]): String = {
+  def findRandomWordValue(wordMappingValues: Seq[WordMappingValue]): String = {
     val randomIndex = Random.nextInt(wordMappingValues.length)
     wordMappingValues(randomIndex).value
   } 

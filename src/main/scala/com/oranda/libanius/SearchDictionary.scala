@@ -35,11 +35,11 @@ import android.os.AsyncTask
 
 class SearchDictionary extends Activity with TypedActivity with Platform {
 
-  private[this] var searchInputBox: EditText = _
-  private[this] var searchResults0Row: LinearLayout = _
-  private[this] var searchResults1Row: LinearLayout = _
-  private[this] var searchResults2Row: LinearLayout = _
-  private[this] var status: TextView = _
+  private[this] lazy val searchInputBox: EditText = findView(TR.searchInput) 
+  private[this] lazy val searchResults0Row: LinearLayout = findView(TR.searchResults0)
+  private[this] lazy val searchResults1Row: LinearLayout = findView(TR.searchResults1)
+  private[this] lazy val searchResults2Row: LinearLayout = findView(TR.searchResults2)
+  private[this] lazy val status: TextView = findView(TR.status)
   
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
@@ -48,11 +48,6 @@ class SearchDictionary extends Activity with TypedActivity with Platform {
   
   def initGui {    
     setContentView(R.layout.searchdictionary)
-    searchInputBox = findView(TR.searchInput) 
-    searchResults0Row = findView(TR.searchResults0)
-    searchResults1Row = findView(TR.searchResults1)
-    searchResults2Row = findView(TR.searchResults2)
-    status = findView(TR.status)
     
     searchInputBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
       override def onEditorAction(searchInputBox: TextView, actionId: Int, 
@@ -98,7 +93,7 @@ class SearchDictionary extends Activity with TypedActivity with Platform {
 	  searchResults = resultsBeginningWith(searchInput)
 	  if (searchResults.isEmpty)
 	    searchResults = resultsBeginningWith(searchInput.dropRight(1))
-	  if  (searchResults.isEmpty)
+	  if (searchResults.isEmpty)
 	    searchResults = resultsBeginningWith(searchInput.dropRight(2))
 	  if (searchResults.isEmpty && searchInput.length > 3)
 	    searchResults = GlobalState.dictionary.get.mappingsForKeysContaining(

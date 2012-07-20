@@ -26,7 +26,7 @@ import android.util.Log
 /*
  * Encapsulate platform-specific code.
  */
-object Platform {
+trait Platform {
  
   def getSplitter(char: java.lang.Character): StringSplitter =
     if (Props.ANDROID)
@@ -39,4 +39,12 @@ object Platform {
       Log.d(module, message)
     else
       System.out.println(module + ": " + message)
+      
+  def log(module: String, message: String, t: Throwable) =
+    if (Props.ANDROID)
+      Log.d(module, message, t)
+    else {
+      System.out.println(module + ": " + message)
+      t.printStackTrace()
+    }  
 }

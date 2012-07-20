@@ -18,7 +18,8 @@ package com.oranda.libanius.model
 
 import com.oranda.libanius.Props
 
-case class UserAnswer(val wasCorrect: Boolean, val promptNumber: Int) extends ModelComponent {
+case class UserAnswer(val wasCorrect: Boolean, val promptNumber: Int) 
+    extends ModelComponent {
   
   def toXML =
     <userAnswer wasCorrect={"" + wasCorrect} promptNumber={"" + promptNumber}/>

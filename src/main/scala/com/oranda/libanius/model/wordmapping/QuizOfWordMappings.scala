@@ -16,19 +16,19 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.Props
-import java.io.FileOutputStream
-import scala.collection.immutable.List
 import scala.collection.immutable.HashSet
+
 import com.oranda.libanius.model.Quiz
-import android.util.Log
 import com.oranda.libanius.util.StringUtil
+import com.oranda.libanius.Props
+
+import math.BigDecimal.double2bigDecimal
 
 class QuizOfWordMappings(_currentPromptNumber: Int) 
     extends Quiz(_currentPromptNumber) {
   
-  private[this] var wordMappingGroups = Set[WordMappingGroup]()
-
+  private var wordMappingGroups = Set[WordMappingGroupReadWrite]()
+  
   def this() = this(_currentPromptNumber = 0)
 
   def toXML  =
@@ -43,63 +43,62 @@ class QuizOfWordMappings(_currentPromptNumber: Int)
    *     against|wider
    */
   def toCustomFormat = {
-    // For efficiency, avoiding Scala's own StringBuilder and mkString 
+    // For efficiency, avoiding Scala's mkString 
     val strBuilder = new StringBuilder("quizOfWordMappings currentPromptNumber=\"").
         append(_currentPromptNumber).append("\"\n")
     StringUtil.mkString(strBuilder, wordMappingGroups, wmgToCustomFormat, '\n')
   }  
   
-  def wmgToCustomFormat(strBuilder: StringBuilder, wmg: WordMappingGroup) = 
+  def wmgToCustomFormat(strBuilder: StringBuilder, wmg: WordMappingGroupReadWrite) = 
     wmg.toCustomFormat(strBuilder)
     
-  def findOrAddWordMappingGroup(keyType: String, valueType: String): WordMappingGroup = {
+  def findOrAddWordMappingGroup(keyType: String, valueType: String): 
+      WordMappingGroupReadWrite = {
     val wordMappingGroupOpt = findWordMappingGroup(keyType, valueType)    
     wordMappingGroupOpt match {
       case Some(wordMappingGroup) => wordMappingGroup
-      case None => addWordMappingGroup(new WordMappingGroup(keyType, valueType))
+      case None => addWordMappingGroup(new WordMappingGroupReadWrite(keyType, valueType))
     }    
   }
     
-  def findValuesFor(keyWord: String, keyType: String, valueType: String): Iterable[String] = {
-    val wordMappingGroupOpt = findWordMappingGroup(keyType, valueType)
-    wordMappingGroupOpt match {
-      case Some(wordMappingGroup) =>
-          val wordMappingValueSetOpt = wordMappingGroup.findValuesFor(keyWord)
-          wordMappingValueSetOpt match {
-            case Some(wordMappingValueSet) => return wordMappingValueSet.strings        
-            case None =>
-          }
-      case None =>    
-    }
+  def findValuesFor(keyWord: String, keyType: String, valueType: String): 
+      Iterable[String] = {
+    findWordMappingGroup(keyType, valueType).foreach(
+      _.findValuesFor(keyWord).foreach(wordMappingValueSet =>
+        return wordMappingValueSet.strings        
+    ))    
     new HashSet[String]
   }
   
   def findWordMappingGroup(keyType: String, valueType: String): 
-      Option[WordMappingGroup] =    
+      Option[WordMappingGroupReadWrite] =    
     wordMappingGroups.find(wordMappingGroup =>
         keyType == wordMappingGroup.keyType && valueType == wordMappingGroup.valueType)
   
   
-  def addWordMappingGroup(wordMappingGroup: WordMappingGroup): WordMappingGroup = {
+  def addWordMappingGroup(wordMappingGroup: WordMappingGroupReadWrite): WordMappingGroupReadWrite = {
       wordMappingGroups += wordMappingGroup
       wordMappingGroup
   }
+  
+  def removeWordMappingGroup(keyType: String, valueType: String) {
+    findWordMappingGroup(keyType, valueType).foreach(wordMappingGroups -= _)
+  }
 
-  def deleteWord(keyWord: String, keyType: String, valueType: String): Boolean = {
+  def removeWord(keyWord: String, keyType: String, valueType: String): Boolean = {
     val wordMappingGroupOpt = findWordMappingGroup(keyType, valueType)
-    wordMappingGroupOpt.isDefined && wordMappingGroupOpt.get.remove(keyWord) != None
+    wordMappingGroupOpt.isDefined && 
+        wordMappingGroupOpt.get.removeWordMapping(keyWord) != None
   }
   
-  def deleteWordMappingValue(keyWord: String, wordMappingValue: WordMappingValue,
+  def removeWordMappingValue(keyWord: String, wordMappingValue: WordMappingValue,
       keyType: String, valueType: String): Boolean = {
     val wordMappingGroupOpt = findWordMappingGroup(keyType, valueType)
     wordMappingGroupOpt.isDefined && wordMappingGroupOpt.get.
-        deleteWordMappingValue(keyWord, wordMappingValue)
+        removeWordMappingValue(keyWord, wordMappingValue)
   }
-  
 
-  def findQuizItem(/*numCorrectAnswersInARowDesired: Int, diffInPromptNum: Int*/): 
-      Option[QuizItemViewWithOptions] =
+  def findQuizItem: Option[QuizItemViewWithOptions] =
     /*
      * Just find the first "presentable" word mapping and return it immediately.
      * .iterator is considered to be more efficient than .view here.
@@ -107,13 +106,27 @@ class QuizOfWordMappings(_currentPromptNumber: Int)
     wordMappingGroups.iterator.map(_.findPresentableQuizItem(currentPromptNumber)).
         find(_.isDefined).getOrElse(None)  
 
+  def addWordMappingToFrontOfTwoGroups(keyType: String, valueType: String, 
+      keyWord: String, value: String) {
+    // E.g. add to the English -> German group
+    addWordMappingToFront(keyType, valueType, keyWord, value)
+    // E.g. add to the German -> English group
+    addWordMappingToFront(valueType, keyType, value, keyWord)
+    
+    def addWordMappingToFront(keyType: String, valueType: String, 
+        keyWord: String, value: String) {
+      findWordMappingGroup(keyType, valueType).foreach(_.addWordMappingToFront(
+          keyWord, value))
+    }
+  }
+  
   def numGroups = wordMappingGroups.size
   
   def numKeyWords = wordMappingGroups.foldLeft(0)(_ + _.numKeyWords)
   
-  def numItems : Int = wordMappingGroups.foldLeft(0)(_ + _.numValues)
+  def numItems: Int = wordMappingGroups.foldLeft(0)(_ + _.numValues)
   
-  override def scoreSoFar : BigDecimal = {  // out of 1.0
+  override def scoreSoFar: BigDecimal = {  // out of 1.0
     val _numItemsAndCorrectAnswers = numItemsAndCorrectAnswers
     val scoreSoFar = _numItemsAndCorrectAnswers._2.toDouble / 
         (_numItemsAndCorrectAnswers._1 * Props.NUM_CORRECT_ANSWERS_REQUIRED).toDouble
@@ -126,6 +139,13 @@ class QuizOfWordMappings(_currentPromptNumber: Int)
     wordMappingGroups.foldLeft(Pair(0, 0))((acc, group) =>
         (acc._1 + group.numItemsAndCorrectAnswers._1,
          acc._2 + group.numItemsAndCorrectAnswers._2))
+         
+  def merge(otherQuiz: QuizOfWordMappings) {
+    otherQuiz.wordMappingGroups.foreach { otherWmg =>
+      val wmg = findOrAddWordMappingGroup(otherWmg.keyType, otherWmg.valueType)
+      wmg.merge(otherWmg)
+    }      
+  }
 }
 
 object QuizOfWordMappings {
@@ -133,8 +153,9 @@ object QuizOfWordMappings {
     new QuizOfWordMappings(
 	  _currentPromptNumber = parseCurrentPromptNumber(str)) { 
       val wmgStrs = str.split("wordMappingGroup").tail
-      for (wmgStr <- wmgStrs)
-        addWordMappingGroup(WordMappingGroup.fromCustomFormat(wmgStr)) 
+      wmgStrs.foreach { wmgStr => 
+        addWordMappingGroup(WordMappingGroupReadWrite.fromCustomFormat(wmgStr))
+      }
     }
 
   // Demo data to use as a fallback if no file is available
@@ -160,6 +181,6 @@ object QuizOfWordMappings {
     new QuizOfWordMappings(
 	  _currentPromptNumber = (node \ "@currentPromptNumber").text.toInt) {
 	  for (wordMappingGroupXml <- node \\ "wordMappingGroup")
-	    addWordMappingGroup(WordMappingGroup.fromXML(wordMappingGroupXml))	      
+	    addWordMappingGroup(WordMappingGroupReadWrite.fromXML(wordMappingGroupXml))	      
       }
 }
