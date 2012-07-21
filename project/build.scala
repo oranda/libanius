@@ -28,7 +28,7 @@ object General {
   )
 
   val proguardSettings = Seq (
-    useProguard in Android := true  // enable for deploy to device
+    useProguard in Android := false  // enable for deploy to device
   )
 
   lazy val fullAndroidSettings =
@@ -41,7 +41,6 @@ object General {
       keyalias in Android := "alias_name",
       libraryDependencies ++= Seq("org.specs2" %% "specs2" % "1.9" % "test")
     )
-
 }
 
 object AndroidBuild extends Build {
