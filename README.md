@@ -23,6 +23,9 @@ https://play.google.com/store/apps/details?id=com.oranda.libanius
 This includes demo data.
 
 
-Screenshot
-==========
-![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshot.png)
+Screenshots
+===========
+
+![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshotQuizV05.png)
+![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshotDictV05.png)
+
