@@ -17,10 +17,10 @@ object General {
 
   val settings = Defaults.defaultSettings ++ Seq (
     name := "Libanius",
-    version := "0.501",
-    versionCode := 56,
+    version := "0.51",
+    versionCode := 57,
     scalaVersion := "2.9.1",
-    platformName in Android := "android-8",
+    platformName in Android := "android-14",
     scalacOptions += "-deprecation",
     parallelExecution in Test := false
     //resolvers += robospecsReleases,
@@ -28,7 +28,7 @@ object General {
   )
 
   val proguardSettings = Seq (
-    useProguard in Android := false  // enable for deploy to device
+    useProguard in Android := true  // enable for deploy to device
   )
 
   lazy val fullAndroidSettings =
@@ -59,7 +59,5 @@ object AndroidBuild extends Build {
       name := "LibaniusTests"
     )
   ) dependsOn main
-
-
 
 }
