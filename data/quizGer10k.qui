@@ -1,14 +1,12 @@
 quizOfWordMappings currentPromptNumber="0"
 wordMappingGroup keyType="English word" valueType="German word"
-on|fort/auf
-as|als
-agreed|stimmte/ausgemacht/einverstanden/zugestimmt/einig
-was|hieß/sei/lief/entstand/verlief/lag/trug/fiel/befand/saß/betrug/ward/ging/bekam/hielt/ergab/nahm/galt/trat/fand
+perhaps|vielleicht
+personally|persönlich
 type|art
-gnawed|genagt
 arts|künsten
-their|deren
-leadeth|führet
+gnawed|genagt
+agreed|stimmte/ausgemacht/einverstanden/zugestimmt/einig
+leads|führet
 actually|eigentlich/tatsächlich
 chamber|gemach
 become|geworden
@@ -18,19 +16,13 @@ single|einzige
 indeed|zwar
 there|dort/dorthin/daselbst
 head|haupt/kopfe/kopfes/kopf
-to|dazu/gegenüber/sollen
-off|ausgeschaltet/weg/los/auszuschalten/abgesagt
-it|dabei/daraus
 some|etliche/manches/gewisses/manch/gewisser/irgend/einiges/einigen/irgendeine
 other things|anderm
 however|hingegen/jedoch/dagegen
 see|siehst/sehn/siehe/seh
 shall|soll
-perhaps|vielleicht
-personally|persönlich
 affected behavior|gehabe
 know|weisst/kennen/kennenzulernen/kenne/wüßte/weißt/wisse
-at all|gar
 location|stelle/lage
 various|verschiedene
 the very same|selbem
@@ -41,7 +33,6 @@ note|vermerks/scheins/beachten
 older|älter
 poor|arme/arm/armen
 hearing|gehörs
-is|erfolgt/handelt/gilt/setzt/dar/heißt/dient
 follow|folgst/nachfolgen/verfolge/folgen
 as well as|sowie
 similar|ähnlich
