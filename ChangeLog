@@ -1,3 +1,7 @@
+== 0.51 May 29 2013
+
+ * Cleaned up the data a bit, and set the minimum Android API level to Ice Cream Sandwich.
+
 == 0.5  July 20 2012
 
  * Added a dictionary screen, so that words can be looked up and added to the 
