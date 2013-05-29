@@ -38,16 +38,14 @@ object StandardIO {
   }    
   
   def save(fileName: String, strToSave: String) {
-	val file = new File(fileName)
-	writeToFile(fileName, strToSave)
+    val file = new File(fileName)
+    writeToFile(fileName, strToSave)
   }
   
   def writeToFile(fileName: String, data: String) = 
-    using (new FileWriter(fileName)) {
-      fileWriter => fileWriter.write(data)
-  }
+    using (new FileWriter(fileName)) (_.write(data))
   
-  def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
+  private def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
 	  try { f(param) } finally { param.close() }   
   
 }

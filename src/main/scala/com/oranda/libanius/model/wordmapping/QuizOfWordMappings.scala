@@ -77,8 +77,8 @@ class QuizOfWordMappings(_currentPromptNumber: Int)
   
   
   def addWordMappingGroup(wordMappingGroup: WordMappingGroupReadWrite): WordMappingGroupReadWrite = {
-      wordMappingGroups += wordMappingGroup
-      wordMappingGroup
+    wordMappingGroups += wordMappingGroup
+    wordMappingGroup
   }
   
   def removeWordMappingGroup(keyType: String, valueType: String) {

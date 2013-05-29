@@ -39,6 +39,6 @@ object WordMappingGroup extends Platform {
   def splitterLineBreak = getSplitter('\n')
   def splitterKeyValue = getSplitter('|')
   
-  def parseKeyType(str: String) = StringUtil.parseValue(str, "keyType=\"", "\"")  
+  def parseKeyType(str: String) = StringUtil.parseValue(str, "keyType=\"", "\"")
   def parseValueType(str: String) = StringUtil.parseValue(str, "valueType=\"", "\"")
 }
