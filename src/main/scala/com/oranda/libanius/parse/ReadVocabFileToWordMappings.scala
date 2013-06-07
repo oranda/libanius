@@ -31,8 +31,9 @@ abstract class ReadVocabFileToWordMappings {
   def pathVocab = "data/" + Props.fileVocab
   def pathQuiz = "data/" + Props.fileQuiz
   
+  /*
   def readQuizAndVocabFile(): QuizOfWordMappings = {
-    var quiz = new QuizOfWordMappings(_currentPromptNumber = 0) 
+    var quiz = QuizOfWordMappings(currentPromptNumber = 0) 
      
     if (new File(pathQuiz).exists) {
       val fileText = StandardIO.readFile(pathQuiz)      
@@ -43,7 +44,7 @@ abstract class ReadVocabFileToWordMappings {
     println("key words after vocab file: " + quiz.numKeyWords)
     quiz
   }
-  
+  */
   def readVocabFile(quiz: QuizOfWordMappings): QuizOfWordMappings = {
     val myFile = new File(pathVocab)
     val src = Source.fromFile(myFile)
@@ -59,6 +60,7 @@ abstract class ReadVocabFileToWordMappings {
     wmGroupGerToEng.addWordMapping(germanWord, englishWord)
   }
   
+  /*
   def readQuiz : QuizOfWordMappings = {
     val fileText = StandardIO.readFile(pathQuiz)      
     QuizOfWordMappings.fromXML(xml.XML.loadString(fileText))
@@ -72,5 +74,5 @@ abstract class ReadVocabFileToWordMappings {
     StandardIO.save(pathQuiz, quiz.toCustomFormat.toString)
     println("Finished writing " + quiz.numKeyWords 
         + " words with their translations!")
-  }
+  }*/
 }

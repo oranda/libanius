@@ -17,8 +17,8 @@ object General {
 
   val settings = Defaults.defaultSettings ++ Seq (
     name := "Libanius",
-    version := "0.51",
-    versionCode := 57,
+    version := "0.6",
+    versionCode := 58,
     scalaVersion := "2.9.1",
     platformName in Android := "android-14",
     scalacOptions += "-deprecation",
@@ -28,7 +28,7 @@ object General {
   )
 
   val proguardSettings = Seq (
-    useProguard in Android := true  // enable for deploy to device
+    useProguard in Android := false  // enable for deploy to device
   )
 
   lazy val fullAndroidSettings =

@@ -20,10 +20,8 @@ import scala.collection.JavaConversions.mapAsScalaMap
 import scala.collection.immutable.HashSet
 import scala.collection.mutable
 import scala.util.Random
-import android.util.Log
 import com.oranda.libanius.util.StringUtil
 import com.sun.xml.internal.ws.util.StringUtils
-import android.text.TextUtils
 import com.oranda.libanius.util.Util
 import com.oranda.libanius.util.Platform
 
@@ -36,8 +34,8 @@ import com.oranda.libanius.model.ModelComponent
  * The raison d'etre is that it can be loaded quickly: the values for each
  * key value are only parsed on demand.
  */
-case class WordMappingGroupReadOnly(_keyType: String, _valueType: String) 
-    extends WordMappingGroup(_keyType, _valueType) with Platform {
+case class WordMappingGroupReadOnly(override val keyType: String, override val valueType: String) 
+    extends WordMappingGroup(keyType, valueType) with Platform {
   
   // When populating, the java.util map is faster than the mutable Scala map
   private val wordMappings = new java.util.LinkedHashMap[String, String]
@@ -81,8 +79,8 @@ object WordMappingGroupReadOnly {
    *    entertain|unterhalten
    */
   def fromCustomFormat(str: String): WordMappingGroupReadOnly =
-    new WordMappingGroupReadOnly(_keyType = WordMappingGroup.parseKeyType(str),
-        _valueType = WordMappingGroup.parseValueType(str)) {
+    new WordMappingGroupReadOnly(keyType = WordMappingGroup.parseKeyType(str),
+        valueType = WordMappingGroup.parseValueType(str)) {
       
       splitterLineBreak.setString(str)
       splitterLineBreak.next // skip the first line, which has already been parsed

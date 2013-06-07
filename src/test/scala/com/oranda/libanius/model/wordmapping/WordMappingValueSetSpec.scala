@@ -25,7 +25,8 @@ class WordMappingValueSetSpec extends Specification {
   "a word-mapping-value-set" should {
     
     val wmvsCustomFormat = "contract:696,698;697/treaty:796;798"
-      
+    
+      /*
     val wmvsXml = <wordMapping key="Vertrag">
       <wordMappingValue value="contract">
         <userAnswers>
@@ -41,12 +42,12 @@ class WordMappingValueSetSpec extends Specification {
         </userAnswers>
       </wordMappingValue>
     </wordMapping>
-        
+    */    
     
     Props.ANDROID = false
     
     val wmvs = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat) 
-    val wmvsFromXml = WordMappingValueSet.fromXML(wmvsXml)
+    //val wmvsFromXml = WordMappingValueSet.fromXML(wmvsXml)
     
     sequential 
     
@@ -55,23 +56,23 @@ class WordMappingValueSetSpec extends Specification {
       wmvs.size mustEqual 2
       wmvs.toCustomFormat(new StringBuilder("")).toString mustEqual wmvsCustomFormat
     }
-     
+    
+    /*
     "be parseable from XML" in {
       wmvsFromXml.containsValue("treaty")
       wmvsFromXml.size mustEqual 2  
-    }
+    }*/
       
     "allow a word-mapping-value to be added" in {
       val wmvsLocal = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
-      wmvsLocal.addValue(new WordMappingValue("agreement"))
-      wmvsLocal.size mustEqual 3
+      val wmvsNew = wmvsLocal.addValueToEnd(new WordMappingValue("agreement"))
+      wmvsNew.size mustEqual 3
     }
     
     "identify a word-mapping-value that is presentable in the context of the quiz" in {
       val wmvsLocal = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
       val correctAnswers = wmvsLocal.numCorrectAnswers
-      val wmvOpt = wmvsLocal.findPresentableWordMappingValue(
-          currentPromptNumber = 800)
+      val wmvOpt = wmvsLocal.findPresentableWordMappingValue(currentPromptNumber = 800)
       wmvOpt.isDefined mustEqual true
       wmvOpt.get.value mustEqual "contract"
     }      

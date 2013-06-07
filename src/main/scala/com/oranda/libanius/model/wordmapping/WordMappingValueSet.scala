@@ -16,23 +16,20 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.collection.JavaConversions.collectionAsScalaIterable
-import scala.collection.mutable
 import scala.xml.Unparsed
 import scala.xml.Text
 import scala.util.Random
-import android.text.TextUtils
-import android.util.Log
 import com.oranda.libanius.util.StringUtil
 import com.sun.xml.internal.ws.util.StringUtils
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.model.ModelComponent
 import scala.collection.mutable.ArrayBuffer
 
-case class WordMappingValueSet() extends ModelComponent {
-    
-  // A List is a bit faster than a Set when deserializing. High performance is required.
-  var values = List[WordMappingValue]()
+/*
+ * A List is a bit faster than a Set when deserializing. High performance is required.
+ * TODO: try again to convert this to a Set.
+ */
+case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends ModelComponent {    
   
   override def toString = values.toString
   
@@ -61,26 +58,30 @@ case class WordMappingValueSet() extends ModelComponent {
     values.foreach { wmv => numCorrectAnswers += wmv.numCorrectAnswersInARow }
     numCorrectAnswers
   }
-  
-  def addValue(wordMappingValue: WordMappingValue) {
-    if (!values.contains(wordMappingValue))
-      values ::= wordMappingValue
-  } 
-  
-  def filterOut(value: String) = { 
-    values = values.filterNot(_.value == value)
-    this
+
+  def addValueToFront(wordMappingValue: WordMappingValue): WordMappingValueSet = {
+    val newValues = 
+      if (!values.contains(wordMappingValue)) wordMappingValue +: values 
+      else values
+    WordMappingValueSet(newValues)    
+  }
+    
+  def addValueToEnd(wordMappingValue: WordMappingValue): WordMappingValueSet = {
+    val newValues = 
+      if (!values.contains(wordMappingValue)) values :+ wordMappingValue
+      else values
+    WordMappingValueSet(newValues)    
   }
   
-  def removeValue(wordMappingValue: WordMappingValue): Boolean = {
-    val existed = values.contains(wordMappingValue)
-    values = values.filterNot(_ == wordMappingValue) // values -= wordMappingValue    
-    existed
-  } 
+  def filterOut(value: String): WordMappingValueSet = 
+    WordMappingValueSet(values.filterNot(_.value == value))
   
-  def findPresentableWordMappingValue(currentPromptNumber: Int): 
-      Option[WordMappingValue] = 
+  def removeValue(wordMappingValue: WordMappingValue): WordMappingValueSet = 
+    WordMappingValueSet(values.filterNot(_ == wordMappingValue))
+  
+  def findPresentableWordMappingValue(currentPromptNumber: Int): Option[WordMappingValue] = {
     values.iterator.find(_.isPresentable(currentPromptNumber))
+  }
   
   def findAnyUnfinishedWordMappingValue: Option[WordMappingValue] = 
     values.iterator.find(_.isUnfinished)    
@@ -102,25 +103,28 @@ case class WordMappingValueSet() extends ModelComponent {
 
 object WordMappingValueSet extends Platform {
   
-  def combineValueSets(valueSets: Iterable[WordMappingValueSet]) =  
+  def combineValueSets(valueSets: Iterable[WordMappingValueSet]): List[WordMappingValue] =
     valueSets.foldLeft(new ArrayBuffer[WordMappingValue]()) {          
-        (acc, wm) => acc ++ wm.values/*AsScala*/
-    }
+        (acc, wm) => acc ++ wm.values
+    }.toList
   
   val wmvSplitter = getSplitter('/')
   // Example: contract:696,697;698/treaty:796;798
-  def fromCustomFormat(str: String): WordMappingValueSet =
-    new WordMappingValueSet() {
-      wmvSplitter.setString(str)
-      while (wmvSplitter.hasNext)
-        addValue(WordMappingValue.fromCustomFormat(wmvSplitter.next))
-      values = values.reverse
-    }
-    
-  def fromXML(node: xml.Node): WordMappingValueSet = {
-	new WordMappingValueSet() {
-	  for (wordMappingValueXml <- node \\ "wordMappingValue")
-	    addValue(WordMappingValue.fromXML(wordMappingValueXml))
-	}
+  def fromCustomFormat(str: String): WordMappingValueSet = {
+    val values = new ArrayBuffer[WordMappingValue]()
+    wmvSplitter.setString(str)
+    while (wmvSplitter.hasNext)
+      values += WordMappingValue.fromCustomFormat(wmvSplitter.next) 
+    WordMappingValueSet(values.toList)  
   }
+    
+  /*
+  def fromXML(node: xml.Node): WordMappingValueSet = {
+    val values = new ArrayBuffer[WordMappingValue]()
+    for (wordMappingValueXml <- node \\ "wordMappingValue")
+	    values += WordMappingValue.fromXML(wordMappingValueXml)
+    WordMappingValueSet(values.toList) 
+  }
+  */
+  
 }

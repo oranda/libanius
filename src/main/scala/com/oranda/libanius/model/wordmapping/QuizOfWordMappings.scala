@@ -16,7 +16,7 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.collection.immutable.HashSet
+import scala.collection.immutable._
 
 import com.oranda.libanius.model.Quiz
 import com.oranda.libanius.util.StringUtil
@@ -24,15 +24,17 @@ import com.oranda.libanius.Props
 
 import math.BigDecimal.double2bigDecimal
 
-class QuizOfWordMappings(_currentPromptNumber: Int) 
-    extends Quiz(_currentPromptNumber) {
+case class QuizOfWordMappings(currentPromptNumber: Int = 0, 
+    wordMappingGroups: Set[WordMappingGroupReadWrite] = ListSet())  
+    extends Quiz(currentPromptNumber) {
   
-  private var wordMappingGroups = Set[WordMappingGroupReadWrite]()
-  
-  def this() = this(_currentPromptNumber = 0)
+  def this() = this(currentPromptNumber = 0, 
+      wordMappingGroups = ListSet[WordMappingGroupReadWrite]())
 
+  def copy(newPromptNumber: Int) = new QuizOfWordMappings(currentPromptNumber, wordMappingGroups)
+  
   def toXML  =
-    <quizOfWordMappings currentPromptNumber={ _currentPromptNumber.toString }>
+    <quizOfWordMappings currentPromptNumber={ currentPromptNumber.toString }>
       { wordMappingGroups map (wmg => wmg.toXML) }
     </quizOfWordMappings>
       
@@ -45,7 +47,7 @@ class QuizOfWordMappings(_currentPromptNumber: Int)
   def toCustomFormat = {
     // For efficiency, avoiding Scala's mkString 
     val strBuilder = new StringBuilder("quizOfWordMappings currentPromptNumber=\"").
-        append(_currentPromptNumber).append("\"\n")
+        append(currentPromptNumber).append("\"\n")
     StringUtil.mkString(strBuilder, wordMappingGroups, wmgToCustomFormat, '\n')
   }  
   
@@ -53,11 +55,12 @@ class QuizOfWordMappings(_currentPromptNumber: Int)
     wmg.toCustomFormat(strBuilder)
     
   def findOrAddWordMappingGroup(keyType: String, valueType: String): 
-      WordMappingGroupReadWrite = {
-    val wordMappingGroupOpt = findWordMappingGroup(keyType, valueType)    
-    wordMappingGroupOpt match {
-      case Some(wordMappingGroup) => wordMappingGroup
-      case None => addWordMappingGroup(new WordMappingGroupReadWrite(keyType, valueType))
+      (QuizOfWordMappings, WordMappingGroupReadWrite) = {
+    val wordMappingGroup = findWordMappingGroup(keyType, valueType)    
+    wordMappingGroup match {
+      case Some(wordMappingGroup) => (this, wordMappingGroup)
+      case None => val wordMappingGroup = WordMappingGroupReadWrite(keyType, valueType)
+                   (addWordMappingGroup(wordMappingGroup), wordMappingGroup)
     }    
   }
     
@@ -65,37 +68,48 @@ class QuizOfWordMappings(_currentPromptNumber: Int)
       Iterable[String] = {
     findWordMappingGroup(keyType, valueType).foreach(
       _.findValuesFor(keyWord).foreach(wordMappingValueSet =>
-        return wordMappingValueSet.strings        
+        return wordMappingValueSet.strings.toList        
     ))    
     new HashSet[String]
   }
   
   def findWordMappingGroup(keyType: String, valueType: String): 
-      Option[WordMappingGroupReadWrite] =    
+      Option[WordMappingGroupReadWrite] =
     wordMappingGroups.find(wordMappingGroup =>
         keyType == wordMappingGroup.keyType && valueType == wordMappingGroup.valueType)
   
-  
-  def addWordMappingGroup(wordMappingGroup: WordMappingGroupReadWrite): WordMappingGroupReadWrite = {
-    wordMappingGroups += wordMappingGroup
-    wordMappingGroup
-  }
-  
-  def removeWordMappingGroup(keyType: String, valueType: String) {
-    findWordMappingGroup(keyType, valueType).foreach(wordMappingGroups -= _)
+  def removeWordMappingGroup(keyType: String, valueType: String): QuizOfWordMappings = {
+    val wordMappingGroup = findWordMappingGroup(keyType, valueType)
+    val wordMappingGroupsFiltered = wordMappingGroups.filterNot(Some(_) == wordMappingGroup)
+    new QuizOfWordMappings(currentPromptNumber, wordMappingGroupsFiltered)
   }
 
-  def removeWord(keyWord: String, keyType: String, valueType: String): Boolean = {
-    val wordMappingGroupOpt = findWordMappingGroup(keyType, valueType)
-    wordMappingGroupOpt.isDefined && 
-        wordMappingGroupOpt.get.removeWordMapping(keyWord) != None
+  // This will replace any existing wordMappingGroup with the same key-value pair  
+  def addWordMappingGroup(wmg: WordMappingGroupReadWrite): QuizOfWordMappings = {
+    val newQuiz = removeWordMappingGroup(wmg.keyType, wmg.valueType)
+    new QuizOfWordMappings(currentPromptNumber, ListSet(wmg) ++ newQuiz.wordMappingGroups)
+  }
+
+  // Just a synonym for addWordMappingGroup
+  def replaceWordMappingGroup(wmg: WordMappingGroupReadWrite) = addWordMappingGroup(wmg)
+
+  def removeWord(keyWord: String, keyType: String, valueType: String): QuizOfWordMappings = {
+    val wordMappingGroup = findWordMappingGroup(keyType, valueType)
+    wordMappingGroup match {
+      case Some(wmg) => replaceWordMappingGroup(wmg.removeWordMapping(keyWord))
+      case None => this
+    }
   }
   
   def removeWordMappingValue(keyWord: String, wordMappingValue: WordMappingValue,
-      keyType: String, valueType: String): Boolean = {
-    val wordMappingGroupOpt = findWordMappingGroup(keyType, valueType)
-    wordMappingGroupOpt.isDefined && wordMappingGroupOpt.get.
-        removeWordMappingValue(keyWord, wordMappingValue)
+      keyType: String, valueType: String): (QuizOfWordMappings, Boolean) = {
+    val wordMappingGroup = findWordMappingGroup(keyType, valueType)
+    wordMappingGroup match {
+      case Some(wmg) => 
+        val (newWmg, wasRemoved) = wmg.removeWordMappingValue(keyWord, wordMappingValue)
+        (replaceWordMappingGroup(newWmg), wasRemoved)
+      case None => (this, false)
+    }
   }
 
   def findQuizItem: Option[QuizItemViewWithOptions] =
@@ -107,17 +121,24 @@ class QuizOfWordMappings(_currentPromptNumber: Int)
         find(_.isDefined).getOrElse(None)  
 
   def addWordMappingToFrontOfTwoGroups(keyType: String, valueType: String, 
-      keyWord: String, value: String) {
-    // E.g. add to the English -> German group
-    addWordMappingToFront(keyType, valueType, keyWord, value)
-    // E.g. add to the German -> English group
-    addWordMappingToFront(valueType, keyType, value, keyWord)
-    
+      keyWord: String, value: String): QuizOfWordMappings = {
+        
     def addWordMappingToFront(keyType: String, valueType: String, 
-        keyWord: String, value: String) {
-      findWordMappingGroup(keyType, valueType).foreach(_.addWordMappingToFront(
-          keyWord, value))
+        keyWord: String, value: String): QuizOfWordMappings = {
+      val wmg = findWordMappingGroup(keyType, valueType)
+      wmg match {
+        case Some(wmg) => replaceWordMappingGroup(wmg.addWordMappingToFront(keyWord, value))
+        case None => this
+      }
     }
+    
+    // E.g. add to the English -> German group
+    val quizAfter1stChange = addWordMappingToFront(keyType, valueType, keyWord, value)
+    
+    // E.g. add to the German -> English group
+    val quizAfter2ndChange = addWordMappingToFront(valueType, keyType, value, keyWord)
+    
+    quizAfter2ndChange
   }
   
   def numGroups = wordMappingGroups.size
@@ -140,23 +161,30 @@ class QuizOfWordMappings(_currentPromptNumber: Int)
         (acc._1 + group.numItemsAndCorrectAnswers._1,
          acc._2 + group.numItemsAndCorrectAnswers._2))
          
-  def merge(otherQuiz: QuizOfWordMappings) {
-    otherQuiz.wordMappingGroups.foreach { otherWmg =>
-      val wmg = findOrAddWordMappingGroup(otherWmg.keyType, otherWmg.valueType)
-      wmg.merge(otherWmg)
+  def merge(otherQuiz: QuizOfWordMappings): QuizOfWordMappings = {
+    val wordMappingGroupsCombined = otherQuiz.wordMappingGroups.foldLeft(wordMappingGroups) { 
+      (acc, otherWmg) => 
+        val wmg = findWordMappingGroup(otherWmg.keyType, otherWmg.valueType)
+        val wmgMerged = otherWmg.merge(wmg)
+        wordMappingGroups.filterNot(Some(_) == wmg) + wmgMerged
     }      
+    new QuizOfWordMappings(currentPromptNumber, wordMappingGroupsCombined)
   }
 }
 
 object QuizOfWordMappings {
-  def fromCustomFormat(str: String): QuizOfWordMappings =
-    new QuizOfWordMappings(
-	  _currentPromptNumber = parseCurrentPromptNumber(str)) { 
-      val wmgStrs = str.split("wordMappingGroup").tail
-      wmgStrs.foreach { wmgStr => 
-        addWordMappingGroup(WordMappingGroupReadWrite.fromCustomFormat(wmgStr))
-      }
+  def fromCustomFormat(str: String): QuizOfWordMappings = {
+    
+    var quiz = QuizOfWordMappings(currentPromptNumber = parseCurrentPromptNumber(str)) 
+    
+    val wmgStrs = str.split("wordMappingGroup").tail
+    wmgStrs.foreach { wmgStr => 
+      quiz = quiz.addWordMappingGroup(WordMappingGroupReadWrite.fromCustomFormat(wmgStr))
     }
+        
+    quiz
+  }
+
 
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat =
@@ -173,14 +201,16 @@ object QuizOfWordMappings {
     "wider|against\n" +
     "unterhalten|entertain"
  
-  
   def parseCurrentPromptNumber(str: String) = 
     StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt
     
+  /*
   def fromXML(node: xml.Node): QuizOfWordMappings =
     new QuizOfWordMappings(
-	  _currentPromptNumber = (node \ "@currentPromptNumber").text.toInt) {
-	  for (wordMappingGroupXml <- node \\ "wordMappingGroup")
-	    addWordMappingGroup(WordMappingGroupReadWrite.fromXML(wordMappingGroupXml))	      
-      }
+	 currentPromptNumber = (node \ "@currentPromptNumber").text.toInt) {
+	   for (wordMappingGroupXml <- node \\ "wordMappingGroup")
+	     addWordMappingGroup(WordMappingGroupReadWrite.fromXML(wordMappingGroupXml))	      
+     }
+     
+  */
 }

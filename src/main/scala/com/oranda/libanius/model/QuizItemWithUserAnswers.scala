@@ -16,7 +16,6 @@
 
 package com.oranda.libanius.model
 import com.oranda.libanius.Props
-import android.util.Log
 import com.oranda.libanius.util.StringSplitter
 
 trait QuizItemWithUserAnswers extends ModelComponent {
@@ -51,8 +50,7 @@ trait QuizItemWithUserAnswers extends ModelComponent {
      * Try different pairs of values for these criteria until a quiz item fits.
      */
     val criteriaSets = Seq((1, 5), (2, 40), (3, 800), /*(4, 5000),*/ (0, -1))
-    criteriaSets.exists(criteria => 
-      isPresentable(currentPromptNum, criteria._1, criteria._2))
+    criteriaSets.exists(criteria => isPresentable(currentPromptNum, criteria._1, criteria._2))
   }
   
   def isPresentable(currentPromptNum : Int, 

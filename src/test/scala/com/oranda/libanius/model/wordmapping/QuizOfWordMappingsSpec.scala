@@ -39,7 +39,7 @@ class QuizOfWordMappingsSpec extends Specification {
         "wordMappingGroup keyType=\"German word\" valueType=\"English word\"\n" +
         "unterwegs|en route\n" +
         "Vertrag|contract:696,697;698/treaty:796;798" 
-    
+/*    
     val quizXml = <quizOfWordMappings currentPromptNumber="0">
   <wordMappingGroup keyType="English word" valueType="German word">
     <wordMapping key="against">  
@@ -100,28 +100,30 @@ class QuizOfWordMappingsSpec extends Specification {
     </wordMapping>
   </wordMappingGroup>
 </quizOfWordMappings>
-  
+  */
     Props.ANDROID = false
     
     val quiz = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
-    val quizFromXml = QuizOfWordMappings.fromXML(quizXml)
+    //val quizFromXml = QuizOfWordMappings.fromXML(quizXml)
     
     sequential 
     
     "be parseable from custom format" in {
       quiz.currentPromptNumber mustEqual 0
-      val wmg = quiz.findWordMappingGroup(keyType = "German word", 
-          valueType = "English word")
+      val wmg = quiz.findWordMappingGroup(keyType = "German word", valueType = "English word")
       wmg.isDefined mustEqual true
       quiz.toCustomFormat.toString mustEqual quizCustomFormat
     }
     
+    /*
+     * deprecated
+     
     "be parseable from XML" in {
       quizFromXml.currentPromptNumber mustEqual 0
       val wmg = quiz.findWordMappingGroup(keyType = "German word", 
           valueType = "English word")
       wmg.isDefined mustEqual true
-    }
+    }*/
     
     /* TODO
     "find a presentable quiz item" in {
@@ -139,8 +141,8 @@ class QuizOfWordMappingsSpec extends Specification {
     
     "allow key-words to be deleted from a particular group" in {
       val quizLocal = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
-      quizLocal.removeWord("full", "English word", "German word")
-      val wmg = quizLocal.findWordMappingGroup(keyType = "English word", 
+      val quizUpdated = quizLocal.removeWord("full", "English word", "German word")
+      val wmg = quizUpdated.findWordMappingGroup(keyType = "English word", 
           valueType = "German word").get
       wmg.contains("full") mustEqual false
     }
@@ -149,10 +151,9 @@ class QuizOfWordMappingsSpec extends Specification {
       val quizLocal = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
       quizLocal.numGroups mustEqual 2 // precondition
       val wmg = WordMappingGroupReadWrite("English word", "German word")
-      quizLocal.addWordMappingGroup(wmg) // should have no effect
-      quizLocal.numGroups mustEqual 2
+      val quizUpdated = quizLocal.addWordMappingGroup(wmg) // should have no effect
+      quizUpdated.numGroups mustEqual 2
     }
-    
     
     /*
      * XML on Android is too slow, so a custom format is used    
@@ -166,7 +167,8 @@ class QuizOfWordMappingsSpec extends Specification {
       val quiz = QuizOfWordMappings.fromCustomFormat(fileText)        
       val endParse = System.currentTimeMillis()
       println("Time to parse: " + (endParse - startParse))
-      endParse - startParse must be<(2500L)
+      endParse - startParse must be<(250L)  // 843
     }
+    
   }
 }

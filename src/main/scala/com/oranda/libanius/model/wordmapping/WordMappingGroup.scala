@@ -19,10 +19,8 @@ package com.oranda.libanius.model.wordmapping
 import scala.collection.JavaConversions.mapAsScalaMap
 import scala.collection.immutable.HashSet
 import scala.util.Random
-import android.util.Log
 import com.oranda.libanius.util.StringUtil
 import com.sun.xml.internal.ws.util.StringUtils
-import android.text.TextUtils
 import com.oranda.libanius.util.Util
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.model.ModelComponent

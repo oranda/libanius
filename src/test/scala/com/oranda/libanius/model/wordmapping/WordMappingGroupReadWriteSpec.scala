@@ -76,7 +76,7 @@ class WordMappingGroupReadWriteSpec extends Specification {
     
     val wmg: WordMappingGroupReadWrite = 
         WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
-    val wmgFromXml = WordMappingGroupReadWrite.fromXML(wmgXml)
+    //val wmgFromXml = WordMappingGroupReadWrite.fromXML(wmgXml)
     
     sequential 
     
@@ -86,18 +86,18 @@ class WordMappingGroupReadWriteSpec extends Specification {
       wmg.toCustomFormat(new StringBuilder()).toString mustEqual wmgCustomFormat
       wmg.numKeyWords mustEqual 10
     }
-    
+    /*
     "be parseable from XML" in {
       wmgFromXml.keyType mustEqual "English word"
       wmgFromXml.valueType mustEqual "German word"
       wmgFromXml.numKeyWords mustEqual 10
     }
-    
+    */
     "accept the addition of a new word-mapping" in {
       val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
       wmgLocal.contains("good") mustEqual false
-      wmgLocal.addWordMapping("good", "gut")
-      wmgLocal.contains("good") mustEqual true
+      val wmgUpdated = wmgLocal.addWordMapping("good", "gut")
+      wmgUpdated.contains("good") mustEqual true
     }
     
     "accept new values for an existing word-mapping" in {
@@ -105,20 +105,20 @@ class WordMappingGroupReadWriteSpec extends Specification {
       val valuesForAgainst = wmgLocal.findValuesFor("against")
       valuesForAgainst.isDefined mustEqual true
       valuesForAgainst.get.size mustEqual 1
-      wmgLocal.addWordMapping("against", "gegen")
-      wmgLocal.findValuesFor("against").get.size mustEqual 2
+      val wmgUpdated = wmgLocal.addWordMapping("against", "gegen")
+      wmgUpdated.findValuesFor("against").get.size mustEqual 2
     }
     
     "generate false answers similar to a correct answer" in {
-      val wmvs = new WordMappingValueSet
-      wmvs.addValue(new WordMappingValue("unterhalten"))
+      val wmvs = WordMappingValueSet()
+      wmvs.addValueToEnd(new WordMappingValue("unterhalten"))
       val falseAnswers = wmg.makeFalseSimilarAnswers(
           wordMappingCorrectValues = wmvs,
           correctValue = new WordMappingValue("unterhalten"), 
           numCorrectAnswersSoFar = 2, numFalseAnswersRequired = 5)
       falseAnswers.contains("unterrichten") mustEqual true
     }
-    
+
     
     def pullQuizItem(wmg: WordMappingGroupReadWrite) = {
       val quizItem = wmg.findPresentableQuizItem(currentPromptNumber = 0)
@@ -130,35 +130,40 @@ class WordMappingGroupReadWriteSpec extends Specification {
     
     "add a new word mapping to the front of the its queue" in {
       val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
-      wmgLocal.addWordMappingToFront("to exchange", "tauschen")      
-      pullQuizItem(wmgLocal) mustEqual ("to exchange", "tauschen")       
+      val wmgUpdated = wmgLocal.addWordMappingToFront("to exchange", "tauschen")   
+      //true mustEqual true
+      pullQuizItem(wmgUpdated) mustEqual ("to exchange", "tauschen")       
     }
     
     "move an existing word mapping to the front of its queue" in {
       val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
-      val numKeyWordsBefore = wmgFromXml.numKeyWords
-      wmgLocal.addWordMappingToFront("sweeps", "streicht") 
-      val numKeyWordsAfter = wmgFromXml.numKeyWords
+      val numKeyWordsBefore = wmgLocal.numKeyWords
+      val wmgUpdated = wmgLocal.addWordMappingToFront("sweeps", "streicht") 
+      val numKeyWordsAfter = wmgUpdated.numKeyWords
       numKeyWordsAfter mustEqual numKeyWordsBefore 
-      pullQuizItem(wmgLocal) mustEqual ("sweeps", "streicht")   
+      pullQuizItem(wmgUpdated) mustEqual ("sweeps", "streicht")   
     }
     
-    "move a word mapping to the front of its queue where the key already exists" in {
+    "move a word mapping to the front of its queue where only the key already exists" in {
       val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
-      val numKeyWordsBefore = wmgFromXml.numKeyWords
-      wmgLocal.addWordMappingToFront("entertain", "bewirten") 
-      val numKeyWordsAfter = wmgFromXml.numKeyWords
+      val numKeyWordsBefore = wmgLocal.numKeyWords
+      val wmgUpdated = wmgLocal.addWordMappingToFront("entertain", "bewirten") 
+      val numKeyWordsAfter = wmgUpdated.numKeyWords
       numKeyWordsAfter mustEqual numKeyWordsBefore      
-      pullQuizItem(wmgLocal) mustEqual ("entertain", "bewirten") 
+      pullQuizItem(wmgUpdated) mustEqual ("entertain", "bewirten") 
     }  
     
     "add more than one new word mapping to the front of the its queue" in {
       val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
-      wmgLocal.addWordMappingToFront("to exchange", "tauschen")
-      wmgLocal.addWordMappingToFront("whole", "ganz")
-      println("wmgLocal: " + wmgLocal.toString)
-      pullQuizItem(wmgLocal) mustEqual ("whole", "ganz")   
-      pullQuizItem(wmgLocal) mustEqual ("to exchange", "tauschen")
+      val wmgUpdated1 = wmgLocal.addWordMappingToFront("to exchange", "tauschen")
+      val wmgUpdated2 = wmgUpdated1.addWordMappingToFront("whole", "ganz")
+      println("wmgUpdated2: " + wmgUpdated2.toString)
+      pullQuizItem(wmgUpdated2) mustEqual ("whole", "ganz")   
+      pullQuizItem(wmgUpdated2) mustEqual ("to exchange", "tauschen")
     }
+    
+    
   }
+      
+    
 }

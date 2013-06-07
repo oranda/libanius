@@ -23,14 +23,17 @@ import com.oranda.libanius.Props
 import com.oranda.libanius.model.Quiz
 
 // This class is old, needs updating
-class QuizOfQuestions(_currentPromptNumber: Int) extends Quiz(_currentPromptNumber) {
+class QuizOfQuestions(val currentPromptNumber: Int) extends Quiz(currentPromptNumber) {
+  // TODO: convert to an immutable parameter
   private[this] val questionItems : LinkedHashSet[QuestionItem] = new LinkedHashSet()
   
   def numQuestionItems = questionItems.size
   
+  def copy(newPromptNumber: Int) = new QuizOfQuestions(currentPromptNumber)
+  
   def toXML =
     <quiz>
-      <currentPromptNumber>{_currentPromptNumber}</currentPromptNumber>
+      <currentPromptNumber>{currentPromptNumber}</currentPromptNumber>
       <QuestionItems>{questionItems map (q => q.toXML) }</QuestionItems>
     </quiz>
 
@@ -75,18 +78,20 @@ class QuizOfQuestions(_currentPromptNumber: Int) extends Quiz(_currentPromptNumb
 object QuizOfQuestions {
   def fromXML(node: xml.Node): QuizOfQuestions =
 	new QuizOfQuestions(
-	    _currentPromptNumber = (node \ "currentPromptNumber").text.toInt) {	    
+	    currentPromptNumber = (node \ "currentPromptNumber").text.toInt) {	    
 	  val quizItemsXml = (node \ "quizItems")
 	  for (quizItemXml <- quizItemsXml \\ "quizItem")
 	    addItem(Some(QuestionItem.fromXML(quizItemXml)))
 	}
     
-  def fromCustomFormat(strCustomFormat: String): QuizOfQuestions = 
-    new QuizOfQuestions(_currentPromptNumber = 0) {
-      val lines = strCustomFormat.split("\\n")
-      currentPromptNumber = lines(0).toInt
+  def fromCustomFormat(strCustomFormat: String): QuizOfQuestions = {
+    val lines = strCustomFormat.split("\\n")
+    val currentPromptNumber = lines(0).toInt
+    new QuizOfQuestions(currentPromptNumber) {  
       lines.foreach(line => 
         if (line.contains("§§")) 
           addItem(Some(QuestionItem.fromCustomFormat(line))))
     }
+  }
+
 }

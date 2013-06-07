@@ -62,7 +62,7 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
     log("Libanius", "onCreate")
-    setContentView(R.layout.main) 
+    setContentView(R.layout.main)
 	initQuiz()
 	loadDictionaryInBackground()
     testUserWithQuizItem
@@ -76,9 +76,13 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
       val value = extras.getString(Props.VALUE)
       log("Libanius", "received vars " + keyWord + " " + value)
       if (dictionaryIsDefined)
-        quiz.addWordMappingToFrontOfTwoGroups(dictionary._keyType, 
-            dictionary._valueType, keyWord, value)   
+        updateQuiz(quiz.addWordMappingToFrontOfTwoGroups(dictionary.keyType, 
+            dictionary.valueType, keyWord, value))   
 	}
+  }
+  
+  def updateQuiz(newQuiz: QuizOfWordMappings) {
+    GlobalState.quiz = Some(newQuiz)
   }
   
   def loadDictionaryInBackground() {
@@ -147,10 +151,12 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   def answerOption3Clicked(v: View) { processUserAnswer(answerOption3Button) }
   
   def removeCurrentWord(v: View) {
-    if (quiz.removeWordMappingValue(currentQuizItem.keyWord, 
-        currentQuizItem.wordMappingValue, currentQuizItem.keyType, 
-        currentQuizItem.valueType))
-      printStatus("Deleted word " + currentQuizItem.keyWord)
+    val (newQuiz, wasRemoved) = quiz.removeWordMappingValue(currentQuizItem.keyWord, 
+        currentQuizItem.wordMappingValue, currentQuizItem.keyType, currentQuizItem.valueType)
+        
+    updateQuiz(newQuiz)
+    
+    if (wasRemoved) printStatus("Deleted word " + currentQuizItem.keyWord)
     testUserWithQuizItemAgain()    
   }
   

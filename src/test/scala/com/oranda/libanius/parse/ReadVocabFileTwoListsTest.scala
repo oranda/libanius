@@ -23,7 +23,7 @@ import com.oranda.libanius.Props
 object ReadVocabFileTwoListsTest {
 
   def main(args: Array[String]) {
-    
+   /* 
     val quizXml = 
 <quizOfWordMappings currentPromptNumber="0">
   <wordMappingGroup keyType="EnglishWord" valueType="GermanWord">
@@ -71,11 +71,13 @@ object ReadVocabFileTwoListsTest {
 </quizOfWordMappings>
 
     Props.ANDROID = false
-    
+   
     val quiz = QuizOfWordMappings.fromXML(quizXml)
     
     val quizXmlNew: xml.Node = quiz.toXML
     
     print(new PrettyPrinter(999, 2).format(quizXmlNew)) // just an eyeball test for now
+    
+    */
   }
 }

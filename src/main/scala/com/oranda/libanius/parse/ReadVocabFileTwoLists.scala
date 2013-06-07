@@ -33,9 +33,9 @@ object ReadVocabTwoLists extends ReadVocabFileToWordMappings {
       QuizOfWordMappings = {
 
     val wmGroupEngToGer = quiz.findOrAddWordMappingGroup(
-        keyType="English word", valueType="German word")
+        keyType="English word", valueType="German word")._2
     val wmGroupGerToEng = quiz.findOrAddWordMappingGroup(
-        keyType="German word", valueType="English word")
+        keyType="German word", valueType="English word")._2
     
     src.getLines.foreach(line => readQuizItemFrequency(line.trim))
     println("germanWords length: " + germanWords.size)

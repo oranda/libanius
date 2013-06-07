@@ -17,25 +17,20 @@
 package com.oranda.libanius.model.wordmapping
 
 import scala.collection.JavaConversions.mapAsScalaMap
-import scala.collection.immutable.HashSet
-import scala.collection.mutable.LinkedHashMap
-import scala.collection.mutable
+import scala.collection.immutable._
 import scala.util.Random
 
 import com.oranda.libanius.util.Util
 
-case class WordMappingGroupReadWrite(_keyType: String, _valueType: String) 
-    extends WordMappingGroup(_keyType, _valueType) {
+case class WordMappingGroupReadWrite(override val keyType: String, override val valueType: String, 
+      wordMappings: ListMap[String, WordMappingValueSet] = ListMap()) 
+    extends WordMappingGroup(keyType, valueType) {
   // keyType example: "English word"
   // valueType example: "German word"
   
-  // When populating, the java.util map is faster than the mutable Scala map.
-  private val wordMappings = new java.util.LinkedHashMap[String, WordMappingValueSet]
-  
-  // ... but apart from that we want a Scala version of the map so as to use Scala syntax
-  private def wordMappingsAsScala: mutable.Map[String, WordMappingValueSet] = 
-    wordMappings
-  
+  def thisUpdated(newWordMappings: ListMap[String, WordMappingValueSet]) =
+    WordMappingGroupReadWrite(keyType, valueType, newWordMappings)
+    
   def toXML =
     <wordMappingGroup keyType={keyType} valueType={valueType}>
       {wordMappings map (keyValue => 
@@ -64,13 +59,13 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
   def size = wordMappings.size  
   def numKeyWords = wordMappings.size
 
-  def numValues = wordMappingsAsScala.values.iterator.foldLeft(0)(_ + _.size)
+  def numValues = wordMappings.values.iterator.foldLeft(0)(_ + _.size)
   
   def numItemsAndCorrectAnswers = {
     /*
      * The functional version (commented) is about 50% slower than the imperative version
      *  
-     * wordMappingsAsScala.values.iterator.foldLeft(Pair(0, 0))((acc, value) =>
+     * wordMappings.values.iterator.foldLeft(Pair(0, 0))((acc, value) =>
      *    (acc._1 + value.numItemsAndCorrectAnswers._1, 
      *     acc._2 + value.numItemsAndCorrectAnswers._2))
      */
@@ -90,74 +85,71 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
   def contains(wordMapping: String): Boolean = wordMappings.contains(wordMapping)
 
   // probably too slow to be useful  (and not a lazy val because values can be deleted)
-  // def allWordMappingValues = combineValueSets(wordMappingsAsScala.values)          
+  // def allWordMappingValues = combineValueSets(wordMappings.values)          
   
+  /*
   def addWordMapping(keyValuePairOpt: Option[Pair[String, String]]): Unit =
     keyValuePairOpt.foreach { keyValuePair =>
       addWordMapping(keyValuePair._1, keyValuePair._2)
     }
-    
-  def addWordMapping(key: String, value: String) {
+  */
+  
+  def addWordMapping(key: String, value: String): WordMappingGroupReadWrite = {
     if (!key.isEmpty && !value.isEmpty && key.toLowerCase != value.toLowerCase)
-      addWordMappingCore(key, value)
+      addWordMappingToEnd(key, value)
+    else 
+      this
   }
   
-  protected def addWordMappingCore(key: String, value: String) {
-    val existingValuesOpt = wordMappingsAsScala.get(key)
-    val existingValues = existingValuesOpt match {
-        case Some(existingValues) => existingValues
-        case None => val wmvs = new WordMappingValueSet()
-          wordMappings.put(key, wmvs)
-          wmvs
-    }          
-    existingValues.addValue(new WordMappingValue(value))
+  private def updatedWordMappingValueSet(key: String, value: String): WordMappingValueSet = {
+    val wmvsOld = findValuesFor(key)
+    val wmvNew = WordMappingValue(value)
+    wmvsOld match {
+      case Some(wmvsOld) => wmvsOld.addValueToFront(wmvNew)
+      case _ => new WordMappingValueSet(List(wmvNew))      
+    }   
   }
   
-  def addWordMappingToFront(keyWord: String, value: String) {
+  protected def addWordMappingToEnd(key: String, value: String): WordMappingGroupReadWrite = {
+    val wmvsNew = updatedWordMappingValueSet(key, value)
+    val wordMappingsNew = wordMappings + Pair(key, wmvsNew)
+    thisUpdated(wordMappingsNew)
+  }
   
-    implicit def prepend[K, V](map: mutable.Map[K, V]) = new {
-      def prepend(kv: (K, V)) {
-        // Warning: val copy = map.toMap causes a 2nd prepend to fail
-        val copy = new mutable.LinkedHashMap[K, V]
-        copy ++= map
-        map.clear
-        map += kv
-        map ++= copy
-      }
-    }
+  def addWordMappingToFront(key: String, value: String): WordMappingGroupReadWrite = {
+    val wmvsNew = updatedWordMappingValueSet(key, value)
+    val wordMappingsNew = ListMap[String, WordMappingValueSet](key -> wmvsNew) ++ 
+        wordMappings.filterNot(_._1 == key) 
+    thisUpdated(wordMappingsNew)
+  }
+  
+  def addWordMapping(key: String, wordMappingValueSetOpt: Option[WordMappingValueSet]): 
+      WordMappingGroupReadWrite =        
+    if (wordMappingValueSetOpt.isDefined) addWordMapping(wordMappings, key, wordMappingValueSetOpt.get)
+    else this
+  
+  def addWordMapping(key: String, wordMappingValueSet: WordMappingValueSet): 
+      WordMappingGroupReadWrite = addWordMapping(wordMappings, key, wordMappingValueSet)
     
-    val newWordMappings = new java.util.LinkedHashMap[String, WordMappingValueSet]
-    val wmvsOpt = findValuesFor(keyWord)
-    var wmvsNew = wmvsOpt match {
-      case Some(wmvs) => wmvsOpt.get.filterOut(value)
-      case _ => new WordMappingValueSet
-    }
-    wmvsNew.addValue(new WordMappingValue(value))
-    wordMappingsAsScala.prepend((keyWord, wmvsNew))
-  }
+  def addWordMapping(wordMappings: ListMap[String, WordMappingValueSet], 
+      key: String, wordMappingValueSet: WordMappingValueSet) = 
+    thisUpdated(wordMappings + Pair(key, wordMappingValueSet))
   
-  def addWordMapping(key: String, wordMappingValueSetOpt: Option[WordMappingValueSet]) =
-    wordMappingValueSetOpt.foreach(wordMappings.put(key, _))
-  
-  def addWordMapping(key: String, wordMappingValueSet: WordMappingValueSet) =
-    wordMappings.put(key, wordMappingValueSet)
-  
-  def removeWordMapping(key: String): Option[WordMappingValueSet] = 
-    wordMappingsAsScala.remove(key)
+  def removeWordMapping(key: String) = thisUpdated(wordMappings.filter(_._1 != key))
 
-  def removeWordMappingValue(keyWord: String, 
-      wordMappingValue: WordMappingValue): Boolean = {
-    val wmvs = wordMappings.get(keyWord)
-    wmvs != null && wmvs.removeValue(wordMappingValue)
-  }
+  def removeWordMappingValue(keyWord: String, wordMappingValue: WordMappingValue): 
+      (WordMappingGroupReadWrite, Boolean) =
+    wordMappings.get(keyWord) match {
+      case Some(wmvs) => (addWordMapping(keyWord, wmvs.removeValue(wordMappingValue)), true)
+      case _ => (this, false)
+    }
   
   def findValuesFor(keyWord: String): Option[WordMappingValueSet] = 
-    wordMappingsAsScala.get(keyWord)
-  
+    wordMappings.get(keyWord)
   
   def findPresentableQuizItem(currentPromptNumber: Int): 
       Option[QuizItemViewWithOptions] = 
-    wordMappingsAsScala.iterator.map(entry => 
+    wordMappings.iterator.map(entry => 
         findPresentableQuizItem(entry._1, entry._2, currentPromptNumber)).
         find(_.isDefined).getOrElse(findAnyUnfinishedQuizItem)
 
@@ -173,7 +165,7 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
   }
   
   def findAnyUnfinishedQuizItem: Option[QuizItemViewWithOptions] =
-    wordMappingsAsScala.iterator.map(entry => 
+    wordMappings.iterator.map(entry => 
         findAnyUnfinishedQuizItem(entry._1,  entry._2)).
         find(_.isDefined).getOrElse(None)
 
@@ -195,7 +187,7 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
       wordMappingValueCorrect: WordMappingValue, numCorrectAnswersSoFar: Int): 
       Set[String] = {
     
-    var falseAnswers = new HashSet[String]
+    var falseAnswers = new ListSet[String]
     val numFalseAnswersRequired = 2
     
     /*
@@ -206,7 +198,7 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
       falseAnswers ++= Util.stopwatch(makeFalseSimilarAnswers(wordMappingCorrectValues,
           wordMappingValueCorrect, numCorrectAnswersSoFar, numFalseAnswersRequired), 
           "makeFalseSimilarAnswers")
-    
+          
     // try again to fill the falseAnswers
     var totalTries = 20 // to stop any infinite loop
     while (falseAnswers.size < numFalseAnswersRequired && totalTries > 0) {
@@ -215,8 +207,12 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
       if (!wordMappingCorrectValues.containsValue(randomAnswer))
          falseAnswers += randomAnswer
     }
+    
+    // final try to fill false answers: use dummy data
+    if (falseAnswers.isEmpty) falseAnswers += ""
     while (falseAnswers.size < numFalseAnswersRequired)
-      falseAnswers += ""
+      falseAnswers += (falseAnswers.last + " ")
+ 
     falseAnswers
   }
   
@@ -224,10 +220,9 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
       correctValue: WordMappingValue, numCorrectAnswersSoFar: Int, 
       numFalseAnswersRequired: Int): Set[String] = {
     var similarWords = new HashSet[String]
-    val similarityFunction = 
-          if (numCorrectAnswersSoFar % 2 == 1) hasSameStart else hasSameEnd
+    val similarityFunction = if (numCorrectAnswersSoFar % 2 == 1) hasSameStart else hasSameEnd
     var numValueSetsSearched = 0
-    wordMappingsAsScala.values.iterator.takeWhile(
+    wordMappings.values.iterator.takeWhile(
         _ => similarWords.size < numFalseAnswersRequired).
             foreach(
               wmvs => {
@@ -253,29 +248,33 @@ case class WordMappingGroupReadWrite(_keyType: String, _valueType: String)
     wordMappingValues(randomIndex).value
   } 
   
-  def randomValues(sliceSize: Int) = WordMappingValueSet.combineValueSets(
-      randomSliceOfValueSets(sliceSize))
+  def randomValues(sliceSize: Int) = 
+    WordMappingValueSet.combineValueSets(randomSliceOfValueSets(sliceSize))
   
-  def randomSliceOfValueSets(sliceSize: Int): Iterable[WordMappingValueSet] = {
-    if (sliceSize >= size)
-      wordMappingsAsScala.values
+  def randomSliceOfValueSets(sliceSize: Int): Iterable[WordMappingValueSet] =
+    if (sliceSize >= size) wordMappings.values.toList
     else {
       val randomStart = Random.nextInt(size - sliceSize)
-      wordMappingsAsScala.values.slice(randomStart, randomStart + sliceSize).
-          toArray[WordMappingValueSet]
+      wordMappings.values.slice(randomStart, randomStart + sliceSize).toList
     }
-  }
   
-  def merge(otherWmg: WordMappingGroupReadWrite) {
-    otherWmg.wordMappingsAsScala.foreach { kvPair => 
-      addWordMapping(kvPair._1, kvPair._2) 
+  def merge(otherWmg: Option[WordMappingGroupReadWrite]): WordMappingGroupReadWrite =
+    otherWmg match {
+      case Some(otherWmg) => merge(otherWmg)
+      case _ => this
     }
+  
+  def merge(otherWmg: WordMappingGroupReadWrite): WordMappingGroupReadWrite = {
+    val wordMappingsCombined = otherWmg.wordMappings.foldLeft(wordMappings) { 
+      (acc, kvPair) => wordMappings + Pair(kvPair._1, kvPair._2)
+    }
+    thisUpdated(wordMappingsCombined)
   }
   
   def keyBeginningWith(keyStart: String) = 
     wordMappings.keys.find(_.startsWith(keyStart)) 
   
-  def hasKey(key: String): Boolean = wordMappings.containsKey(key)
+  def hasKey(key: String): Boolean = wordMappings.isDefinedAt(key)
 }
 
 
@@ -291,33 +290,47 @@ object WordMappingGroupReadWrite {
    *    against|wider
    *    entertain|unterhalten
    */
-  def fromCustomFormat(str: String): WordMappingGroupReadWrite =
-    new WordMappingGroupReadWrite(_keyType = WordMappingGroup.parseKeyType(str),
-        _valueType = WordMappingGroup.parseValueType(str)) {
+  def fromCustomFormat(str: String): WordMappingGroupReadWrite = {
+    
+    // Initial parsing is performance-critical, so this part is done in a mutable Java map.
+    //var wordMappings = new java.util.LinkedHashMap[String, WordMappingValueSet]()
+    var wordMappings = ListMap[String, WordMappingValueSet]()
+    
+    splitterLineBreak.setString(str)
+    splitterLineBreak.next // skip the first line, which has already been parsed
       
-      splitterLineBreak.setString(str)
-      splitterLineBreak.next // skip the first line, which has already been parsed
-      
-      while (splitterLineBreak.hasNext) {
-        splitterKeyValue.setString(splitterLineBreak.next)
+    while (splitterLineBreak.hasNext) {
+      splitterKeyValue.setString(splitterLineBreak.next)
         
+      if (splitterKeyValue.hasNext) {
+        val strKey = splitterKeyValue.next
         if (splitterKeyValue.hasNext) {
-          val strKey = splitterKeyValue.next
-          if (splitterKeyValue.hasNext) {
-            val strValues = splitterKeyValue.next
-            addWordMapping(strKey, WordMappingValueSet.fromCustomFormat(strValues))
-          }
+          val strValues = splitterKeyValue.next
+          wordMappings += Pair(strKey, WordMappingValueSet.fromCustomFormat(strValues))
         }
       }
     }
     
+    //val list = wordMappings.toList
+    
+    //val listMap: collection.immutable.ListMap[String, WordMappingValueSet] = 
+    //    list.map{ e => (e._1, e._2) } (collection.breakOut)
+  
+    // Now use the persistent data structure.
+    var wmg = new WordMappingGroupReadWrite(keyType = WordMappingGroup.parseKeyType(str),
+        valueType = WordMappingGroup.parseValueType(str), wordMappings /*ListMap(wordMappings.toList:_*)*/)
+    
+    wmg
+  }
+
+  /*  
   def fromXML(node: xml.Node): WordMappingGroupReadWrite = {
-	new WordMappingGroupReadWrite(_keyType = (node \ "@keyType").text, 
-	    _valueType = (node \ "@valueType").text) {  
+	new WordMappingGroupReadWrite(keyType = (node \ "@keyType").text, 
+	    valueType = (node \ "@valueType").text) {  
 	  for (wordMappingXml <- node \\ "wordMapping") {
 	    val wmvs = WordMappingValueSet.fromXML(wordMappingXml)
 	    addWordMapping((wordMappingXml \ "@key").text, Some(wmvs))
 	  }
 	}  
-  }
+  }*/
 }
