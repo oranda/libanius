@@ -1,6 +1,19 @@
-== 0.51 May 29 2013
+== 0.6  July 3 2013
+
+  * Converted core types to persistent data structures.
+
+  * Implemented lazy parsing (using Stream and a Lazy Load Proxy with an implicit conversion)
+    to ensure the app is quickly available to the user on startup.
+
+  * Removed support for XML quiz format.
+
+  * Changed static properties to a configuration object using com.typesafe.config.
+
+
+== 0.51  May 29 2013
 
  * Cleaned up the data a bit, and set the minimum Android API level to Ice Cream Sandwich.
+
 
 == 0.5  July 20 2012
 
