@@ -20,15 +20,16 @@ object General {
     version := "0.6",
     versionCode := 58,
     scalaVersion := "2.9.1",
-    platformName in Android := "android-14",
+    platformName in Android := "android-14",  // formerly android-8
     scalacOptions += "-deprecation",
-    parallelExecution in Test := false
-    //resolvers += robospecsReleases,
-    //libraryDependencies += robospecs
+    parallelExecution in Test := false,
+    resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+    libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0"),
+    unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "config") }
   )
 
   val proguardSettings = Seq (
-    useProguard in Android := false  // enable for deploy to device
+    useProguard in Android := true  // enable for deploy to device
   )
 
   lazy val fullAndroidSettings =
@@ -56,7 +57,9 @@ object AndroidBuild extends Build {
     settings = General.settings ++
                AndroidTest.settings ++
                General.proguardSettings ++ Seq (
-      name := "LibaniusTests"
+      name := "LibaniusTests"    
+      //resolvers += robospecsReleases,
+      //libraryDependencies += robospecs
     )
   ) dependsOn main
 

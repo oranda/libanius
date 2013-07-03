@@ -17,7 +17,7 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 import com.oranda.libanius.model.UserAnswer
 
 class WordMappingGroupReadWriteSpec extends Specification {
@@ -36,43 +36,8 @@ class WordMappingGroupReadWriteSpec extends Specification {
         "contract|Vertrag\n" +
         "rides|reitet\n" +
         "sweeps|streicht"
-        
-    val wmgXml = 
-  <wordMappingGroup keyType="English word" valueType="German word">
-    <wordMapping key="against">  
-      <wordMappingValue value="wider"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="entertain">  
-      <wordMappingValue value="unterhalten"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="teach">
-      <wordMappingValue value="unterrichten"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="winner"> 
-      <wordMappingValue value="Siegerin"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="en route"> 
-      <wordMappingValue value="unterwegs"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="full">
-      <wordMappingValue value="satt"><userAnswers></userAnswers></wordMappingValue> 
-      <wordMappingValue value="voll"><userAnswers></userAnswers></wordMappingValue>   
-    </wordMapping>
-    <wordMapping key="interrupted"> 
-      <wordMappingValue value="unterbrochen"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="contract">
-      <wordMappingValue value="Vertrag"><userAnswers></userAnswers></wordMappingValue>        
-    </wordMapping>
-    <wordMapping key="rides"> 
-      <wordMappingValue value="reitet"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="sweeps">  
-      <wordMappingValue value="streicht"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-  </wordMappingGroup>
-  
-    Props.ANDROID = false
+
+    Conf.setUpDummy()
     
     val wmg: WordMappingGroupReadWrite = 
         WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
@@ -86,19 +51,13 @@ class WordMappingGroupReadWriteSpec extends Specification {
       wmg.toCustomFormat(new StringBuilder()).toString mustEqual wmgCustomFormat
       wmg.numKeyWords mustEqual 10
     }
-    /*
-    "be parseable from XML" in {
-      wmgFromXml.keyType mustEqual "English word"
-      wmgFromXml.valueType mustEqual "German word"
-      wmgFromXml.numKeyWords mustEqual 10
-    }
-    */
     "accept the addition of a new word-mapping" in {
       val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
       wmgLocal.contains("good") mustEqual false
       val wmgUpdated = wmgLocal.addWordMapping("good", "gut")
       wmgUpdated.contains("good") mustEqual true
     }
+     
     
     "accept new values for an existing word-mapping" in {
       val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
@@ -157,13 +116,9 @@ class WordMappingGroupReadWriteSpec extends Specification {
       val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
       val wmgUpdated1 = wmgLocal.addWordMappingToFront("to exchange", "tauschen")
       val wmgUpdated2 = wmgUpdated1.addWordMappingToFront("whole", "ganz")
-      println("wmgUpdated2: " + wmgUpdated2.toString)
       pullQuizItem(wmgUpdated2) mustEqual ("whole", "ganz")   
       pullQuizItem(wmgUpdated2) mustEqual ("to exchange", "tauschen")
     }
-    
-    
   }
       
-    
 }

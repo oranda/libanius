@@ -18,13 +18,13 @@ package com.oranda.libanius.model
 
 import com.oranda.libanius.model.wordmapping.WordMappingValue
 import org.specs2.mutable.Specification
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 
 class UserAnswerSpec extends Specification {
   
   "a user answer" should {
-    
-    Props.ANDROID = false
+
+    Conf.setUpDummy()
     
     val uaXml = <userAnswer wasCorrect="true" promptNumber="1"></userAnswer>
   

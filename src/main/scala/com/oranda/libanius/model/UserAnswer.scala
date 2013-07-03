@@ -16,7 +16,7 @@
 
 package com.oranda.libanius.model
 
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 
 case class UserAnswer(val wasCorrect: Boolean, val promptNumber: Int) 
     extends ModelComponent {

@@ -18,7 +18,7 @@ package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.io.StandardIO
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 
 class QuizOfWordMappingsSpec extends Specification {
   
@@ -38,70 +38,9 @@ class QuizOfWordMappingsSpec extends Specification {
         "sweeps|streicht\n" +
         "wordMappingGroup keyType=\"German word\" valueType=\"English word\"\n" +
         "unterwegs|en route\n" +
-        "Vertrag|contract:696,697;698/treaty:796;798" 
-/*    
-    val quizXml = <quizOfWordMappings currentPromptNumber="0">
-  <wordMappingGroup keyType="English word" valueType="German word">
-    <wordMapping key="against">  
-      <wordMappingValue value="wider">
-        <userAnswers>
-          <userAnswer wasCorrect="true" promptNumber="696"/>
-          <userAnswer wasCorrect="false" promptNumber="697"/>
-        </userAnswers>
-      </wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="entertain">  
-      <wordMappingValue value="unterhalten"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="teach">
-      <wordMappingValue value="unterrichten"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="winner"> 
-      <wordMappingValue value="Siegerin"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="en route"> 
-      <wordMappingValue value="unterwegs"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="full">
-      <wordMappingValue value="satt"><userAnswers></userAnswers></wordMappingValue> 
-      <wordMappingValue value="voll"><userAnswers></userAnswers></wordMappingValue>   
-    </wordMapping>
-    <wordMapping key="interrupted"> 
-      <wordMappingValue value="unterbrochen"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="contract">
-      <wordMappingValue value="Vertrag"><userAnswers></userAnswers></wordMappingValue>        
-    </wordMapping>
-    <wordMapping key="rides"> 
-      <wordMappingValue value="reitet"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-    <wordMapping key="sweeps">  
-      <wordMappingValue value="streicht"><userAnswers></userAnswers></wordMappingValue> 
-    </wordMapping>
-  </wordMappingGroup>
-  <wordMappingGroup keyType="German word" valueType="English word">
-    <wordMapping key="unterwegs">
-      <wordMappingValue value="en route"><userAnswers></userAnswers></wordMappingValue>
-    </wordMapping>
-    <wordMapping key="Vertrag">
-      <wordMappingValue value="contract">
-        <userAnswers>
-          <userAnswer wasCorrect="true" promptNumber="696"/>
-          <userAnswer wasCorrect="true" promptNumber="697"/>
-          <userAnswer wasCorrect="false" promptNumber="698"/>
-        </userAnswers>
-      </wordMappingValue>
-      <wordMappingValue value="treaty">
-        <userAnswers>
-          <userAnswer wasCorrect="true" promptNumber="796"/>
-          <userAnswer wasCorrect="false" promptNumber="798"/>
-        </userAnswers>
-      </wordMappingValue>
-    </wordMapping>
-  </wordMappingGroup>
-</quizOfWordMappings>
-  */
-    Props.ANDROID = false
+        "Vertrag|contract:696,697;698/treaty:796;798"
+
+    Conf.setUpDummy()
     
     val quiz = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
     //val quizFromXml = QuizOfWordMappings.fromXML(quizXml)
@@ -114,16 +53,6 @@ class QuizOfWordMappingsSpec extends Specification {
       wmg.isDefined mustEqual true
       quiz.toCustomFormat.toString mustEqual quizCustomFormat
     }
-    
-    /*
-     * deprecated
-     
-    "be parseable from XML" in {
-      quizFromXml.currentPromptNumber mustEqual 0
-      val wmg = quiz.findWordMappingGroup(keyType = "German word", 
-          valueType = "English word")
-      wmg.isDefined mustEqual true
-    }*/
     
     /* TODO
     "find a presentable quiz item" in {
@@ -139,14 +68,30 @@ class QuizOfWordMappingsSpec extends Specification {
       translations.contains("treaty") mustEqual true
     }    
     
-    "allow key-words to be deleted from a particular group" in {
-      val quizLocal = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
-      val quizUpdated = quizLocal.removeWord("full", "English word", "German word")
-      val wmg = quizUpdated.findWordMappingGroup(keyType = "English word", 
+    "delete key-words from a particular group" in {
+      val quizBefore = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
+      val wmgBefore = quizBefore.findWordMappingGroup(keyType = "English word",
           valueType = "German word").get
-      wmg.contains("full") mustEqual false
+      wmgBefore.contains("full") mustEqual true
+      val quizAfter = quizBefore.removeWord("full", "English word", "German word")
+      val wmgAfter = quizAfter.findWordMappingGroup(keyType = "English word",
+          valueType = "German word").get
+      wmgAfter.contains("full") mustEqual false
     }
-    
+
+    "delete a word mapping without deleting the word" in {
+      val quizBefore = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
+      val (quizAfter, result) = quizBefore.removeWordMappingValue(
+          keyWord = "Vertrag", wordMappingValue = WordMappingValue("contract"),
+          keyType = "German word", valueType = "English word")
+
+      result mustEqual true
+      val translations = quizAfter.findValuesFor(keyWord = "Vertrag",
+          keyType = "German word", valueType = "English word").toSet[String]
+      translations.contains("contract") mustEqual false
+      translations.contains("treaty") mustEqual true
+    }
+
     "contain unique groups only" in {
       val quizLocal = QuizOfWordMappings.fromCustomFormat(quizCustomFormat)
       quizLocal.numGroups mustEqual 2 // precondition
@@ -158,8 +103,9 @@ class QuizOfWordMappingsSpec extends Specification {
     /*
      * XML on Android is too slow, so a custom format is used    
      *
-     * This is not the important performance test. Performance still needs to 
-     * tested manually using logging with both the emulator and a real device.
+     * This is not the main performance test, just a sanity check. 
+     * (Real performance tests can be done manually using logging with both the 
+     * emulator and a real device.)
      */
     "deserialize a big quiz quickly" in {
       val fileText = StandardIO.readFile("data/quizGer20k.qui")
@@ -167,7 +113,7 @@ class QuizOfWordMappingsSpec extends Specification {
       val quiz = QuizOfWordMappings.fromCustomFormat(fileText)        
       val endParse = System.currentTimeMillis()
       println("Time to parse: " + (endParse - startParse))
-      endParse - startParse must be<(250L)  // 843
+      endParse - startParse must be<(2500L)  
     }
     
   }

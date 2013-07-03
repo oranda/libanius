@@ -16,8 +16,6 @@
 
 package com.oranda.libanius.util
 
-import android.util.Log
-import java.lang.Character
 
 object Util extends Platform {
   
@@ -25,8 +23,7 @@ object Util extends Platform {
     val start = System.currentTimeMillis()
     val result = fn
     val end = System.currentTimeMillis()
-    log("Libanius", "time taken for " + actionDescription + " was " +
-        (end - start) + "ms")
+    log("Libanius", "time taken for " + actionDescription + " was " + (end - start) + "ms")
     result
   }
 }

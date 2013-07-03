@@ -26,18 +26,17 @@ trait DataStore extends Platform {
   
   def readQuiz(ctx: Context): QuizOfWordMappings = {
     val fileText =
-      if (ctx.getFileStreamPath(Props.fileQuiz).exists)
+      if (ctx.getFileStreamPath(Conf.conf.fileQuiz).exists)
         try {
           // TODO: consider changing to Platform.readFile
-          Util.stopwatch(AndroidIO.readFile(ctx, Props.fileQuiz), 
-              "reading quiz from data/files")
+          Util.stopwatch(AndroidIO.readFile(ctx, Conf.conf.fileQuiz), "reading quiz from data/files")
         } catch { 
           // for security access exceptions or anything else unexpected
           case e: Exception => fallBackToDemoQuiz(e.getMessage())
         }
       else {
         try {
-          Util.stopwatch(AndroidIO.readResource(ctx, Props.resQuizPublic),
+          Util.stopwatch(AndroidIO.readResource(ctx, Conf.conf.resQuizPublic),
               "reading quiz from res/raw")
         } catch {
           case e: Exception => fallBackToDemoQuiz("Could not load quiz from res/raw")
@@ -48,36 +47,33 @@ trait DataStore extends Platform {
        
   def fallBackToDemoQuiz(errmsg: String): String = {
     log("Libanius", errmsg + " Using demo data")
-    Props.fileQuizRoot = "quizTestData" // for saving
+    Conf.conf.fileQuizRoot = "quizTestData" // for saving
     QuizOfWordMappings.demoDataInCustomFormat
   }
   
   def saveQuiz(ctx: Context, quiz: QuizOfWordMappings) {
     val str = Util.stopwatch(quiz.toCustomFormat, "serialize the quiz")
-    AndroidIO.save(ctx, Props.fileQuiz, Props.fileQuizLastBackup, str.toString)
+    AndroidIO.save(ctx, Conf.conf.fileQuiz, Conf.conf.fileQuizLastBackup, str.toString)
   }
   
   def readDictionary(ctx: Context): WordMappingGroupReadOnly = {
-   
     val fileText = readDictionaryText(ctx)
     var dictionary = WordMappingGroupReadOnly("", "")
     try {
       dictionary = Util.stopwatch(WordMappingGroupReadOnly.fromCustomFormat(
         fileText), "reading and parsing dictionary")
     } catch {
-      case e: Exception => log("Libanius", 
-          "Could not parse dictionary: " + e.getMessage(), e)
+      case e: Exception => log("Libanius", "Could not parse dictionary: " + e.getMessage(), e)
     }
-    val msg = "Finished reading " + dictionary.numKeyWords + " dictionary key words!"
-    log("Libanius", msg)
+    log("Libanius", "Finished reading " + dictionary.numKeyWords + " dictionary key words!")
     dictionary
   }
   
   def readDictionaryText(ctx: Context): String = {
-    if (ctx.getFileStreamPath(Props.fileDictionary).exists)
+    if (ctx.getFileStreamPath(Conf.conf.fileDictionary).exists)
       try {
         // TODO: consider changing to Platform.readFile
-        AndroidIO.readFile(ctx, Props.fileDictionary)
+        AndroidIO.readFile(ctx, Conf.conf.fileDictionary)
       } catch { 
         // for security access exceptions or anything else unexpected
         case e: Exception => log("Libanius", e.getMessage())
@@ -85,7 +81,7 @@ trait DataStore extends Platform {
       }
     else {
       try {
-        Util.stopwatch(AndroidIO.readResource(ctx, Props.resDictPublic),
+        Util.stopwatch(AndroidIO.readResource(ctx, Conf.conf.resDictPublic),
             "reading quiz from res/raw")
       } catch {
         case e: Exception => log("Libanius", 

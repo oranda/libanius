@@ -15,7 +15,7 @@
  */
 
 package com.oranda.libanius.model
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 
 abstract class Quiz(currentPromptNumber: Int) extends ModelComponent {
   
@@ -24,7 +24,7 @@ abstract class Quiz(currentPromptNumber: Int) extends ModelComponent {
   def incPromptNumber = copy(currentPromptNumber + 1)
   
   def scoreSoFar : BigDecimal = {  // out of 1.0
-    val availableScorePerItem = (1.0 / numItems) /  Props.NUM_CORRECT_ANSWERS_REQUIRED : BigDecimal
+    val availableScorePerItem = (1.0 / numItems) /  Conf.conf.numCorrectAnswersRequired : BigDecimal
     availableScorePerItem * numCorrectAnswers
   }  
   

@@ -17,7 +17,7 @@
 package com.oranda.libanius.model.questions
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 
 
 class QuizOfQuestionsSpec extends Specification {
@@ -40,8 +40,8 @@ class QuizOfQuestionsSpec extends Specification {
     </quizItem>
   </quizItems>
 </quiz>
-  
-    Props.ANDROID = false
+
+    Conf.setUpDummy()
     
     val quiz = QuizOfQuestions.fromXML(quizXml)
      

@@ -25,11 +25,6 @@ import com.oranda.libanius.util.StringSplitter
 case class WordMappingValue(val value: String) extends QuizItemWithUserAnswers { 
      
   override def toString = value   // e.g. "unterrichten"
-
-  def toXML =
-      <wordMappingValue value={value}>
-        <userAnswers>{userAnswers map (u => u.toXML) }</userAnswers>
-      </wordMappingValue>
   
   // Example: nachlösen:1,7,9;6
   def toCustomFormat(strBuilder: StringBuilder): StringBuilder = {
@@ -92,11 +87,4 @@ object WordMappingValue extends Platform {
       }
     }
   }
-  
-  def fromXML(node: xml.Node): WordMappingValue =
-	new WordMappingValue(value = (node \ "@value").text) {
-      val answers = (node \ "userAnswers")
-	  for (userAnswer <- answers \\ "userAnswer")
-	    addUserAnswer(UserAnswer.fromXML(userAnswer))
-	}    
 }

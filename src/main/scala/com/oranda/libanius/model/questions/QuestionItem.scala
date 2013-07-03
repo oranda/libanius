@@ -17,7 +17,7 @@
 package com.oranda.libanius.model.questions
 
 import scala.xml.Node
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 import com.oranda.libanius.model.UserAnswer
 import scala.util.matching.Regex
 import com.oranda.libanius.model.QuizItemWithUserAnswers
@@ -93,7 +93,7 @@ class QuestionItem extends QuizItemWithUserAnswers {
   }
   
   def scoreSoFar : BigDecimal =  // out of 1
-    numCorrectAnswersInARow.toFloat / Props.NUM_CORRECT_ANSWERS_REQUIRED : BigDecimal
+    numCorrectAnswersInARow.toFloat / Conf.conf.numCorrectAnswersRequired : BigDecimal
     
   def toXML =
 <quizItem>

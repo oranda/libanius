@@ -18,7 +18,7 @@ package com.oranda.libanius.util
 
 import scala.collection.JavaConverters._
 import java.util.HashMap
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 import java.util.Iterator
 import android.text.TextUtils
 import android.util.Log
@@ -29,19 +29,19 @@ import android.util.Log
 trait Platform {
  
   def getSplitter(char: java.lang.Character): StringSplitter =
-    if (Props.ANDROID)
+    if (Conf.conf.useAndroid)
       new StringSplitterAndroid(char)
     else 
       new StringSplitterDefault(char)
    
   def log(module: String, message: String) =
-    if (Props.ANDROID)
+    if (Conf.conf.useAndroid)
       Log.d(module, message)
     else
       System.out.println(module + ": " + message)
       
   def log(module: String, message: String, t: Throwable) =
-    if (Props.ANDROID)
+    if (Conf.conf.useAndroid)
       Log.d(module, message, t)
     else {
       System.out.println(module + ": " + message)

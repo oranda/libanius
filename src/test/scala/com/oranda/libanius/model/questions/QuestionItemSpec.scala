@@ -17,7 +17,7 @@
 package com.oranda.libanius.model.questions
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 
 class QuestionItemSpec extends Specification {
 
@@ -29,8 +29,8 @@ class QuestionItemSpec extends Specification {
   <answer>(The World Wide) Web</answer>
   <userAnswers></userAnswers>
 </quizItem>
-  
-    Props.ANDROID = false
+
+    Conf.setUpDummy()
     
     val qi = QuestionItem.fromXML(qiXml)
     

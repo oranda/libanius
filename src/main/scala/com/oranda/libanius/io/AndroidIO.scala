@@ -16,7 +16,7 @@
 
 package com.oranda.libanius.io
 
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 import _root_.android.content.Context
 import _root_.java.io._
 import _root_.android.util.Log
@@ -29,7 +29,8 @@ object AndroidIO {
     readInputStream(ctx, fileToInputStream)
   }
   
-  def readResource(ctx: Context, resID: Int): String = {    
+  def readResource(ctx: Context, resName: String): String = {
+    def resID = ctx.getResources().getIdentifier(resName, "raw", ctx.getPackageName)
     def resourceToInputStream(ctx: Context) = ctx.getResources().openRawResource(resID)
     readInputStream(ctx, resourceToInputStream)
   }
@@ -68,7 +69,7 @@ object AndroidIO {
 	//Platform.log("AndroidIO.save", "Renaming " + fileName + " to " + fileNameBackup)
 	file.renameTo(file2) // Doesn't seem to work, but not crucial
 
-	writeToFile(Props.fileQuiz, strToSave, ctx)
+	writeToFile(Conf.conf.fileQuiz, strToSave, ctx)
   }
 
   def writeToFile(fileName:String, data:String, ctx:Context) = {

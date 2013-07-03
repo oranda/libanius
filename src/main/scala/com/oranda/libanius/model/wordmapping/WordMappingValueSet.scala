@@ -24,29 +24,29 @@ import com.sun.xml.internal.ws.util.StringUtils
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.model.ModelComponent
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.ListBuffer
+
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
  * TODO: try again to convert this to a Set.
  */
-case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends ModelComponent {    
+case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {    
   
   override def toString = values.toString
-  
-  def toXML = values map (_.toXML)
     
   // Example: contract:696,697;698/treaty:796;798
   def toCustomFormat(strBuilder: StringBuilder) = 
     StringUtil.mkString(strBuilder, values, wmvToCustomFormat, '/')
   
-  def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue) =
+  def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue): StringBuilder =
     wmv.toCustomFormat(strBuilder)
     
   def strings: Iterable[String] = values map (_.toString ) 
   
   def size = values.size
   
-  def numItemsAndCorrectAnswers = Pair(size, numCorrectAnswers)
+  def numItemsAndCorrectAnswers: Pair[Int, Int] = Pair(size, numCorrectAnswers)
   
   def numCorrectAnswers = {
     /*
@@ -79,10 +79,9 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends Mod
   def removeValue(wordMappingValue: WordMappingValue): WordMappingValueSet = 
     WordMappingValueSet(values.filterNot(_ == wordMappingValue))
   
-  def findPresentableWordMappingValue(currentPromptNumber: Int): Option[WordMappingValue] = {
+  def findPresentableWordMappingValue(currentPromptNumber: Int): Option[WordMappingValue] =
     values.iterator.find(_.isPresentable(currentPromptNumber))
-  }
-  
+   
   def findAnyUnfinishedWordMappingValue: Option[WordMappingValue] = 
     values.iterator.find(_.isUnfinished)    
     
@@ -96,14 +95,13 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends Mod
   
   def containsValue(value: String): Boolean = findValue(value).isDefined
   
-  def valueBeginningWith(valueStart: String) = 
-    values.find(_.value.startsWith(valueStart))
+  def valueBeginningWith(valueStart: String) = values.find(_.value.startsWith(valueStart))
 }
 
 
 object WordMappingValueSet extends Platform {
   
-  def combineValueSets(valueSets: Iterable[WordMappingValueSet]): List[WordMappingValue] =
+  def combineValueSets(valueSets: Iterable[WordMappingValueSetWrapperBase]): List[WordMappingValue] =
     valueSets.foldLeft(new ArrayBuffer[WordMappingValue]()) {          
         (acc, wm) => acc ++ wm.values
     }.toList
@@ -111,20 +109,41 @@ object WordMappingValueSet extends Platform {
   val wmvSplitter = getSplitter('/')
   // Example: contract:696,697;698/treaty:796;798
   def fromCustomFormat(str: String): WordMappingValueSet = {
-    val values = new ArrayBuffer[WordMappingValue]()
+    
+    val values = new ListBuffer[WordMappingValue]()
     wmvSplitter.setString(str)
     while (wmvSplitter.hasNext)
       values += WordMappingValue.fromCustomFormat(wmvSplitter.next) 
-    WordMappingValueSet(values.toList)  
+    WordMappingValueSet(values.toList)
   }
     
-  /*
-  def fromXML(node: xml.Node): WordMappingValueSet = {
-    val values = new ArrayBuffer[WordMappingValue]()
-    for (wordMappingValueXml <- node \\ "wordMappingValue")
-	    values += WordMappingValue.fromXML(wordMappingValueXml)
-    WordMappingValueSet(values.toList) 
-  }
-  */
-  
 }
+
+abstract class WordMappingValueSetWrapperBase {
+  def wmvs: WordMappingValueSet
+}
+
+/*
+ * This object provides an implicit conversion so that calls to a proxy object are
+ * automatically forwarded to the concrete entity that it wraps.
+ */
+object WordMappingValueSetWrapperBase {
+  implicit def proxy2wmvs(proxy: WordMappingValueSetWrapperBase): WordMappingValueSet = proxy.wmvs
+}
+
+/*
+ * Because deserializing a WordMappingValueSet is slow, it is wrapped in a Proxy that
+ * supports lazy initialization.
+ */
+case class WordMappingValueSetLazyProxy(valuesString: String) 
+    extends WordMappingValueSetWrapperBase {   
+  
+  lazy val wmvs: WordMappingValueSet = WordMappingValueSet.fromCustomFormat(valuesString)
+}
+
+/*
+ * When a new WordMappingValueSet is generated from a proxied WordMappingValueSet, it needs to be
+ * wrapped in order to have a type compatible with the original WordMappingValueSetLazyProxy.
+ */
+case class WordMappingValueSetWrapper(wmvs: WordMappingValueSet) 
+    extends WordMappingValueSetWrapperBase

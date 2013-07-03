@@ -23,13 +23,13 @@ import scala.xml.PrettyPrinter
 import com.oranda.libanius.io.StandardIO
 import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
 import com.oranda.libanius.model.wordmapping.WordMappingGroup
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 import com.oranda.libanius.model.wordmapping.WordMappingGroupReadWrite
 
 abstract class ReadVocabFileToWordMappings {
   
-  def pathVocab = "data/" + Props.fileVocab
-  def pathQuiz = "data/" + Props.fileQuiz
+  def pathVocab = "data/" + Conf.conf.fileVocab
+  def pathQuiz = "data/" + Conf.conf.fileQuiz
   
   /*
   def readQuizAndVocabFile(): QuizOfWordMappings = {

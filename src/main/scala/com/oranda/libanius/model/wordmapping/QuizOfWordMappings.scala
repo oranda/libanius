@@ -20,7 +20,7 @@ import scala.collection.immutable._
 
 import com.oranda.libanius.model.Quiz
 import com.oranda.libanius.util.StringUtil
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 
 import math.BigDecimal.double2bigDecimal
 
@@ -32,11 +32,6 @@ case class QuizOfWordMappings(currentPromptNumber: Int = 0,
       wordMappingGroups = ListSet[WordMappingGroupReadWrite]())
 
   def copy(newPromptNumber: Int) = new QuizOfWordMappings(currentPromptNumber, wordMappingGroups)
-  
-  def toXML  =
-    <quizOfWordMappings currentPromptNumber={ currentPromptNumber.toString }>
-      { wordMappingGroups map (wmg => wmg.toXML) }
-    </quizOfWordMappings>
       
   /*
    * Example:
@@ -63,7 +58,7 @@ case class QuizOfWordMappings(currentPromptNumber: Int = 0,
                    (addWordMappingGroup(wordMappingGroup), wordMappingGroup)
     }    
   }
-    
+     
   def findValuesFor(keyWord: String, keyType: String, valueType: String): 
       Iterable[String] = {
     findWordMappingGroup(keyType, valueType).foreach(
@@ -150,7 +145,7 @@ case class QuizOfWordMappings(currentPromptNumber: Int = 0,
   override def scoreSoFar: BigDecimal = {  // out of 1.0
     val _numItemsAndCorrectAnswers = numItemsAndCorrectAnswers
     val scoreSoFar = _numItemsAndCorrectAnswers._2.toDouble / 
-        (_numItemsAndCorrectAnswers._1 * Props.NUM_CORRECT_ANSWERS_REQUIRED).toDouble
+        (_numItemsAndCorrectAnswers._1 * Conf.conf.numCorrectAnswersRequired).toDouble
     scoreSoFar
   } 
   
@@ -203,14 +198,5 @@ object QuizOfWordMappings {
  
   def parseCurrentPromptNumber(str: String) = 
     StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt
-    
-  /*
-  def fromXML(node: xml.Node): QuizOfWordMappings =
-    new QuizOfWordMappings(
-	 currentPromptNumber = (node \ "@currentPromptNumber").text.toInt) {
-	   for (wordMappingGroupXml <- node \\ "wordMappingGroup")
-	     addWordMappingGroup(WordMappingGroupReadWrite.fromXML(wordMappingGroupXml))	      
-     }
-     
-  */
+
 }

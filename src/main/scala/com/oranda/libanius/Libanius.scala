@@ -15,14 +15,10 @@
  */
 package com.oranda.libanius
 
-import java.io.File
 import java.lang.CharSequence
 import java.lang.Runnable
-import java.lang.System
-import com.oranda.libanius.io.AndroidIO
 import com.oranda.libanius.model.wordmapping.QuizItemViewWithOptions
 import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
-import com.oranda.libanius.model.wordmapping.WordMappingGroupReadOnly
 import com.oranda.libanius.model.UserAnswer
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.util.Util
@@ -35,7 +31,6 @@ import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import scala.io.Source
 
 class Libanius extends Activity with TypedActivity with Platform with DataStore 
     with Timestamps {
@@ -50,6 +45,12 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   private[this] lazy val prevAnswerOption1Label: TextView = findView(TR.prevAnswerOption1)
   private[this] lazy val prevAnswerOption2Label: TextView = findView(TR.prevAnswerOption2)
   private[this] lazy val prevAnswerOption3Label: TextView = findView(TR.prevAnswerOption3)
+
+  private lazy val answerOptionButtons = List(answerOption1Button, answerOption2Button,
+      answerOption3Button)
+  private lazy val prevOptionLabels = List(prevAnswerOption1Label, prevAnswerOption2Label,
+      prevAnswerOption3Label)
+
   private[this] lazy val speedLabel: TextView = findView(TR.speed)
   private[this] lazy val statusLabel: TextView = findView(TR.status)
   
@@ -61,24 +62,25 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
+    Conf.setUp()
     log("Libanius", "onCreate")
     setContentView(R.layout.main)
-	initQuiz()
-	loadDictionaryInBackground()
-    testUserWithQuizItem
+    initQuiz()
+    loadDictionaryInBackground()
+    testUserWithQuizItem()
   }
   
   def initQuiz() {
     GlobalState.initQuiz(readQuizUi)
-    val extrasOpt = Option(getIntent().getExtras()) // values from SearchDictionary activity
-    extrasOpt.foreach { extras =>
-	  val keyWord = extras.getString(Props.KEY_WORD)
-      val value = extras.getString(Props.VALUE)
+    val extras = Option(getIntent().getExtras()) // values from the SearchDictionary Activity
+    extras.foreach { extras =>
+	    val keyWord = extras.getString(Conf.conf.keyWord)
+      val value = extras.getString(Conf.conf.value)
       log("Libanius", "received vars " + keyWord + " " + value)
       if (dictionaryIsDefined)
         updateQuiz(quiz.addWordMappingToFrontOfTwoGroups(dictionary.keyType, 
             dictionary.valueType, keyWord, value))   
-	}
+	  }
   }
   
   def updateQuiz(newQuiz: QuizOfWordMappings) {
@@ -90,7 +92,7 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
     new AsyncTask[Object, Object, Object] {      
       override def doInBackground(args: Object*): Object = {
         GlobalState.initDictionary(readDictionary(ctx))
-	    None
+        None
       }
     }.execute()
   }
@@ -128,10 +130,8 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   
   def showNextQuizItem() {
     quiz.incPromptNumber
-    
-    answerOption1Button.setBackgroundColor(Color.LTGRAY)
-    answerOption2Button.setBackgroundColor(Color.LTGRAY)
-    answerOption3Button.setBackgroundColor(Color.LTGRAY)
+
+    answerOptionButtons.foreach(_.setBackgroundColor(Color.LTGRAY))
 
     questionLabel.setText(currentQuizItem.keyWord)
     var questionNotesText = "What is the " + currentQuizItem.valueType + "?"
@@ -141,9 +141,7 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
     questionNotesLabel.setText(questionNotesText)
         
     val optionsIter = currentQuizItem.optionsInRandomOrder().iterator
-    answerOption1Button.setText(optionsIter.next)
-    answerOption2Button.setText(optionsIter.next)
-    answerOption3Button.setText(optionsIter.next)
+    answerOptionButtons.foreach(_.setText(optionsIter.next))
   }
   
   def answerOption1Clicked(v: View) { processUserAnswer(answerOption1Button) }
@@ -175,16 +173,12 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
     currentQuizItem.wordMappingValue.addUserAnswer(userAnswer)
     
     var prevQuestionText = "PREV: " + questionLabel.getText
-    val maxAnswers = Props.NUM_CORRECT_ANSWERS_REQUIRED
+    val maxAnswers = Conf.conf.numCorrectAnswersRequired
     if (currentQuizItem.wordMappingValue.numCorrectAnswersInARow == maxAnswers)
       prevQuestionText += " (correct " + maxAnswers + " times -- COMPLETE)"
     prevQuestionLabel.setText(prevQuestionText)
-    
-    val answerOptionButtons = List(answerOption1Button, answerOption2Button, 
-        answerOption3Button)
-    val prevOptionsLabels = List(prevAnswerOption1Label, prevAnswerOption2Label,
-        prevAnswerOption3Label)  
-    val buttonsToLabels = answerOptionButtons zip prevOptionsLabels
+
+    val buttonsToLabels = answerOptionButtons zip prevOptionLabels
     
     buttonsToLabels.foreach { buttonToLabel =>
       setPrevOptionsText(buttonToLabel._2, buttonToLabel._1.getText)
@@ -196,7 +190,7 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
       setColorOnAnswer(buttonToLabel._1, buttonToLabel._2, correctButton, clickedButton)
     }  
     
-    val delayMillis = if (isCorrect) 50 else 500
+    val delayMillis = if (isCorrect) 10 else 300
     val handler = new Handler
     handler.postDelayed(new Runnable() { def run() = testUserWithQuizItemAgain() }, 
         delayMillis)
@@ -248,15 +242,9 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
     }.execute()
   }
   
-  def showSpeed() {
-    speedLabel.setText("Speed: " + answerSpeed + "/min")
-  }  
+  def showSpeed() { speedLabel.setText("Speed: " + answerSpeed + "/min") }
   
-  def printStatus(text: String) {
-    statusLabel.setText(text)
-  }
+  def printStatus(text: String) { statusLabel.setText(text) }
   
-  def printScore(score: String) {
-    statusLabel.setText("Score: " + score)
-  }
+  def printScore(score: String) { statusLabel.setText("Score: " + score) }
 }

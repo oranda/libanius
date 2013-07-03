@@ -19,7 +19,7 @@ package com.oranda.libanius.model.questions
 import java.io.File
 import java.io.FileOutputStream
 import scala.collection.mutable.LinkedHashSet
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 import com.oranda.libanius.model.Quiz
 
 // This class is old, needs updating

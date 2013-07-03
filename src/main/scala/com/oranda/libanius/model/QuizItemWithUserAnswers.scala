@@ -15,7 +15,7 @@
  */
 
 package com.oranda.libanius.model
-import com.oranda.libanius.Props
+import com.oranda.libanius.Conf
 import com.oranda.libanius.util.StringSplitter
 
 trait QuizItemWithUserAnswers extends ModelComponent {
@@ -62,7 +62,7 @@ trait QuizItemWithUserAnswers extends ModelComponent {
   }
   
   def isUnfinished: Boolean = 
-    numCorrectAnswersInARow < Props.NUM_CORRECT_ANSWERS_REQUIRED
+    numCorrectAnswersInARow < Conf.conf.numCorrectAnswersRequired
   
   def numCorrectAnswersInARow = correctAnswersInARow.length
   

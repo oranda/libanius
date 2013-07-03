@@ -9,12 +9,12 @@ object GlobalState {
   var dictionary: Option[WordMappingGroupReadOnly] = None
   
   def initQuiz(fn: => QuizOfWordMappings) {
-	if (!GlobalState.quiz.isDefined)
-	  this.quiz = Some(fn)
+    if (!GlobalState.quiz.isDefined)
+      this.quiz = Some(fn)
   }
   
   def initDictionary(fn: => WordMappingGroupReadOnly) {
-	if (!GlobalState.dictionary.isDefined)
-	  this.dictionary = Some(fn)    
+    if (!GlobalState.dictionary.isDefined)
+      this.dictionary = Some(fn)
   } 
 }
