@@ -30,11 +30,10 @@ object AndroidIO {
   }
   
   def readResource(ctx: Context, resName: String): String = {
-    def resID = ctx.getResources().getIdentifier(resName, "raw", ctx.getPackageName)
-    def resourceToInputStream(ctx: Context) = ctx.getResources().openRawResource(resID)
+    def resID = ctx.getResources.getIdentifier(resName, "raw", ctx.getPackageName)
+    def resourceToInputStream(ctx: Context) = ctx.getResources.openRawResource(resID)
     readInputStream(ctx, resourceToInputStream)
   }
-  
   // This is much faster than using Scala's Source functionality
   def readInputStream(ctx: Context, inStreamGetter: Context => InputStream): String = {
     

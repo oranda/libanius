@@ -29,7 +29,8 @@ trait DataStore extends Platform {
       if (ctx.getFileStreamPath(Conf.conf.fileQuiz).exists)
         try {
           // TODO: consider changing to Platform.readFile
-          Util.stopwatch(AndroidIO.readFile(ctx, Conf.conf.fileQuiz), "reading quiz from data/files")
+          Util.stopwatch(AndroidIO.readFile(ctx, Conf.conf.fileQuiz),
+              "reading quiz from data/files")
         } catch { 
           // for security access exceptions or anything else unexpected
           case e: Exception => fallBackToDemoQuiz(e.getMessage())
@@ -39,14 +40,15 @@ trait DataStore extends Platform {
           Util.stopwatch(AndroidIO.readResource(ctx, Conf.conf.resQuizPublic),
               "reading quiz from res/raw")
         } catch {
-          case e: Exception => fallBackToDemoQuiz("Could not load quiz from res/raw")
+          case e: Exception => fallBackToDemoQuiz("Could not load quiz from " +
+              Conf.conf.resQuizPublic + "...")
         }        
       }
     Util.stopwatch(QuizOfWordMappings.fromCustomFormat(fileText), "parsing quiz") 
   }
        
   def fallBackToDemoQuiz(errmsg: String): String = {
-    log("Libanius", errmsg + " Using demo data")
+    log("Libanius", errmsg + "Using demo data")
     Conf.conf.fileQuizRoot = "quizTestData" // for saving
     QuizOfWordMappings.demoDataInCustomFormat
   }
@@ -61,7 +63,7 @@ trait DataStore extends Platform {
     var dictionary = WordMappingGroupReadOnly("", "")
     try {
       dictionary = Util.stopwatch(WordMappingGroupReadOnly.fromCustomFormat(
-        fileText), "reading and parsing dictionary")
+          fileText), "reading and parsing dictionary")
     } catch {
       case e: Exception => log("Libanius", "Could not parse dictionary: " + e.getMessage(), e)
     }
@@ -85,7 +87,7 @@ trait DataStore extends Platform {
             "reading quiz from res/raw")
       } catch {
         case e: Exception => log("Libanius", 
-            "Could not load dictionary from res/raw")
+            "Could not load dictionary from " + Conf.conf.resDictPublic + "... ")
         ""    
       }   
     }    
