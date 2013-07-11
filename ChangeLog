@@ -1,3 +1,10 @@
+== 0.62 July 11 2013
+
+  * Moved development from Scala 2.9.2 to 2.10.2.
+
+  * Changed Android interface to use Scala Futures rather than Android AsyncTasks.
+
+
 == 0.6  July 3 2013
 
   * Converted core types to persistent data structures.

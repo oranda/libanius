@@ -17,6 +17,9 @@ package com.oranda.libanius
 
 import java.lang.CharSequence
 import java.lang.Runnable
+import scala.concurrent.{ExecutionContext, Future}
+import ExecutionContext.Implicits.global
+
 import com.oranda.libanius.model.wordmapping.QuizItemViewWithOptions
 import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
 import com.oranda.libanius.model.UserAnswer
@@ -25,7 +28,6 @@ import com.oranda.libanius.util.Util
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -89,12 +91,12 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   
   def loadDictionaryInBackground() {
     val ctx = this
-    new AsyncTask[Object, Object, Object] {      
-      override def doInBackground(args: Object*): Object = {
-        GlobalState.initDictionary(readDictionary(ctx))
-        None
-      }
-    }.execute()
+
+    /*
+     * Instead of using Android's AsyncTask for a background task, use a Future.
+     * The Future has no result. An Akka actor might be used instead later.
+     */
+    Future(GlobalState.initDictionary(readDictionary(ctx)))
   }
 
   override def onPause() {
@@ -228,18 +230,21 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   }  
   
   def showScoreAsync() {
-    new AsyncTask[Object, Object, String] {
-      
-      override def doInBackground(args: Object*): String = {
-        val scoreSoFar = Util.stopwatch(quiz.scoreSoFar, "scoreSoFar")
-        (scoreSoFar * 100).toString()
-      }
-      
-      override def onPostExecute(strScore: String) {
-        val strScoreMaxIndex = scala.math.min(strScore.length(), 6)
-        printScore(strScore.substring(0, strScoreMaxIndex) + "%")
-      }
-    }.execute()
+
+    def scoreSoFarStr = (Util.stopwatch(quiz.scoreSoFar, "scoreSoFar") * 100).toString
+    /*
+     * Instead of using Android's AsyncTask, use a Scala Future. It's more concise and general,
+     * but we need to remind Android to use the UI thread when the result is returned.
+     */
+    val future = Future(scoreSoFarStr)
+
+    def formatAndPrintScore(scoreStr: String) {
+      val scoreStrMaxIndex = scala.math.min(scoreStr.length, 6)
+      printScore(scoreStr.substring(0, scoreStrMaxIndex) + "%")
+    }
+
+    future.foreach(scoreSoFarStr =>
+        runOnUiThread(new Runnable { override def run() { formatAndPrintScore(scoreSoFarStr) } }))
   }
   
   def showSpeed() { speedLabel.setText("Speed: " + answerSpeed + "/min") }

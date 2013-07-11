@@ -16,10 +16,7 @@
 
 package com.oranda.libanius.model.questions
 
-import java.io.File
-import java.io.FileOutputStream
 import scala.collection.mutable.LinkedHashSet
-import com.oranda.libanius.Conf
 import com.oranda.libanius.model.Quiz
 
 // This class is old, needs updating
@@ -76,13 +73,6 @@ class QuizOfQuestions(val currentPromptNumber: Int) extends Quiz(currentPromptNu
 }
 
 object QuizOfQuestions {
-  def fromXML(node: xml.Node): QuizOfQuestions =
-	new QuizOfQuestions(
-	    currentPromptNumber = (node \ "currentPromptNumber").text.toInt) {	    
-	  val quizItemsXml = (node \ "quizItems")
-	  for (quizItemXml <- quizItemsXml \\ "quizItem")
-	    addItem(Some(QuestionItem.fromXML(quizItemXml)))
-	}
     
   def fromCustomFormat(strCustomFormat: String): QuizOfQuestions = {
     val lines = strCustomFormat.split("\\n")

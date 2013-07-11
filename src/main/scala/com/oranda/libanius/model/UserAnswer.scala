@@ -16,26 +16,21 @@
 
 package com.oranda.libanius.model
 
-import com.oranda.libanius.Conf
+case class UserAnswer(val wasCorrect: Boolean, val promptNumber: Int) extends ModelComponent {
 
-case class UserAnswer(val wasCorrect: Boolean, val promptNumber: Int) 
-    extends ModelComponent {
-  
-  def toXML =
-    <userAnswer wasCorrect={"" + wasCorrect} promptNumber={"" + promptNumber}/>
-   
+  def toXML = <userAnswer wasCorrect={"" + wasCorrect} promptNumber={"" + promptNumber}/>
+
   // not currently used
   def toCustomFormat: String = wasCorrect + "_" + promptNumber
 }
 
 object UserAnswer {
-    def fromXML(node: xml.Node): UserAnswer =
+  def fromXML(node: xml.Node): UserAnswer =
 	  new UserAnswer(wasCorrect = (node \ "@wasCorrect").text.toBoolean,
-	      promptNumber = (node \ "@promptNumber").text.toInt) 
+	      promptNumber = (node \ "@promptNumber").text.toInt)
     
-    def fromCustomFormat(strCustomFormat: String): UserAnswer = {
-        val parts = strCustomFormat.split("_")
-        new UserAnswer(wasCorrect = parts(0).toBoolean,
-            promptNumber = parts(1).toInt)
-    }
+  def fromCustomFormat(strCustomFormat: String): UserAnswer = {
+    val parts = strCustomFormat.split("_")
+    new UserAnswer(wasCorrect = parts(0).toBoolean, promptNumber = parts(1).toInt)
+  }
 }

@@ -113,25 +113,26 @@ case class QuizOfWordMappings(currentPromptNumber: Int = 0,
      * .iterator is considered to be more efficient than .view here.
      */
     wordMappingGroups.iterator.map(_.findPresentableQuizItem(currentPromptNumber)).
-        find(_.isDefined).getOrElse(None)  
+        find(_.isDefined).getOrElse(None)
+
+  def addWordMappingToFront(keyType: String, valueType: String,
+                            keyWord: String, value: String): QuizOfWordMappings = {
+    val wmg = findWordMappingGroup(keyType, valueType)
+    wmg match {
+      case Some(wmg) => replaceWordMappingGroup(wmg.addWordMappingToFront(keyWord, value))
+      case None => this
+    }
+  }
 
   def addWordMappingToFrontOfTwoGroups(keyType: String, valueType: String, 
       keyWord: String, value: String): QuizOfWordMappings = {
-        
-    def addWordMappingToFront(keyType: String, valueType: String, 
-        keyWord: String, value: String): QuizOfWordMappings = {
-      val wmg = findWordMappingGroup(keyType, valueType)
-      wmg match {
-        case Some(wmg) => replaceWordMappingGroup(wmg.addWordMappingToFront(keyWord, value))
-        case None => this
-      }
-    }
-    
+
     // E.g. add to the English -> German group
     val quizAfter1stChange = addWordMappingToFront(keyType, valueType, keyWord, value)
     
     // E.g. add to the German -> English group
-    val quizAfter2ndChange = addWordMappingToFront(valueType, keyType, value, keyWord)
+    val quizAfter2ndChange = quizAfter1stChange.addWordMappingToFront(
+        valueType, keyType, value, keyWord)
     
     quizAfter2ndChange
   }
@@ -196,7 +197,7 @@ object QuizOfWordMappings {
     "wider|against\n" +
     "unterhalten|entertain"
  
-  def parseCurrentPromptNumber(str: String) = 
+  def parseCurrentPromptNumber(str: String): Int =
     StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt
 
 }

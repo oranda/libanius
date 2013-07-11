@@ -5,21 +5,11 @@ import AndroidKeys._
 
 object General {
 
-  /* 
-    Robolectric stuff - not currently used
-
-    val robospecs = "com.github.jbrechtel" %% "robospecs" % "0.2" % "test"
-    val robospecsSnapshots  = "snapshots" at "http://jbrechtel.github.com/repo/snapshots" 
-    val robospecsReleases  = "releases" at "http://jbrechtel.github.com/repo/releases" 
-    val snapshots = "snapshots" at "http://scala-tools.org/repo-snapshots"
-    val releases  = "releases" at "http://scala-tools.org/repo-releases"
-  */
-
   val settings = Defaults.defaultSettings ++ Seq (
     name := "Libanius",
-    version := "0.61",
-    versionCode := 61,
-    scalaVersion := "2.9.1",
+    version := "0.62",
+    versionCode := 62,
+    scalaVersion := "2.10.2",
     platformName in Android := "android-14",  // formerly android-8
     scalacOptions += "-deprecation",
     parallelExecution in Test := false,
@@ -31,16 +21,20 @@ object General {
   val proguardSettings = Seq (
     useProguard in Android := true  // enable for deploy to device
   )
+  val proguardOptions = Seq(
+    proguardOption in Android := "-keep class scala.collection.SeqLike {\n    public protected *;\n}"
+  )
 
   lazy val fullAndroidSettings =
     General.settings ++
     AndroidProject.androidSettings ++
     TypedResources.settings ++
     proguardSettings ++
+    proguardOptions ++
     AndroidManifestGenerator.settings ++
     AndroidMarketPublish.settings ++ Seq (
       keyalias in Android := "alias_name",
-      libraryDependencies ++= Seq("org.specs2" %% "specs2" % "1.9" % "test")
+      libraryDependencies ++= Seq("org.specs2" %% "specs2" % "2.0" % "test")
     )
 }
 

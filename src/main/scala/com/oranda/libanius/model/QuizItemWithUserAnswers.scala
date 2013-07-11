@@ -16,7 +16,6 @@
 
 package com.oranda.libanius.model
 import com.oranda.libanius.Conf
-import com.oranda.libanius.util.StringSplitter
 
 trait QuizItemWithUserAnswers extends ModelComponent {
 

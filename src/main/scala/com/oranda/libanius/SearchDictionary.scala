@@ -21,8 +21,6 @@ import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.view.KeyEvent
-import com.oranda.libanius.model.wordmapping.WordMappingGroupReadOnly
-import com.oranda.libanius.io.AndroidIO
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.util.Util
 import android.widget.LinearLayout
@@ -31,7 +29,8 @@ import android.widget.Button
 import android.view.View.OnClickListener
 import android.view.View
 import android.content.Intent
-import android.os.AsyncTask
+import scala.concurrent.{ExecutionContext, Future}
+import ExecutionContext.Implicits.global
 
 class SearchDictionary extends Activity with TypedActivity with Platform {
 
@@ -54,52 +53,56 @@ class SearchDictionary extends Activity with TypedActivity with Platform {
           event: KeyEvent): Boolean = {
 	    if (actionId == EditorInfo.IME_ACTION_DONE 
 	        || event.getAction() == KeyEvent.ACTION_DOWN)
-	      findAndShowResults()
+	      findAndShowResultsAsync()
 	    true
 	  }
     })
   }
   
-  def findAndShowResults() {
+  def findAndShowResultsAsync() {
     clearResults()
     status.setText("Searching...")
-	val searchInput = searchInputBox.getText.toString
-	
-	new AsyncTask[Object, Object, List[(String, String)]] {
-      
-      override def doInBackground(args: Object*): List[(String, String)] = 
-	    Util.stopwatch(searchDictionary(searchInput), "search dictionary")
-      
-      override def onPostExecute(searchResults: List[(String, String)]) {
-	    if (searchResults.isEmpty)  
-	      status.setText("No results found")
-	    else {	      
-          status.setText("")
-	      addRow(searchResults0Row, searchResults, 0)
-	      addRow(searchResults1Row, searchResults, 1)
-	      addRow(searchResults2Row, searchResults, 2)
-	    }
+    val searchInput = searchInputBox.getText.toString
+
+    def searchResults = Util.stopwatch(searchDictionary(searchInput), "search dictionary")
+    /*
+     * Instead of using Android's AsyncTask, use a Scala Future. It's more concise and general,
+     * but we need to remind Android to use the UI thread when the result is returned.
+     */
+    val future = Future(searchResults)
+
+    future.foreach(searchResults =>
+      runOnUiThread(new Runnable { override def run() { showSearchResults(searchResults) } }))
+
+    def showSearchResults(searchResults: List[(String, String)]) {
+      if (searchResults.isEmpty)
+        status.setText("No results found")
+      else {
+        status.setText("")
+        addRow(searchResults0Row, searchResults, 0)
+        addRow(searchResults1Row, searchResults, 1)
+        addRow(searchResults2Row, searchResults, 2)
       }
-    }.execute()
+    }
   }
 
-  def searchDictionary(searchInput: String) = {
+  def searchDictionary(searchInput: String): List[(String, String)] = {
         
- 	def resultsBeginningWith(input: String): List[(String, String)] = 
-	  GlobalState.dictionary.get.mappingsForKeysBeginningWith(input)
+ 	  def resultsBeginningWith(input: String): List[(String, String)] =
+	    GlobalState.dictionary.get.mappingsForKeysBeginningWith(input)
 	  
     var searchResults = List[(String, String)]()
-	if (searchInput.length > 2 && GlobalState.dictionary.isDefined) { 
-	  searchResults = resultsBeginningWith(searchInput)
-	  if (searchResults.isEmpty)
-	    searchResults = resultsBeginningWith(searchInput.dropRight(1))
-	  if (searchResults.isEmpty)
-	    searchResults = resultsBeginningWith(searchInput.dropRight(2))
-	  if (searchResults.isEmpty && searchInput.length > 3)
-	    searchResults = GlobalState.dictionary.get.mappingsForKeysContaining(
-	        searchInput)
-	}    
- 	searchResults
+    if (searchInput.length > 2 && GlobalState.dictionary.isDefined) {
+      searchResults = resultsBeginningWith(searchInput)
+      if (searchResults.isEmpty)
+        searchResults = resultsBeginningWith(searchInput.dropRight(1))
+      if (searchResults.isEmpty)
+        searchResults = resultsBeginningWith(searchInput.dropRight(2))
+      if (searchResults.isEmpty && searchInput.length > 3)
+        searchResults = GlobalState.dictionary.get.mappingsForKeysContaining(
+	          searchInput)
+	  }
+ 	  searchResults
   }
   
   def addRow(searchResultsRow: LinearLayout, 

@@ -241,7 +241,7 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
               wmvs => {
                 numValueSetsSearched = numValueSetsSearched + 1
                 // Avoid selecting values belonging to the "correct" value set
-                if (wmvs ne wordMappingCorrectValues) {
+                if (wmvs.wmvs ne wordMappingCorrectValues) {
                   val numSimilarLetters = 2
                   wmvs.values.foreach { wmv =>
                     if (similarWords.size < numFalseAnswersRequired &&
