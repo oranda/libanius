@@ -16,13 +16,8 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.xml.Unparsed
-import scala.xml.Text
 import scala.util.Random
-import com.oranda.libanius.util.StringUtil
-import com.sun.xml.internal.ws.util.StringUtils
-import com.oranda.libanius.util.Platform
-import com.oranda.libanius.model.ModelComponent
+import com.oranda.libanius.util.{Util, StringUtil, Platform}
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.ListBuffer
 
@@ -59,9 +54,12 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {
     numCorrectAnswers
   }
 
+  def replaceWmv(wmvNew: WordMappingValue): WordMappingValueSet =
+    filterOut(wmvNew.value).addValueToFront(wmvNew)
+
   def addValueToFront(wordMappingValue: WordMappingValue): WordMappingValueSet = {
-    val newValues = 
-      if (!values.contains(wordMappingValue)) wordMappingValue +: values 
+    val newValues =
+      if (!values.contains(wordMappingValue)) wordMappingValue +: values
       else values
     WordMappingValueSet(newValues)    
   }
@@ -76,12 +74,12 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {
   def filterOut(value: String): WordMappingValueSet = 
     WordMappingValueSet(values.filterNot(_.value == value))
   
-  def removeValue(wordMappingValue: WordMappingValue): WordMappingValueSet = 
-    WordMappingValueSet(values.filterNot(_ == wordMappingValue))
+  def removeValue(wordMappingValue: WordMappingValue): WordMappingValueSet =
+    filterOut(wordMappingValue.value)
   
   def findPresentableWordMappingValue(currentPromptNumber: Int): Option[WordMappingValue] =
     values.iterator.find(_.isPresentable(currentPromptNumber))
-   
+
   def findAnyUnfinishedWordMappingValue: Option[WordMappingValue] = 
     values.iterator.find(_.isUnfinished)    
     

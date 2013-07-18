@@ -20,14 +20,16 @@ import scala.collection.mutable.LinkedHashSet
 import com.oranda.libanius.model.Quiz
 
 // This class is old, needs updating
-class QuizOfQuestions(val currentPromptNumber: Int) extends Quiz(currentPromptNumber) {
+class QuizOfQuestions(val currentPromptNumber: Int) extends Quiz {
   // TODO: convert to an immutable parameter
   private[this] val questionItems : LinkedHashSet[QuestionItem] = new LinkedHashSet()
   
   def numQuestionItems = questionItems.size
   
   def copy(newPromptNumber: Int) = new QuizOfQuestions(currentPromptNumber)
-  
+
+  def incPromptNumber = copy(currentPromptNumber + 1)
+
   def toXML =
     <quiz>
       <currentPromptNumber>{currentPromptNumber}</currentPromptNumber>
@@ -53,7 +55,7 @@ class QuizOfQuestions(val currentPromptNumber: Int) extends Quiz(currentPromptNu
   def findQuestionItem(numCorrectAnswersInARowDesired : Int, diffInPromptNum : Int): 
       Option[QuestionItem] =
     questionItems.find(questionItem => questionItem.isPresentable(
-        numCorrectAnswersInARowDesired, diffInPromptNum, currentPromptNumber))
+        /*numCorrectAnswersInARowDesired, diffInPromptNum,*/ currentPromptNumber))
     
   def remove(QuestionItem : QuestionItem) {
     questionItems -= QuestionItem
@@ -73,7 +75,16 @@ class QuizOfQuestions(val currentPromptNumber: Int) extends Quiz(currentPromptNu
 }
 
 object QuizOfQuestions {
-    
+
+  // deprecated
+  def fromXML(node: xml.Node): QuizOfQuestions =
+    new QuizOfQuestions(
+      currentPromptNumber = (node \ "currentPromptNumber").text.toInt) {
+      val quizItemsXml = (node \ "quizItems")
+      for (quizItemXml <- quizItemsXml \\ "quizItem")
+        addItem(Some(QuestionItem.fromXML(quizItemXml)))
+    }
+
   def fromCustomFormat(strCustomFormat: String): QuizOfQuestions = {
     val lines = strCustomFormat.split("\\n")
     val currentPromptNumber = lines(0).toInt

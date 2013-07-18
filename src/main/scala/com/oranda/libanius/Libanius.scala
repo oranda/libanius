@@ -17,11 +17,10 @@ package com.oranda.libanius
 
 import java.lang.CharSequence
 import java.lang.Runnable
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ future, ExecutionContext }
 import ExecutionContext.Implicits.global
 
-import com.oranda.libanius.model.wordmapping.QuizItemViewWithOptions
-import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
+import com.oranda.libanius.model.wordmapping.{WordMappingGroupReadWrite, QuizItemViewWithOptions, QuizOfWordMappings}
 import com.oranda.libanius.model.UserAnswer
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.util.Util
@@ -33,6 +32,7 @@ import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import scala.collection.immutable.{ListSet, Set}
 
 class Libanius extends Activity with TypedActivity with Platform with DataStore 
     with Timestamps {
@@ -96,7 +96,7 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
      * Instead of using Android's AsyncTask for a background task, use a Future.
      * The Future has no result. An Akka actor might be used instead later.
      */
-    Future(GlobalState.initDictionary(readDictionary(ctx)))
+    future { GlobalState.initDictionary(readDictionary(ctx)) }
   }
 
   override def onPause() {
@@ -107,7 +107,8 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   
   def readQuizUi: QuizOfWordMappings = {    
     printStatus("Reading quiz data...")
-    val quiz = readQuiz(this)
+    val wordMappingGroups: Set[WordMappingGroupReadWrite] = readWmgFiles(ctx = this)
+    val quiz = readQuiz(ctx = this, wordMappingGroups).getOrElse(QuizOfWordMappings.demoQuiz())
     val msg = "Finished reading " + quiz.numItems + " quiz items!"
     log("Libanius", msg)
     printStatus(msg)
@@ -115,10 +116,15 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   }
   
   def testUserWithQuizItem() { 
-    Util.stopwatch(quiz.findQuizItem, "find quiz item") match {
-      case Some(quizItem) =>       
+    Util.stopwatch(quiz.findQuizItem, "find quiz items") match {
+      case Some((quizItem, wmg)) =>
         currentQuizItem = quizItem
         showNextQuizItem()
+        GlobalState.quiz.foreach { q =>
+          updateQuiz(q.addWordMappingGroup(wmg.updatedPromptNumber).updateRangeForFailedWmgs(wmg))
+          q.wordMappingGroups.foreach(wmg => log("Libanius", wmg.keyType + " prompt number is " +
+              wmg.currentPromptNumber + ", range is " + wmg.currentSearchRange.start))
+        }
       case _ =>
         printStatus("No more questions found! Done!")
     }
@@ -131,14 +137,12 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   }
   
   def showNextQuizItem() {
-    quiz.incPromptNumber
-
     answerOptionButtons.foreach(_.setBackgroundColor(Color.LTGRAY))
 
     questionLabel.setText(currentQuizItem.keyWord)
     var questionNotesText = "What is the " + currentQuizItem.valueType + "?"
     if (currentQuizItem.numCorrectAnswersInARow > 0)
-      questionNotesText += " (correctly answered " + 
+      questionNotesText += " (correctly answered " +
           currentQuizItem.numCorrectAnswersInARow + " times)"
     questionNotesLabel.setText(questionNotesText)
         
@@ -164,16 +168,8 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
     val dictScreen = new Intent(getApplicationContext(), classOf[SearchDictionary])
     startActivity(dictScreen)
   }
-  
-  def processUserAnswer(clickedButton: Button) {
-    val userAnswerTxt = clickedButton.getText.toString
-    val correctAnswer = currentQuizItem.wordMappingValue.value 
-    val isCorrect = userAnswerTxt == correctAnswer
-    updateTimestamps(isCorrect)
-      
-    val userAnswer = new UserAnswer(isCorrect, quiz.currentPromptNumber)
-    currentQuizItem.wordMappingValue.addUserAnswer(userAnswer)
-    
+
+  private def updateUI(correctAnswer: String, clickedButton: Button) {
     var prevQuestionText = "PREV: " + questionLabel.getText
     val maxAnswers = Conf.conf.numCorrectAnswersRequired
     if (currentQuizItem.wordMappingValue.numCorrectAnswersInARow == maxAnswers)
@@ -181,17 +177,28 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
     prevQuestionLabel.setText(prevQuestionText)
 
     val buttonsToLabels = answerOptionButtons zip prevOptionLabels
-    
+
     buttonsToLabels.foreach { buttonToLabel =>
       setPrevOptionsText(buttonToLabel._2, buttonToLabel._1.getText)
-    }  
-    
+    }
+
     val correctButton = answerOptionButtons.find(_.getText == correctAnswer).get
-    
+
     buttonsToLabels.foreach { buttonToLabel =>
       setColorOnAnswer(buttonToLabel._1, buttonToLabel._2, correctButton, clickedButton)
-    }  
-    
+    }
+  }
+
+  def processUserAnswer(clickedButton: Button) {
+    val userAnswerTxt = clickedButton.getText.toString
+    val correctAnswer = currentQuizItem.wordMappingValue.value 
+    val isCorrect = userAnswerTxt == correctAnswer
+    updateTimestamps(isCorrect)
+
+    updateQuiz(
+        Util.stopwatch(GlobalState.quiz.get.updateWithUserAnswer(isCorrect, currentQuizItem), "updateQuiz"))
+    updateUI(correctAnswer, clickedButton)
+
     val delayMillis = if (isCorrect) 10 else 300
     val handler = new Handler
     handler.postDelayed(new Runnable() { def run() = testUserWithQuizItemAgain() }, 
@@ -200,7 +207,7 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   
   def setPrevOptionsText(prevOptionLabel: TextView, keyWord: CharSequence) {
     val keyWordStr = keyWord.toString
-    // The arguments for quiz.findValuesFor() have keyType and valueType reversed
+    // The arguments for quiz.findValueSetFor() have keyType and valueType reversed
     val values = quiz.findValuesFor(keyWordStr, 
         valueType = currentQuizItem.keyType, 
         keyType = currentQuizItem.valueType).mkString(", ")
@@ -231,20 +238,20 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   
   def showScoreAsync() {
 
-    def scoreSoFarStr = (Util.stopwatch(quiz.scoreSoFar, "scoreSoFar") * 100).toString
-    /*
-     * Instead of using Android's AsyncTask, use a Scala Future. It's more concise and general,
-     * but we need to remind Android to use the UI thread when the result is returned.
-     */
-    val future = Future(scoreSoFarStr)
-
     def formatAndPrintScore(scoreStr: String) {
       val scoreStrMaxIndex = scala.math.min(scoreStr.length, 6)
       printScore(scoreStr.substring(0, scoreStrMaxIndex) + "%")
     }
 
-    future.foreach(scoreSoFarStr =>
-        runOnUiThread(new Runnable { override def run() { formatAndPrintScore(scoreSoFarStr) } }))
+    /*
+     * Instead of using Android's AsyncTask, use a Scala Future. It's more concise and general,
+     * but we need to remind Android to use the UI thread when the result is returned.
+     */
+    future {
+      (Util.stopwatch(quiz.scoreSoFar, "scoreSoFar") * 100).toString
+    } map { scoreSoFar: String =>
+        runOnUiThread(new Runnable { override def run() { formatAndPrintScore(scoreSoFar) } })
+    }
   }
   
   def showSpeed() { speedLabel.setText("Speed: " + answerSpeed + "/min") }

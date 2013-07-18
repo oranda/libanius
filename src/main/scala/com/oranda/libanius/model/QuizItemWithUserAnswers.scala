@@ -16,61 +16,92 @@
 
 package com.oranda.libanius.model
 import com.oranda.libanius.Conf
+import com.oranda.libanius.util.Platform
+import QuizItemWithUserAnswers._
 
-trait QuizItemWithUserAnswers extends ModelComponent {
+abstract class QuizItemWithUserAnswers[T](correctAnswersInARow: List[UserAnswer],
+    incorrectAnswers: List[UserAnswer]) extends ModelComponent with Platform {
 
-  protected var correctAnswersInARow = List[UserAnswer]()
-  protected var incorrectAnswers = List[UserAnswer]()
-  
+  def self: T
+
+  def updated(correctAnswersInARow: List[UserAnswer], incorrectAnswers: List[UserAnswer]): T
+
   def userAnswers = correctAnswersInARow ++ incorrectAnswers
+
+  def addUserAnswer(userAnswer : UserAnswer): T =
+    if (userAnswer.wasCorrect)
+      updated(userAnswer :: correctAnswersInARow, incorrectAnswers)
+    else
+      updated(Nil, userAnswer :: incorrectAnswers) // old correct answers are discarded
+
   
-  def addUserAnswer(userAnswer : UserAnswer) {
-    if (userAnswer.wasCorrect) {
-      correctAnswersInARow ::= userAnswer 
-    } else {
-      correctAnswersInARow = List() // old correct answers are discarded
-      incorrectAnswers ::= userAnswer
-    }
-  }
-  
-  def addUserAnswersBatch(correctPromptNumStrs: List[String], 
-      incorrectPromptNumStrs: List[String]) {
+  def addUserAnswersBatch(correctPromptNumStrs: List[String],
+      incorrectPromptNumStrs: List[String]): T = {
     // TODO: see if an imperative version is faster
-    correctAnswersInARow = correctPromptNumStrs.map(correctPromptNum =>
+    val newCorrectAnswersInARow = correctPromptNumStrs.map(correctPromptNum =>
         new UserAnswer(wasCorrect = false, promptNumber = correctPromptNum.toInt))
-    incorrectAnswers = incorrectPromptNumStrs.map(incorrectPromptNum =>
+    val newIncorrectAnswers = incorrectPromptNumStrs.map(incorrectPromptNum =>
         new UserAnswer(wasCorrect = false, promptNumber = incorrectPromptNum.toInt))
+    updated(newCorrectAnswersInARow, newIncorrectAnswers)
   }
-  
-  def isPresentable(currentPromptNum : Int): Boolean = {
-    /*
-     * See if this quiz item meets defined criteria: how many times 
-     * it has been answered correctly, and how long ago it was last answered.
-     * Try different pairs of values for these criteria until a quiz item fits.
-     */
-    val criteriaSets = Seq((1, 5), (2, 40), (3, 800), /*(4, 5000),*/ (0, -1))
-    criteriaSets.exists(criteria => isPresentable(currentPromptNum, criteria._1, criteria._2))
-  }
-  
-  def isPresentable(currentPromptNum : Int, 
-      numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int): Boolean = {
-    def diffInPromptNum = currentPromptNum - promptNumInLastAnswer
-    numCorrectAnswersInARow == numCorrectAnswersInARowDesired &&
-      (correctAnswersInARow.isEmpty && incorrectAnswers.isEmpty ||
-      diffInPromptNum >= diffInPromptNumMinimum)
-  }
-  
-  def isUnfinished: Boolean = 
-    numCorrectAnswersInARow < Conf.conf.numCorrectAnswersRequired
+
+  /*
+   * See if this quiz item meets any of the defined criteria sets that would make it presentable.
+   * (Intended to be called over many quiz items until one fits.)
+   */
+  def isPresentable(currentPromptNum : Int): Boolean =
+    isPresentable(currentPromptNum, promptNumInMostRecentAnswer, numCorrectAnswersInARow)
+
+  protected[model] def isPresentable(currentPromptNum : Int,
+      promptNumInMostRecentAnswer: Option[Int], numCorrectAnswersInARow: Int): Boolean =
+    numCorrectAnswersInARow == 0 || criteriaSets.exists(
+        _.isPresentable(currentPromptNum, promptNumInMostRecentAnswer, numCorrectAnswersInARow))
+
+
+  def isUnfinished: Boolean = numCorrectAnswersInARow < Conf.conf.numCorrectAnswersRequired
   
   def numCorrectAnswersInARow = correctAnswersInARow.length
   
-  def promptNumInLastAnswer: Int = {
-    if (!correctAnswersInARow.isEmpty)
-      correctAnswersInARow.last.promptNumber
-    else if (!incorrectAnswers.isEmpty)
-      incorrectAnswers.last.promptNumber
-    else
-      Int.MinValue
+  def promptNumInMostRecentAnswer: Option[Int] =
+    correctAnswersInARow.headOption.orElse(incorrectAnswers.headOption).orElse(None).
+        map(_.promptNumber)
+}
+
+/*
+ * Criteria used to check if a quiz item is "presentable".
+ *
+ * numCorrectAnswersInARowDesired: how many times this item should have been answered correctly
+ * diffInPromptNumMinimum: how long ago it was last answered - may be None to omit this criterion
+ */
+case class Criteria(numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int)
+    extends Platform {
+  def isPresentable(currentPromptNum : Int, promptNumInMostRecentAnswer: Option[Int],
+      numCorrectAnswersInARow: Int): Boolean = {
+    /*
+    log("Libanius", "numCorrectAnswersInARow: " + numCorrectAnswersInARow +
+        ", promptNumInMostRecentAnswer: " + promptNumInMostRecentAnswer +
+        ", currentPromptNum: " + currentPromptNum +
+        ", numCorrectAnswersInARowDesired: " + numCorrectAnswersInARowDesired +
+        ", diffInPromptNumMinimum: " + diffInPromptNumMinimum)
+    */
+    def wasNotTooRecentlyUsed = promptNumInMostRecentAnswer.forall {
+      case promptNumInMostRecentAnswer =>
+          val diffInPromptNum = currentPromptNum - promptNumInMostRecentAnswer
+          diffInPromptNum >= diffInPromptNumMinimum
+    }
+
+    (numCorrectAnswersInARow == numCorrectAnswersInARowDesired) && wasNotTooRecentlyUsed
   }
+}
+
+object QuizItemWithUserAnswers {
+  /*
+   * Criteria sets that determine whether the current item is presentable or not.
+   */
+  val criteriaSets = Seq[Criteria](
+      Criteria(numCorrectAnswersInARowDesired = 1, diffInPromptNumMinimum = 5),
+      Criteria(numCorrectAnswersInARowDesired = 2, diffInPromptNumMinimum = 40),
+      Criteria(numCorrectAnswersInARowDesired = 3, diffInPromptNumMinimum = 800)
+      /*(4, 5000),*/
+  )
 }

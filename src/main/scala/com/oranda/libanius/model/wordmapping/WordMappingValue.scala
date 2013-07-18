@@ -22,8 +22,16 @@ import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.util.StringSplitter
 
-case class WordMappingValue(val value: String) extends QuizItemWithUserAnswers { 
-     
+case class WordMappingValue(val value: String, val correctAnswersInARow: List[UserAnswer] = Nil,
+                            val incorrectAnswers: List[UserAnswer] = Nil)
+    extends QuizItemWithUserAnswers[WordMappingValue](correctAnswersInARow, incorrectAnswers) {
+
+  def self = this
+
+  def updated(correctAnswersInARow: List[UserAnswer], incorrectAnswers: List[UserAnswer]):
+      WordMappingValue =
+    WordMappingValue(value, correctAnswersInARow, incorrectAnswers)
+
   override def toString = value   // e.g. "unterrichten"
   
   // Example: nachlösen:1,7,9;6
@@ -68,23 +76,23 @@ object WordMappingValue extends Platform {
   // Example: str = "nachlösen:1,7,9;6"
   def fromCustomFormat(str: String): WordMappingValue = {
     wmvSplitter.setString(str)
-    new WordMappingValue(wmvSplitter.next) {
-      if (wmvSplitter.hasNext) {
-        val strAllAnswers = wmvSplitter.next
-        allAnswersSplitter.setString(strAllAnswers)
+    var wmv = new WordMappingValue(wmvSplitter.next)
+    if (wmvSplitter.hasNext) {
+      val strAllAnswers = wmvSplitter.next
+      allAnswersSplitter.setString(strAllAnswers)
 
-        val correctPromptNums = allAnswersSplitter.next
-        answersSplitter.setString(correctPromptNums)
-        val correctAnswers = answersSplitter.toList
-        val incorrectAnswers = 
-            if (allAnswersSplitter.hasNext) {
-              val incorrectPromptNums = allAnswersSplitter.next
-              answersSplitter.setString(incorrectPromptNums)
-              answersSplitter.toList
-            } else
-              List()
-        addUserAnswersBatch(correctAnswers, incorrectAnswers)    
-      }
+      val correctPromptNums = allAnswersSplitter.next
+      answersSplitter.setString(correctPromptNums)
+      val correctAnswers = answersSplitter.toList
+      val incorrectAnswers =
+          if (allAnswersSplitter.hasNext) {
+            val incorrectPromptNums = allAnswersSplitter.next
+            answersSplitter.setString(incorrectPromptNums)
+            answersSplitter.toList
+          } else
+            List()
+      wmv = wmv.addUserAnswersBatch(correctAnswers, incorrectAnswers)
     }
+    wmv
   }
 }

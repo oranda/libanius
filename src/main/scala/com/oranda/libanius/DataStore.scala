@@ -15,47 +15,66 @@
  */
 package com.oranda.libanius
 
-import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
+import com.oranda.libanius.model.wordmapping.{WordMappingGroupReadWrite, QuizOfWordMappings, WordMappingGroupReadOnly}
 import android.content.Context
 import com.oranda.libanius.util.Util
 import com.oranda.libanius.io.AndroidIO
 import com.oranda.libanius.util.Platform
-import com.oranda.libanius.model.wordmapping.WordMappingGroupReadOnly
+import scala.collection.immutable.Set
 
 trait DataStore extends Platform {
-  
-  def readQuiz(ctx: Context): QuizOfWordMappings = {
-    val fileText =
-      if (ctx.getFileStreamPath(Conf.conf.fileQuiz).exists)
-        try {
-          // TODO: consider changing to Platform.readFile
-          Util.stopwatch(AndroidIO.readFile(ctx, Conf.conf.fileQuiz),
-              "reading quiz from data/files")
-        } catch { 
-          // for security access exceptions or anything else unexpected
-          case e: Exception => fallBackToDemoQuiz(e.getMessage())
-        }
-      else {
-        try {
-          Util.stopwatch(AndroidIO.readResource(ctx, Conf.conf.resQuizPublic),
-              "reading quiz from res/raw")
-        } catch {
-          case e: Exception => fallBackToDemoQuiz("Could not load quiz from " +
-              Conf.conf.resQuizPublic + "...")
-        }        
+
+  def readQuiz(ctx: Context, wordMappingGroups: Set[WordMappingGroupReadWrite]):
+      Option[QuizOfWordMappings] = {
+    if (wordMappingGroups.isEmpty)
+      None
+    else
+      try {
+        val fileText =
+          if (ctx.getFileStreamPath(Conf.conf.fileQuiz).exists)
+            // TODO: consider changing to Platform.readFile
+            Util.stopwatch(AndroidIO.readFile(ctx, Conf.conf.fileQuiz),
+                "reading quiz from data/files")
+          else
+            Util.stopwatch(AndroidIO.readResource(ctx, Conf.conf.resQuizPublic),
+                "reading quiz from res/raw")
+        Util.stopwatch(Some(QuizOfWordMappings.fromCustomFormat(fileText, wordMappingGroups)),
+            "parsing quiz")
+      } catch {
+        // for absent data files, security access exceptions or anything else unexpected
+        case e: Exception => log("Libanius", "Error reading quiz: " + e.getMessage)
+                             None
       }
-    Util.stopwatch(QuizOfWordMappings.fromCustomFormat(fileText), "parsing quiz") 
   }
-       
-  def fallBackToDemoQuiz(errmsg: String): String = {
-    log("Libanius", errmsg + "Using demo data")
-    Conf.conf.fileQuizRoot = "quizTestData" // for saving
-    QuizOfWordMappings.demoDataInCustomFormat
+
+  def readWmgFiles(ctx: Context): Set[WordMappingGroupReadWrite] = {
+
+    // TODO: improve style
+    var wmgFiles = ctx.getFilesDir.listFiles.filter(_.getName.endsWith(".wmg")).map(_.getName)
+    if (wmgFiles.isEmpty) {
+      log("Libanius", "No wmg files found in data dir. Trying resources... ")
+      wmgFiles = ctx.getResources.getAssets.list("").filter(_.endsWith("wmg.txt"))
+    }
+    if (wmgFiles.isEmpty)
+      log("Libanius", "No wmg files found at all")
+
+    def readAndParseWmgFile(wmgFile: String) = {
+      val wmgFileText = AndroidIO.readFile(ctx, wmgFile)
+      WordMappingGroupReadWrite.fromCustomFormat(wmgFileText)
+    }
+
+    wmgFiles.map(readAndParseWmgFile(_)).toSet
   }
-  
+
   def saveQuiz(ctx: Context, quiz: QuizOfWordMappings) {
-    val str = Util.stopwatch(quiz.toCustomFormat, "serialize the quiz")
-    AndroidIO.save(ctx, Conf.conf.fileQuiz, Conf.conf.fileQuizLastBackup, str.toString)
+
+    def saveToFile(wmg: WordMappingGroupReadWrite) = {
+      val saveData = wmg.getSaveData
+      log("Libanius", "Saving wmg " + wmg.keyType + ", wmg has promptNumber " +
+          wmg.currentPromptNumber)
+      AndroidIO.writeToFile(saveData.fileName, saveData.data, ctx)
+    }
+    quiz.wordMappingGroups.foreach(saveToFile(_))
   }
   
   def readDictionary(ctx: Context): WordMappingGroupReadOnly = {
@@ -65,7 +84,8 @@ trait DataStore extends Platform {
       dictionary = Util.stopwatch(WordMappingGroupReadOnly.fromCustomFormat(
           fileText), "reading and parsing dictionary")
     } catch {
-      case e: Exception => log("Libanius", "Could not parse dictionary: " + e.getMessage(), e)
+      case e: Exception =>
+          log("Libanius", "Could not parse dictionary: " + e.getMessage(), Some(e))
     }
     log("Libanius", "Finished reading " + dictionary.numKeyWords + " dictionary key words!")
     dictionary

@@ -29,7 +29,7 @@ import android.widget.Button
 import android.view.View.OnClickListener
 import android.view.View
 import android.content.Intent
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ future, ExecutionContext }
 import ExecutionContext.Implicits.global
 
 class SearchDictionary extends Activity with TypedActivity with Platform {
@@ -64,15 +64,15 @@ class SearchDictionary extends Activity with TypedActivity with Platform {
     status.setText("Searching...")
     val searchInput = searchInputBox.getText.toString
 
-    def searchResults = Util.stopwatch(searchDictionary(searchInput), "search dictionary")
     /*
      * Instead of using Android's AsyncTask, use a Scala Future. It's more concise and general,
      * but we need to remind Android to use the UI thread when the result is returned.
      */
-    val future = Future(searchResults)
-
-    future.foreach(searchResults =>
-      runOnUiThread(new Runnable { override def run() { showSearchResults(searchResults) } }))
+    future {
+      Util.stopwatch(searchDictionary(searchInput), "search dictionary")
+    } map { searchResults =>
+      runOnUiThread(new Runnable { override def run() { showSearchResults(searchResults) } })
+    }
 
     def showSearchResults(searchResults: List[(String, String)]) {
       if (searchResults.isEmpty)
@@ -141,6 +141,5 @@ class SearchDictionary extends Activity with TypedActivity with Platform {
     searchResults1Row.removeAllViews()
     searchResults2Row.removeAllViews()
   }
-  
 
 }

@@ -51,11 +51,13 @@ class QuizOfQuestionsSpec extends Specification {
       quiz.currentPromptNumber mustEqual 0
       quiz.numQuestionItems mustEqual 2
     }
-    
+
+    /* TODO
     "offer a presentable quiz item" in {
       val quizItem = quiz.findQuestionItem(numCorrectAnswersInARowDesired = 0, 
           diffInPromptNum = 0)
       quizItem.isDefined mustEqual true
     }
+    */
   }
 }

@@ -25,9 +25,10 @@ object Conf {
     val config = ConfigFactory.load()
     conf = Conf(
         useAndroid = config.getBoolean("libanius.useAndroid"),
+        enableLogging = config.getBoolean("libanius.enableLogging"),
         numCorrectAnswersRequired = config.getInt("libanius.numCorrectAnswersRequired"),
         fileVocab = config.getString("libanius.file.vocab"),
-        fileQuizRootInit = config.getString("libanius.file.quizRoot"),
+        fileQuizRoot = config.getString("libanius.file.quizRoot"),
         fileDictionary = config.getString("libanius.file.dictionary"),
         resQuizPublic = config.getString("libanius.res.quizPublic"),
         resDictPublic = config.getString("libanius.res.dictPublic"),
@@ -41,9 +42,10 @@ object Conf {
   def setUpDummy() {
     conf = Conf(
       useAndroid = false,
+      enableLogging = false,
       numCorrectAnswersRequired = 4,
       fileVocab = "",
-      fileQuizRootInit = "",
+      fileQuizRoot = "",
       fileDictionary = "",
       resQuizPublic = "",
       resDictPublic = "",
@@ -56,13 +58,13 @@ object Conf {
 }
 
 
-case class Conf(useAndroid: Boolean, numCorrectAnswersRequired: Int,
-    fileVocab: String, fileQuizRootInit: String, fileDictionary: String,
-    resQuizPublic: String, resDictPublic: String, keyWord: String, value: String) {
+case class Conf(
+    useAndroid: Boolean, enableLogging: Boolean,
+    numCorrectAnswersRequired: Int,
+    fileVocab: String, fileQuizRoot: String, fileDictionary: String,
+    resQuizPublic: String, resDictPublic: String,
+    keyWord: String, value: String) {
 
   lazy val fileQuiz = Conf.conf.fileQuizRoot + ".qui"
   lazy val fileQuizLastBackup = Conf.conf.fileQuizRoot + "Backup" + ".qui"
-
-  // things that can change
-  var fileQuizRoot = fileQuizRootInit
 }

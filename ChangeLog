@@ -1,3 +1,10 @@
+== 0.65 July 18 2013
+
+  * split serialized quiz into separate .wmg files to allow parallel access and hybrid quizzes
+
+  * bugfixes and removal of mutable state
+
+
 == 0.62 July 11 2013
 
   * Moved development from Scala 2.9.2 to 2.10.2.

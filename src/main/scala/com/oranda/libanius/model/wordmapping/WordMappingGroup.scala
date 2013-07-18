@@ -16,20 +16,17 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.collection.JavaConversions.mapAsScalaMap
-import scala.collection.immutable.HashSet
-import scala.util.Random
 import com.oranda.libanius.util.StringUtil
-import com.sun.xml.internal.ws.util.StringUtils
-import com.oranda.libanius.util.Util
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.model.ModelComponent
-import com.oranda.libanius.util.StringSplitterDefault
 
 abstract class WordMappingGroup(val keyType: String, val valueType: String)
     extends ModelComponent {
   // keyType example: "English word"
   // valueType example: "German word"
+
+  def matches(wmgOther: WordMappingGroup): Boolean =
+    WordMappingGroup.matches(wmgOther, keyType, valueType)
 }
 
 object WordMappingGroup extends Platform {
@@ -39,4 +36,7 @@ object WordMappingGroup extends Platform {
   
   def parseKeyType(str: String) = StringUtil.parseValue(str, "keyType=\"", "\"")
   def parseValueType(str: String) = StringUtil.parseValue(str, "valueType=\"", "\"")
+
+  def matches(wmg: WordMappingGroup, keyType: String, valueType: String) =
+    keyType == wmg.keyType && valueType == wmg.valueType
 }

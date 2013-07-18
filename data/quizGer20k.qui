@@ -1,5 +1,5 @@
-quizOfWordMappings currentPromptNumber="0"
-wordMappingGroup keyType="English word" valueType="German word"
+quizOfWordMappings
+wordMappingGroup keyType="English word" valueType="German word" currentPromptNumber="0"
 on|fort/auf
 as|als
 agreed|stimmte/ausgemacht/einverstanden/abgesprochen/zugestimmt/einig/übereingekommen/eingewilligt
@@ -12336,7 +12336,7 @@ color television|farbfernsehen
 fax machine|faxgerät
 Enemy|Feindbild
 sill|fensterbrett
-wordMappingGroup keyType="German word" valueType="English word"
+wordMappingGroup keyType="German word" valueType="English word" currentPromptNumber="0"
 auf|on
 als|as
 einig|agreed

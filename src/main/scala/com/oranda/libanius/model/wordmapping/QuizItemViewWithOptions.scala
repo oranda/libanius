@@ -20,10 +20,12 @@ import scala.util.Random
 
 /**
  * Quiz item data holder:
- * contains whatever information is necessary for the view.
+ * contains whatever information is necessary for the view, and for updating the backing data.
  */
-case class QuizItemViewWithOptions(val keyWord: String, 
-    val wordMappingValue: WordMappingValue, 
+case class QuizItemViewWithOptions(val keyWord: String,
+    val wmvs: WordMappingValueSet,
+    val wordMappingValue: WordMappingValue,
+    val wmgCurrentPromptNumber: Int,
     val keyType: String, val valueType: String, otherOptions: Set[String], 
     val numCorrectAnswersInARow: Int) {
   

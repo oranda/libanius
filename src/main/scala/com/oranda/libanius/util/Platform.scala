@@ -16,11 +16,7 @@
 
 package com.oranda.libanius.util
 
-import scala.collection.JavaConverters._
-import java.util.HashMap
 import com.oranda.libanius.Conf
-import java.util.Iterator
-import android.text.TextUtils
 import android.util.Log
 
 /*
@@ -34,17 +30,13 @@ trait Platform {
     else 
       new StringSplitterDefault(char)
    
-  def log(module: String, message: String) =
-    if (Conf.conf.useAndroid)
-      Log.d(module, message)
-    else
-      System.out.println(module + ": " + message)
-      
-  def log(module: String, message: String, t: Throwable) =
-    if (Conf.conf.useAndroid)
-      Log.d(module, message, t)
-    else {
-      System.out.println(module + ": " + message)
-      t.printStackTrace()
-    }  
+  def log(module: String, message: String, t: Option[Throwable] = None) =
+    if (Conf.conf.enableLogging) {
+      if (Conf.conf.useAndroid)
+       Log.d(module, message)
+      else {
+        System.out.println(module + ": " + message)
+        t.foreach(_.printStackTrace())
+      }
+    }
 }

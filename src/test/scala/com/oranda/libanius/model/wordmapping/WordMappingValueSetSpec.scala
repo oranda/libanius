@@ -18,7 +18,6 @@ package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.Conf
-import org.specs2.specification.Scope
 
 class WordMappingValueSetSpec extends Specification {
 
@@ -26,7 +25,7 @@ class WordMappingValueSetSpec extends Specification {
 
     Conf.setUpDummy()
 
-    val wmvsCustomFormat = "contract:696,698;697/treaty:796;798"
+    val wmvsCustomFormat = "contract:698,696;697/treaty:796;798"
 
     val wmvs = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
 
@@ -50,7 +49,12 @@ class WordMappingValueSetSpec extends Specification {
       val wmvOpt = wmvsLocal.findPresentableWordMappingValue(currentPromptNumber = 800)
       wmvOpt.isDefined mustEqual true
       wmvOpt.get.value mustEqual "contract"
-    }      
+    }
+
+    "remove a value" in {
+      val wmvsUpdated = wmvs.removeValue(WordMappingValue("contract"))
+      wmvsUpdated.containsValue("contract") mustEqual false
+    }
   }
   
 }  

@@ -24,11 +24,13 @@ import scala.io.Source
 
 object AndroidIO {
 
+  def readFile(ctx: Context, file: File): String = readFile(ctx, file.getName)
+
   def readFile(ctx: Context, fileName: String): String = {
     def fileToInputStream(ctx: Context) = ctx.openFileInput(fileName)
     readInputStream(ctx, fileToInputStream)
   }
-  
+
   def readResource(ctx: Context, resName: String): String = {
     def resID = ctx.getResources.getIdentifier(resName, "raw", ctx.getPackageName)
     def resourceToInputStream(ctx: Context) = ctx.getResources.openRawResource(resID)
@@ -62,13 +64,12 @@ object AndroidIO {
           
   
   def save(ctx: Context, fileName: String, fileNameBackup: String, strToSave: String) {
-	val file = new File(fileName)
-	val file2 = new File(fileNameBackup)
-	file2.delete()
-	//Platform.log("AndroidIO.save", "Renaming " + fileName + " to " + fileNameBackup)
-	file.renameTo(file2) // Doesn't seem to work, but not crucial
-
-	writeToFile(Conf.conf.fileQuiz, strToSave, ctx)
+    val file = new File(fileName)
+    val file2 = new File(fileNameBackup)
+    file2.delete()
+	  //Platform.log("AndroidIO.save", "Renaming " + fileName + " to " + fileNameBackup)
+    file.renameTo(file2) // Doesn't seem to work, but not crucial
+    writeToFile(Conf.conf.fileQuiz, strToSave, ctx)
   }
 
   def writeToFile(fileName:String, data:String, ctx:Context) = {

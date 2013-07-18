@@ -20,22 +20,31 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.immutable._
 import scala.util.Random
 
-import com.oranda.libanius.util.Util
+import com.oranda.libanius.util.{Platform, StringUtil, Util}
 import WordMappingGroupReadWrite._
+import com.oranda.libanius.io.AndroidIO
+import com.oranda.libanius.{SaveData, Conf}
+import com.oranda.libanius.model.UserAnswer
 
-case class WordMappingGroupReadWrite(override val keyType: String, override val valueType: String, 
-      wordMappings: Stream[Pair[String, WordMappingValueSetWrapperBase]] = Stream.empty) 
-    extends WordMappingGroup(keyType, valueType) {
+case class WordMappingGroupReadWrite(override val keyType: String, override val valueType: String,
+      wordMappings: Stream[Pair[String, WordMappingValueSetWrapperBase]] = Stream.empty,
+      currentPromptNumber: Int = 0, currentSearchRange: Range = 0 until rangeSize)
+    extends WordMappingGroup(keyType, valueType) with Platform {
   // keyType example: "English word"
   // valueType example: "German word"
   
-  // This mutable range is used by the findPresentableQuizItem function to improve performance
-  var currentItemSearchRange = 0 until rangeSize
-  
   def thisUpdated(newWordMappings: Stream[Pair[String, WordMappingValueSetWrapperBase]]) =
-    WordMappingGroupReadWrite(keyType, valueType, newWordMappings)
+    WordMappingGroupReadWrite(keyType, valueType, newWordMappings, currentPromptNumber,
+        currentSearchRange)
 
-  
+  def updatedPromptNumber =
+    WordMappingGroupReadWrite(keyType, valueType, wordMappings,
+        currentPromptNumber + 1, currentSearchRange)
+
+  def updatedSearchRange =
+    WordMappingGroupReadWrite(keyType, valueType, wordMappings, currentPromptNumber,
+        rangeForNextSearch)
+
   def wordMappingValueSets = wordMappings.view.map(_._2)
   def wordMappingKeys = wordMappings.view.map(_._1)
     
@@ -48,7 +57,8 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
    */
   def toCustomFormat(strBuilder: StringBuilder) = {
     strBuilder.append("wordMappingGroup keyType=\"").append(keyType).
-        append("\" valueType=\"").append(valueType).append("\"")
+        append("\" valueType=\"").append(valueType).append("\" currentPromptNumber=\"").
+        append(currentPromptNumber).append("\"")
     val iter = wordMappings.iterator
     while (iter.hasNext) {
       val wordMapping = iter.next
@@ -56,6 +66,12 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
       wordMapping._2.toCustomFormat(strBuilder)
     }      
     strBuilder
+  }
+
+  def getSaveData: SaveData = {
+    val serialized = toCustomFormat(new StringBuilder())
+    val fileName = keyType + "-" + valueType + ".wmg"
+    SaveData(fileName, serialized.toString)
   }
 
   def size = wordMappings.size  
@@ -89,24 +105,37 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
   // probably too slow to be useful  (and not a lazy val because values can be deleted)
   // def allWordMappingValues = combineValueSets(wordMappings.values)
   
-  def addWordMapping(key: String, value: String): WordMappingGroupReadWrite = {
+  def addWordMapping(key: String, value: String): WordMappingGroupReadWrite =
     if (!key.isEmpty && !value.isEmpty && key.toLowerCase != value.toLowerCase)
       addWordMappingToEnd(key, value)
     else 
       this
+
+  private def updatedWordMappingValueSet(key: String, value: String):
+      WordMappingValueSetWrapperBase =
+    updatedWordMappingValueSet(key, WordMappingValue(value))
+
+  def updateWithUserAnswer(key: String, wmvs: WordMappingValueSet, wmv: WordMappingValue,
+      userAnswer: UserAnswer): WordMappingGroupReadWrite = {
+    val wmvUpdated = wmv.addUserAnswer(userAnswer)
+    updateWordMappingValue(key, wmvs, wmvUpdated)
   }
-  
-  private def updatedWordMappingValueSet(key: String, value: String): 
+
+  def updateWordMappingValue(key: String, wmvsOld: WordMappingValueSet, wmv: WordMappingValue):
+      WordMappingGroupReadWrite = {
+    val wmvsNew = WordMappingValueSetWrapper(wmvsOld.replaceWmv(wmv))
+    addWordMappingToFront(key, wmvsNew)
+  }
+
+  private def updatedWordMappingValueSet(key: String, wmvNew: WordMappingValue):
       WordMappingValueSetWrapperBase = {
-    val wmvsOld = findValuesFor(key)
-    val wmvNew = WordMappingValue(value)
+    val wmvsOld = findValueSetFor(key)
     WordMappingValueSetWrapper(
       wmvsOld match {
         case Some(wmvsOld) => wmvsOld.addValueToFront(wmvNew)
-        case _ => WordMappingValueSet(List(wmvNew))      
+        case _ => WordMappingValueSet(List(wmvNew))
       })
   }
-
   
   def addWordMapping(key: String, wordMappingValueSetOpt: Option[WordMappingValueSetWrapperBase]): 
       WordMappingGroupReadWrite =        
@@ -132,16 +161,26 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
 
   def addWordMappingToFront(key: String, value: String): WordMappingGroupReadWrite = {
     val wmvsNew = updatedWordMappingValueSet(key, value)
-    val wordMappingsNew = Pair(key, wmvsNew) +: wordMappings.filterNot(_._1 == key)
-    thisUpdated(wordMappingsNew)
+    thisUpdated(Pair(key, wmvsNew) +: wordMappings.filterNot(_._1 == key))
   }
-  
+
+  protected def addWordMappingToFront(key: String,
+      wordMappingValueSet: WordMappingValueSetWrapperBase): WordMappingGroupReadWrite =
+    addWordMappingToFront(wordMappings, key, wordMappingValueSet)
+
+  protected def addWordMappingToFront(
+      wordMappings: Stream[Pair[String, WordMappingValueSetWrapperBase]],
+      key: String, wmvsNew: WordMappingValueSetWrapperBase): WordMappingGroupReadWrite =
+    thisUpdated(Pair(key, wmvsNew) +: wordMappings.filterNot(_._1 == key))
+
   def removeWordMapping(key: String) = thisUpdated(wordMappings.filter(_._1 != key))
 
   def removeWordMappingValue(keyWord: String, wordMappingValue: WordMappingValue): 
       (WordMappingGroupReadWrite, Boolean) =
-    findValuesFor(keyWord) match {
-      case Some(wmvs) => (addWordMappingToEnd(keyWord, removeValue(wmvs, wordMappingValue)), true)
+    findValueSetFor(keyWord) match {
+      case Some(wmvs) =>
+        val wmvsNew = removeValue(wmvs, wordMappingValue)
+        (addWordMappingToEnd(keyWord, wmvsNew), true)
       case _ => (this, false)
     }
   
@@ -149,51 +188,56 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
     WordMappingValueSetWrapper(wmvs.removeValue(wmv))
   
   // Low usage expected. Slow because we are not using a Map for wordMappings. 
-  def findValuesFor(keyWord: String): Option[WordMappingValueSetWrapperBase] = 
+  def findValueSetFor(keyWord: String): Option[WordMappingValueSetWrapperBase] =
     wordMappings.find(_._1 == keyWord).map(_._2)
   
-  def findPresentableQuizItem(currentPromptNumber: Int): Option[QuizItemViewWithOptions] = {
-    //Util.log("Libanius", "currentItemSearchRange: " + currentItemSearchRange.start)
-    val wmSlice = wordMappings.slice(currentItemSearchRange.start, currentItemSearchRange.end)
-    moveRangeForNextSearch()
-    wmSlice.iterator.map(entry => 
-        findPresentableQuizItem(entry._1, entry._2, currentPromptNumber)).
-        find(_.isDefined).getOrElse(findAnyUnfinishedQuizItem)
+  def findPresentableQuizItem: Option[QuizItemViewWithOptions] = {
+    log("Libanius", "currentSearchRange: " + currentSearchRange.start)
+    val wmSlice = wordMappings.slice(currentSearchRange.start, currentSearchRange.end)
+    val quizItem =
+      (for {
+        wm <- wmSlice.toStream
+        quizItem <- findPresentableQuizItem(wm._1, wm._2, currentPromptNumber)
+      } yield quizItem).headOption
+    log("Libanius", "found quiz item " + quizItem)
+    quizItem
   }
   
-  def moveRangeForNextSearch() {
-    currentItemSearchRange = 
-      if (currentItemSearchRange.end > wordMappings.size) 0 until rangeSize
-      else currentItemSearchRange.start + rangeSize until currentItemSearchRange.end + rangeSize
+  def rangeForNextSearch: Range = {
+    if (currentSearchRange.end > wordMappings.size) 0 until rangeSize
+    else currentSearchRange.start + rangeSize until currentSearchRange.end + rangeSize
   }
 
   private def findPresentableQuizItem(key: String, wordMappingValues: WordMappingValueSet, 
       currentPromptNumber: Int): Option[QuizItemViewWithOptions] = {
-    val wordMappingValueOpt = wordMappingValues.findPresentableWordMappingValue(
-        currentPromptNumber)
-    wordMappingValueOpt.map { wordMappingValue =>
-      Util.stopwatch(quizItemWithOptions(key, wordMappingValues, wordMappingValue), 
-          "quizItemWithOptions for " + wordMappingValue) 
+    //log("Libanius", "findPresentableQuizItem: key=" + key + ", currentPromptNumber=" +
+    //    currentPromptNumber)
+    val wordMappingValue = wordMappingValues.findPresentableWordMappingValue(currentPromptNumber)
+    wordMappingValue.map { wordMappingValue =>
+      Util.stopwatch(quizItemWithOptions(key, wordMappingValues, wordMappingValue),
+          "quizItemWithOptions for " + wordMappingValue)
     }
   }
   
-  def findAnyUnfinishedQuizItem: Option[QuizItemViewWithOptions] =
+  def findAnyUnfinishedQuizItem: Option[QuizItemViewWithOptions] = {
+    log("Libanius", "findAnyUnfinishedQuizItem " + keyType)
     wordMappings.iterator.map(entry => 
         findAnyUnfinishedQuizItem(entry._1,  entry._2)).
         find(_.isDefined).getOrElse(None)
+  }
 
   private def findAnyUnfinishedQuizItem(key: String, 
       wordMappingValues: WordMappingValueSet): Option[QuizItemViewWithOptions] =
     wordMappingValues.findAnyUnfinishedWordMappingValue.map(
         quizItemWithOptions(key, wordMappingValues, _))
     
-  private def quizItemWithOptions(key: String, wordMappingValues: WordMappingValueSet, 
+  private def quizItemWithOptions(key: String, wmvs: WordMappingValueSet,
       wordMappingValueCorrect: WordMappingValue): QuizItemViewWithOptions = {
     val numCorrectAnswers = wordMappingValueCorrect.numCorrectAnswersInARow
-    val falseAnswers = makeFalseAnswers(key, wordMappingValues, 
+    val falseAnswers = makeFalseAnswers(key, wmvs,
         wordMappingValueCorrect, numCorrectAnswers)
-    new QuizItemViewWithOptions(key, wordMappingValueCorrect, 
-        keyType, valueType, falseAnswers, numCorrectAnswers)
+    new QuizItemViewWithOptions(key, wmvs, wordMappingValueCorrect,
+        currentPromptNumber, keyType, valueType, falseAnswers, numCorrectAnswers)
   }
 
   def makeFalseAnswers(key: String, wordMappingCorrectValues: WordMappingValueSet, 
@@ -287,8 +331,7 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
   }
   
   def hasKey(key: String): Boolean = wordMappingKeys.find(_ == key).isDefined
-  def keyBeginningWith(keyStart: String) = wordMappingKeys.find(_.startsWith(keyStart)) 
-  
+  def keyBeginningWith(keyStart: String) = wordMappingKeys.find(_.startsWith(keyStart))
 }
 
 
@@ -326,11 +369,17 @@ object WordMappingGroupReadWrite {
       }
     }
     
-    val wordMappings = wordMappingsMutable.toStream
+    val wordMappingsStream = wordMappingsMutable.toStream
   
     // Now use the persistent data structure.
     new WordMappingGroupReadWrite(keyType = WordMappingGroup.parseKeyType(str),
-        valueType = WordMappingGroup.parseValueType(str), wordMappings)
+        valueType = WordMappingGroup.parseValueType(str),
+        wordMappings = wordMappingsStream,
+        currentPromptNumber = WordMappingGroupReadWrite.parseCurrentPromptNumber(str))
   }
 
+  def parseCurrentPromptNumber(str: String): Int = {
+    //println("parseCurrentPromptNumber, str: " + str)
+    StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt
+  }
 }

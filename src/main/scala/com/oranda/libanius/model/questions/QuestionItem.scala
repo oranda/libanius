@@ -21,11 +21,22 @@ import com.oranda.libanius.Conf
 import com.oranda.libanius.model.UserAnswer
 import scala.util.matching.Regex
 import com.oranda.libanius.model.QuizItemWithUserAnswers
+import com.oranda.libanius.model.wordmapping.WordMappingValue
 
-class QuestionItem extends QuizItemWithUserAnswers {
+case class QuestionItem(val correctAnswersInARow: List[UserAnswer] = Nil,
+                   val incorrectAnswers: List[UserAnswer] = Nil)
+    extends QuizItemWithUserAnswers[QuestionItem](correctAnswersInARow, incorrectAnswers) {
+
+  def self = this
+
+  // TODO: make these vals
   var question: String = _
   var correctAnswer: String = _
-  
+
+  def updated(correctAnswersInARow: List[UserAnswer], incorrectAnswers: List[UserAnswer]):
+      QuestionItem =
+    QuestionItem(correctAnswersInARow, incorrectAnswers)
+
   override def equals(other: Any) = other match {
     case that: QuestionItem =>
       this.question == that.question
@@ -116,16 +127,16 @@ class QuestionItem extends QuizItemWithUserAnswers {
 
 object QuestionItem {
     def fromXML(node: xml.Node): QuestionItem =
-	  new QuestionItem {
-	    question = (node \ "question").text
-	    correctAnswer = (node \ "answer").text
-	    val answers = (node \ "userAnswers")
-	    for (userAnswer <- answers \\ "userAnswer")
-	      addUserAnswer(userAnswer)
+      new QuestionItem() {
+        question = (node \ "question").text
+        correctAnswer = (node \ "answer").text
+        val answers = (node \ "userAnswers")
+        for (userAnswer <- answers \\ "userAnswer")
+          addUserAnswer(userAnswer)
 	  }
     
     def fromCustomFormat(strCustomFormat: String): QuestionItem = 
-      new QuestionItem {
+      new QuestionItem() {
         val parts = strCustomFormat.split("§§")
         question = parts(0)
         correctAnswer = parts(1)

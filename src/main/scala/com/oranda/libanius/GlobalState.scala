@@ -1,6 +1,6 @@
 package com.oranda.libanius
-import com.oranda.libanius.model.wordmapping.WordMappingGroupReadOnly
-import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
+import com.oranda.libanius.model.wordmapping.{WordMappingGroupReadWrite, WordMappingGroupReadOnly, QuizOfWordMappings}
+import scala.collection.immutable.{ListSet, Set}
 
 object GlobalState {
   

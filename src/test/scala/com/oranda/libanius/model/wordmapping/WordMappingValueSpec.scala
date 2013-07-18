@@ -18,12 +18,13 @@ package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.Conf
+import com.oranda.libanius.model.Criteria
 
 class WordMappingValueSpec extends Specification {
   
   "a word-mapping-value" should {
     
-    val wmvCustomFormat = "nachlösen:7,9;6"
+    val wmvCustomFormat = "nachlösen:9,7;6"
 
     Conf.setUpDummy()
     
@@ -51,15 +52,22 @@ class WordMappingValueSpec extends Specification {
     "know the number of times in a row it was answered correctly by the user" in {
       wmv.numCorrectAnswersInARow must be equalTo 2
     }
-    
+    def isPresentable(wmv: WordMappingValue, numCorrectAnswersInARowDesired: Int,
+        diffInPromptNumMinimum: Int, currentPromptNum: Int) = {
+      val criteria = Criteria(numCorrectAnswersInARowDesired, diffInPromptNumMinimum)
+      criteria.isPresentable(currentPromptNum, wmv.promptNumInMostRecentAnswer,
+        wmv.numCorrectAnswersInARow)
+    }
+
     "is presentable in the quiz, given certain criteria" in {
-      wmv.isPresentable(numCorrectAnswersInARowDesired = 2,
+
+      isPresentable(wmv, numCorrectAnswersInARowDesired = 2,
           diffInPromptNumMinimum = 2, currentPromptNum = 11) mustEqual true
-      wmv.isPresentable(numCorrectAnswersInARowDesired = 3,
+      isPresentable(wmv, numCorrectAnswersInARowDesired = 3,
           diffInPromptNumMinimum = 2, currentPromptNum = 11) mustEqual false
-      wmv.isPresentable(numCorrectAnswersInARowDesired = 2,
-          diffInPromptNumMinimum = 3, currentPromptNum = 11) mustEqual false
-      wmv.isPresentable(numCorrectAnswersInARowDesired = 2,
+      isPresentable(wmv, numCorrectAnswersInARowDesired = 2,
+        diffInPromptNumMinimum = 3, currentPromptNum = 11) mustEqual false
+      isPresentable(wmv, numCorrectAnswersInARowDesired = 2,
           diffInPromptNumMinimum = 2, currentPromptNum = 10) mustEqual false
     }
   }

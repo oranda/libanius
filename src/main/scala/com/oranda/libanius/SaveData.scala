@@ -13,18 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.oranda.libanius
 
-package com.oranda.libanius.model
-import com.oranda.libanius.Conf
-
-abstract class Quiz extends ModelComponent {
-  
-  def scoreSoFar : BigDecimal = {  // out of 1.0
-    val availableScorePerItem = (1.0 / numItems) /  Conf.conf.numCorrectAnswersRequired : BigDecimal
-    availableScorePerItem * numCorrectAnswers
-  }  
-  
-  def numItems: Int
-  
-  def numCorrectAnswers: Int  
-}
+// simple value object used for saving a data structure to a file
+case class SaveData(fileName: String, data: String)
