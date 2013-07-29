@@ -16,27 +16,15 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.util.Platform
 import com.oranda.libanius.model.ModelComponent
 
-abstract class WordMappingGroup(val keyType: String, val valueType: String)
-    extends ModelComponent {
-  // keyType example: "English word"
-  // valueType example: "German word"
-
-  def matches(wmgOther: WordMappingGroup): Boolean =
-    WordMappingGroup.matches(wmgOther, keyType, valueType)
+abstract class WordMappingGroup(val header: QuizGroupHeader) extends ModelComponent {
+  def matches(wmgOther: WordMappingGroup): Boolean = header.matches(wmgOther.header)
 }
 
 object WordMappingGroup extends Platform {
   // Utility functions for parsing WordMappingGroup's from files
   def splitterLineBreak = getSplitter('\n')
   def splitterKeyValue = getSplitter('|')
-  
-  def parseKeyType(str: String) = StringUtil.parseValue(str, "keyType=\"", "\"")
-  def parseValueType(str: String) = StringUtil.parseValue(str, "valueType=\"", "\"")
-
-  def matches(wmg: WordMappingGroup, keyType: String, valueType: String) =
-    keyType == wmg.keyType && valueType == wmg.valueType
 }

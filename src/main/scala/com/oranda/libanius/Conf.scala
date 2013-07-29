@@ -27,28 +27,36 @@ object Conf {
         useAndroid = config.getBoolean("libanius.useAndroid"),
         enableLogging = config.getBoolean("libanius.enableLogging"),
         numCorrectAnswersRequired = config.getInt("libanius.numCorrectAnswersRequired"),
-        fileVocab = config.getString("libanius.file.vocab"),
         fileQuizRoot = config.getString("libanius.file.quizRoot"),
-        fileDictionary = config.getString("libanius.file.dictionary"),
         resQuizPublic = config.getString("libanius.res.quizPublic"),
-        resDictPublic = config.getString("libanius.res.dictPublic"),
-        // Variables passed between activities
+        // Variables passed between activities:
         keyWord = config.getString("libanius.interActivity.keyWord"),
         value = config.getString("libanius.interActivity.value")
     )
   }
 
   // Mock configuration for tests
-  def setUpDummy() {
+  def setUpForTest() {
     conf = Conf(
       useAndroid = false,
       enableLogging = false,
       numCorrectAnswersRequired = 4,
-      fileVocab = "",
       fileQuizRoot = "",
-      fileDictionary = "",
       resQuizPublic = "",
-      resDictPublic = "",
+      // Variables passed between activities
+      keyWord = "",
+      value = ""
+    )
+  }
+
+  // Configuration for preparing data files before the app is deployed
+  def setUpForParsing(fileQuizRoot: String) {
+    conf = Conf(
+      useAndroid = false,
+      enableLogging = true,
+      numCorrectAnswersRequired = 4,
+      fileQuizRoot,
+      resQuizPublic = "",
       // Variables passed between activities
       keyWord = "",
       value = ""
@@ -61,8 +69,8 @@ object Conf {
 case class Conf(
     useAndroid: Boolean, enableLogging: Boolean,
     numCorrectAnswersRequired: Int,
-    fileVocab: String, fileQuizRoot: String, fileDictionary: String,
-    resQuizPublic: String, resDictPublic: String,
+    fileQuizRoot: String,
+    resQuizPublic: String,
     keyWord: String, value: String) {
 
   lazy val fileQuiz = Conf.conf.fileQuizRoot + ".qui"

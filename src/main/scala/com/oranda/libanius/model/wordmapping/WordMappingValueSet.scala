@@ -16,8 +16,8 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.util.Random
-import com.oranda.libanius.util.{Util, StringUtil, Platform}
+import scala.util.{Random}
+import com.oranda.libanius.util.{StringUtil, Platform}
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.ListBuffer
 
@@ -98,20 +98,25 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {
 
 
 object WordMappingValueSet extends Platform {
-  
-  def combineValueSets(valueSets: Iterable[WordMappingValueSetWrapperBase]): List[WordMappingValue] =
+
+  def combineValueSets(valueSets: Iterable[WordMappingValueSetWrapperBase]):
+      List[WordMappingValue] =
     valueSets.foldLeft(new ArrayBuffer[WordMappingValue]()) {          
         (acc, wm) => acc ++ wm.values
     }.toList
-  
-  val wmvSplitter = getSplitter('/')
+
   // Example: contract:696,697;698/treaty:796;798
   def fromCustomFormat(str: String): WordMappingValueSet = {
-    
+
     val values = new ListBuffer[WordMappingValue]()
-    wmvSplitter.setString(str)
-    while (wmvSplitter.hasNext)
-      values += WordMappingValue.fromCustomFormat(wmvSplitter.next) 
+    val wmvsSplitter = getSplitter('/')
+    try {
+      wmvsSplitter.setString(str)
+      while (wmvsSplitter.hasNext)
+        values += WordMappingValue.fromCustomFormat(wmvsSplitter.next)
+    } catch {
+      case e: Exception => log("WordMappingValueSet: ERROR: Could not parse str " + str, e)
+    }
     WordMappingValueSet(values.toList)
   }
     
@@ -145,3 +150,8 @@ case class WordMappingValueSetLazyProxy(valuesString: String)
  */
 case class WordMappingValueSetWrapper(wmvs: WordMappingValueSet) 
     extends WordMappingValueSetWrapperBase
+
+object WordMappingValueSetWrapper {
+  def apply(values: List[WordMappingValue]): WordMappingValueSetWrapper =
+    WordMappingValueSetWrapper(WordMappingValueSet(values))
+}

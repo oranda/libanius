@@ -20,22 +20,26 @@ import com.oranda.libanius.Conf
 import _root_.android.content.Context
 import _root_.java.io._
 import _root_.android.util.Log
-import scala.io.Source
 
 object AndroidIO {
 
   def readFile(ctx: Context, file: File): String = readFile(ctx, file.getName)
 
-  def readFile(ctx: Context, fileName: String): String = {
-    def fileToInputStream(ctx: Context) = ctx.openFileInput(fileName)
-    readInputStream(ctx, fileToInputStream)
-  }
+  def readFile(ctx: Context, fileName: String): String =
+    readInputStream(ctx, fileToInputStream(fileName))
 
-  def readResource(ctx: Context, resName: String): String = {
-    def resID = ctx.getResources.getIdentifier(resName, "raw", ctx.getPackageName)
-    def resourceToInputStream(ctx: Context) = ctx.getResources.openRawResource(resID)
-    readInputStream(ctx, resourceToInputStream)
-  }
+  def resID(ctx: Context, resName: String) =
+    ctx.getResources.getIdentifier(resName, "raw", ctx.getPackageName)
+
+  def resourceToInputStream(resName: String) (ctx: Context) =
+    ctx.getResources.openRawResource(resID(ctx, resName))
+
+  def fileToInputStream(fileName: String) (ctx: Context) =
+    ctx.openFileInput(fileName)
+
+  def readResource(ctx: Context, resName: String): String =
+    readInputStream(ctx, resourceToInputStream(resName))
+
   // This is much faster than using Scala's Source functionality
   def readInputStream(ctx: Context, inStreamGetter: Context => InputStream): String = {
     
@@ -48,8 +52,7 @@ object AndroidIO {
       while (is.read(reader) != -1) {}
         allText = allText + new String(reader)
     } catch {
-      case e: IOException =>
-        Log.e("IO Exception", e.getMessage, e)
+      case e: IOException => Log.e("IO Exception", e.getMessage, e)
     } finally {
       if (is != null) {
         try {
@@ -61,7 +64,6 @@ object AndroidIO {
     }
     allText
   }
-          
   
   def save(ctx: Context, fileName: String, fileNameBackup: String, strToSave: String) {
     val file = new File(fileName)
@@ -72,10 +74,38 @@ object AndroidIO {
     writeToFile(Conf.conf.fileQuiz, strToSave, ctx)
   }
 
-  def writeToFile(fileName:String, data:String, ctx:Context) = {
-    val fOut : FileOutputStream = ctx.openFileOutput(fileName, Context.MODE_PRIVATE);
+  def writeToFile(fileName: String, data: String, ctx: Context) = {
+    val fOut : FileOutputStream = ctx.openFileOutput(fileName, Context.MODE_PRIVATE)
     fOut.write(data.getBytes())  
     fOut.close()
   }
-  
+
+  // TODO: combine with readInputStream
+  def readFirstLine(ctx: Context, inStreamGetter: Context => InputStream): String = {
+    var is: InputStream = null
+    try {
+      is = inStreamGetter(ctx)
+      val br = new BufferedReader(new InputStreamReader(is))
+      br.readLine
+    } catch {
+      case e: IOException =>
+        Log.e("IO Exception", e.getMessage, e)
+        ""
+    } finally {
+      if (is != null) {
+        try {
+          is.close()
+        } catch {
+          case e: IOException => // swallow
+        }
+      }
+    }
+  }
+
+  def log(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
+    t match {
+      case Some(t) => Log.d(module, message, t)
+      case _ => Log.d(module, message)
+    }
+  }
 }

@@ -15,79 +15,166 @@
  */
 package com.oranda.libanius
 
-import com.oranda.libanius.model.wordmapping.{WordMappingGroupReadWrite, QuizOfWordMappings, WordMappingGroupReadOnly}
+import com.oranda.libanius.model.wordmapping._
 import android.content.Context
 import com.oranda.libanius.util.Util
 import com.oranda.libanius.io.AndroidIO
 import com.oranda.libanius.util.Platform
 import scala.collection.immutable.Set
+import scala.concurrent.{ future, Future, ExecutionContext }
+import ExecutionContext.Implicits.global
+import java.io.InputStream
 
 trait DataStore extends Platform {
 
-  def readQuiz(ctx: Context, wordMappingGroups: Set[WordMappingGroupReadWrite]):
-      Option[QuizOfWordMappings] = {
-    if (wordMappingGroups.isEmpty)
-      None
-    else
+  def readQuizMetadata(ctx: Context): Set[QuizGroupHeader] = {
       try {
         val fileText =
           if (ctx.getFileStreamPath(Conf.conf.fileQuiz).exists)
             // TODO: consider changing to Platform.readFile
-            Util.stopwatch(AndroidIO.readFile(ctx, Conf.conf.fileQuiz),
-                "reading quiz from data/files")
+            AndroidIO.readFile(ctx, Conf.conf.fileQuiz)
           else
-            Util.stopwatch(AndroidIO.readResource(ctx, Conf.conf.resQuizPublic),
-                "reading quiz from res/raw")
-        Util.stopwatch(Some(QuizOfWordMappings.fromCustomFormat(fileText, wordMappingGroups)),
-            "parsing quiz")
+            AndroidIO.readResource(ctx, Conf.conf.resQuizPublic)
+        QuizOfWordMappings.metadataFromCustomFormat(fileText)
       } catch {
         // for absent data files, security access exceptions or anything else unexpected
-        case e: Exception => log("Libanius", "Error reading quiz: " + e.getMessage)
-                             None
+        case e: Exception => log("Error reading quiz: " + e.getMessage)
+                             Set()
       }
   }
+
+  def loadWmg(ctx: Context, header: QuizGroupHeader): Future[WordMappingGroupReadWrite] = {
+    log("seeing if wmg was loaded for " + header)
+    future {
+      val loadedWmg =
+        GlobalState.loadedQuizGroups.find(_.header == header).getOrElse {
+          log("no, so loading wmg for " + header)
+          val loadedWmg = loadWmgCore(ctx, header)
+          GlobalState.loadedQuizGroups :+= loadedWmg
+          loadedWmg
+        }
+      log("loadedWmg.numItemsAndCorrectAnswers: " + loadedWmg.numItemsAndCorrectAnswers)
+      loadedWmg
+    }
+  }
+
+  def loadWmgCore(ctx: Context, header: QuizGroupHeader): WordMappingGroupReadWrite =
+    findWmgInFilesDir(ctx, header) match {
+      case Some(wmgFileName) =>
+        Util.stopwatch(readWmgFromFilesDir(ctx, wmgFileName),
+            "reading wmg from file" + wmgFileName)
+      case _ =>
+        findWmgInResources(ctx, header) match {
+          case Some(wmgResName) =>
+            val wmgText = Util.stopwatch(AndroidIO.readResource(ctx, wmgResName),
+                "reading wmg resource " + wmgResName)
+            writeToFile(header.makeFileName, wmgText, Some(ctx)) // TODO: eliminate side-effect
+            log("read text from wmg resource starting " + wmgText.take(200))
+            WordMappingGroupReadWrite.fromCustomFormat(wmgText)
+          case _ =>
+            log("ERROR: failed to load wmg " + header)
+            WordMappingGroupReadWrite(header)
+        }
+    }
+
+  def readWmgFromFilesDir(ctx: Context, wmgFileName: String): WordMappingGroupReadWrite = {
+    log("reading wmg from file " + wmgFileName)
+    val wmgText = AndroidIO.readFile(ctx, wmgFileName)
+    log("have read wmgText " + wmgText.take(200) + "... ")
+    WordMappingGroupReadWrite.fromCustomFormat(wmgText)
+  }
+
+  def findWmgInFilesDir(ctx: Context, header: QuizGroupHeader): Option[String] = {
+    val fileNames = findWmgFileNamesFromFilesDir(ctx)
+    log("fileNames: " + fileNames.toList)
+    fileNames.find(readWmgMetadataFromFile(ctx, _) == Some(header))
+  }
+
+  def findWmgInResources(ctx: Context, header: QuizGroupHeader): Option[String] = {
+    val fileNames = findWmgFileNamesFromResources(ctx)
+    log("fileNames: " + fileNames.toList)
+    fileNames.find(readWmgMetadataFromResource(ctx, _) == Some(header))
+  }
+
+  def findAvailableWmgs(ctx: Context): Set[QuizGroupHeader] =
+    findAvailableResWmgs(ctx) ++ findAvailableFileNameWmgs(ctx)
+
+  def findAvailableResWmgs(ctx: Context): Set[QuizGroupHeader] = {
+    val wmgResNames = findWmgFileNamesFromResources(ctx)
+    log("wmgResNames = " + wmgResNames.toList)
+    wmgResNames.flatMap(readWmgMetadataFromResource(ctx, _)).toSet
+  }
+
+  def findAvailableFileNameWmgs(ctx: Context): Set[QuizGroupHeader] = {
+    val wmgFileNames = findWmgFileNamesFromFilesDir(ctx)
+    log("wmgFileNames = " + wmgFileNames.toList)
+    wmgFileNames.flatMap(readWmgMetadataFromFile(ctx, _)).toSet
+  }
+
+  def readWmgMetadataFromFile(ctx: Context, wmgFileName: String): Option[QuizGroupHeader] =
+    readWmgMetadata(ctx, AndroidIO.fileToInputStream(wmgFileName))
+
+  def readWmgMetadataFromResource(ctx: Context, wmgResName: String): Option[QuizGroupHeader] =
+    readWmgMetadata(ctx, AndroidIO.resourceToInputStream(wmgResName))
+
+  def readWmgMetadata(ctx: Context, inStreamGetter: Context => InputStream):
+       Option[QuizGroupHeader] = {
+    var firstLine = ""
+    try {
+      firstLine = AndroidIO.readFirstLine(ctx, inStreamGetter)
+      Some(QuizGroupHeader(firstLine))
+    } catch {
+      case e: Exception =>
+        log("Could not read wmg file, firstLine " + firstLine)
+        None
+    }
+  }
+
+  def findWmgFileNamesFromFilesDir(ctx: Context) =
+    ctx.getFilesDir.listFiles.filter(_.getName.endsWith(".wmg")).map(_.getName)
+
+  def findWmgFileNamesFromResources(ctx: Context) =
+    classOf[R.raw].getFields.map(_.getName).filter(_.startsWith("wmg"))
 
   def readWmgFiles(ctx: Context): Set[WordMappingGroupReadWrite] = {
 
     // TODO: improve style
-    var wmgFiles = ctx.getFilesDir.listFiles.filter(_.getName.endsWith(".wmg")).map(_.getName)
-    if (wmgFiles.isEmpty) {
-      log("Libanius", "No wmg files found in data dir. Trying resources... ")
-      wmgFiles = ctx.getResources.getAssets.list("").filter(_.endsWith("wmg.txt"))
-    }
-    if (wmgFiles.isEmpty)
-      log("Libanius", "No wmg files found at all")
+    val wmgFileNames = findWmgFileNamesFromFilesDir(ctx)
+    val wmgFileTexts =
+      if (!wmgFileNames.isEmpty) {
+        wmgFileNames.map(AndroidIO.readFile(ctx, _))
+      } else {
+        log("No wmg files found in data dir. Trying resources... ")
+        findWmgFileNamesFromResources(ctx).map(AndroidIO.readResource(ctx, _))
+      }
+    if (wmgFileTexts.isEmpty)
+      log("No wmg files found at all")
 
-    def readAndParseWmgFile(wmgFile: String) = {
-      val wmgFileText = AndroidIO.readFile(ctx, wmgFile)
-      WordMappingGroupReadWrite.fromCustomFormat(wmgFileText)
-    }
-
-    wmgFiles.map(readAndParseWmgFile(_)).toSet
+    wmgFileTexts.map(WordMappingGroupReadWrite.fromCustomFormat(_)).toSet
   }
 
-  def saveQuiz(ctx: Context, quiz: QuizOfWordMappings) {
+  def saveWmgs(quiz: QuizOfWordMappings, path: String = "", ctx: Option[Context] = None) {
 
     def saveToFile(wmg: WordMappingGroupReadWrite) = {
       val saveData = wmg.getSaveData
-      log("Libanius", "Saving wmg " + wmg.keyType + ", wmg has promptNumber " +
-          wmg.currentPromptNumber)
-      AndroidIO.writeToFile(saveData.fileName, saveData.data, ctx)
+      log("Saving wmg " + wmg.keyType + ", wmg has promptNumber " +
+          wmg.currentPromptNumber + " to " + saveData.fileName)
+      writeToFile(path + saveData.fileName, saveData.data, ctx)
     }
     quiz.wordMappingGroups.foreach(saveToFile(_))
   }
-  
+
+  /*
   def readDictionary(ctx: Context): WordMappingGroupReadOnly = {
     val fileText = readDictionaryText(ctx)
-    var dictionary = WordMappingGroupReadOnly("", "")
+    var dictionary = WordMappingGroupReadOnly(QuizGroupHeader("", ""))
     try {
       dictionary = Util.stopwatch(WordMappingGroupReadOnly.fromCustomFormat(
           fileText), "reading and parsing dictionary")
     } catch {
-      case e: Exception =>
-          log("Libanius", "Could not parse dictionary: " + e.getMessage(), Some(e))
+      case e: Exception => log("Could not parse dictionary: " + e.getMessage(), e)
     }
-    log("Libanius", "Finished reading " + dictionary.numKeyWords + " dictionary key words!")
+    log("Finished reading " + dictionary.numKeyWords + " dictionary key words!")
     dictionary
   }
   
@@ -98,7 +185,7 @@ trait DataStore extends Platform {
         AndroidIO.readFile(ctx, Conf.conf.fileDictionary)
       } catch { 
         // for security access exceptions or anything else unexpected
-        case e: Exception => log("Libanius", e.getMessage())
+        case e: Exception => log(e.getMessage())
         ""
       }
     else {
@@ -106,10 +193,11 @@ trait DataStore extends Platform {
         Util.stopwatch(AndroidIO.readResource(ctx, Conf.conf.resDictPublic),
             "reading quiz from res/raw")
       } catch {
-        case e: Exception => log("Libanius", 
+        case e: Exception => log(
             "Could not load dictionary from " + Conf.conf.resDictPublic + "... ")
-        ""    
+            ""
       }   
     }    
   }
+  */
 }

@@ -2,12 +2,12 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     >
   <LinearLayout 
     android:orientation="horizontal"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_weight="5"
     >
@@ -32,20 +32,14 @@
   </LinearLayout>
   <LinearLayout
     android:orientation="vertical"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"    
     android:layout_weight="75"
     android:layout_gravity="center_horizontal"
     >
-    <!--  <View
-      android:layout_width="fill_parent"
-      android:layout_height="1dp"
-      android:background="@android:color/darker_gray"
-      android:layout_marginBottom="10px"
-    />-->
     <LinearLayout 
       android:orientation="horizontal"
-      android:layout_width="fill_parent"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="5dp"
       >
@@ -55,24 +49,12 @@
 	    android:layout_width="0dp"
 	    android:layout_weight="15"
         android:layout_height="wrap_content"
-        android:text="DICT"
+        android:text="@string/opt"
         android:textSize="12sp"
 	    android:textColor="#AAAA00"	    
         android:textStyle="bold"
         android:onClick="gotoDictionary" 
-      />  <!--  
-      <Button
-        android:id="@+id/saveButton"
-        style="?android:attr/buttonStyleSmall"
-	    android:layout_width="0dp"
-	    android:layout_weight="15"
-        android:layout_height="wrap_content"
-        android:text="SAVE"
-        android:textSize="12sp"
-	    android:textColor="#AAAA00"	    
-        android:textStyle="bold"
-        android:onClick="saveQuiz" 
-      />  -->
+      />
       <TextView
         android:id="@+id/question"
         android:singleLine="true"
@@ -90,7 +72,7 @@
 	    android:layout_width="0dp"
 	    android:layout_weight="15"
         android:layout_height="wrap_content"
-        android:text="DEL"
+        android:text="@string/del"
         android:textSize="12sp"
 	    android:textColor="#FF8888"	    
         android:textStyle="bold"
@@ -98,14 +80,14 @@
       />
     </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-      android:layout_width="fill_parent"
+      android:layout_width="match_parent"
       android:layout_height="20dp"
       android:layout_marginBottom="10dp"
       android:layout_weight="5">
       <TextView
         android:id="@+id/questionNotes"
         android:singleLine="true"
-	    android:layout_width="fill_parent"
+	    android:layout_width="match_parent"
         android:layout_height="wrap_content"  
         android:layout_weight="1"
         android:gravity="center_horizontal"
@@ -116,7 +98,7 @@
     <Button
       android:id="@+id/answerOption1"
       android:layout_height="wrap_content"
-      android:layout_width="fill_parent"
+      android:layout_width="match_parent"
       android:layout_weight="20"
       android:gravity="center"
       android:textSize="20sp"
@@ -127,7 +109,7 @@
     <Button
       android:id="@+id/answerOption2"
       android:layout_height="wrap_content"
-      android:layout_width="fill_parent"
+      android:layout_width="match_parent"
       android:layout_weight="20"
       android:gravity="center"
       android:textSize="20sp"
@@ -138,7 +120,7 @@
     <Button
       android:id="@+id/answerOption3"
       android:layout_height="wrap_content"
-      android:layout_width="fill_parent"
+      android:layout_width="match_parent"
       android:layout_weight="20"
       android:gravity="center"
       android:textSize="20sp"
@@ -149,7 +131,7 @@
   </LinearLayout>
   <LinearLayout 
     android:orientation="horizontal"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_weight="20"
   >
@@ -170,7 +152,7 @@
       <TextView
 	    android:id="@+id/prevAnswerOption1"
   	    android:singleLine="true"
-	    android:layout_width="fill_parent"
+	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
         android:textSize="14sp"
 	    android:textStyle="italic"
@@ -179,7 +161,7 @@
       <TextView
 	    android:id="@+id/prevAnswerOption2"
 	    android:singleLine="true"
-	    android:layout_width="fill_parent"
+	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
         android:textSize="14sp"
 	    android:textStyle="italic"
@@ -188,7 +170,7 @@
       <TextView
 	    android:id="@+id/prevAnswerOption3"
 	    android:singleLine="true"
-	    android:layout_width="fill_parent"
+	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
         android:textSize="14sp"
 	    android:textStyle="italic"

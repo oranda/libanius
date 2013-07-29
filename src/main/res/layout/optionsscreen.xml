@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    >
+
+  <LinearLayout
+    android:id="@+id/quizGroupSelectionLayout"
+    android:orientation="vertical"
+    android:layout_height="match_parent" android:layout_width="match_parent"
+    android:layout_weight="1"
+    android:layout_marginBottom="10dp"
+    android:paddingBottom="10dp"
+    >
+    <TextView
+      android:id="@+id/searchLabel"
+      android:singleLine="true"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_marginTop="20dp"
+      android:layout_marginBottom="10dp"
+      android:textSize="20sp"
+      android:gravity="center"
+      android:text="@string/select_quiz_groups"
+    />
+    <LinearLayout
+      android:id="@+id/checkboxesLayout"
+      android:orientation="vertical"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center"
+      android:layout_marginTop="10dp"
+      android:layout_marginBottom="10dp"
+    />
+  </LinearLayout>
+
+
+  <Button
+    android:id="@+id/gotoQuizButton"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_weight="20"
+    android:gravity="center"
+    android:textSize="20sp"
+    android:textColor="#000000"
+    android:text="@string/go_to_quiz"
+    android:layout_marginBottom="18dp"
+    android:onClick="gotoQuiz"
+  />
+
+  <LinearLayout
+    android:id="@+id/dictionaryLayout"
+    android:orientation="vertical"
+    android:layout_height="match_parent" android:layout_width="match_parent"
+    android:layout_weight="1"
+    >
+    <!--
+    <TextView
+      android:id="@+id/searchLabel"
+      android:singleLine="true"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/search_dictionary"
+    />
+    <EditText
+      android:id="@+id/searchInput"
+      android:singleLine="true"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+    />
+    <TextView
+      android:id="@+id/status"
+      android:singleLine="true"
+	  android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text=" "
+    />
+    <LinearLayout
+      android:id="@+id/searchResults0"
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+    />
+    <LinearLayout
+      android:id="@+id/searchResults1"
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+    />
+    <LinearLayout
+      android:id="@+id/searchResults2"
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+    />
+    -->
+  </LinearLayout>
+</LinearLayout>
+

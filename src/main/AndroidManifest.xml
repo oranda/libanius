@@ -7,11 +7,15 @@
         android:label="@string/app_name"
         android:debuggable="true">
 
-        <activity android:label="@string/app_name" android:name=".Libanius"
+        <activity android:label="@string/app_name" android:name=".QuizScreen"
                   android:configChanges="keyboardHidden|orientation"
                   android:screenOrientation="portrait" 
                   android:alwaysRetainTaskState="true"
                   android:windowSoftInputMode="adjustPan"
+                  android:theme="@android:style/Theme.NoTitleBar"
+                  />
+        <activity android:label="@string/app_name" android:name=".OptionsScreen"
+                  android:screenOrientation="portrait"
                   android:theme="@android:style/Theme.NoTitleBar"
                   >
             <intent-filter>
@@ -19,9 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:label="@string/app_name" android:name=".SearchDictionary"
-                  android:screenOrientation="portrait"
-                  android:theme="@android:style/Theme.NoTitleBar"/>
     </application>
 
     <uses-sdk android:minSdkVersion="14"/> <!-- formerly 8 -->

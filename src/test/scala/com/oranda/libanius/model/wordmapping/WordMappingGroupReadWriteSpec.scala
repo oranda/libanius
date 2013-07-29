@@ -37,7 +37,7 @@ class WordMappingGroupReadWriteSpec extends Specification {
         "rides|reitet\n" +
         "sweeps|streicht"
 
-    Conf.setUpDummy()
+    Conf.setUpForTest()
 
     val wmg = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
     

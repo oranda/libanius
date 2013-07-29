@@ -23,7 +23,7 @@ object Util extends Platform {
     val start = System.currentTimeMillis()
     val result = fn
     val end = System.currentTimeMillis()
-    log("Libanius", "time taken for " + actionDescription + " was " + (end - start) + "ms")
+    log("time taken for " + actionDescription + " was " + (end - start) + "ms")
     result
   }
 }

@@ -26,11 +26,17 @@ case class QuizItemViewWithOptions(val keyWord: String,
     val wmvs: WordMappingValueSet,
     val wordMappingValue: WordMappingValue,
     val wmgCurrentPromptNumber: Int,
-    val keyType: String, val valueType: String, otherOptions: Set[String], 
+    val quizGroupHeader: QuizGroupHeader,
+    val falseAnswers: Set[String],
     val numCorrectAnswersInARow: Int) {
-  
-  def optionsInRandomOrder(): Set[String] = {
-    val allOptions = otherOptions + wordMappingValue.value
-    Random.shuffle(allOptions)
+
+  lazy val keyType = quizGroupHeader.keyType
+  lazy val valueType = quizGroupHeader.valueType
+
+  lazy val allOptions = optionsInRandomOrder(wordMappingValue, falseAnswers)
+
+  def optionsInRandomOrder(wmv: WordMappingValue, otherOptions: Set[String]): List[String] = {
+    val allOptions = otherOptions + wmv.value
+    Random.shuffle(allOptions.toList)
   }
 }

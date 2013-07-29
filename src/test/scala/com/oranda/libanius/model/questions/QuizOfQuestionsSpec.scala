@@ -41,7 +41,7 @@ class QuizOfQuestionsSpec extends Specification {
   </quizItems>
 </quiz>
 
-    Conf.setUpDummy()
+    Conf.setUpForTest()
     
     val quiz = QuizOfQuestions.fromXML(quizXml)
      

@@ -15,14 +15,11 @@
  */
 package com.oranda.libanius
 
-import java.lang.CharSequence
 import java.lang.Runnable
 import scala.concurrent.{ future, ExecutionContext }
 import ExecutionContext.Implicits.global
 
-import com.oranda.libanius.model.wordmapping.{WordMappingGroupReadWrite, QuizItemViewWithOptions, QuizOfWordMappings}
-import com.oranda.libanius.model.UserAnswer
-import com.oranda.libanius.util.Platform
+import com.oranda.libanius.model.wordmapping.{QuizGroupHeader, QuizItemViewWithOptions, QuizOfWordMappings}
 import com.oranda.libanius.util.Util
 import android.app.Activity
 import android.content.Intent
@@ -32,10 +29,8 @@ import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import scala.collection.immutable.{ListSet, Set}
 
-class Libanius extends Activity with TypedActivity with Platform with DataStore 
-    with Timestamps {
+class QuizScreen extends Activity with TypedActivity with DataStore with Timestamps {
 
   private[this] lazy val questionLabel: TextView = findView(TR.question)
   private[this] lazy val questionNotesLabel: TextView = findView(TR.questionNotes)
@@ -59,61 +54,48 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   private[this] var currentQuizItem: QuizItemViewWithOptions = _
 
   def quiz = GlobalState.quiz.get
-  def dictionaryIsDefined = GlobalState.dictionary.isDefined
-  def dictionary = GlobalState.dictionary.get
+  //def dictionaryIsDefined = GlobalState.dictionary.isDefined
+  //def dictionary = GlobalState.dictionary.get
   
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
-    Conf.setUp()
-    log("Libanius", "onCreate")
-    setContentView(R.layout.main)
+    log("onCreate")
+    setContentView(R.layout.quizscreen)
     initQuiz()
-    loadDictionaryInBackground()
+    //loadDictionaryInBackground()
+
+    log("quiz groups are " + quiz.wordMappingGroups.map(_.header).mkString)
     testUserWithQuizItem()
   }
   
   def initQuiz() {
-    GlobalState.initQuiz(readQuizUi)
-    val extras = Option(getIntent().getExtras()) // values from the SearchDictionary Activity
+    /*
+    val extras = Option(getIntent().getExtras()) // values from the OptionsScreen Activity
     extras.foreach { extras =>
 	    val keyWord = extras.getString(Conf.conf.keyWord)
       val value = extras.getString(Conf.conf.value)
-      log("Libanius", "received vars " + keyWord + " " + value)
+      log("received vars " + keyWord + " " + value)
       if (dictionaryIsDefined)
-        updateQuiz(quiz.addWordMappingToFrontOfTwoGroups(dictionary.keyType, 
-            dictionary.valueType, keyWord, value))   
+        GlobalState.updateQuiz(quiz.addWordMappingToFrontOfTwoGroups(
+            QuizGroupHeader(dictionary.keyType, dictionary.valueType), keyWord, value))
 	  }
+	  */
   }
-  
-  def updateQuiz(newQuiz: QuizOfWordMappings) {
-    GlobalState.quiz = Some(newQuiz)
-  }
-  
-  def loadDictionaryInBackground() {
-    val ctx = this
 
-    /*
-     * Instead of using Android's AsyncTask for a background task, use a Future.
-     * The Future has no result. An Akka actor might be used instead later.
-     */
-    future { GlobalState.initDictionary(readDictionary(ctx)) }
-  }
+
+  //def loadDictionaryInBackground() =
+  //  /*
+  //   * Instead of using Android's AsyncTask for a background task, use a Future.
+  //   * The Future has no result. An Akka actor might be used instead later.
+  //   */
+  //  future { GlobalState.initDictionary(readDictionary(ctx = this)) }
 
   override def onPause() {
     super.onPause()
-    log("Libanius", "onPause")
-    saveQuizUi
+    log("onPause")
+    saveQuiz
   }
-  
-  def readQuizUi: QuizOfWordMappings = {    
-    printStatus("Reading quiz data...")
-    val wordMappingGroups: Set[WordMappingGroupReadWrite] = readWmgFiles(ctx = this)
-    val quiz = readQuiz(ctx = this, wordMappingGroups).getOrElse(QuizOfWordMappings.demoQuiz())
-    val msg = "Finished reading " + quiz.numItems + " quiz items!"
-    log("Libanius", msg)
-    printStatus(msg)
-    quiz
-  }
+
   
   def testUserWithQuizItem() { 
     Util.stopwatch(quiz.findQuizItem, "find quiz items") match {
@@ -121,8 +103,9 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
         currentQuizItem = quizItem
         showNextQuizItem()
         GlobalState.quiz.foreach { q =>
-          updateQuiz(q.addWordMappingGroup(wmg.updatedPromptNumber).updateRangeForFailedWmgs(wmg))
-          q.wordMappingGroups.foreach(wmg => log("Libanius", wmg.keyType + " prompt number is " +
+          GlobalState.updateQuiz(
+              q.addWordMappingGroup(wmg.updatedPromptNumber).updateRangeForFailedWmgs(wmg))
+          q.wordMappingGroups.foreach(wmg => log(wmg.keyType + " prompt number is " +
               wmg.currentPromptNumber + ", range is " + wmg.currentSearchRange.start))
         }
       case _ =>
@@ -146,7 +129,7 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
           currentQuizItem.numCorrectAnswersInARow + " times)"
     questionNotesLabel.setText(questionNotesText)
         
-    val optionsIter = currentQuizItem.optionsInRandomOrder().iterator
+    val optionsIter = currentQuizItem.allOptions.iterator
     answerOptionButtons.foreach(_.setText(optionsIter.next))
   }
   
@@ -156,62 +139,77 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
   
   def removeCurrentWord(v: View) {
     val (newQuiz, wasRemoved) = quiz.removeWordMappingValue(currentQuizItem.keyWord, 
-        currentQuizItem.wordMappingValue, currentQuizItem.keyType, currentQuizItem.valueType)
+        currentQuizItem.wordMappingValue, currentQuizItem.quizGroupHeader)
         
-    updateQuiz(newQuiz)
+    GlobalState.updateQuiz(newQuiz)
     
     if (wasRemoved) printStatus("Deleted word " + currentQuizItem.keyWord)
     testUserWithQuizItemAgain()    
   }
   
   def gotoDictionary(v: View) {
-    val dictScreen = new Intent(getApplicationContext(), classOf[SearchDictionary])
+    val dictScreen = new Intent(getApplicationContext(), classOf[OptionsScreen])
     startActivity(dictScreen)
   }
 
   private def updateUI(correctAnswer: String, clickedButton: Button) {
+    resetButtonAndLabelColors()
+    setPrevQuestionText()
+    populatePrevOptions()
+    setColorsForButtons(correctAnswer, clickedButton)
+  }
+
+  private def resetButtonAndLabelColors() {
+    prevOptionLabels.foreach (_.setTextColor(Color.LTGRAY))
+    answerOptionButtons.foreach (_.setBackgroundColor(Color.LTGRAY))
+  }
+
+  private def setPrevQuestionText() {
     var prevQuestionText = "PREV: " + questionLabel.getText
     val maxAnswers = Conf.conf.numCorrectAnswersRequired
     if (currentQuizItem.wordMappingValue.numCorrectAnswersInARow == maxAnswers)
       prevQuestionText += " (correct " + maxAnswers + " times -- COMPLETE)"
     prevQuestionLabel.setText(prevQuestionText)
+  }
 
-    val buttonsToLabels = answerOptionButtons zip prevOptionLabels
+  private def populatePrevOptions() {
 
-    buttonsToLabels.foreach { buttonToLabel =>
-      setPrevOptionsText(buttonToLabel._2, buttonToLabel._1.getText)
+    log("allOptions for currentQuizItem: " + currentQuizItem.allOptions)
+
+    val reverseGroupHeader = currentQuizItem.quizGroupHeader.reverse
+    val isReverseLookupPossible = (GlobalState.quiz.flatMap(
+        _.findWordMappingGroup(reverseGroupHeader)
+    )).isDefined
+
+    if (isReverseLookupPossible) {
+      val labelsToOptions = prevOptionLabels zip currentQuizItem.allOptions
+      labelsToOptions.foreach {
+        case (label, option) => setPrevOptionsText(label, option, reverseGroupHeader)
+      }
+    } else {
+      prevAnswerOption1Label.setTextColor(Color.GREEN)
+      prevAnswerOption1Label.setText(currentQuizItem.keyWord + " = " +
+          currentQuizItem.wmvs.strings.mkString(", "))
     }
+  }
+
+  private def setColorsForButtons(correctAnswer: String, clickedButton: Button) {
 
     val correctButton = answerOptionButtons.find(_.getText == correctAnswer).get
 
+    val buttonsToLabels = answerOptionButtons zip prevOptionLabels
     buttonsToLabels.foreach { buttonToLabel =>
       setColorOnAnswer(buttonToLabel._1, buttonToLabel._2, correctButton, clickedButton)
     }
   }
 
-  def processUserAnswer(clickedButton: Button) {
-    val userAnswerTxt = clickedButton.getText.toString
-    val correctAnswer = currentQuizItem.wordMappingValue.value 
-    val isCorrect = userAnswerTxt == correctAnswer
-    updateTimestamps(isCorrect)
+  def setPrevOptionsText(prevOptionLabel: TextView, keyWord: String,
+      quizGroupHeader: QuizGroupHeader) {
 
-    updateQuiz(
-        Util.stopwatch(GlobalState.quiz.get.updateWithUserAnswer(isCorrect, currentQuizItem), "updateQuiz"))
-    updateUI(correctAnswer, clickedButton)
-
-    val delayMillis = if (isCorrect) 10 else 300
-    val handler = new Handler
-    handler.postDelayed(new Runnable() { def run() = testUserWithQuizItemAgain() }, 
-        delayMillis)
-  }
-  
-  def setPrevOptionsText(prevOptionLabel: TextView, keyWord: CharSequence) {
-    val keyWordStr = keyWord.toString
-    // The arguments for quiz.findValueSetFor() have keyType and valueType reversed
-    val values = quiz.findValuesFor(keyWordStr, 
-        valueType = currentQuizItem.keyType, 
-        keyType = currentQuizItem.valueType).mkString(", ")
-    prevOptionLabel.setText(keyWord.toString + " = " + values)
+    log("quiz wordMappingGroups: " + quiz.wordMappingGroups.map(_.header))
+    // The arguments for quiz.findValuesFor() have keyType and valueType reversed
+    val values = quiz.findValuesFor(keyWord, quizGroupHeader).mkString(", ")
+    prevOptionLabel.setText(keyWord + " = " + values)
   }
   
   def setColorOnAnswer(answerOptionButton: Button, 
@@ -225,17 +223,31 @@ class Libanius extends Activity with TypedActivity with Platform with DataStore
         answerOptionButton.setBackgroundColor(Color.RED)
         prevAnswerOptionLabel.setTextColor(Color.RED)
       case _ =>
-        answerOptionButton.setBackgroundColor(Color.LTGRAY)
-        prevAnswerOptionLabel.setTextColor(Color.LTGRAY)
     }
   }
   
-  def saveQuizUi() {
+  def saveQuiz() {
     printStatus("Saving quiz data...")
-    saveQuiz(this, quiz)
+    saveWmgs(quiz, ctx = Some(this))
     printStatus("Finished saving quiz data!")
-  }  
-  
+  }
+
+  def processUserAnswer(clickedButton: Button) {
+    val userAnswerTxt = clickedButton.getText.toString
+    val correctAnswer = currentQuizItem.wordMappingValue.value
+    val isCorrect = userAnswerTxt == correctAnswer
+    updateTimestamps(isCorrect)
+
+    GlobalState.updateQuiz(Util.stopwatch(
+      GlobalState.quiz.get.updateWithUserAnswer(isCorrect, currentQuizItem), "updateQuiz"))
+    updateUI(correctAnswer, clickedButton)
+
+    val delayMillis = if (isCorrect) 10 else 300
+    val handler = new Handler
+    handler.postDelayed(new Runnable() { def run() = testUserWithQuizItemAgain() },
+      delayMillis)
+  }
+
   def showScoreAsync() {
 
     def formatAndPrintScore(scoreStr: String) {

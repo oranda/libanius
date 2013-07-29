@@ -26,7 +26,7 @@ class WordMappingValueSpec extends Specification {
     
     val wmvCustomFormat = "nachlösen:9,7;6"
 
-    Conf.setUpDummy()
+    Conf.setUpForTest()
     
     val wmv = WordMappingValue.fromCustomFormat(wmvCustomFormat)
     

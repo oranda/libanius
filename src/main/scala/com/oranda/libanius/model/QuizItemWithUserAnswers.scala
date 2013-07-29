@@ -77,13 +77,6 @@ case class Criteria(numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum:
     extends Platform {
   def isPresentable(currentPromptNum : Int, promptNumInMostRecentAnswer: Option[Int],
       numCorrectAnswersInARow: Int): Boolean = {
-    /*
-    log("Libanius", "numCorrectAnswersInARow: " + numCorrectAnswersInARow +
-        ", promptNumInMostRecentAnswer: " + promptNumInMostRecentAnswer +
-        ", currentPromptNum: " + currentPromptNum +
-        ", numCorrectAnswersInARowDesired: " + numCorrectAnswersInARowDesired +
-        ", diffInPromptNumMinimum: " + diffInPromptNumMinimum)
-    */
     def wasNotTooRecentlyUsed = promptNumInMostRecentAnswer.forall {
       case promptNumInMostRecentAnswer =>
           val diffInPromptNum = currentPromptNum - promptNumInMostRecentAnswer

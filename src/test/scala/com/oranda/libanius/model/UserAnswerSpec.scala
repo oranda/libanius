@@ -24,7 +24,7 @@ class UserAnswerSpec extends Specification {
   
   "a user answer" should {
 
-    Conf.setUpDummy()
+    Conf.setUpForTest()
     
     val uaXml = <userAnswer wasCorrect="true" promptNumber="1"></userAnswer>
   

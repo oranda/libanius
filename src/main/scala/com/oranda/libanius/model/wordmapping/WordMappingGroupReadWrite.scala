@@ -21,29 +21,29 @@ import scala.collection.immutable._
 import scala.util.Random
 
 import com.oranda.libanius.util.{Platform, StringUtil, Util}
-import WordMappingGroupReadWrite._
-import com.oranda.libanius.io.AndroidIO
-import com.oranda.libanius.{SaveData, Conf}
+import com.oranda.libanius.SaveData
 import com.oranda.libanius.model.UserAnswer
 
-case class WordMappingGroupReadWrite(override val keyType: String, override val valueType: String,
+case class WordMappingGroupReadWrite(override val header: QuizGroupHeader,
       wordMappings: Stream[Pair[String, WordMappingValueSetWrapperBase]] = Stream.empty,
-      currentPromptNumber: Int = 0, currentSearchRange: Range = 0 until rangeSize)
-    extends WordMappingGroup(keyType, valueType) with Platform {
-  // keyType example: "English word"
-  // valueType example: "German word"
-  
+      currentPromptNumber: Int = 0,
+      currentSearchRange: Range = 0 until WordMappingGroupReadWrite.rangeSize)
+    extends WordMappingGroup(header) with Platform {
+
+  def keyType = header.keyType     // example: "English word"
+  def valueType = header.valueType // example: "German word"
+
+  // workaround: compiler does not accept import
+  lazy val rangeSize = WordMappingGroupReadWrite.rangeSize
+
   def thisUpdated(newWordMappings: Stream[Pair[String, WordMappingValueSetWrapperBase]]) =
-    WordMappingGroupReadWrite(keyType, valueType, newWordMappings, currentPromptNumber,
-        currentSearchRange)
+    WordMappingGroupReadWrite(header, newWordMappings, currentPromptNumber, currentSearchRange)
 
   def updatedPromptNumber =
-    WordMappingGroupReadWrite(keyType, valueType, wordMappings,
-        currentPromptNumber + 1, currentSearchRange)
+    WordMappingGroupReadWrite(header, wordMappings, currentPromptNumber + 1, currentSearchRange)
 
   def updatedSearchRange =
-    WordMappingGroupReadWrite(keyType, valueType, wordMappings, currentPromptNumber,
-        rangeForNextSearch)
+    WordMappingGroupReadWrite(header, wordMappings, currentPromptNumber, rangeForNextSearch)
 
   def wordMappingValueSets = wordMappings.view.map(_._2)
   def wordMappingKeys = wordMappings.view.map(_._1)
@@ -51,13 +51,12 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
   /*
    * Example of custom format:
    * 
-   * wordMappingGroup keyType="English word" valueType="German word"
+   * wordMappingGroup keyType="English word" valueType="German word" currentPromptNumber="0"
    *    against|wider
    *    entertain|unterhalten
    */
   def toCustomFormat(strBuilder: StringBuilder) = {
-    strBuilder.append("wordMappingGroup keyType=\"").append(keyType).
-        append("\" valueType=\"").append(valueType).append("\" currentPromptNumber=\"").
+    header.toCustomFormat(strBuilder).append(" currentPromptNumber=\"").
         append(currentPromptNumber).append("\"")
     val iter = wordMappings.iterator
     while (iter.hasNext) {
@@ -70,7 +69,7 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
 
   def getSaveData: SaveData = {
     val serialized = toCustomFormat(new StringBuilder())
-    val fileName = keyType + "-" + valueType + ".wmg"
+    val fileName = header.makeFileName
     SaveData(fileName, serialized.toString)
   }
 
@@ -192,14 +191,14 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
     wordMappings.find(_._1 == keyWord).map(_._2)
   
   def findPresentableQuizItem: Option[QuizItemViewWithOptions] = {
-    log("Libanius", "currentSearchRange: " + currentSearchRange.start)
+    log("currentSearchRange: " + currentSearchRange.start)
     val wmSlice = wordMappings.slice(currentSearchRange.start, currentSearchRange.end)
     val quizItem =
       (for {
         wm <- wmSlice.toStream
         quizItem <- findPresentableQuizItem(wm._1, wm._2, currentPromptNumber)
       } yield quizItem).headOption
-    log("Libanius", "found quiz item " + quizItem)
+    log("found quiz item " + quizItem)
     quizItem
   }
   
@@ -210,7 +209,7 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
 
   private def findPresentableQuizItem(key: String, wordMappingValues: WordMappingValueSet, 
       currentPromptNumber: Int): Option[QuizItemViewWithOptions] = {
-    //log("Libanius", "findPresentableQuizItem: key=" + key + ", currentPromptNumber=" +
+    //log("findPresentableQuizItem: key=" + key + ", currentPromptNumber=" +
     //    currentPromptNumber)
     val wordMappingValue = wordMappingValues.findPresentableWordMappingValue(currentPromptNumber)
     wordMappingValue.map { wordMappingValue =>
@@ -220,7 +219,7 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
   }
   
   def findAnyUnfinishedQuizItem: Option[QuizItemViewWithOptions] = {
-    log("Libanius", "findAnyUnfinishedQuizItem " + keyType)
+    log("findAnyUnfinishedQuizItem " + header)
     wordMappings.iterator.map(entry => 
         findAnyUnfinishedQuizItem(entry._1,  entry._2)).
         find(_.isDefined).getOrElse(None)
@@ -237,7 +236,7 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
     val falseAnswers = makeFalseAnswers(key, wmvs,
         wordMappingValueCorrect, numCorrectAnswers)
     new QuizItemViewWithOptions(key, wmvs, wordMappingValueCorrect,
-        currentPromptNumber, keyType, valueType, falseAnswers, numCorrectAnswers)
+        currentPromptNumber, header, falseAnswers, numCorrectAnswers)
   }
 
   def makeFalseAnswers(key: String, wordMappingCorrectValues: WordMappingValueSet, 
@@ -261,8 +260,10 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
     while (falseAnswers.size < numFalseAnswersRequired && totalTries > 0) {
       totalTries = totalTries - 1
       val randomAnswer = findRandomWordValue(randomValues(100)) 
-      if (!wordMappingCorrectValues.containsValue(randomAnswer))
-         falseAnswers += randomAnswer
+      randomAnswer.foreach( randomAnswer =>
+        if (!wordMappingCorrectValues.containsValue(randomAnswer))
+          falseAnswers += randomAnswer
+      )
     }
     
     // final try to fill false answers: use dummy data
@@ -300,13 +301,21 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
   def hasSameStart = (wmv: WordMappingValue, value: String) => wmv.hasSameStart(value)
   def hasSameEnd = (wmv: WordMappingValue, value: String) => wmv.hasSameEnd(value)
   
-  def findRandomWordValue(wordMappingValues: Seq[WordMappingValue]): String = {
-    val randomIndex = Random.nextInt(wordMappingValues.length)
-    wordMappingValues(randomIndex).value
+  def findRandomWordValue(wordMappingValues: Seq[WordMappingValue]): Option[String] = {
+    if (wordMappingValues.isEmpty)
+      None
+    else {
+      val randomIndex = Random.nextInt(wordMappingValues.length)
+      Some(wordMappingValues(randomIndex).value)
+    }
   } 
   
-  def randomValues(sliceSize: Int) = 
-    WordMappingValueSet.combineValueSets(randomSliceOfValueSets(sliceSize))
+  def randomValues(sliceSize: Int) =  {
+    val combinedValueSets = WordMappingValueSet.combineValueSets(randomSliceOfValueSets(sliceSize))
+    if (combinedValueSets.isEmpty)
+      log("ERROR: randomValues found nothing")
+    combinedValueSets
+  }
   
   def randomSliceOfValueSets(sliceSize: Int): Iterable[WordMappingValueSetWrapperBase] =
     if (sliceSize >= size) wordMappingValueSets.toList
@@ -335,51 +344,64 @@ case class WordMappingGroupReadWrite(override val keyType: String, override val 
 }
 
 
-object WordMappingGroupReadWrite {
+object WordMappingGroupReadWrite extends Platform {
   
   val rangeSize = 200
-  
-  val splitterLineBreak = WordMappingGroup.splitterLineBreak
-  val splitterKeyValue = WordMappingGroup.splitterKeyValue
-  
+
   /*
    * Example:
    * 
-   * wordMappingGroup keyType="English word" valueType="German word"
+   * wordMappingGroup keyType="English word" valueType="German word" currentPromptNumber="0"
    *    against|wider
    *    entertain|unterhalten
    */
   def fromCustomFormat(str: String): WordMappingGroupReadWrite = {
-    
+
+    val splitterLineBreak = WordMappingGroup.splitterLineBreak
+    val splitterKeyValue = WordMappingGroup.splitterKeyValue
+
     // TODO: write directly to the Stream not a ListBuffer
     val wordMappingsMutable = new ListBuffer[Pair[String, WordMappingValueSetWrapperBase]]()
-    
-    splitterLineBreak.setString(str)
-    splitterLineBreak.next // skip the first line, which has already been parsed
-      
-    while (splitterLineBreak.hasNext) {
-      splitterKeyValue.setString(splitterLineBreak.next)
-        
-      if (splitterKeyValue.hasNext) {
-        val strKey = splitterKeyValue.next
+
+    try {
+      splitterLineBreak.setString(str)
+      splitterLineBreak.next // skip the first line, which has already been parsed
+
+      while (splitterLineBreak.hasNext) {
+        val strKeyValue = splitterLineBreak.next
+        splitterKeyValue.setString(strKeyValue)
+
         if (splitterKeyValue.hasNext) {
-          val strValues = splitterKeyValue.next
-          wordMappingsMutable += Pair(strKey, WordMappingValueSetLazyProxy(strValues)) 
+
+          try {
+            val strKey = splitterKeyValue.next
+
+            if (splitterKeyValue.hasNext) {
+              val strValues = splitterKeyValue.next
+              wordMappingsMutable += Pair(strKey, WordMappingValueSetLazyProxy(strValues))
+            }
+          } catch {
+            case e: Exception => log("could not parse key-value string: " + strKeyValue)
+          }
         }
       }
+    } catch {
+      case e: Exception => log("could not parse wmg with str " + str.take(100) + "..." + str.takeRight(100))
     }
-    
+
     val wordMappingsStream = wordMappingsMutable.toStream
   
     // Now use the persistent data structure.
-    new WordMappingGroupReadWrite(keyType = WordMappingGroup.parseKeyType(str),
-        valueType = WordMappingGroup.parseValueType(str),
+    new WordMappingGroupReadWrite(QuizGroupHeader(str),
         wordMappings = wordMappingsStream,
         currentPromptNumber = WordMappingGroupReadWrite.parseCurrentPromptNumber(str))
   }
 
-  def parseCurrentPromptNumber(str: String): Int = {
-    //println("parseCurrentPromptNumber, str: " + str)
-    StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt
-  }
+  def parseCurrentPromptNumber(str: String): Int =
+    try {
+      StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt
+    } catch {
+      case e: Exception => log("Could not parse prompt number from " + str)
+                           0
+    }
 }

@@ -17,12 +17,7 @@
 package com.oranda.libanius.model.wordmapping
 
 import scala.collection.JavaConversions.mapAsScalaMap
-import scala.collection.immutable.HashSet
 import scala.collection.mutable
-import scala.util.Random
-import com.oranda.libanius.util.StringUtil
-import com.sun.xml.internal.ws.util.StringUtils
-import com.oranda.libanius.util.Util
 import com.oranda.libanius.util.Platform
 
 import com.oranda.libanius.model.ModelComponent
@@ -34,9 +29,12 @@ import com.oranda.libanius.model.ModelComponent
  * The raison d'etre is that it can be loaded quickly: the values for each
  * key value are only parsed on demand.
  */
-case class WordMappingGroupReadOnly(override val keyType: String, override val valueType: String) 
-    extends WordMappingGroup(keyType, valueType) with Platform {
-  
+case class WordMappingGroupReadOnly(override val header: QuizGroupHeader)
+    extends WordMappingGroup(header) with Platform {
+
+  def keyType = header.keyType     // example: "English word"
+  def valueType = header.valueType // example: "German word"
+
   // When populating, the java.util map is faster than the mutable Scala map
   private val wordMappings = new java.util.LinkedHashMap[String, String]
   
@@ -67,9 +65,7 @@ case class WordMappingGroupReadOnly(override val keyType: String, override val v
 
 
 object WordMappingGroupReadOnly {
-      
-  val splitterLineBreak = WordMappingGroup.splitterLineBreak
-  val splitterKeyValue = WordMappingGroup.splitterKeyValue
+
   
   /*
    * Example:
@@ -78,9 +74,12 @@ object WordMappingGroupReadOnly {
    *    against|wider
    *    entertain|unterhalten
    */
-  def fromCustomFormat(str: String): WordMappingGroupReadOnly =
-    new WordMappingGroupReadOnly(keyType = WordMappingGroup.parseKeyType(str),
-        valueType = WordMappingGroup.parseValueType(str)) {
+  def fromCustomFormat(str: String): WordMappingGroupReadOnly = {
+
+    val splitterLineBreak = WordMappingGroup.splitterLineBreak
+    val splitterKeyValue = WordMappingGroup.splitterKeyValue
+
+    new WordMappingGroupReadOnly(QuizGroupHeader(str)) {
       
       splitterLineBreak.setString(str)
       splitterLineBreak.next // skip the first line, which has already been parsed
@@ -98,4 +97,5 @@ object WordMappingGroupReadOnly {
         }
       }
     }
+  }
 }

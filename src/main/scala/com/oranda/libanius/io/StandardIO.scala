@@ -16,16 +16,8 @@
 
 package com.oranda.libanius.io
 
-import java.io.FileOutputStream
-import java.io.OutputStreamWriter
-import java.io.FileInputStream
-import java.io.InputStreamReader
-import java.io.BufferedReader
-import java.io.IOException
 import java.io.File
 import java.io.FileWriter
-import com.oranda.libanius.model.Quiz
-import scala.io.BufferedSource
 import scala.io.Source
 
 
@@ -46,6 +38,11 @@ object StandardIO {
     using (new FileWriter(fileName)) (_.write(data))
   
   private def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
-	  try { f(param) } finally { param.close() }   
+	  try { f(param) } finally { param.close() }
+
+  def log(message: String, module: String = "QuizScreen", t: Option[Throwable] = None) {
+    System.out.println(module + ": " + message)
+    t.foreach(_.printStackTrace())
+  }
   
 }

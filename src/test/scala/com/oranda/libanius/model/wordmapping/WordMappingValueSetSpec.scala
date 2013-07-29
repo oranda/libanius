@@ -23,7 +23,7 @@ class WordMappingValueSetSpec extends Specification {
 
   "a word-mapping-value-set" should {
 
-    Conf.setUpDummy()
+    Conf.setUpForTest()
 
     val wmvsCustomFormat = "contract:698,696;697/treaty:796;798"
 

@@ -30,7 +30,7 @@ class QuestionItemSpec extends Specification {
   <userAnswers></userAnswers>
 </quizItem>
 
-    Conf.setUpDummy()
+    Conf.setUpForTest()
     
     val qi = QuestionItem.fromXML(qiXml)
     

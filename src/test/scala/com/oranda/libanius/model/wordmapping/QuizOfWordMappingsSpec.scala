@@ -42,14 +42,14 @@ class QuizOfWordMappingsSpec extends Specification {
         "unterwegs|en route\n" +
         "Vertrag|contract:697,696;698/treaty:796;798")
 
-    Conf.setUpDummy()
+    Conf.setUpForTest()
     
     val quiz = QuizOfWordMappings.demoQuiz(quizData)
     
     sequential 
     
     "be parseable from custom format" in {
-      val wmg = quiz.findWordMappingGroup(keyType = "German word", valueType = "English word")
+      val wmg = quiz.findWordMappingGroup(QuizGroupHeader("German word", "English word"))
       wmg.isDefined mustEqual true
       //quiz.toCustomFormat.toString mustEqual quizCustomFormat
     }
@@ -63,19 +63,19 @@ class QuizOfWordMappingsSpec extends Specification {
     
     "offer translations for a word, given the group of the word" in { 
       val translations = quiz.findValuesFor(keyWord = "Vertrag", 
-          keyType = "German word", valueType = "English word").toSet[String]
+          QuizGroupHeader("German word", "English word")).toSet[String]
       translations.contains("contract") mustEqual true
       translations.contains("treaty") mustEqual true
     }    
     
     "delete key-words from a particular group" in {
       val quizBefore = QuizOfWordMappings.demoQuiz(quizData)
-      val wmgBefore = quizBefore.findWordMappingGroup(keyType = "English word",
-          valueType = "German word").get
+      val wmgBefore = quizBefore.findWordMappingGroup(
+          QuizGroupHeader("English word", "German word")).get
       wmgBefore.contains("full") mustEqual true
-      val quizAfter = quizBefore.removeWord("full", "English word", "German word")
-      val wmgAfter = quizAfter.findWordMappingGroup(keyType = "English word",
-          valueType = "German word").get
+      val quizAfter = quizBefore.removeWord("full", QuizGroupHeader("English word", "German word"))
+      val wmgAfter = quizAfter.findWordMappingGroup(
+          QuizGroupHeader("English word", "German word")).get
       wmgAfter.contains("full") mustEqual false
     }
 
@@ -83,11 +83,11 @@ class QuizOfWordMappingsSpec extends Specification {
       val quizBefore = QuizOfWordMappings.demoQuiz(quizData)
       val (quizAfter, wasRemoved) = quizBefore.removeWordMappingValue(
           keyWord = "Vertrag", wordMappingValue = WordMappingValue("contract"),
-          keyType = "German word", valueType = "English word")
+          QuizGroupHeader("German word", "English word"))
 
       wasRemoved mustEqual true
       val translations = quizAfter.findValuesFor(keyWord = "Vertrag",
-          keyType = "German word", valueType = "English word").toSet[String]
+          QuizGroupHeader("German word", "English word")).toSet[String]
       translations.contains("contract") mustEqual false
       translations.contains("treaty") mustEqual true
     }
@@ -95,7 +95,7 @@ class QuizOfWordMappingsSpec extends Specification {
     "contain unique groups only" in {
       val quizLocal = QuizOfWordMappings.demoQuiz(quizData)
       quizLocal.numGroups mustEqual 2 // precondition
-      val wmg = WordMappingGroupReadWrite("English word", "German word")
+      val wmg = WordMappingGroupReadWrite(QuizGroupHeader("English word", "German word"))
       val quizUpdated = quizLocal.addWordMappingGroup(wmg) // should have no effect
       quizUpdated.numGroups mustEqual 2
     }

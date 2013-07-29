@@ -17,26 +17,43 @@
 package com.oranda.libanius.util
 
 import com.oranda.libanius.Conf
-import android.util.Log
+import android.content.Context
+import com.oranda.libanius.io.{StandardIO, AndroidIO}
 
 /*
  * Encapsulate platform-specific code.
  */
 trait Platform {
- 
-  def getSplitter(char: java.lang.Character): StringSplitter =
+
+  /**
+   * The String processing needs to be very fast, especially on a limited Android device.
+   * The Android splitter utilities are faster than String.split()
+   *
+   * The gnarly ThreadLocal code should go away on the switch to Akka
+   */
+  def getSplitter(char: java.lang.Character): StringSplitter = {
     if (Conf.conf.useAndroid)
       new StringSplitterAndroid(char)
-    else 
+    else
       new StringSplitterDefault(char)
-   
-  def log(module: String, message: String, t: Option[Throwable] = None) =
+  }
+
+  def log(message: String, t: Throwable) {
+    log(message, "QuizScreen", Some(t))
+  }
+
+  def log(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
     if (Conf.conf.enableLogging) {
       if (Conf.conf.useAndroid)
-       Log.d(module, message)
-      else {
-        System.out.println(module + ": " + message)
-        t.foreach(_.printStackTrace())
-      }
+        AndroidIO.log(message, module, t)
+      else
+        StandardIO.log(module, message, t)
     }
+  }
+
+  def writeToFile(fileName: String, data: String, ctx: Option[Context] = None) =
+    if (Conf.conf.useAndroid)
+      AndroidIO.writeToFile(fileName, data, ctx.get)
+    else
+      StandardIO.writeToFile(fileName, data)
 }

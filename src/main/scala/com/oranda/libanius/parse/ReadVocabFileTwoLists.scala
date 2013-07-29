@@ -18,44 +18,59 @@ package com.oranda.libanius.parse
 
 import scala.io.BufferedSource
 import scala.collection.mutable.ListBuffer
-import scala.collection.mutable.LinkedHashSet
 
-import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
-import com.oranda.libanius.model.wordmapping.WordMappingGroup
+import com.oranda.libanius.model.wordmapping._
+import scala.collection.immutable.Stream
 
-object ReadVocabTwoLists extends ReadVocabFileToWordMappings {
-  
-  var germanMode = true
+abstract class ReadVocabFileTwoLists extends ReadVocabFileToWordMappings {
+
+  var englishMode = false
   val englishWords = ListBuffer[String]()
-  val germanWords = ListBuffer[String]()
-    
-  override def readIntoQuiz(src: BufferedSource, quiz: QuizOfWordMappings): 
-      QuizOfWordMappings = {
+  val otherWords = ListBuffer[String]()
 
-    val wmGroupEngToGer = quiz.findOrAddWordMappingGroup(
-        keyType="English word", valueType="German word")._2
-    val wmGroupGerToEng = quiz.findOrAddWordMappingGroup(
-        keyType="German word", valueType="English word")._2
+  def readIntoQuiz(src: BufferedSource, quiz: QuizOfWordMappings,
+      keyType: String, valueType: String): QuizOfWordMappings = {
     
     src.getLines.foreach(line => readQuizItemFrequency(line.trim))
-    println("germanWords length: " + germanWords.size)
-    println("englishWords length: " + englishWords.size)
-    val combinedWords = germanWords zip englishWords
-    combinedWords.foreach(pair => addWordMappings(
-        wmGroupEngToGer, wmGroupGerToEng, pair._2, pair._1))
-    quiz
+    println(keyType + "s length: " + otherWords.size)
+    println(valueType + "s length: " + englishWords.size)
+    val wordsOtherToEnglish = otherWords zip englishWords
+    val wordsEnglishToOther = englishWords zip otherWords
+
+    val wmg1 = makeWmg(wordsOtherToEnglish, keyType, valueType)
+    val wmg2 = makeWmg(wordsEnglishToOther, valueType, keyType)
+    val quizUpdated = quiz.addWordMappingGroup(wmg1).addWordMappingGroup(wmg2)
+
+    println("Number of wmgs in quiz: " + quizUpdated.wordMappingGroups.size)
+    quizUpdated
+  }
+
+  def makeWmg(combinedWords: Seq[(String, String)], type1: String, type2: String) = {
+    val wordMappings = combinedWords.map(keyValue =>
+        (keyValue._1, WordMappingValueSetWrapper(List(WordMappingValue(keyValue._2)))))
+    WordMappingGroupReadWrite(QuizGroupHeader(type1, type2), wordMappings.toStream)
   }
   
-  def readQuizItemFrequency(word: String) = {
+  def readQuizItemFrequency(word: String) =
     word match {
-      case w if w.startsWith("--") =>
-        germanMode = false
-      case _ =>
-        if (germanMode)
-          germanWords += word
-        else
-          englishWords += word
+      case w if w.startsWith("--") => englishMode = true
+      case _ => if (englishMode) englishWords += word else otherWords += word
     }
-  }
+}
+
+object ReadVocabTwoListsGermanEnglish extends ReadVocabFileTwoLists {
+
+  val fileVocab = "vocabGer10k.txt"
+
+  override def readIntoQuiz(src: BufferedSource, quiz: QuizOfWordMappings): QuizOfWordMappings =
+    readIntoQuiz(src, quiz, "German word", "English word")
+}
+
+object ReadVocabTwoListsSpanishEnglish extends ReadVocabFileTwoLists {
+
+  val fileVocab = "vocabSpan10k.txt"
+
+  override def readIntoQuiz(src: BufferedSource, quiz: QuizOfWordMappings): QuizOfWordMappings =
+    readIntoQuiz(src, quiz, "Spanish word", "English word")
 
 }
