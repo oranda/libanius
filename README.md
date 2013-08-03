@@ -29,3 +29,10 @@ Screenshots
 ![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshotQuizV05.png)
 ![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshotDictV05.png)
 
+
+License
+=======
+
+The application is licenced under the Apache License, Version 2.0.
+
+Attribution info is in [SOURCES](SOURCES.md).
