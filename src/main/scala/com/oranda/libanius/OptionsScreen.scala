@@ -18,29 +18,32 @@ package com.oranda.libanius
 import android.app.{AlertDialog, Activity}
 import android.widget._
 import android.os.Bundle
-import android.view.{ViewGroup, View}
+import android.view.{KeyEvent, ViewGroup, View}
 import android.content.{Context, Intent}
-import scala.concurrent.{Await, Future, ExecutionContext}
+import scala.concurrent.{Await, future, Future, ExecutionContext}
 import ExecutionContext.Implicits.global
-import com.oranda.libanius.model.wordmapping.{QuizOfWordMappings, WordMappingGroupReadWrite, QuizGroupHeader}
+import com.oranda.libanius.util.Util
+import com.oranda.libanius.model.wordmapping._
 import scala.collection.immutable.Set
 import scala.concurrent.duration._
 import java.util.concurrent.TimeoutException
 import android.widget.CompoundButton.OnCheckedChangeListener
+import android.view.inputmethod.{InputMethodManager, EditorInfo}
+import android.view.ViewGroup.LayoutParams
+import android.view.View.OnClickListener
 
 class OptionsScreen extends Activity with TypedActivity with DataStore {
 
   private[this] lazy val quizGroupLayout: LinearLayout = findView(TR.checkboxesLayout)
 
-  /*
   private[this] lazy val searchInputBox: EditText = findView(TR.searchInput) 
   private[this] lazy val searchResults0Row: LinearLayout = findView(TR.searchResults0)
   private[this] lazy val searchResults1Row: LinearLayout = findView(TR.searchResults1)
   private[this] lazy val searchResults2Row: LinearLayout = findView(TR.searchResults2)
   private[this] lazy val status: TextView = findView(TR.status)
-  */
+
   private var checkBoxes = Map[CheckBox, QuizGroupHeader]()
-  private var wmgLoadingFutures: Set[Future[WordMappingGroupReadWrite]] = Set()
+  private var wmgLoadingFutures: Set[Future[WordMappingGroup]] = Set()
 
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
@@ -52,7 +55,7 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
   def initGui() {
     setContentView(R.layout.optionsscreen)
     addQuizGroupCheckBoxes()
-    //prepareSearchUi()
+    prepareSearchUi()
   }
 
   def addQuizGroupCheckBoxes() {
@@ -112,21 +115,29 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
     if (noBoxesChecked)
       alert("Error", "No boxes checked")
     else {
-      try {
-        Await.result(Future.sequence(wmgLoadingFutures), 10 seconds)
-      } catch {
-        case e: TimeoutException => log("ERROR: Timed out loading quiz groups")
-      }
-      // TODO: rather than having a general Await as above, have individual waits for each WMG
-      fillQuizWithCheckedQuizGroups()
+      waitForQuizToLoadWithQuizGroups()
+      val wmgs = GlobalState.quiz.get.wordMappingGroups
+      log("number of wmgs: " + wmgs.size)
       val intent = new Intent(getBaseContext(), classOf[QuizScreen])
       startActivity(intent)
     }
   }
 
+  def waitForQuizToLoadWithQuizGroups() {
+    val allFutures: List[Future[Any]] = wmgLoadingFutures.toList :+ future {
+      fillQuizWithCheckedQuizGroups()
+    }
+
+    try {
+      Await.result(Future.sequence(allFutures), 10 seconds)
+    } catch {
+      case e: TimeoutException => log("ERROR: Timed out loading quiz groups")
+    }
+  }
+
   def fillQuizWithCheckedQuizGroups() {
 
-    def quizGroupForHeader(header: QuizGroupHeader): Option[WordMappingGroupReadWrite] =
+    def quizGroupForHeader(header: QuizGroupHeader): Option[WordMappingGroup] =
       GlobalState.loadedQuizGroups.find(_.header == header)
 
     val checkedQuizGroups = checkedQuizGroupHeaders.flatMap(quizGroupForHeader(_))
@@ -135,24 +146,33 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
     GlobalState.updateQuiz(QuizOfWordMappings(checkedQuizGroups))
   }
 
-  /*
 
   def prepareSearchUi() {
     searchInputBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
       override def onEditorAction(searchInputBox: TextView, actionId: Int,
-                                  event: KeyEvent): Boolean = {
-        if (actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN)
+          event: KeyEvent): Boolean = {
+        if (actionId == EditorInfo.IME_ACTION_DONE || event.getAction == KeyEvent.ACTION_DOWN)
           findAndShowResultsAsync()
         true
       }
     })
   }
 
+  def closeSoftInput() {
+    val inputMethodService = getSystemService(Context.INPUT_METHOD_SERVICE).
+        asInstanceOf[InputMethodManager]
+    inputMethodService.hideSoftInputFromWindow(searchInputBox.getWindowToken, 0)
+  }
+
   def findAndShowResultsAsync() {
     clearResults()
+    closeSoftInput()
     status.setText("Searching...")
+    log("waiting for quiz groups to load")
+    waitForQuizToLoadWithQuizGroups()
     val searchInput = searchInputBox.getText.toString
 
+    log("search input is " + searchInput)
     /*
      * Instead of using Android's AsyncTask, use a Scala Future. It's more concise and general,
      * but we need to remind Android to use the UI thread when the result is returned.
@@ -163,7 +183,7 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
       runOnUiThread(new Runnable { override def run() { showSearchResults(searchResults) } })
     }
 
-    def showSearchResults(searchResults: List[(String, String)]) {
+    def showSearchResults(searchResults: List[(String, WordMappingValueSetWrapperBase)]) {
       if (searchResults.isEmpty)
         status.setText("No results found")
       else {
@@ -175,26 +195,32 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
     }
   }
 
-  def searchDictionary(searchInput: String): List[(String, String)] = {
-        
- 	  def resultsBeginningWith(input: String): List[(String, String)] =
-	    GlobalState.dictionary.get.mappingsForKeysBeginningWith(input)
+  def searchDictionary(searchInput: String): List[(String, WordMappingValueSetWrapperBase)] = {
+    log("searchDictionary")
+    val wmgs = GlobalState.quiz.get.wordMappingGroups
+    val allDictionaries = wmgs.toList.map(_.dictionary)
+
+ 	  def resultsBeginningWith(input: String): List[(String, WordMappingValueSetWrapperBase)] =
+      allDictionaries.flatMap(_.mappingsForKeysBeginningWith(input)).toList
+
+    def resultsContaining(input: String): List[(String, WordMappingValueSetWrapperBase)] =
+      allDictionaries.flatMap(_.mappingsForKeysContaining(input)).toList
 	  
-    var searchResults = List[(String, String)]()
-    if (searchInput.length > 2 && GlobalState.dictionary.isDefined) {
+    var searchResults = List[(String, WordMappingValueSetWrapperBase)]()
+    if (searchInput.length > 2) {
       searchResults = resultsBeginningWith(searchInput)
       if (searchResults.isEmpty)
         searchResults = resultsBeginningWith(searchInput.dropRight(1))
       if (searchResults.isEmpty)
         searchResults = resultsBeginningWith(searchInput.dropRight(2))
       if (searchResults.isEmpty && searchInput.length > 3)
-        searchResults = GlobalState.dictionary.get.mappingsForKeysContaining(
-	          searchInput)
+        searchResults = resultsContaining(searchInput)
 	  }
  	  searchResults
   }
   
-  def addRow(searchResultsRow: LinearLayout, searchResults: List[(String, String)], index: Int) {
+  def addRow(searchResultsRow: LinearLayout,
+             searchResults: List[(String, WordMappingValueSetWrapperBase)], index: Int) {
     if (searchResults.size > index) {
       val keyWordBox = new TextView(this)
       keyWordBox.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
@@ -204,7 +230,7 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
       searchResultsRow.addView(keyWordBox)
              
       val maxNumButtons = 5
-      val values = searchResults(index)._2.split("/").slice(0, maxNumButtons)
+      val values = searchResults(index)._2.strings.slice(0, maxNumButtons)
       values.foreach { value =>
         val btnTag = new Button(this)
         btnTag.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, 
@@ -229,5 +255,4 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
     searchResults1Row.removeAllViews()
     searchResults2Row.removeAllViews()
   }
-  */
 }

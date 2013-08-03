@@ -11,7 +11,7 @@
                   android:configChanges="keyboardHidden|orientation"
                   android:screenOrientation="portrait" 
                   android:alwaysRetainTaskState="true"
-                  android:windowSoftInputMode="adjustPan"
+                  android:windowSoftInputMode="stateHidden"
                   android:theme="@android:style/Theme.NoTitleBar"
                   />
         <activity android:label="@string/app_name" android:name=".OptionsScreen"
@@ -25,7 +25,10 @@
         </activity>
     </application>
 
-    <uses-sdk android:minSdkVersion="14"/> <!-- formerly 8 -->
+    <!-- Experimental: spoof as API level 8 (2.2) in order to persuade the HTC Desire C that
+      it is compatible. In the build, the version must be 14 to support JDK 1.6. -->
+    <uses-sdk android:minSdkVersion="8"
+              android:targetSdkVersion="8"/>  <!-- later set these to 14 also -->
     <!--  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
 </manifest>
 

@@ -43,7 +43,7 @@ trait DataStore extends Platform {
       }
   }
 
-  def loadWmg(ctx: Context, header: QuizGroupHeader): Future[WordMappingGroupReadWrite] = {
+  def loadWmg(ctx: Context, header: QuizGroupHeader): Future[WordMappingGroup] = {
     log("seeing if wmg was loaded for " + header)
     future {
       val loadedWmg =
@@ -54,11 +54,15 @@ trait DataStore extends Platform {
           loadedWmg
         }
       log("loadedWmg.numItemsAndCorrectAnswers: " + loadedWmg.numItemsAndCorrectAnswers)
+
+      // TODO: move this to a separate Future
+      Util.stopwatch(loadedWmg.prepareDictionaryData, "preparing dictionary for " + header)
+
       loadedWmg
     }
   }
 
-  def loadWmgCore(ctx: Context, header: QuizGroupHeader): WordMappingGroupReadWrite =
+  def loadWmgCore(ctx: Context, header: QuizGroupHeader): WordMappingGroup =
     findWmgInFilesDir(ctx, header) match {
       case Some(wmgFileName) =>
         Util.stopwatch(readWmgFromFilesDir(ctx, wmgFileName),
@@ -70,18 +74,18 @@ trait DataStore extends Platform {
                 "reading wmg resource " + wmgResName)
             writeToFile(header.makeFileName, wmgText, Some(ctx)) // TODO: eliminate side-effect
             log("read text from wmg resource starting " + wmgText.take(200))
-            WordMappingGroupReadWrite.fromCustomFormat(wmgText)
+            WordMappingGroup.fromCustomFormat(wmgText)
           case _ =>
             log("ERROR: failed to load wmg " + header)
-            WordMappingGroupReadWrite(header)
+            WordMappingGroup(header)
         }
     }
 
-  def readWmgFromFilesDir(ctx: Context, wmgFileName: String): WordMappingGroupReadWrite = {
+  def readWmgFromFilesDir(ctx: Context, wmgFileName: String): WordMappingGroup = {
     log("reading wmg from file " + wmgFileName)
     val wmgText = AndroidIO.readFile(ctx, wmgFileName)
     log("have read wmgText " + wmgText.take(200) + "... ")
-    WordMappingGroupReadWrite.fromCustomFormat(wmgText)
+    WordMappingGroup.fromCustomFormat(wmgText)
   }
 
   def findWmgInFilesDir(ctx: Context, header: QuizGroupHeader): Option[String] = {
@@ -136,7 +140,7 @@ trait DataStore extends Platform {
   def findWmgFileNamesFromResources(ctx: Context) =
     classOf[R.raw].getFields.map(_.getName).filter(_.startsWith("wmg"))
 
-  def readWmgFiles(ctx: Context): Set[WordMappingGroupReadWrite] = {
+  def readWmgFiles(ctx: Context): Set[WordMappingGroup] = {
 
     // TODO: improve style
     val wmgFileNames = findWmgFileNamesFromFilesDir(ctx)
@@ -150,12 +154,12 @@ trait DataStore extends Platform {
     if (wmgFileTexts.isEmpty)
       log("No wmg files found at all")
 
-    wmgFileTexts.map(WordMappingGroupReadWrite.fromCustomFormat(_)).toSet
+    wmgFileTexts.map(WordMappingGroup.fromCustomFormat(_)).toSet
   }
 
   def saveWmgs(quiz: QuizOfWordMappings, path: String = "", ctx: Option[Context] = None) {
 
-    def saveToFile(wmg: WordMappingGroupReadWrite) = {
+    def saveToFile(wmg: WordMappingGroup) = {
       val saveData = wmg.getSaveData
       log("Saving wmg " + wmg.keyType + ", wmg has promptNumber " +
           wmg.currentPromptNumber + " to " + saveData.fileName)
@@ -165,11 +169,11 @@ trait DataStore extends Platform {
   }
 
   /*
-  def readDictionary(ctx: Context): WordMappingGroupReadOnly = {
+  def readDictionary(ctx: Context): Dictionary = {
     val fileText = readDictionaryText(ctx)
-    var dictionary = WordMappingGroupReadOnly(QuizGroupHeader("", ""))
+    var dictionary = Dictionary(QuizGroupHeader("", ""))
     try {
-      dictionary = Util.stopwatch(WordMappingGroupReadOnly.fromCustomFormat(
+      dictionary = Util.stopwatch(Dictionary.fromCustomFormat(
           fileText), "reading and parsing dictionary")
     } catch {
       case e: Exception => log("Could not parse dictionary: " + e.getMessage(), e)

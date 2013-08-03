@@ -1,4 +1,3 @@
-/*
  * Copyright 2012-2013 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -20,7 +19,7 @@ import org.specs2.mutable.Specification
 import com.oranda.libanius.Conf
 import com.oranda.libanius.model.UserAnswer
 
-class WordMappingGroupReadWriteSpec extends Specification {
+class WordMappingGroupSpec extends Specification {
   
   "a word-mapping group" should {
 
@@ -39,7 +38,7 @@ class WordMappingGroupReadWriteSpec extends Specification {
 
     Conf.setUpForTest()
 
-    val wmg = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
+    val wmg = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
     
     sequential
 
@@ -52,14 +51,14 @@ class WordMappingGroupReadWriteSpec extends Specification {
     }
 
     "accept the addition of a new word-mapping" in {
-      val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
+      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
       wmgLocal.contains("good") mustEqual false
       val wmgUpdated = wmgLocal.addWordMapping("good", "gut")
       wmgUpdated.contains("good") mustEqual true
     }
 
     "accept new values for an existing word-mapping" in {
-      val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
+      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
       val valuesForAgainst = wmgLocal.findValueSetFor("against")
       valuesForAgainst.isDefined mustEqual true
       valuesForAgainst.get.size mustEqual 1
@@ -77,8 +76,7 @@ class WordMappingGroupReadWriteSpec extends Specification {
       falseAnswers.contains("unterrichten") mustEqual true
     }
 
-    def pullQuizItem(wmg: WordMappingGroupReadWrite):
-        (WordMappingGroupReadWrite, (String, String)) = {
+    def pullQuizItem(wmg: WordMappingGroup): (WordMappingGroup, (String, String)) = {
       val quizItem = wmg.findPresentableQuizItem
       quizItem.isDefined mustEqual true
       // Each time a quiz item is pulled, a user answer must be set
@@ -93,13 +91,13 @@ class WordMappingGroupReadWriteSpec extends Specification {
     }
 
     "add a new word mapping to the front of its queue" in {
-      val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
+      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
       val wmgUpdated = wmgLocal.addWordMappingToFront("to exchange", "tauschen")
       pullQuizItem(wmgUpdated)._2 mustEqual ("to exchange", "tauschen")
     }
     
     "move an existing word mapping to the front of its queue" in {
-      val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
+      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
       val numKeyWordsBefore = wmgLocal.numKeyWords
       val wmgUpdated = wmgLocal.addWordMappingToFront("sweeps", "streicht") 
       val numKeyWordsAfter = wmgUpdated.numKeyWords
@@ -108,7 +106,7 @@ class WordMappingGroupReadWriteSpec extends Specification {
     }
     
     "move a word mapping to the front of its queue where only the key already exists" in {
-      val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
+      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
       val numKeyWordsBefore = wmgLocal.numKeyWords
       val wmgUpdated = wmgLocal.addWordMappingToFront("entertain", "bewirten") 
       val numKeyWordsAfter = wmgUpdated.numKeyWords
@@ -117,7 +115,7 @@ class WordMappingGroupReadWriteSpec extends Specification {
     }  
     
     "add more than one new word mapping to the front of the its queue" in {
-      val wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
+      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
       val wmgUpdated1 = wmgLocal.addWordMappingToFront("to exchange", "tauschen")
       val wmgUpdated2 = wmgUpdated1.addWordMappingToFront("whole", "ganz")
       val (wmgUnrolled, (keyWord, value)) = pullQuizItem(wmgUpdated2)
@@ -125,20 +123,19 @@ class WordMappingGroupReadWriteSpec extends Specification {
       pullQuizItem(wmgUnrolled)._2 mustEqual ("to exchange", "tauschen")
     }
 
-    def pullQuizItemAndAnswerCorrectly(wmg: WordMappingGroupReadWrite):
-        WordMappingGroupReadWrite = {
+    def pullQuizItemAndAnswerCorrectly(wmg: WordMappingGroup): WordMappingGroup = {
       val quizItem = wmg.findPresentableQuizItem.get
       updateWithUserAnswer(wmg, quizItem)
     }
 
-    def updateWithUserAnswer(wmg: WordMappingGroupReadWrite, quizItem: QuizItemViewWithOptions) = {
+    def updateWithUserAnswer(wmg: WordMappingGroup, quizItem: QuizItemViewWithOptions) = {
       val userAnswer = new UserAnswer(true, wmg.currentPromptNumber)
       wmg.updateWithUserAnswer(quizItem.keyWord, quizItem.wmvs,
           quizItem.wordMappingValue, userAnswer).updatedPromptNumber
     }
 
     "should present an item that has been answered before after five prompts" in {
-      var wmgLocal = WordMappingGroupReadWrite.fromCustomFormat(wmgCustomFormat)
+      var wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
       val quizItem0 = wmgLocal.findPresentableQuizItem.get
       quizItem0.wordMappingValue.value mustEqual "wider"
       wmgLocal = updateWithUserAnswer(wmgLocal, quizItem0)

@@ -95,7 +95,7 @@ class QuizOfWordMappingsSpec extends Specification {
     "contain unique groups only" in {
       val quizLocal = QuizOfWordMappings.demoQuiz(quizData)
       quizLocal.numGroups mustEqual 2 // precondition
-      val wmg = WordMappingGroupReadWrite(QuizGroupHeader("English word", "German word"))
+      val wmg = WordMappingGroup(QuizGroupHeader("English word", "German word"))
       val quizUpdated = quizLocal.addWordMappingGroup(wmg) // should have no effect
       quizUpdated.numGroups mustEqual 2
     }

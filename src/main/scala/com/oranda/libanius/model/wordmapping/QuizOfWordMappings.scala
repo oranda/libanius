@@ -25,7 +25,7 @@ import com.oranda.libanius.{Conf}
 import scala.math.BigDecimal.double2bigDecimal
 import scala.collection.immutable.List
 
-case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroupReadWrite] = ListSet())
+case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet())
     extends Quiz with Platform {
 
   def copy(newPromptNumber: Int) = new QuizOfWordMappings(wordMappingGroups)
@@ -42,7 +42,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroupReadWrite] 
     // For efficiency, avoiding Scala's own StringBuilder and mkString
     val strBuilder = new StringBuilder("quizOfWordMappings\n")
 
-    def wmgMetadata(strBuilder: StringBuilder, wmg: WordMappingGroupReadWrite) =
+    def wmgMetadata(strBuilder: StringBuilder, wmg: WordMappingGroup) =
       strBuilder.append("wordMappingGroup keyType=\"").append(wmg.keyType).
           append("\" valueType=\"").append(wmg.valueType).append("\"")
 
@@ -50,11 +50,11 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroupReadWrite] 
   }
 
   def findOrAddWordMappingGroup(header: QuizGroupHeader):
-      (QuizOfWordMappings, WordMappingGroupReadWrite) = {
+      (QuizOfWordMappings, WordMappingGroup) = {
     val wordMappingGroup = findWordMappingGroup(header)
     wordMappingGroup match {
       case Some(wordMappingGroup) => (this, wordMappingGroup)
-      case None => val wordMappingGroup = WordMappingGroupReadWrite(header)
+      case None => val wordMappingGroup = WordMappingGroup(header)
                    (addWordMappingGroup(wordMappingGroup), wordMappingGroup)
     }    
   }
@@ -75,7 +75,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroupReadWrite] 
     }
   }
 
-  def findWordMappingGroup(header: QuizGroupHeader): Option[WordMappingGroupReadWrite] =
+  def findWordMappingGroup(header: QuizGroupHeader): Option[WordMappingGroup] =
     QuizOfWordMappings.findWordMappingGroup(wordMappingGroups, header)
   
   def removeWordMappingGroup(header: QuizGroupHeader): QuizOfWordMappings = {
@@ -86,13 +86,13 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroupReadWrite] 
   }
 
   // This will replace any existing wordMappingGroup with the same key-value pair  
-  def addWordMappingGroup(wmg: WordMappingGroupReadWrite): QuizOfWordMappings = {
+  def addWordMappingGroup(wmg: WordMappingGroup): QuizOfWordMappings = {
     val newQuiz = removeWordMappingGroup(wmg.header)
     new QuizOfWordMappings(newQuiz.wordMappingGroups + wmg)
   }
 
   // Just a synonym for addWordMappingGroup
-  def replaceWordMappingGroup(wmg: WordMappingGroupReadWrite) = addWordMappingGroup(wmg)
+  def replaceWordMappingGroup(wmg: WordMappingGroup) = addWordMappingGroup(wmg)
 
   def removeWord(keyWord: String, header: QuizGroupHeader): QuizOfWordMappings = {
     val wordMappingGroup = findWordMappingGroup(header)
@@ -113,7 +113,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroupReadWrite] 
     }
   }
 
-  def findQuizItem: Option[(QuizItemViewWithOptions, WordMappingGroupReadWrite)] =
+  def findQuizItem: Option[(QuizItemViewWithOptions, WordMappingGroup)] =
     /*
      * Find the first available "presentable" word mapping
      */
@@ -122,7 +122,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroupReadWrite] 
       quizItem <- wmg.findPresentableQuizItem.toStream
     } yield (quizItem, wmg)).headOption.orElse(findAnyUnfinishedQuizItem)
 
-  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithOptions, WordMappingGroupReadWrite)] =
+  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithOptions, WordMappingGroup)] =
     (for {
       wmg <- wordMappingGroups.toStream
       quizItem <- wmg.findAnyUnfinishedQuizItem.toStream
@@ -170,7 +170,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroupReadWrite] 
    * the chances of a hit next time.
    * Note: this design is not great, and will be improved when each wmg is an independent Actor.
    */
-  def updateRangeForFailedWmgs(wmgSuccessful: WordMappingGroupReadWrite): QuizOfWordMappings = {
+  def updateRangeForFailedWmgs(wmgSuccessful: WordMappingGroup): QuizOfWordMappings = {
     val wmgsFailed = wordMappingGroups.takeWhile(!_.matches(wmgSuccessful))
     val wmgsWithUpdatedRange = wmgsFailed.map(_.updatedSearchRange)
     wmgsWithUpdatedRange.foldLeft(this)((acc, wmg) => acc.addWordMappingGroup(wmg))
@@ -209,8 +209,8 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroupReadWrite] 
 
 object QuizOfWordMappings extends Platform {
 
-  def findWordMappingGroup(wmgs: Set[WordMappingGroupReadWrite], header: QuizGroupHeader):
-      Option[WordMappingGroupReadWrite] =
+  def findWordMappingGroup(wmgs: Set[WordMappingGroup], header: QuizGroupHeader):
+      Option[WordMappingGroup] =
     wmgs.find(_.header.matches(header))
 
   def metadataFromCustomFormat(str: String): Set[QuizGroupHeader] = {
@@ -226,7 +226,7 @@ object QuizOfWordMappings extends Platform {
 
     wmgHeadings.foreach {
       wmgHeading => quiz = quiz.addWordMappingGroup(
-          WordMappingGroupReadWrite(QuizGroupHeader(wmgHeading)))
+          WordMappingGroup(QuizGroupHeader(wmgHeading)))
     }
     quiz
   }
@@ -234,7 +234,7 @@ object QuizOfWordMappings extends Platform {
 
   def demoQuiz(wmgsData: List[String] = demoDataInCustomFormat): QuizOfWordMappings = {
     log("Using demo data")
-    val wmgs = wmgsData.map(WordMappingGroupReadWrite.fromCustomFormat(_))
+    val wmgs = wmgsData.map(WordMappingGroup.fromCustomFormat(_))
     wmgs.foldLeft(QuizOfWordMappings())((acc, wmg) => acc.addWordMappingGroup(wmg))
     // TODO: watch out when we're saving, we're not overwriting anything
   }

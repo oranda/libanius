@@ -5,24 +5,18 @@ object GlobalState {
   
   // Could be lazy val's, but the UI needs some control over when they are initialized.
   var quiz: Option[QuizOfWordMappings] = None
-  var dictionary: Option[WordMappingGroupReadOnly] = None
 
   // a global cache of quiz groups. TODO: use function-local memoization instead!
-  var loadedQuizGroups = List[WordMappingGroupReadWrite]()
+  var loadedQuizGroups = List[WordMappingGroup]()
 
   def updateQuiz(newQuiz: QuizOfWordMappings) {
     this.quiz = Some(newQuiz)
 
-    def updateLoadedQuizGroups(quizGroup: WordMappingGroupReadWrite) {
+    def updateLoadedQuizGroups(quizGroup: WordMappingGroup) {
       loadedQuizGroups = loadedQuizGroups.filter(_.header != quizGroup.header)
       loadedQuizGroups :+= quizGroup
     }
 
     newQuiz.wordMappingGroups.foreach(updateLoadedQuizGroups(_))
   }
-
-  def initDictionary(fn: => WordMappingGroupReadOnly) {
-    if (!GlobalState.dictionary.isDefined)
-      this.dictionary = Some(fn)
-  } 
 }

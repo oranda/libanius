@@ -8,17 +8,13 @@
     android:id="@+id/quizGroupSelectionLayout"
     android:orientation="vertical"
     android:layout_height="match_parent" android:layout_width="match_parent"
-    android:layout_weight="1"
-    android:layout_marginBottom="10dp"
-    android:paddingBottom="10dp"
+    android:layout_weight="5"
     >
     <TextView
       android:id="@+id/searchLabel"
       android:singleLine="true"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:layout_marginTop="20dp"
-      android:layout_marginBottom="10dp"
       android:textSize="20sp"
       android:gravity="center"
       android:text="@string/select_quiz_groups"
@@ -34,17 +30,15 @@
     />
   </LinearLayout>
 
-
   <Button
     android:id="@+id/gotoQuizButton"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:layout_weight="20"
+    android:layout_weight="1"
     android:gravity="center"
     android:textSize="20sp"
     android:textColor="#000000"
     android:text="@string/go_to_quiz"
-    android:layout_marginBottom="18dp"
     android:onClick="gotoQuiz"
   />
 
@@ -52,9 +46,9 @@
     android:id="@+id/dictionaryLayout"
     android:orientation="vertical"
     android:layout_height="match_parent" android:layout_width="match_parent"
-    android:layout_weight="1"
+    android:layout_weight="5"
     >
-    <!--
+
     <TextView
       android:id="@+id/searchLabel"
       android:singleLine="true"
@@ -93,7 +87,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
     />
-    -->
+
   </LinearLayout>
 </LinearLayout>
 

@@ -1,3 +1,8 @@
+== 0.72 August 4 2013
+
+  * Dictionary feature re-introduced in the OptionsScreen.
+
+
 == 0.7 July 29 2013
 
   * New OptionsScreen to allow selection of QuizGroups (i.e. wmg's) before the QuizScreen.
