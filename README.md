@@ -27,7 +27,7 @@ Screenshots
 ===========
 
 ![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshotQuizV05.png)
-![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshotOptionsV072.png)
+![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshotOptionsV072_480.png)
 
 
 License
