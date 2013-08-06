@@ -47,7 +47,8 @@ abstract class ReadVocabFileTwoLists extends ReadVocabFileToWordMappings {
 
   def makeWmg(combinedWords: Seq[(String, String)], type1: String, type2: String) = {
     val wordMappings = combinedWords.map(keyValue =>
-        (keyValue._1, WordMappingValueSetWrapper(List(WordMappingValue(keyValue._2)))))
+        WordMappingPair(keyValue._1, WordMappingValueSetWrapper(
+          List(WordMappingValue(keyValue._2)))))
     WordMappingGroup(QuizGroupHeader(type1, type2), wordMappings.toStream)
   }
   

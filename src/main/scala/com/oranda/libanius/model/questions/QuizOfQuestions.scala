@@ -41,8 +41,8 @@ class QuizOfQuestions(val currentPromptNumber: Int) extends Quiz {
         (questionItems map (q => q.toCustomFormat + "\n")).reduceLeft[String](_+_)
         
   // TODO: check duplicate questions are avoided
-  def addItem(questionItemOpt : Option[QuestionItem]) {
-    questionItems += questionItemOpt.getOrElse(questionItemOpt.get)
+  def addItem(questionItem : Option[QuestionItem]) {
+    questionItem.foreach(questionItems += _)
   }  
   
   def addItems(questionItemsOpt : Option[Tuple2[QuestionItem, QuestionItem]]) {

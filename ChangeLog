@@ -1,3 +1,8 @@
+== 0.73 August 6 2013
+
+  * Cleanup, including improved error handling with Try
+
+
 == 0.72 August 4 2013
 
   * Dictionary feature re-introduced in the OptionsScreen.

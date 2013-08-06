@@ -67,10 +67,10 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
         case Some(wordMappingValueSet) => wordMappingValueSet.strings.toList
         case _ => log("quizGroup numKeyWords = " + quizGroup.numKeyWords)
             log("quizGroup first 10 wordMappings: " + quizGroup.wordMappings.take(10))
-            log("ERROR: could not find valueSet for keyWord " + keyWord)
+            logError("could not find valueSet for keyWord " + keyWord)
             Nil
       }
-      case _ => log("ERROR: could not find quizGroup for " + header)
+      case _ => logError("could not find quizGroup for " + header)
           Nil
     }
   }
@@ -142,23 +142,25 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
 
     log("Adding to 2 wmgs: " + keyWord + "," + value)
     // E.g. add to the English -> German group
-    val quizAfter1stChange = addWordMappingToFront(header, keyWord, value)
+    val quizUpdated1 = addWordMappingToFront(header, keyWord, value)
     
     // E.g. add to the German -> English group
-    val quizAfter2ndChange = quizAfter1stChange.addWordMappingToFront(
-        header.reverse, value, keyWord)
-    
-    quizAfter2ndChange
+    val quizUpdated2 = quizUpdated1.addWordMappingToFront(header.reverse, value, keyWord)
+
+    quizUpdated2
   }
 
   def updateWithUserAnswer(isCorrect: Boolean, currentQuizItem: QuizItemViewWithOptions):
       QuizOfWordMappings = {
     val userAnswer = new UserAnswer(isCorrect, currentQuizItem.wmgCurrentPromptNumber)
     val wmg = findWordMappingGroup(currentQuizItem.quizGroupHeader)
-
-    val wmgUpdated = wmg.get.updateWithUserAnswer(currentQuizItem.keyWord,
-        currentQuizItem.wmvs, currentQuizItem.wordMappingValue, userAnswer)
-    addWordMappingGroup(wmgUpdated)
+    wmg match {
+      case Some(wmg) =>
+        val wmgUpdated = wmg.updateWithUserAnswer(currentQuizItem.keyWord,
+            currentQuizItem.wmvs, currentQuizItem.wordMappingValue, userAnswer)
+        addWordMappingGroup(wmgUpdated)
+      case _ => this
+    }
   }
 
   /*
@@ -197,7 +199,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
          acc._2 + group.numItemsAndCorrectAnswers._2))
          
   def merge(otherQuiz: QuizOfWordMappings): QuizOfWordMappings = {
-    val wordMappingGroupsCombined = otherQuiz.wordMappingGroups.foldLeft(wordMappingGroups) { 
+    val wordMappingGroupsCombined = otherQuiz.wordMappingGroups.foldLeft(wordMappingGroups) {
       (acc, otherWmg) => 
         val wmg = findWordMappingGroup(otherWmg.header)
         val wmgMerged = otherWmg.merge(wmg)

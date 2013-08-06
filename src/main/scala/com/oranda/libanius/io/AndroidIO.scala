@@ -23,10 +23,16 @@ import _root_.android.util.Log
 
 object AndroidIO {
 
-  def readFile(ctx: Context, file: File): String = readFile(ctx, file.getName)
+  def readFile(ctx: Context, file: File): Option[String] = readFile(ctx, file.getName)
 
-  def readFile(ctx: Context, fileName: String): String =
-    readInputStream(ctx, fileToInputStream(fileName))
+  def readFile(ctx: Context, fileName: String): Option[String] =
+    if (ctx.getFileStreamPath(fileName).exists)
+      Some(readInputStream(ctx, fileToInputStream(fileName)))
+    else {
+      log("ERROR: File not found: " + fileName)
+      None
+    }
+
 
   def resID(ctx: Context, resName: String) =
     ctx.getResources.getIdentifier(resName, "raw", ctx.getPackageName)

@@ -86,7 +86,7 @@ class WordMappingGroupSpec extends Specification {
     }
 
     "find a presentable quiz item" in {
-      println("find a presentable quiz item: wmg.wordMappings: " + wmg.wordMappings)
+      //println("find a presentable quiz item: wmg.wordMappings: " + wmg.wordMappings)
       pullQuizItem(wmg)._2 mustEqual ("against", "wider")
     }
 

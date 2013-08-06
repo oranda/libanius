@@ -24,23 +24,19 @@ import scala.collection.immutable.Set
 import scala.concurrent.{ future, Future, ExecutionContext }
 import ExecutionContext.Implicits.global
 import java.io.InputStream
+import scala.util.{Failure, Try}
 
 trait DataStore extends Platform {
 
   def readQuizMetadata(ctx: Context): Set[QuizGroupHeader] = {
-      try {
-        val fileText =
-          if (ctx.getFileStreamPath(Conf.conf.fileQuiz).exists)
-            // TODO: consider changing to Platform.readFile
-            AndroidIO.readFile(ctx, Conf.conf.fileQuiz)
-          else
-            AndroidIO.readResource(ctx, Conf.conf.resQuizPublic)
-        QuizOfWordMappings.metadataFromCustomFormat(fileText)
-      } catch {
-        // for absent data files, security access exceptions or anything else unexpected
-        case e: Exception => log("Error reading quiz: " + e.getMessage)
-                             Set()
-      }
+    // TODO: consider changing to Platform.readFile
+    def readRawMetadata: String = AndroidIO.readFile(ctx, Conf.conf.fileQuiz).getOrElse(
+        AndroidIO.readResource(ctx, Conf.conf.resQuizPublic))
+    Try(QuizOfWordMappings.metadataFromCustomFormat(readRawMetadata)).recover {
+      // for absent data files, security access exceptions or anything else unexpected
+      case e: Exception => log("Error reading quiz: " + e.getMessage)
+                           Set[QuizGroupHeader]()
+    }.get
   }
 
   def loadWmg(ctx: Context, header: QuizGroupHeader): Future[WordMappingGroup] = {
@@ -56,36 +52,44 @@ trait DataStore extends Platform {
       log("loadedWmg.numItemsAndCorrectAnswers: " + loadedWmg.numItemsAndCorrectAnswers)
 
       // TODO: move this to a separate Future
-      Util.stopwatch(loadedWmg.prepareDictionaryData, "preparing dictionary for " + header)
+      Util.stopwatch(loadDictionary(ctx, loadedWmg), "preparing dictionary for " + header)
 
       loadedWmg
     }
   }
 
+  def loadDictionary(ctx: Context, wmg: WordMappingGroup) {
+    val dictFileName = wmg.header.makeDictFileName
+    val dictionary = readDictionary(ctx, dictFileName).getOrElse(
+        Dictionary.fromWordMappings(wmg.wordMappings))
+    wmg.setDictionary(dictionary)
+  }
+
   def loadWmgCore(ctx: Context, header: QuizGroupHeader): WordMappingGroup =
     findWmgInFilesDir(ctx, header) match {
       case Some(wmgFileName) =>
-        Util.stopwatch(readWmgFromFilesDir(ctx, wmgFileName),
+        Util.stopwatch(readWmgFromFilesDir(ctx, wmgFileName).getOrElse(WordMappingGroup(header)),
             "reading wmg from file" + wmgFileName)
       case _ =>
         findWmgInResources(ctx, header) match {
           case Some(wmgResName) =>
             val wmgText = Util.stopwatch(AndroidIO.readResource(ctx, wmgResName),
                 "reading wmg resource " + wmgResName)
-            writeToFile(header.makeFileName, wmgText, Some(ctx)) // TODO: eliminate side-effect
-            log("read text from wmg resource starting " + wmgText.take(200))
+            writeToFile(header.makeWmgFileName, wmgText, Some(ctx)) // TODO: eliminate side-effect
+            //log("read text from wmg resource starting " + wmgText.take(200))
             WordMappingGroup.fromCustomFormat(wmgText)
           case _ =>
-            log("ERROR: failed to load wmg " + header)
+            logError("failed to load wmg " + header)
             WordMappingGroup(header)
         }
     }
 
-  def readWmgFromFilesDir(ctx: Context, wmgFileName: String): WordMappingGroup = {
+  def readWmgFromFilesDir(ctx: Context, wmgFileName: String): Option[WordMappingGroup] = {
     log("reading wmg from file " + wmgFileName)
-    val wmgText = AndroidIO.readFile(ctx, wmgFileName)
-    log("have read wmgText " + wmgText.take(200) + "... ")
-    WordMappingGroup.fromCustomFormat(wmgText)
+    for {
+      wmgText <- AndroidIO.readFile(ctx, wmgFileName)
+      //log("have read wmgText " + wmgText.take(200) + "... ")
+    } yield WordMappingGroup.fromCustomFormat(wmgText)
   }
 
   def findWmgInFilesDir(ctx: Context, header: QuizGroupHeader): Option[String] = {
@@ -122,16 +126,17 @@ trait DataStore extends Platform {
     readWmgMetadata(ctx, AndroidIO.resourceToInputStream(wmgResName))
 
   def readWmgMetadata(ctx: Context, inStreamGetter: Context => InputStream):
-       Option[QuizGroupHeader] = {
+      Option[QuizGroupHeader] = {
+
     var firstLine = ""
-    try {
-      firstLine = AndroidIO.readFirstLine(ctx, inStreamGetter)
-      Some(QuizGroupHeader(firstLine))
-    } catch {
+    (for {
+      firstLine <- Try(AndroidIO.readFirstLine(ctx, inStreamGetter))
+      wmgMetadata <- Try(Some(QuizGroupHeader(firstLine)))
+    } yield wmgMetadata).recover {
       case e: Exception =>
         log("Could not read wmg file, firstLine " + firstLine)
         None
-    }
+    }.get
   }
 
   def findWmgFileNamesFromFilesDir(ctx: Context) =
@@ -139,23 +144,6 @@ trait DataStore extends Platform {
 
   def findWmgFileNamesFromResources(ctx: Context) =
     classOf[R.raw].getFields.map(_.getName).filter(_.startsWith("wmg"))
-
-  def readWmgFiles(ctx: Context): Set[WordMappingGroup] = {
-
-    // TODO: improve style
-    val wmgFileNames = findWmgFileNamesFromFilesDir(ctx)
-    val wmgFileTexts =
-      if (!wmgFileNames.isEmpty) {
-        wmgFileNames.map(AndroidIO.readFile(ctx, _))
-      } else {
-        log("No wmg files found in data dir. Trying resources... ")
-        findWmgFileNamesFromResources(ctx).map(AndroidIO.readResource(ctx, _))
-      }
-    if (wmgFileTexts.isEmpty)
-      log("No wmg files found at all")
-
-    wmgFileTexts.map(WordMappingGroup.fromCustomFormat(_)).toSet
-  }
 
   def saveWmgs(quiz: QuizOfWordMappings, path: String = "", ctx: Option[Context] = None) {
 
@@ -168,40 +156,12 @@ trait DataStore extends Platform {
     quiz.wordMappingGroups.foreach(saveToFile(_))
   }
 
-  /*
-  def readDictionary(ctx: Context): Dictionary = {
-    val fileText = readDictionaryText(ctx)
-    var dictionary = Dictionary(QuizGroupHeader("", ""))
-    try {
-      dictionary = Util.stopwatch(Dictionary.fromCustomFormat(
-          fileText), "reading and parsing dictionary")
-    } catch {
-      case e: Exception => log("Could not parse dictionary: " + e.getMessage(), e)
-    }
-    log("Finished reading " + dictionary.numKeyWords + " dictionary key words!")
+  def readDictionary(ctx: Context, fileName: String): Option[Dictionary] = {
+    val fileText = Util.stopwatch(AndroidIO.readFile(ctx, fileName),
+        "reading dictionary " + fileName)
+    val dictionary = Util.stopwatch(fileText.map(Dictionary.fromCustomFormat(_)),
+        "parsing dictionary")
+    log("Finished reading " + dictionary.map(_.numKeyWords).getOrElse(0) + " dictionary key words")
     dictionary
   }
-  
-  def readDictionaryText(ctx: Context): String = {
-    if (ctx.getFileStreamPath(Conf.conf.fileDictionary).exists)
-      try {
-        // TODO: consider changing to Platform.readFile
-        AndroidIO.readFile(ctx, Conf.conf.fileDictionary)
-      } catch { 
-        // for security access exceptions or anything else unexpected
-        case e: Exception => log(e.getMessage())
-        ""
-      }
-    else {
-      try {
-        Util.stopwatch(AndroidIO.readResource(ctx, Conf.conf.resDictPublic),
-            "reading quiz from res/raw")
-      } catch {
-        case e: Exception => log(
-            "Could not load dictionary from " + Conf.conf.resDictPublic + "... ")
-            ""
-      }   
-    }    
-  }
-  */
 }

@@ -31,6 +31,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener
 import android.view.inputmethod.{InputMethodManager, EditorInfo}
 import android.view.ViewGroup.LayoutParams
 import android.view.View.OnClickListener
+import scala.util.Try
 
 class OptionsScreen extends Activity with TypedActivity with DataStore {
 
@@ -45,10 +46,13 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
   private var checkBoxes = Map[CheckBox, QuizGroupHeader]()
   private var wmgLoadingFutures: Set[Future[WordMappingGroup]] = Set()
 
+  def quiz = GlobalState.quiz
+
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
     Conf.setUp()
     log("OptionsScreen.onCreate")
+    readQuizMetadata(ctx = this)
     initGui()
   }
 
@@ -101,10 +105,8 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
   def checkedQuizGroupHeaders: Set[QuizGroupHeader] =
     checkBoxes.filter(_._1.isChecked).map(_._2).toSet
 
-  def activeQuizGroupHeaders: Set[QuizGroupHeader] = {
-    def groupHeaders(quiz: QuizOfWordMappings) = quiz.wordMappingGroups.map(_.header)
-    (GlobalState.quiz.map(groupHeaders(_))).getOrElse(readQuizMetadata(ctx = this))
-  }
+  def activeQuizGroupHeaders: Set[QuizGroupHeader] =
+    GlobalState.quiz.wordMappingGroups.map(_.header)
 
   def alert(title: String, message: String) {
     new AlertDialog.Builder(OptionsScreen.this).setTitle(title).setMessage(message).
@@ -116,22 +118,23 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
       alert("Error", "No boxes checked")
     else {
       waitForQuizToLoadWithQuizGroups()
-      val wmgs = GlobalState.quiz.get.wordMappingGroups
-      log("number of wmgs: " + wmgs.size)
+      log("number of quizGroups: " + GlobalState.numActiveQuizGroups)
       val intent = new Intent(getBaseContext(), classOf[QuizScreen])
       startActivity(intent)
     }
+  }
+
+  def addWordToQuiz(quizGroupHeader: QuizGroupHeader, keyWord: String, value: String) {
+    log("received vars " + keyWord + " " + value)
+    GlobalState.updateQuiz(quiz.addWordMappingToFrontOfTwoGroups(quizGroupHeader, keyWord, value))
   }
 
   def waitForQuizToLoadWithQuizGroups() {
     val allFutures: List[Future[Any]] = wmgLoadingFutures.toList :+ future {
       fillQuizWithCheckedQuizGroups()
     }
-
-    try {
-      Await.result(Future.sequence(allFutures), 10 seconds)
-    } catch {
-      case e: TimeoutException => log("ERROR: Timed out loading quiz groups")
+    Try(Await.result(Future.sequence(allFutures), 10 seconds)).recover {
+      case e: TimeoutException => logError("Timed out loading quiz groups")
     }
   }
 
@@ -183,7 +186,7 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
       runOnUiThread(new Runnable { override def run() { showSearchResults(searchResults) } })
     }
 
-    def showSearchResults(searchResults: List[(String, WordMappingValueSetWrapperBase)]) {
+    def showSearchResults(searchResults: List[SearchResult]) {
       if (searchResults.isEmpty)
         status.setText("No results found")
       else {
@@ -195,18 +198,22 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
     }
   }
 
-  def searchDictionary(searchInput: String): List[(String, WordMappingValueSetWrapperBase)] = {
+  def searchDictionary(searchInput: String): List[SearchResult] = {
     log("searchDictionary")
-    val wmgs = GlobalState.quiz.get.wordMappingGroups
-    val allDictionaries = wmgs.toList.map(_.dictionary)
 
- 	  def resultsBeginningWith(input: String): List[(String, WordMappingValueSetWrapperBase)] =
-      allDictionaries.flatMap(_.mappingsForKeysBeginningWith(input)).toList
+    def convertToSearchResults(pairs: List[(String, WordMappingValueSetWrapperBase)],
+        wmg: WordMappingGroup) =
+      pairs.map(pair => SearchResult(wmg.header, WordMappingPair(pair._1, pair._2)))
 
-    def resultsContaining(input: String): List[(String, WordMappingValueSetWrapperBase)] =
-      allDictionaries.flatMap(_.mappingsForKeysContaining(input)).toList
+ 	  def resultsBeginningWith(input: String): List[SearchResult] =
+      quiz.wordMappingGroups.flatMap(wmg =>
+        convertToSearchResults(wmg.dictionary.mappingsForKeysBeginningWith(input), wmg)).toList
+
+    def resultsContaining(input: String): List[SearchResult] =
+      quiz.wordMappingGroups.flatMap(wmg =>
+        convertToSearchResults(wmg.dictionary.mappingsForKeysContaining(input), wmg)).toList
 	  
-    var searchResults = List[(String, WordMappingValueSetWrapperBase)]()
+    var searchResults = List[SearchResult]()
     if (searchInput.length > 2) {
       searchResults = resultsBeginningWith(searchInput)
       if (searchResults.isEmpty)
@@ -220,28 +227,25 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
   }
   
   def addRow(searchResultsRow: LinearLayout,
-             searchResults: List[(String, WordMappingValueSetWrapperBase)], index: Int) {
+      searchResults: List[SearchResult], index: Int) {
     if (searchResults.size > index) {
       val keyWordBox = new TextView(this)
       keyWordBox.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
           LayoutParams.WRAP_CONTENT))
-      val keyWord = searchResults(index)._1
+      val keyWord = searchResults(index).keyWord
       keyWordBox.setText(keyWord)
       searchResultsRow.addView(keyWordBox)
              
-      val maxNumButtons = 5
-      val values = searchResults(index)._2.strings.slice(0, maxNumButtons)
+      val maxNumButtons = 4
+      val values = searchResults(index).valueSet.strings.slice(0, maxNumButtons)
       values.foreach { value =>
         val btnTag = new Button(this)
-        btnTag.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, 
+        btnTag.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
             LayoutParams.WRAP_CONTENT))
         btnTag.setText(value)
         btnTag.setOnClickListener(new OnClickListener() {
           def onClick(view: View) {
-            val intent = new Intent(getBaseContext(), classOf[QuizScreen])
-            intent.putExtra("keyWord", keyWord)
-            intent.putExtra("value", value)
-            startActivity(intent)
+            addWordToQuiz(searchResults(index).quizGroupHeader, keyWord, value) // TODO: SearchResult
           }
         })
         searchResultsRow.addView(btnTag)

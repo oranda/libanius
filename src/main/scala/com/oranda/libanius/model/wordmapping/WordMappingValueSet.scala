@@ -16,7 +16,7 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.util.{Random}
+import scala.util.{Try, Random}
 import com.oranda.libanius.util.{StringUtil, Platform}
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.ListBuffer
@@ -110,12 +110,13 @@ object WordMappingValueSet extends Platform {
 
     val values = new ListBuffer[WordMappingValue]()
     val wmvsSplitter = getSplitter('/')
-    try {
+    def parseFromCustomFormat {
       wmvsSplitter.setString(str)
       while (wmvsSplitter.hasNext)
         values += WordMappingValue.fromCustomFormat(wmvsSplitter.next)
-    } catch {
-      case e: Exception => log("WordMappingValueSet: ERROR: Could not parse str " + str, e)
+    }
+    Try(parseFromCustomFormat) recover {
+      case e: Exception => logError("WordMappingValueSet: Could not parse str " + str, e)
     }
     WordMappingValueSet(values.toList)
   }

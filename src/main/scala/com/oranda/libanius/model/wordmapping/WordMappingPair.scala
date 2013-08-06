@@ -14,17 +14,7 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.util
+package com.oranda.libanius.model.wordmapping
 
+case class WordMappingPair(key: String, valueSet: WordMappingValueSetWrapperBase)
 
-object Util extends Platform {
-  
-  def stopwatch[X](fn: => X, actionDescription: String): X = {
-    val start = System.currentTimeMillis()
-    val result = fn
-    val end = System.currentTimeMillis()
-    log("time taken for " + actionDescription + " was " + (end - start) + "ms")
-    result
-  }
-
-}

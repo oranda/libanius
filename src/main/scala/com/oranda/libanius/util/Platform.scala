@@ -38,8 +38,12 @@ trait Platform {
       new StringSplitterDefault(char)
   }
 
-  def log(message: String, t: Throwable) {
-    log(message, "QuizScreen", Some(t))
+  def logError(message: String, t: Throwable) {
+    logError(message, "Libanius", Some(t))
+  }
+
+  def logError(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
+    log("ERROR: " + message, module, t)
   }
 
   def log(message: String, module: String = "Libanius", t: Option[Throwable] = None) {

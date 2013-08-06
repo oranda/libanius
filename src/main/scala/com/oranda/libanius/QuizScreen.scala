@@ -53,42 +53,17 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
   
   private[this] var currentQuizItem: QuizItemViewWithOptions = _
 
-  def quiz = GlobalState.quiz.get
-  //def dictionaryIsDefined = GlobalState.dictionary.isDefined
-  //def dictionary = GlobalState.dictionary.get
-  
+  def quiz = GlobalState.quiz
+
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState)
     log("onCreate")
     setContentView(R.layout.quizscreen)
-    initQuiz()
     //loadDictionaryInBackground()
 
     log("quiz groups are " + quiz.wordMappingGroups.map(_.header).mkString)
     testUserWithQuizItem()
   }
-  
-  def initQuiz() {
-    /*
-    val extras = Option(getIntent().getExtras()) // values from the OptionsScreen Activity
-    extras.foreach { extras =>
-	    val keyWord = extras.getString(Conf.conf.keyWord)
-      val value = extras.getString(Conf.conf.value)
-      log("received vars " + keyWord + " " + value)
-      if (dictionaryIsDefined)
-        GlobalState.updateQuiz(quiz.addWordMappingToFrontOfTwoGroups(
-            QuizGroupHeader(dictionary.keyType, dictionary.valueType), keyWord, value))
-	  }
-	  */
-  }
-
-
-  //def loadDictionaryInBackground() =
-  //  /*
-  //   * Instead of using Android's AsyncTask for a background task, use a Future.
-  //   * The Future has no result. An Akka actor might be used instead later.
-  //   */
-  //  future { GlobalState.initDictionary(readDictionary(ctx = this)) }
 
   override def onPause() {
     super.onPause()
@@ -96,18 +71,16 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
     saveQuiz
   }
 
-  
   def testUserWithQuizItem() { 
     Util.stopwatch(quiz.findQuizItem, "find quiz items") match {
       case Some((quizItem, wmg)) =>
         currentQuizItem = quizItem
         showNextQuizItem()
-        GlobalState.quiz.foreach { q =>
-          GlobalState.updateQuiz(
-              q.addWordMappingGroup(wmg.updatedPromptNumber).updateRangeForFailedWmgs(wmg))
-          q.wordMappingGroups.foreach(wmg => log(wmg.keyType + " prompt number is " +
-              wmg.currentPromptNumber + ", range is " + wmg.currentSearchRange.start))
-        }
+        GlobalState.updateQuiz(
+            quiz.addWordMappingGroup(wmg.updatedPromptNumber).updateRangeForFailedWmgs(wmg))
+            quiz.wordMappingGroups.foreach(wmg => log(wmg.keyType + " prompt number is " +
+                wmg.currentPromptNumber + ", range is " + wmg.currentSearchRange.start))
+
       case _ =>
         printStatus("No more questions found! Done!")
     }
@@ -177,9 +150,7 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
     log("allOptions for currentQuizItem: " + currentQuizItem.allOptions)
 
     val reverseGroupHeader = currentQuizItem.quizGroupHeader.reverse
-    val isReverseLookupPossible = (GlobalState.quiz.flatMap(
-        _.findWordMappingGroup(reverseGroupHeader)
-    )).isDefined
+    val isReverseLookupPossible = quiz.findWordMappingGroup(reverseGroupHeader).isDefined
 
     if (isReverseLookupPossible) {
       val labelsToOptions = prevOptionLabels zip currentQuizItem.allOptions
@@ -195,11 +166,11 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
 
   private def setColorsForButtons(correctAnswer: String, clickedButton: Button) {
 
-    val correctButton = answerOptionButtons.find(_.getText == correctAnswer).get
-
-    val buttonsToLabels = answerOptionButtons zip prevOptionLabels
-    buttonsToLabels.foreach { buttonToLabel =>
-      setColorOnAnswer(buttonToLabel._1, buttonToLabel._2, correctButton, clickedButton)
+    answerOptionButtons.find(_.getText == correctAnswer).foreach { correctButton =>
+      val buttonsToLabels = answerOptionButtons zip prevOptionLabels
+      buttonsToLabels.foreach { buttonToLabel =>
+        setColorOnAnswer(buttonToLabel._1, buttonToLabel._2, correctButton, clickedButton)
+      }
     }
   }
 
@@ -239,7 +210,7 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
     updateTimestamps(isCorrect)
 
     GlobalState.updateQuiz(Util.stopwatch(
-      GlobalState.quiz.get.updateWithUserAnswer(isCorrect, currentQuizItem), "updateQuiz"))
+        quiz.updateWithUserAnswer(isCorrect, currentQuizItem), "updateQuiz"))
     updateUI(correctAnswer, clickedButton)
 
     val delayMillis = if (isCorrect) 10 else 300

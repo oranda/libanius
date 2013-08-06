@@ -28,10 +28,7 @@ object Conf {
         enableLogging = config.getBoolean("libanius.enableLogging"),
         numCorrectAnswersRequired = config.getInt("libanius.numCorrectAnswersRequired"),
         fileQuizRoot = config.getString("libanius.file.quizRoot"),
-        resQuizPublic = config.getString("libanius.res.quizPublic"),
-        // Variables passed between activities:
-        keyWord = config.getString("libanius.interActivity.keyWord"),
-        value = config.getString("libanius.interActivity.value")
+        resQuizPublic = config.getString("libanius.res.quizPublic")
     )
   }
 
@@ -42,10 +39,7 @@ object Conf {
       enableLogging = false,
       numCorrectAnswersRequired = 4,
       fileQuizRoot = "",
-      resQuizPublic = "",
-      // Variables passed between activities
-      keyWord = "",
-      value = ""
+      resQuizPublic = ""
     )
   }
 
@@ -56,10 +50,7 @@ object Conf {
       enableLogging = true,
       numCorrectAnswersRequired = 4,
       fileQuizRoot,
-      resQuizPublic = "",
-      // Variables passed between activities
-      keyWord = "",
-      value = ""
+      resQuizPublic = ""
     )
   }
 
@@ -70,8 +61,7 @@ case class Conf(
     useAndroid: Boolean, enableLogging: Boolean,
     numCorrectAnswersRequired: Int,
     fileQuizRoot: String,
-    resQuizPublic: String,
-    keyWord: String, value: String) {
+    resQuizPublic: String) {
 
   lazy val fileQuiz = Conf.conf.fileQuizRoot + ".qui"
   lazy val fileQuizLastBackup = Conf.conf.fileQuizRoot + "Backup" + ".qui"

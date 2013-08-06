@@ -13,31 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.oranda.libanius.model.wordmapping
 
-import scala.util.Random
-
-/**
- * Quiz item data holder:
- * contains whatever information is necessary for the view, and for updating the backing data.
- */
-case class QuizItemViewWithOptions(val wmp: WordMappingPair,
-    val wordMappingValue: WordMappingValue,
-    val wmgCurrentPromptNumber: Int,
-    val quizGroupHeader: QuizGroupHeader,
-    val falseAnswers: Set[String],
-    val numCorrectAnswersInARow: Int) {
-
-  lazy val keyWord = wmp.key
-  lazy val wmvs = wmp.valueSet
+case class SearchResult(quizGroupHeader: QuizGroupHeader, wmp: WordMappingPair) {
   lazy val keyType = quizGroupHeader.keyType
   lazy val valueType = quizGroupHeader.valueType
-
-  lazy val allOptions = optionsInRandomOrder(wordMappingValue, falseAnswers)
-
-  def optionsInRandomOrder(wmv: WordMappingValue, otherOptions: Set[String]): List[String] = {
-    val allOptions = otherOptions + wmv.value
-    Random.shuffle(allOptions.toList)
-  }
+  lazy val keyWord = wmp.key
+  lazy val valueSet = wmp.valueSet
 }

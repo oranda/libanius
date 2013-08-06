@@ -20,13 +20,11 @@ import scala.collection.JavaConversions.mapAsScalaMap
 
 import com.oranda.libanius.util.Platform
 import scala.collection.immutable.Stream
+import scala.util.Try
 
 /**
- * A dictionary. A large read-only repository of word mappings, which can be 
- * copied and used by more dynamic parts of the application.
- * 
- * The raison d'etre is that it can be loaded quickly: the values for each
- * key value are only parsed on demand.
+ * A dictionary. A large read-only repository of word mappings, structured as a map
+ * for fast access.
  */
 case class Dictionary() extends Platform {
 
@@ -59,9 +57,9 @@ case class Dictionary() extends Platform {
 
 object Dictionary {
 
-  def fromWordMappings(wordMappingsStream: Stream[Pair[String, WordMappingValueSetWrapperBase]]) =
+  def fromWordMappings(wordMappingsStream: Stream[WordMappingPair]) =
     new Dictionary() {
-      wordMappingsStream.foreach(pair => wordMappings.put(pair._1, pair._2))
+      wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
     }
 
 
@@ -76,23 +74,29 @@ object Dictionary {
 
     new Dictionary() {
 
-      val splitterLineBreak = WordMappingGroup.splitterLineBreak
-      val splitterKeyValue = WordMappingGroup.splitterKeyValue
+      def parseCustomFormat = {
+        val splitterLineBreak = WordMappingGroup.splitterLineBreak
+        val splitterKeyValue = WordMappingGroup.splitterKeyValue
+        splitterLineBreak.setString(str)
+        splitterLineBreak.next // skip the first line, which has already been parsed
 
-      splitterLineBreak.setString(str)
-      splitterLineBreak.next // skip the first line, which has already been parsed
+        while (splitterLineBreak.hasNext) {
+          splitterKeyValue.setString(splitterLineBreak.next)
 
-      while (splitterLineBreak.hasNext) {
-        splitterKeyValue.setString(splitterLineBreak.next)
-
-        if (splitterKeyValue.hasNext) {
-          val strKey = splitterKeyValue.next
           if (splitterKeyValue.hasNext) {
-            val strValues = splitterKeyValue.next
-            // for efficiency, avoid an extra method call into Dictionary here
-            wordMappings.put(strKey, WordMappingValueSetLazyProxy(strValues))
+            val strKey = splitterKeyValue.next
+            if (splitterKeyValue.hasNext) {
+              val strValues = splitterKeyValue.next
+              // for efficiency, avoid an extra method call into Dictionary here
+              wordMappings.put(strKey, WordMappingValueSetLazyProxy(strValues))
+            }
           }
         }
+      }
+
+      Try(parseCustomFormat) recover {
+        case e: Exception => logError("Could not parse dictionary: " + e.getMessage(), e)
+        None
       }
     }
 }
