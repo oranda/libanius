@@ -73,14 +73,13 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
 
   def testUserWithQuizItem() { 
     Util.stopwatch(quiz.findQuizItem, "find quiz items") match {
-      case Some((quizItem, wmg)) =>
+      case (Some((quizItem, wmg)), failedWmgs) =>
         currentQuizItem = quizItem
         showNextQuizItem()
         GlobalState.updateQuiz(
-            quiz.addWordMappingGroup(wmg.updatedPromptNumber).updateRangeForFailedWmgs(wmg))
-            quiz.wordMappingGroups.foreach(wmg => log(wmg.keyType + " prompt number is " +
+            quiz.addWordMappingGroup(wmg.updatedPromptNumber).updateRangeForFailedWmgs(failedWmgs))
+        quiz.wordMappingGroups.foreach(wmg => log(wmg.keyType + " prompt number is " +
                 wmg.currentPromptNumber + ", range is " + wmg.currentSearchRange.start))
-
       case _ =>
         printStatus("No more questions found! Done!")
     }

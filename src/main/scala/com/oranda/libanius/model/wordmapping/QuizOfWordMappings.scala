@@ -113,14 +113,28 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
     }
   }
 
-  def findQuizItem: Option[(QuizItemViewWithOptions, WordMappingGroup)] =
-    /*
-     * Find the first available "presentable" word mapping
-     */
-    (for {
-      wmg <- wordMappingGroups.toStream
-      quizItem <- wmg.findPresentableQuizItem.toStream
-    } yield (quizItem, wmg)).headOption.orElse(findAnyUnfinishedQuizItem)
+  /*
+   * Find the first available "presentable" word mapping: imperative version.
+   * Return a quiz item, the quiz group it belongs to, and a list of quiz groups which failed
+   * to return anything.
+   */
+  def findQuizItem:
+      Pair[Option[(QuizItemViewWithOptions, WordMappingGroup)], List[WordMappingGroup]] = {
+
+    var failedWmgs = List[WordMappingGroup]()
+    var quizItemPair: Option[(QuizItemViewWithOptions, WordMappingGroup)] = None
+
+    val wmgIter = wordMappingGroups.iterator
+    while (wmgIter.hasNext && !quizItemPair.isDefined) {
+      val wmg = wmgIter.next
+      wmg.findPresentableQuizItem match {
+        case Some(quizItem) => quizItemPair = Some(Pair(quizItem, wmg))
+        case _ => failedWmgs ::= wmg
+      }
+    }
+    quizItemPair = quizItemPair.orElse(findAnyUnfinishedQuizItem)
+    (quizItemPair, failedWmgs)
+  }
 
   def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithOptions, WordMappingGroup)] =
     (for {
@@ -131,10 +145,9 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
   def addWordMappingToFront(header: QuizGroupHeader, keyWord: String, value: String):
       QuizOfWordMappings = {
     val wmg = findWordMappingGroup(header)
-    wmg match {
-      case Some(wmg) => replaceWordMappingGroup(wmg.addWordMappingToFront(keyWord, value))
-      case None => this
-    }
+    wmg.map(wmg =>
+        replaceWordMappingGroup(wmg.addWordMappingToFront(keyWord, value).resetSearchRange)).
+        getOrElse(this)
   }
 
   def addWordMappingToFrontOfTwoGroups(header: QuizGroupHeader,
@@ -172,8 +185,8 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
    * the chances of a hit next time.
    * Note: this design is not great, and will be improved when each wmg is an independent Actor.
    */
-  def updateRangeForFailedWmgs(wmgSuccessful: WordMappingGroup): QuizOfWordMappings = {
-    val wmgsFailed = wordMappingGroups.takeWhile(!_.matches(wmgSuccessful))
+  def updateRangeForFailedWmgs(wmgsFailed: List[WordMappingGroup]): QuizOfWordMappings = {
+    log("updating search ranges for wmgs: " + wmgsFailed.map(_.header).mkString(";"))
     val wmgsWithUpdatedRange = wmgsFailed.map(_.updatedSearchRange)
     wmgsWithUpdatedRange.foldLeft(this)((acc, wmg) => acc.addWordMappingGroup(wmg))
   }

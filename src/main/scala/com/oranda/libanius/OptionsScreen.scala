@@ -125,7 +125,7 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
   }
 
   def addWordToQuiz(quizGroupHeader: QuizGroupHeader, keyWord: String, value: String) {
-    log("received vars " + keyWord + " " + value)
+    log("addWordToQuiz " + keyWord + " " + value)
     GlobalState.updateQuiz(quiz.addWordMappingToFrontOfTwoGroups(quizGroupHeader, keyWord, value))
   }
 

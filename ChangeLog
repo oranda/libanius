@@ -1,6 +1,11 @@
+== 0.74 August 10 2013
+
+  * Fix bugs around range search updating.
+
+
 == 0.73 August 6 2013
 
-  * Cleanup, including improved error handling with Try
+  * Cleanup, including improved error handling with Try.
 
 
 == 0.72 August 4 2013

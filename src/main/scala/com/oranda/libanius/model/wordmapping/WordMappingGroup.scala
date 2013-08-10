@@ -47,6 +47,9 @@ case class WordMappingGroup(val header: QuizGroupHeader,
   def updatedSearchRange =
     WordMappingGroup(header, wordMappings, currentPromptNumber, rangeForNextSearch)
 
+  def resetSearchRange =
+    WordMappingGroup(header, wordMappings, currentPromptNumber, 0 until WordMappingGroup.rangeSize)
+
   def wordMappingKeys = wordMappings.view.map(_.key)
   def wordMappingValueSets = wordMappings.view.map(_.valueSet)
 
