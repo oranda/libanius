@@ -73,7 +73,7 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
       checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
         override def onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
           if (isChecked)
-            wmgLoadingFutures += loadWmg(ctx, quizGroupHeader)
+            wmgLoadingFutures += loadWmg(ctx, quizGroupHeader, GlobalState.loadedQuizGroups)
         }
       })
 
@@ -117,8 +117,7 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
     if (noBoxesChecked)
       alert("Error", "No boxes checked")
     else {
-      waitForQuizToLoadWithQuizGroups()
-      log("number of quizGroups: " + GlobalState.numActiveQuizGroups)
+      getQuizReady()
       val intent = new Intent(getBaseContext(), classOf[QuizScreen])
       startActivity(intent)
     }
@@ -129,11 +128,16 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
     GlobalState.updateQuiz(quiz.addWordMappingToFrontOfTwoGroups(quizGroupHeader, keyWord, value))
   }
 
-  def waitForQuizToLoadWithQuizGroups() {
-    val allFutures: List[Future[Any]] = wmgLoadingFutures.toList :+ future {
+  def getQuizReady() {
+    def waitForQuizToLoadWithQuizGroups {
+      log("waiting for " +  wmgLoadingFutures.size + " wmgLoadingFutures")
+      val loadedQuizGroups = Await.result(Future.sequence(wmgLoadingFutures), 10 seconds)
+      wmgLoadingFutures = Set() // make sure the futures don't run again
+      loadedQuizGroups.foreach(GlobalState.updateLoadedQuizGroups(_))
       fillQuizWithCheckedQuizGroups()
     }
-    Try(Await.result(Future.sequence(allFutures), 10 seconds)).recover {
+
+    Try(waitForQuizToLoadWithQuizGroups).recover {
       case e: TimeoutException => logError("Timed out loading quiz groups")
     }
   }
@@ -171,8 +175,7 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
     clearResults()
     closeSoftInput()
     status.setText("Searching...")
-    log("waiting for quiz groups to load")
-    waitForQuizToLoadWithQuizGroups()
+    getQuizReady()
     val searchInput = searchInputBox.getText.toString
 
     log("search input is " + searchInput)
@@ -199,7 +202,6 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
   }
 
   def searchDictionary(searchInput: String): List[SearchResult] = {
-    log("searchDictionary")
 
     def convertToSearchResults(pairs: List[(String, WordMappingValueSetWrapperBase)],
         wmg: WordMappingGroup) =

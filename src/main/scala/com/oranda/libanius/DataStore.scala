@@ -39,30 +39,33 @@ trait DataStore extends Platform {
     }.get
   }
 
-  def loadWmg(ctx: Context, header: QuizGroupHeader): Future[WordMappingGroup] = {
-    log("seeing if wmg was loaded for " + header)
+  def loadWmg(ctx: Context, header: QuizGroupHeader, loadedQuizGroups: List[WordMappingGroup]):
+      Future[WordMappingGroup] = {
     future {
-      val loadedWmg =
-        GlobalState.loadedQuizGroups.find(_.header == header).getOrElse {
+      log("seeing if wmg was loaded for " + header)
+      val loadedWmg = loadedQuizGroups.find(_.header == header).getOrElse {
           log("no, so loading wmg for " + header)
           val loadedWmg = loadWmgCore(ctx, header)
-          GlobalState.loadedQuizGroups :+= loadedWmg
           loadedWmg
         }
-      log("loadedWmg.numItemsAndCorrectAnswers: " + loadedWmg.numItemsAndCorrectAnswers)
 
       // TODO: move this to a separate Future
-      Util.stopwatch(loadDictionary(ctx, loadedWmg), "preparing dictionary for " + header)
+      val loadedWmgWithDictionary = Util.stopwatch(loadDictionary(ctx, loadedWmg),
+          "preparing dictionary for " + header)
 
-      loadedWmg
+      log("loaded wmg with numItemsAndCorrectAnswers: " +
+          loadedWmgWithDictionary.numItemsAndCorrectAnswers +
+          " and dictionary with " + loadedWmgWithDictionary.dictionary.numKeyWords + " key words")
+
+      loadedWmgWithDictionary
     }
   }
 
-  def loadDictionary(ctx: Context, wmg: WordMappingGroup) {
+  def loadDictionary(ctx: Context, wmg: WordMappingGroup): WordMappingGroup = {
     val dictFileName = wmg.header.makeDictFileName
     val dictionary = readDictionary(ctx, dictFileName).getOrElse(
         Dictionary.fromWordMappings(wmg.wordMappings))
-    wmg.setDictionary(dictionary)
+    wmg.updatedDictionary(dictionary)
   }
 
   def loadWmgCore(ctx: Context, header: QuizGroupHeader): WordMappingGroup =
@@ -156,6 +159,7 @@ trait DataStore extends Platform {
     quiz.wordMappingGroups.foreach(saveToFile(_))
   }
 
+  // return None if the specified fileName is not found on disk
   def readDictionary(ctx: Context, fileName: String): Option[Dictionary] = {
     val fileText = Util.stopwatch(AndroidIO.readFile(ctx, fileName),
         "reading dictionary " + fileName)

@@ -80,8 +80,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
   
   def removeWordMappingGroup(header: QuizGroupHeader): QuizOfWordMappings = {
     //val wordMappingGroup = findWordMappingGroup(keyType, valueType)
-    val wordMappingGroupsFiltered = wordMappingGroups.filterNot(
-        _.header.matches(header))
+    val wordMappingGroupsFiltered = wordMappingGroups.filterNot(_.header.matches(header))
     new QuizOfWordMappings(wordMappingGroupsFiltered)
   }
 

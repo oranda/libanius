@@ -59,6 +59,7 @@ object Dictionary {
 
   def fromWordMappings(wordMappingsStream: Stream[WordMappingPair]) =
     new Dictionary() {
+      log("converting wordMappings to dictionary form")
       wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
     }
 

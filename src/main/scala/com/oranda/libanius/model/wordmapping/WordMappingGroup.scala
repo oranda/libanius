@@ -26,29 +26,35 @@ import com.oranda.libanius.model.{ModelComponent, UserAnswer}
 
 case class WordMappingGroup(val header: QuizGroupHeader,
     wordMappings: Stream[WordMappingPair] = Stream.empty,
+    dictionary: Dictionary = Dictionary(),
     currentPromptNumber: Int = 0,
-    currentSearchRange: Range = 0 until WordMappingGroup.rangeSize)
+    currentSearchRange: Range = WordMappingGroup.initRange)
   extends ModelComponent with Platform {
 
   def keyType = header.keyType     // example: "English word"
   def valueType = header.valueType // example: "German word"
 
-  var dictionary = Dictionary()
-
   // workaround: compiler does not accept import
   lazy val rangeSize = WordMappingGroup.rangeSize
 
-  def thisUpdated(newWordMappings: Stream[WordMappingPair]) =
-    WordMappingGroup(header, newWordMappings, currentPromptNumber, currentSearchRange)
+  def updatedWordMappings(newWordMappings: Stream[WordMappingPair]) =
+    WordMappingGroup(header, newWordMappings, dictionary, currentPromptNumber,
+        currentSearchRange)
 
   def updatedPromptNumber =
-    WordMappingGroup(header, wordMappings, currentPromptNumber + 1, currentSearchRange)
+    WordMappingGroup(header, wordMappings, dictionary, currentPromptNumber + 1,
+        currentSearchRange)
 
   def updatedSearchRange =
-    WordMappingGroup(header, wordMappings, currentPromptNumber, rangeForNextSearch)
+    WordMappingGroup(header, wordMappings, dictionary, currentPromptNumber, rangeForNextSearch)
 
   def resetSearchRange =
-    WordMappingGroup(header, wordMappings, currentPromptNumber, 0 until WordMappingGroup.rangeSize)
+    WordMappingGroup(header, wordMappings, dictionary, currentPromptNumber,
+        WordMappingGroup.initRange)
+
+  def updatedDictionary(newDictionary: Dictionary) =
+    WordMappingGroup(header, wordMappings, newDictionary, currentPromptNumber,
+        WordMappingGroup.initRange)
 
   def wordMappingKeys = wordMappings.view.map(_.key)
   def wordMappingValueSets = wordMappings.view.map(_.valueSet)
@@ -72,10 +78,6 @@ case class WordMappingGroup(val header: QuizGroupHeader,
       wordMapping.valueSet.toCustomFormat(strBuilder)
     }
     strBuilder
-  }
-
-  def setDictionary(dict: Dictionary) {
-    dictionary = dict
   }
 
   def getSaveData: SaveData = {
@@ -161,12 +163,12 @@ case class WordMappingGroup(val header: QuizGroupHeader,
 
   protected def addWordMappingToEnd(wordMappings: Stream[WordMappingPair],
       key: String, wmvsNew: WordMappingValueSetWrapperBase): WordMappingGroup =
-    thisUpdated(wordMappings.filterNot(_.key == key) :+ WordMappingPair(key, wmvsNew))
+    updatedWordMappings(wordMappings.filterNot(_.key == key) :+ WordMappingPair(key, wmvsNew))
 
 
   def addWordMappingToFront(key: String, value: String): WordMappingGroup = {
     val wmvsNew = updatedWordMappingValueSet(key, value)
-    thisUpdated(WordMappingPair(key, wmvsNew) +: wordMappings.filterNot(_.key == key))
+    updatedWordMappings(WordMappingPair(key, wmvsNew) +: wordMappings.filterNot(_.key == key))
   }
 
   protected def addWordMappingToFront(wmp: WordMappingPair): WordMappingGroup =
@@ -174,18 +176,17 @@ case class WordMappingGroup(val header: QuizGroupHeader,
 
   protected def addWordMappingToFront(wordMappings: Stream[WordMappingPair],
       wmp: WordMappingPair): WordMappingGroup =
-    thisUpdated(wmp +: wordMappings.filterNot(_.key == wmp.key))
+    updatedWordMappings(wmp +: wordMappings.filterNot(_.key == wmp.key))
 
-  def removeWordMapping(key: String) = thisUpdated(wordMappings.filter(_.key != key))
+  def removeWordMapping(key: String) = updatedWordMappings(wordMappings.filter(_.key != key))
 
   def removeWordMappingValue(keyWord: String, wordMappingValue: WordMappingValue):
       (WordMappingGroup, Boolean) =
-    findValueSetFor(keyWord) match {
-      case Some(wmvs) =>
-        val wmvsNew = removeValue(wmvs, wordMappingValue)
-        (addWordMappingToEnd(keyWord, wmvsNew), true)
-      case _ => (this, false)
-    }
+    (findValueSetFor(keyWord) map {
+      case wm => val wmvsNew = removeValue(wm, wordMappingValue)
+                 (addWordMappingToEnd(keyWord, wmvsNew), true)
+    }).getOrElse((this, false))
+
 
   private def removeValue(wmvs: WordMappingValueSetWrapperBase, wmv: WordMappingValue) =
     WordMappingValueSetWrapper(wmvs.removeValue(wmv))
@@ -330,7 +331,7 @@ case class WordMappingGroup(val header: QuizGroupHeader,
 
   def merge(otherWmg: WordMappingGroup): WordMappingGroup = {
     val wordMappingsCombined = wordMappings ++ otherWmg.wordMappings
-    thisUpdated(wordMappingsCombined)
+    updatedWordMappings(wordMappingsCombined)
   }
 
   def hasKey(key: String): Boolean = wordMappingKeys.find(_ == key).isDefined
@@ -341,6 +342,7 @@ case class WordMappingGroup(val header: QuizGroupHeader,
 object WordMappingGroup extends Platform {
 
   val rangeSize = 200
+  val initRange = 0 until rangeSize
 
   def splitterLineBreak = getSplitter('\n')
   def splitterKeyValue = getSplitter('|')

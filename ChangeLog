@@ -1,3 +1,8 @@
+== 0.741 August 10 2103
+
+  * Eliminated some mutable state (Dictionary) that was causing a problem.
+
+
 == 0.74 August 10 2013
 
   * Fix bugs around range search updating.
