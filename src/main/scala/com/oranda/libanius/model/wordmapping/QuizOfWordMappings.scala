@@ -177,13 +177,8 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
   }
 
   /*
-   * Return a quiz with wmg's updated to have changed "search ranges" where a search just failed.
-   *
-   * This assumes there has just been a search through the list of wmg's for quiz items,
-   * and one of the wmg's returned something successfully. This means that all of the wmg's
-   * prior to that (if any) "failed" and the search range within each should be shifted to improve
-   * the chances of a hit next time.
-   * Note: this design is not great, and will be improved when each wmg is an independent Actor.
+   * Return a quiz with wmg's updated to have changed "search ranges" for wmg's where a
+   * search just failed. The point of this is to improve performance for the next search.
    */
   def updateRangeForFailedWmgs(wmgsFailed: List[WordMappingGroup]): QuizOfWordMappings = {
     log("updating search ranges for wmgs: " + wmgsFailed.map(_.header).mkString(";"))
