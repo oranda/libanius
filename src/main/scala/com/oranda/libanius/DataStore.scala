@@ -24,7 +24,7 @@ import scala.collection.immutable.Set
 import scala.concurrent.{ future, Future, ExecutionContext }
 import ExecutionContext.Implicits.global
 import java.io.InputStream
-import scala.util.{Failure, Try}
+import scala.util.Try
 
 trait DataStore extends Platform {
 
@@ -44,10 +44,9 @@ trait DataStore extends Platform {
     future {
       log("seeing if wmg was loaded for " + header)
       val loadedWmg = loadedQuizGroups.find(_.header == header).getOrElse {
-          log("no, so loading wmg for " + header)
-          val loadedWmg = loadWmgCore(ctx, header)
-          loadedWmg
-        }
+        log("no, so loading wmg for " + header)
+        loadWmgCore(ctx, header)
+      }
 
       // TODO: move this to a separate Future
       val loadedWmgWithDictionary = Util.stopwatch(loadDictionary(ctx, loadedWmg),
@@ -72,12 +71,12 @@ trait DataStore extends Platform {
     findWmgInFilesDir(ctx, header) match {
       case Some(wmgFileName) =>
         Util.stopwatch(readWmgFromFilesDir(ctx, wmgFileName).getOrElse(WordMappingGroup(header)),
-            "reading wmg from file" + wmgFileName)
+            "reading quiz group from file " + wmgFileName)
       case _ =>
         findWmgInResources(ctx, header) match {
           case Some(wmgResName) =>
             val wmgText = Util.stopwatch(AndroidIO.readResource(ctx, wmgResName),
-                "reading wmg resource " + wmgResName)
+                "reading quiz group resource " + wmgResName)
             writeToFile(header.makeWmgFileName, wmgText, Some(ctx)) // TODO: eliminate side-effect
             //log("read text from wmg resource starting " + wmgText.take(200))
             WordMappingGroup.fromCustomFormat(wmgText)
@@ -90,20 +89,21 @@ trait DataStore extends Platform {
   def readWmgFromFilesDir(ctx: Context, wmgFileName: String): Option[WordMappingGroup] = {
     log("reading wmg from file " + wmgFileName)
     for {
-      wmgText <- AndroidIO.readFile(ctx, wmgFileName)
+      wmgText <- Util.stopwatch(AndroidIO.readFile(ctx, wmgFileName),
+          "reading file " + wmgFileName)
       //log("have read wmgText " + wmgText.take(200) + "... ")
-    } yield WordMappingGroup.fromCustomFormat(wmgText)
+    } yield Util.stopwatch(WordMappingGroup.fromCustomFormat(wmgText),
+          "parsing text of " + wmgFileName)
   }
 
   def findWmgInFilesDir(ctx: Context, header: QuizGroupHeader): Option[String] = {
     val fileNames = findWmgFileNamesFromFilesDir(ctx)
-    log("fileNames: " + fileNames.toList)
     fileNames.find(readWmgMetadataFromFile(ctx, _) == Some(header))
   }
 
   def findWmgInResources(ctx: Context, header: QuizGroupHeader): Option[String] = {
     val fileNames = findWmgFileNamesFromResources(ctx)
-    log("fileNames: " + fileNames.toList)
+    log("fileNames in resources: " + fileNames.toList)
     fileNames.find(readWmgMetadataFromResource(ctx, _) == Some(header))
   }
 
@@ -148,23 +148,12 @@ trait DataStore extends Platform {
   def findWmgFileNamesFromResources(ctx: Context) =
     classOf[R.raw].getFields.map(_.getName).filter(_.startsWith("wmg"))
 
-  def saveWmgs(quiz: QuizOfWordMappings, path: String = "", ctx: Option[Context] = None) {
-
-    def saveToFile(wmg: WordMappingGroup) = {
-      val saveData = wmg.getSaveData
-      log("Saving wmg " + wmg.keyType + ", wmg has promptNumber " +
-          wmg.currentPromptNumber + " to " + saveData.fileName)
-      writeToFile(path + saveData.fileName, saveData.data, ctx)
-    }
-    quiz.wordMappingGroups.foreach(saveToFile(_))
-  }
-
   // return None if the specified fileName is not found on disk
   def readDictionary(ctx: Context, fileName: String): Option[Dictionary] = {
     val fileText = Util.stopwatch(AndroidIO.readFile(ctx, fileName),
         "reading dictionary " + fileName)
-    val dictionary = Util.stopwatch(fileText.map(Dictionary.fromCustomFormat(_)),
-        "parsing dictionary")
+    val dictionary = fileText.map(Util.stopwatch(Dictionary.fromCustomFormat(_),
+        "parsing dictionary " + fileName))
     log("Finished reading " + dictionary.map(_.numKeyWords).getOrElse(0) + " dictionary key words")
     dictionary
   }

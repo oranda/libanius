@@ -19,11 +19,12 @@ package com.oranda.libanius.model.wordmapping
 import scala.collection.immutable._
 
 import com.oranda.libanius.model.{UserAnswer, Quiz}
-import com.oranda.libanius.util.{StringUtil, Platform}
+import com.oranda.libanius.util.{Util, StringUtil, Platform}
 import com.oranda.libanius.{Conf}
 
 import scala.math.BigDecimal.double2bigDecimal
 import scala.collection.immutable.List
+import android.content.Context
 
 case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet())
     extends Quiz with Platform {
@@ -213,6 +214,12 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
         wordMappingGroups.filterNot(Some(_) == wmg) + wmgMerged
     }      
     new QuizOfWordMappings(wordMappingGroupsCombined)
+  }
+
+  // Synchronous version of saving the quiz, i.e. not using Akka.
+  def saveWmgs(ctx: Option[Context], path: String = "") {
+    wordMappingGroups.foreach(wmg =>
+        Util.stopwatch(wmg.saveToFile(ctx, path), "Saving quiz group " + wmg.header))
   }
 }
 

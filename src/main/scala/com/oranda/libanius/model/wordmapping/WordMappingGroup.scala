@@ -21,8 +21,9 @@ import scala.collection.immutable._
 import scala.util.{Try, Random}
 
 import com.oranda.libanius.util.{Platform, StringUtil, Util}
-import com.oranda.libanius.SaveData
 import com.oranda.libanius.model.{ModelComponent, UserAnswer}
+import android.content.Context
+import com.oranda.libanius.SaveData
 
 case class WordMappingGroup(val header: QuizGroupHeader,
     wordMappings: Stream[WordMappingPair] = Stream.empty,
@@ -80,6 +81,13 @@ case class WordMappingGroup(val header: QuizGroupHeader,
     strBuilder
   }
 
+  def saveToFile(ctx: Option[Context] = None, path: String = "") {
+    val saveData = getSaveData
+    log("Saving quiz group " + keyType + ", quiz group has promptNumber " +
+        currentPromptNumber + " to " + saveData.fileName)
+    writeToFile(path + saveData.fileName, saveData.data, ctx)
+  }
+
   def getSaveData: SaveData = {
     val serialized = toCustomFormat(new StringBuilder())
     val fileName = header.makeWmgFileName
@@ -91,7 +99,7 @@ case class WordMappingGroup(val header: QuizGroupHeader,
 
   def numValues = wordMappingValueSets.iterator.foldLeft(0)(_ + _.size)
 
-  def numItemsAndCorrectAnswers: Pair[Int, Int]  = {
+  def numItemsAndCorrectAnswers: Pair[Int, Int] = {
     /*
      * The functional version is about 50% slower than the imperative version
      *

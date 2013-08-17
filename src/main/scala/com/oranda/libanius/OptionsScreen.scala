@@ -32,6 +32,7 @@ import android.view.inputmethod.{InputMethodManager, EditorInfo}
 import android.view.ViewGroup.LayoutParams
 import android.view.View.OnClickListener
 import scala.util.Try
+import com.oranda.libanius.pi.{Listener, Pi, Worker}
 
 class OptionsScreen extends Activity with TypedActivity with DataStore {
 
@@ -52,8 +53,27 @@ class OptionsScreen extends Activity with TypedActivity with DataStore {
     super.onCreate(savedInstanceState)
     Conf.setUp()
     log("OptionsScreen.onCreate")
+    //cpuTestsInAndroidWithAkka
     readQuizMetadata(ctx = this)
     initGui()
+  }
+
+  def cpuTestsInAndroidWithAkka {
+
+    // tests with Akka:
+
+    //Pi.calculate(nrOfWorkers = 1, nrOfElements = 100000000, nrOfMessages = 1)
+    //Pi.calculate(nrOfWorkers = 2, nrOfElements = 50000000, nrOfMessages = 2)
+    Pi.calculate(nrOfWorkers = 4, nrOfElements = 25000000, nrOfMessages = 4)
+    //Pi.calculate(nrOfWorkers = 8, nrOfElements = 12500000, nrOfMessages = 8)
+  }
+
+  def cpuTestsInAndroidWithoutAkka {
+    // test without Akka:
+
+    //val pi =  Util.stopwatch(Worker.calculatePiFor(start = 0, nrOfElements = 100000000),
+    //    "calculating pi without an Actor")
+    //Listener.printPi(pi)
   }
 
   def initGui() {

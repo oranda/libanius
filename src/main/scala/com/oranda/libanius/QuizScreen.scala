@@ -15,20 +15,32 @@
  */
 package com.oranda.libanius
 
+import akka.actor.ActorDSL._
+import akka.actor._
+
 import java.lang.Runnable
 import scala.concurrent.{ future, ExecutionContext }
 import ExecutionContext.Implicits.global
 
-import com.oranda.libanius.model.wordmapping.{QuizGroupHeader, QuizItemViewWithOptions, QuizOfWordMappings}
+import com.oranda.libanius.model.wordmapping.{WordMappingGroup, QuizGroupHeader, QuizItemViewWithOptions, QuizOfWordMappings}
 import com.oranda.libanius.util.Util
+import com.oranda.libanius.actors._
+
+
 import android.app.Activity
-import android.content.Intent
+import android.content.{Intent}
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import com.oranda.libanius.pi.{Master, Listener}
+import com.oranda.libanius.model.wordmapping.QuizItemViewWithOptions
+import com.oranda.libanius.actors.SaveQuiz
+import com.oranda.libanius.actors.Result
+import com.oranda.libanius.actors.Calculate
+import com.oranda.libanius.actors.Done
 
 class QuizScreen extends Activity with TypedActivity with DataStore with Timestamps {
 
@@ -50,7 +62,10 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
 
   private[this] lazy val speedLabel: TextView = findView(TR.speed)
   private[this] lazy val statusLabel: TextView = findView(TR.status)
-  
+
+  // Create an Akka system
+  private implicit val system = ActorSystem("LibaniusActorSystem")
+
   private[this] var currentQuizItem: QuizItemViewWithOptions = _
 
   def quiz = GlobalState.quiz
@@ -68,7 +83,7 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
   override def onPause() {
     super.onPause()
     log("onPause")
-    saveQuiz
+    saveQuiz()
   }
 
   def testUserWithQuizItem() { 
@@ -79,7 +94,7 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
         GlobalState.updateQuiz(
             quiz.addWordMappingGroup(wmg.updatedPromptNumber).updateRangeForFailedWmgs(failedWmgs))
         quiz.wordMappingGroups.foreach(wmg => log(wmg.keyType + " prompt number is " +
-                wmg.currentPromptNumber + ", range is " + wmg.currentSearchRange.start))
+            wmg.currentPromptNumber + ", range is " + wmg.currentSearchRange.start))
       case _ =>
         printStatus("No more questions found! Done!")
     }
@@ -195,10 +210,31 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
       case _ =>
     }
   }
-  
+
+  /**
+   * Saving the quiz is akka-fied here, with each quiz group being saved to a separate file
+   * by a separate actor. However, because of the way I/O works, there is no performance boost
+   * here, so:
+   * TODO: consider rolling this back and doing it for the CPU intensive parsing instead.
+   */
   def saveQuiz() {
     printStatus("Saving quiz data...")
-    saveWmgs(quiz, ctx = Some(this))
+    val start: Long = System.currentTimeMillis
+
+    val listener = actor(new Act {
+      become {
+        case Done =>
+          log("time taken for saving all quiz groups was " +
+            (System.currentTimeMillis - start) + "ms")
+          printStatus("Finished saving quiz data!")
+      }
+    })
+
+    val quizSaveActor = system.actorOf(Props(new QuizSaveWorker(quiz, listener)))
+
+    // start the calculation
+    quizSaveActor ! SaveQuiz(ctx = Some(this))
+
     printStatus("Finished saving quiz data!")
   }
 
@@ -218,22 +254,42 @@ class QuizScreen extends Activity with TypedActivity with DataStore with Timesta
       delayMillis)
   }
 
+
+  def formatAndPrintScore(scoreStr: String) {
+    val scoreStrMaxIndex = scala.math.min(scoreStr.length, 6)
+    printScore(scoreStr.substring(0, scoreStrMaxIndex) + "%")
+  }
+
   def showScoreAsync() {
 
-    def formatAndPrintScore(scoreStr: String) {
-      val scoreStrMaxIndex = scala.math.min(scoreStr.length, 6)
-      printScore(scoreStr.substring(0, scoreStrMaxIndex) + "%")
-    }
+    val service = system.actorOf(Props[ScoreCalculator])
+    val scoreServiceHook = actor(new Act {
+      become {
+        case Calculate(quiz: QuizOfWordMappings) =>
+          log("Forwarding Calculate message")
+          service ! Calculate(quiz) // perform the work
+        case scoreSoFar: Result =>
+          log("QuizScreen:scoreServiceHook: received message scoreSoFar")
+          runOnUiThread(new Runnable { override def run() {
+            formatAndPrintScore(scoreSoFar.value) }
+          })
+      }
+    })
+
+    // start the calculation
+    scoreServiceHook ! Calculate(quiz)
 
     /*
      * Instead of using Android's AsyncTask, use a Scala Future. It's more concise and general,
      * but we need to remind Android to use the UI thread when the result is returned.
      */
+    /*
     future {
       (Util.stopwatch(quiz.scoreSoFar, "scoreSoFar") * 100).toString
     } map { scoreSoFar: String =>
         runOnUiThread(new Runnable { override def run() { formatAndPrintScore(scoreSoFar) } })
     }
+    */
   }
   
   def showSpeed() { speedLabel.setText("Speed: " + answerSpeed + "/min") }

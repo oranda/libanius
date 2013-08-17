@@ -64,7 +64,7 @@ abstract class ReadVocabFileToWordMappings extends DataStore {
     println("quiz first wmg length is " + quiz.wordMappingGroups.toList(0).wordMappingKeys.length)
     println("Finished reading (quiz and) vocab file... Now writing quiz to " + pathQuiz + "...")
     StandardIO.save(pathQuiz, quiz.toCustomFormat.toString)
-    saveWmgs(quiz, path = "data/")
+    quiz.saveWmgs(ctx = None, path = "data/")
     println("Finished writing " + quiz.numKeyWords + " words with their translations!")
   }
 }
