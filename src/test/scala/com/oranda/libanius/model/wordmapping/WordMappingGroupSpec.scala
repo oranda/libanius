@@ -128,7 +128,7 @@ class WordMappingGroupSpec extends Specification {
       updateWithUserAnswer(wmg, quizItem)
     }
 
-    def updateWithUserAnswer(wmg: WordMappingGroup, quizItem: QuizItemViewWithOptions) = {
+    def updateWithUserAnswer(wmg: WordMappingGroup, quizItem: QuizItemViewWithChoices) = {
       val userAnswer = new UserAnswer(true, wmg.currentPromptNumber)
       wmg.updateWithUserAnswer(quizItem.keyWord, quizItem.wmvs,
           quizItem.wordMappingValue, userAnswer).updatedPromptNumber

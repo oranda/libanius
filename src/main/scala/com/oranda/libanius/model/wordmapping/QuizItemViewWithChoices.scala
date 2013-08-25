@@ -22,7 +22,7 @@ import scala.util.Random
  * Quiz item data holder:
  * contains whatever information is necessary for the view, and for updating the backing data.
  */
-case class QuizItemViewWithOptions(val wmp: WordMappingPair,
+case class QuizItemViewWithChoices(val wmp: WordMappingPair,
     val wordMappingValue: WordMappingValue,
     val wmgCurrentPromptNumber: Int,
     val quizGroupHeader: QuizGroupHeader,
@@ -34,10 +34,13 @@ case class QuizItemViewWithOptions(val wmp: WordMappingPair,
   lazy val keyType = quizGroupHeader.keyType
   lazy val valueType = quizGroupHeader.valueType
 
-  lazy val allOptions = optionsInRandomOrder(wordMappingValue, falseAnswers)
+  lazy val allChoices = choicesInRandomOrder(wordMappingValue, falseAnswers)
 
-  def optionsInRandomOrder(wmv: WordMappingValue, otherOptions: Set[String]): List[String] = {
-    val allOptions = otherOptions + wmv.value
-    Random.shuffle(allOptions.toList)
+  def choicesInRandomOrder(wmv: WordMappingValue, otherChoices: Set[String]): List[String] = {
+    val allChoices = otherChoices + wmv.value
+    Random.shuffle(allChoices.toList)
   }
+
+  // In the future, quiz items with many correct answers might not be multiple choice.
+  def useMultipleChoice = true
 }

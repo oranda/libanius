@@ -122,10 +122,10 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
    * to return anything.
    */
   def findQuizItem:
-      Pair[Option[(QuizItemViewWithOptions, WordMappingGroup)], List[WordMappingGroup]] = {
+      Pair[Option[(QuizItemViewWithChoices, WordMappingGroup)], List[WordMappingGroup]] = {
 
     var failedWmgs = List[WordMappingGroup]()
-    var quizItemPair: Option[(QuizItemViewWithOptions, WordMappingGroup)] = None
+    var quizItemPair: Option[(QuizItemViewWithChoices, WordMappingGroup)] = None
 
     val wmgIter = wordMappingGroups.iterator
     while (wmgIter.hasNext && !quizItemPair.isDefined) {
@@ -139,7 +139,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
     (quizItemPair, failedWmgs)
   }
 
-  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithOptions, WordMappingGroup)] =
+  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices, WordMappingGroup)] =
     (for {
       wmg <- wordMappingGroups.toStream
       quizItem <- wmg.findAnyUnfinishedQuizItem.toStream
@@ -166,7 +166,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
     quizUpdated2
   }
 
-  def updateWithUserAnswer(isCorrect: Boolean, currentQuizItem: QuizItemViewWithOptions):
+  def updateWithUserAnswer(isCorrect: Boolean, currentQuizItem: QuizItemViewWithChoices):
       QuizOfWordMappings = {
     val userAnswer = new UserAnswer(isCorrect, currentQuizItem.wmgCurrentPromptNumber)
     val wmg = findWordMappingGroup(currentQuizItem.quizGroupHeader)

@@ -198,7 +198,7 @@ case class WordMappingGroup(val header: QuizGroupHeader,
   def findValueSetFor(keyWord: String): Option[WordMappingValueSetWrapperBase] =
     wordMappings.find(_.key == keyWord).map(_.valueSet)
 
-  def findPresentableQuizItem: Option[QuizItemViewWithOptions] = {
+  def findPresentableQuizItem: Option[QuizItemViewWithChoices] = {
     l.log("currentSearchRange: " + currentSearchRange.start)
     val wmSlice = wordMappings.slice(currentSearchRange.start, currentSearchRange.end)
     val quizItem =
@@ -215,7 +215,7 @@ case class WordMappingGroup(val header: QuizGroupHeader,
     else currentSearchRange.start + rangeSize until currentSearchRange.end + rangeSize
 
   private def findPresentableQuizItem(wmp: WordMappingPair, currentPromptNumber: Int):
-      Option[QuizItemViewWithOptions] = {
+      Option[QuizItemViewWithChoices] = {
     //log("findPresentableQuizItem: key=" + key + ", currentPromptNumber=" +
     //    currentPromptNumber)
     val wordMappingValue = wmp.valueSet.findPresentableWordMappingValue(currentPromptNumber)
@@ -225,20 +225,20 @@ case class WordMappingGroup(val header: QuizGroupHeader,
     }
   }
 
-  def findAnyUnfinishedQuizItem: Option[QuizItemViewWithOptions] = {
+  def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] = {
     l.log("findAnyUnfinishedQuizItem " + header)
     wordMappings.iterator.map(wmPair =>
       findAnyUnfinishedQuizItem(wmPair)).find(_.isDefined).getOrElse(None)
   }
 
-  private def findAnyUnfinishedQuizItem(wmp: WordMappingPair): Option[QuizItemViewWithOptions] =
+  private def findAnyUnfinishedQuizItem(wmp: WordMappingPair): Option[QuizItemViewWithChoices] =
     wmp.valueSet.findAnyUnfinishedWordMappingValue.map(quizItemWithOptions(wmp, _))
 
   private def quizItemWithOptions(wmp: WordMappingPair,
-      wordMappingValueCorrect: WordMappingValue): QuizItemViewWithOptions = {
+      wordMappingValueCorrect: WordMappingValue): QuizItemViewWithChoices = {
     val numCorrectAnswers = wordMappingValueCorrect.numCorrectAnswersInARow
     val falseAnswers = makeFalseAnswers(wmp, wordMappingValueCorrect, numCorrectAnswers)
-    new QuizItemViewWithOptions(wmp, wordMappingValueCorrect,
+    new QuizItemViewWithChoices(wmp, wordMappingValueCorrect,
         currentPromptNumber, header, falseAnswers, numCorrectAnswers)
   }
 

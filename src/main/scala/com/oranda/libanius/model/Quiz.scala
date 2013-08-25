@@ -15,6 +15,7 @@
  */
 
 package com.oranda.libanius.model
+
 import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 abstract class Quiz extends ModelComponent {

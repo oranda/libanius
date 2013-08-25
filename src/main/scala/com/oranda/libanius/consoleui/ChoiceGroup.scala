@@ -19,22 +19,24 @@ package com.oranda.libanius.consoleui
 import Output._
 import scala.util.Try
 
-case class OptionGroup[T](options: List[T]) {
-  val optionsWithIndex = options.zipWithIndex
+/*
+ * A list of choices in a console UI.
+ */
+case class ChoiceGroup[T](choices: List[T]) {
+  val choicesWithIndex = choices.zipWithIndex
 
   def show() {
-    optionsWithIndex.foreach {
+    choicesWithIndex.foreach {
       case (header, index) => output((index + 1).toString + ". " + header.toString)
     }
   }
 
-  // return None if quit is requested
   def getSelectionFromInput: UserResponse =
     readLine match {
       case "q" => Quit
       case "quit" => Quit
       case userResponse: String =>
-        Try(Options(userResponse.split(",").map(_.toInt - 1).map(options(_)).toList)).recover {
+        Try(ChosenOptions(userResponse.split(",").map(_.toInt - 1).map(choices(_)).toList)).recover {
           case e: Exception => Invalid
         }.get
     }
