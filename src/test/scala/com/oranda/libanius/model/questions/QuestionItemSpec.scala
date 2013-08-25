@@ -17,7 +17,7 @@
 package com.oranda.libanius.model.questions
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.Conf
+import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 class QuestionItemSpec extends Specification {
 
@@ -30,7 +30,7 @@ class QuestionItemSpec extends Specification {
   <userAnswers></userAnswers>
 </quizItem>
 
-    Conf.setUpForTest()
+    AppDependencies.conf = Conf.setUpForTest()
     
     val qi = QuestionItem.fromXML(qiXml)
     

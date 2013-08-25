@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.util
+package com.oranda.libanius.consoleui
 
-import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.dependencies.AppDependencies
-
-
-object Util {
-
-  val l = AppDependencies.logger
-
-  def stopwatch[X](fn: => X, actionDescription: String): X = {
-    val start = System.currentTimeMillis()
-    val result = fn
-    val end = System.currentTimeMillis()
-    l.log("time taken for " + actionDescription + " was " + (end - start) + "ms")
-    result
-  }
-
+object Output {
+  def output(str: String) = println(str)
 }

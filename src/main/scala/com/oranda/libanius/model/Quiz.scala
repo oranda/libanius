@@ -15,12 +15,13 @@
  */
 
 package com.oranda.libanius.model
-import com.oranda.libanius.Conf
+import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 abstract class Quiz extends ModelComponent {
   
   def scoreSoFar : BigDecimal = {  // out of 1.0
-    val availableScorePerItem = (1.0 / numItems) /  Conf.conf.numCorrectAnswersRequired : BigDecimal
+    val availableScorePerItem = (1.0 / numItems) /
+        AppDependencies.conf.numCorrectAnswersRequired : BigDecimal
     availableScorePerItem * numCorrectAnswers
   }  
   

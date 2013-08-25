@@ -20,16 +20,19 @@ import scala.collection.mutable.ListBuffer
 import scala.collection.immutable._
 import scala.util.{Try, Random}
 
-import com.oranda.libanius.util.{Platform, StringUtil, Util}
-import com.oranda.libanius.SaveData
+import com.oranda.libanius.util.{StringUtil, Util}
 import com.oranda.libanius.model.{ModelComponent, UserAnswer}
+import WordMappingGroup._
+import com.oranda.libanius.dependencies.AppDependencies
 
 case class WordMappingGroup(val header: QuizGroupHeader,
     wordMappings: Stream[WordMappingPair] = Stream.empty,
-    dictionary: Dictionary = Dictionary(),
+    dictionary: Dictionary = new Dictionary,
     currentPromptNumber: Int = 0,
     currentSearchRange: Range = WordMappingGroup.initRange)
-  extends ModelComponent with Platform {
+  extends ModelComponent {
+
+  private[this] lazy val l = AppDependencies.logger
 
   def keyType = header.keyType     // example: "English word"
   def valueType = header.valueType // example: "German word"
@@ -196,14 +199,14 @@ case class WordMappingGroup(val header: QuizGroupHeader,
     wordMappings.find(_.key == keyWord).map(_.valueSet)
 
   def findPresentableQuizItem: Option[QuizItemViewWithOptions] = {
-    log("currentSearchRange: " + currentSearchRange.start)
+    l.log("currentSearchRange: " + currentSearchRange.start)
     val wmSlice = wordMappings.slice(currentSearchRange.start, currentSearchRange.end)
     val quizItem =
       (for {
         wordMappingPair <- wmSlice.toStream
         quizItem <- findPresentableQuizItem(wordMappingPair, currentPromptNumber)
       } yield quizItem).headOption
-    log("found quiz item " + quizItem)
+    l.log("found quiz item " + quizItem)
     quizItem
   }
 
@@ -223,7 +226,7 @@ case class WordMappingGroup(val header: QuizGroupHeader,
   }
 
   def findAnyUnfinishedQuizItem: Option[QuizItemViewWithOptions] = {
-    log("findAnyUnfinishedQuizItem " + header)
+    l.log("findAnyUnfinishedQuizItem " + header)
     wordMappings.iterator.map(wmPair =>
       findAnyUnfinishedQuizItem(wmPair)).find(_.isDefined).getOrElse(None)
   }
@@ -313,7 +316,7 @@ case class WordMappingGroup(val header: QuizGroupHeader,
   def randomValues(sliceSize: Int) =  {
     val combinedValueSets = WordMappingValueSet.combineValueSets(randomSliceOfValueSets(sliceSize))
     if (combinedValueSets.isEmpty)
-      logError("randomValues found nothing")
+      l.logError("randomValues found nothing")
     combinedValueSets
   }
 
@@ -339,13 +342,15 @@ case class WordMappingGroup(val header: QuizGroupHeader,
 }
 
 
-object WordMappingGroup extends Platform {
+object WordMappingGroup {
+
+  private[this] val l = AppDependencies.logger
 
   val rangeSize = 200
   val initRange = 0 until rangeSize
 
-  def splitterLineBreak = getSplitter('\n')
-  def splitterKeyValue = getSplitter('|')
+  def splitterLineBreak = AppDependencies.stringSplitterFactory.getSplitter('\n')
+  def splitterKeyValue = AppDependencies.stringSplitterFactory.getSplitter('|')
 
   /*
    * Example:
@@ -356,38 +361,38 @@ object WordMappingGroup extends Platform {
    */
   def fromCustomFormat(str: String): WordMappingGroup = {
 
-    val splitterLineBreakLocal = getSplitter('\n')
-    val splitterKeyValueLocal = getSplitter('|')
+    val splitterLineBreak = WordMappingGroup.splitterLineBreak
+    val splitterKeyValue = WordMappingGroup.splitterKeyValue
 
     // TODO: write directly to the Stream not a ListBuffer
     val wordMappingsMutable = new ListBuffer[WordMappingPair]()
 
     def parseWordMappingGroup {
-      splitterLineBreakLocal.setString(str)
-      splitterLineBreakLocal.next // skip the first line, which has already been parsed
+      splitterLineBreak.setString(str)
+      splitterLineBreak.next // skip the first line, which has already been parsed
 
-      while (splitterLineBreakLocal.hasNext) {
-        val strKeyValue = splitterLineBreakLocal.next
-        splitterKeyValueLocal.setString(strKeyValue)
+      while (splitterLineBreak.hasNext) {
+        val strKeyValue = splitterLineBreak.next
+        splitterKeyValue.setString(strKeyValue)
 
-        if (splitterKeyValueLocal.hasNext) {
+        if (splitterKeyValue.hasNext) {
 
           def parseKeyValue {
-            val strKey = splitterKeyValueLocal.next
+            val strKey = splitterKeyValue.next
 
-            if (splitterKeyValueLocal.hasNext) {
-              val strValues = splitterKeyValueLocal.next
+            if (splitterKeyValue.hasNext) {
+              val strValues = splitterKeyValue.next
               wordMappingsMutable += WordMappingPair(strKey, WordMappingValueSetLazyProxy(strValues))
             }
           }
           Try(parseKeyValue) recover {
-            case e: Exception => logError("could not parse key-value string: " + strKeyValue)
+            case e: Exception => l.logError("could not parse key-value string: " + strKeyValue)
           }
         }
       }
     }
     Try(parseWordMappingGroup) recover {
-      case e: Exception => logError("could not parse wmg with str " + str.take(100) + "..." +
+      case e: Exception => l.logError("could not parse wmg with str " + str.take(100) + "..." +
           str.takeRight(100))
     }
 
@@ -400,7 +405,7 @@ object WordMappingGroup extends Platform {
 
   def parseCurrentPromptNumber(str: String): Int =
     Try(StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt).recover {
-      case e: Exception => logError("Could not parse prompt number from " + str)
+      case e: Exception => l.logError("Could not parse prompt number from " + str)
                            0
     }.get
 }

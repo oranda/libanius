@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oranda.libanius
 
-// simple value object used for saving a data structure to a file
-case class SaveData(fileName: String, data: String)
+package com.oranda.libanius.consoleui
+
+abstract class UserResponse
+case class Options[T](options: List[T]) extends UserResponse
+case object Invalid extends UserResponse
+case object Quit extends UserResponse

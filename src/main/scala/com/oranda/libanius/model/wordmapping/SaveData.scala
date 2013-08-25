@@ -14,22 +14,7 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.util
+package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.dependencies.AppDependencies
-
-
-object Util {
-
-  val l = AppDependencies.logger
-
-  def stopwatch[X](fn: => X, actionDescription: String): X = {
-    val start = System.currentTimeMillis()
-    val result = fn
-    val end = System.currentTimeMillis()
-    l.log("time taken for " + actionDescription + " was " + (end - start) + "ms")
-    result
-  }
-
-}
+// simple value object used for saving a data structure to a file
+case class SaveData(fileName: String, data: String)

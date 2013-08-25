@@ -19,7 +19,9 @@ package com.oranda.libanius.model.wordmapping
 import com.oranda.libanius.model.QuizItemWithUserAnswers
 import com.oranda.libanius.model.UserAnswer
 import com.oranda.libanius.util.StringUtil
-import com.oranda.libanius.util.Platform
+import com.oranda.libanius.io.PlatformIO
+import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.dependencies.AppDependencies
 
 case class WordMappingValue(val value: String, val correctAnswersInARow: List[UserAnswer] = Nil,
                             val incorrectAnswers: List[UserAnswer] = Nil)
@@ -62,17 +64,15 @@ case class WordMappingValue(val value: String, val correctAnswersInARow: List[Us
 
 }
 
-object WordMappingValue extends Platform {
-  
+object WordMappingValue {
 
-  
   // Example: str = "nachlösen:1,7,9;6"
   def fromCustomFormat(str: String): WordMappingValue = {
 
-      // See comments for getSplitter. This code needs to be both fast and thread-safe.
-      val wmvSplitter = getSplitter(':')
-      val allAnswersSplitter = getSplitter(';')
-      val answersSplitter = getSplitter(',')
+      // This code needs to be both fast and thread-safe.
+      val wmvSplitter = AppDependencies.stringSplitterFactory.getSplitter(':')
+      val allAnswersSplitter = AppDependencies.stringSplitterFactory.getSplitter(';')
+      val answersSplitter = AppDependencies.stringSplitterFactory.getSplitter(',')
 
       wmvSplitter.setString(str)
       var wmv = new WordMappingValue(wmvSplitter.next)

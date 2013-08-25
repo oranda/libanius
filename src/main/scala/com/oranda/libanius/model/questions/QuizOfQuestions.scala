@@ -77,7 +77,7 @@ class QuizOfQuestions(val currentPromptNumber: Int) extends Quiz {
 object QuizOfQuestions {
 
   // deprecated
-  def fromXML(node: xml.Node): QuizOfQuestions =
+  def fromXML(node: scala.xml.Node): QuizOfQuestions =
     new QuizOfQuestions(
       currentPromptNumber = (node \ "currentPromptNumber").text.toInt) {
       val quizItemsXml = (node \ "quizItems")

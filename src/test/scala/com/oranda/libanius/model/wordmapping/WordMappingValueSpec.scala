@@ -17,8 +17,8 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.Conf
 import com.oranda.libanius.model.Criteria
+import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 class WordMappingValueSpec extends Specification {
   
@@ -26,7 +26,7 @@ class WordMappingValueSpec extends Specification {
     
     val wmvCustomFormat = "nachlösen:9,7;6"
 
-    Conf.setUpForTest()
+    AppDependencies.conf = Conf.setUpForTest()
     
     val wmv = WordMappingValue.fromCustomFormat(wmvCustomFormat)
     

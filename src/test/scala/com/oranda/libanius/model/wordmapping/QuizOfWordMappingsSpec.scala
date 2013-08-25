@@ -17,8 +17,7 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.io.StandardIO
-import com.oranda.libanius.Conf
+import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 class QuizOfWordMappingsSpec extends Specification {
   
@@ -42,7 +41,7 @@ class QuizOfWordMappingsSpec extends Specification {
         "unterwegs|en route\n" +
         "Vertrag|contract:697,696;698/treaty:796;798")
 
-    Conf.setUpForTest()
+    AppDependencies.conf = Conf.setUpForTest()
     
     val quiz = QuizOfWordMappings.demoQuiz(quizData)
     

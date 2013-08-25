@@ -15,12 +15,12 @@
  */
 
 package com.oranda.libanius.model
-import com.oranda.libanius.Conf
-import com.oranda.libanius.util.Platform
 import QuizItemWithUserAnswers._
+import com.oranda.libanius.io.PlatformIO
+import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 abstract class QuizItemWithUserAnswers[T](correctAnswersInARow: List[UserAnswer],
-    incorrectAnswers: List[UserAnswer]) extends ModelComponent with Platform {
+    incorrectAnswers: List[UserAnswer]) extends ModelComponent {
 
   def self: T
 
@@ -58,7 +58,8 @@ abstract class QuizItemWithUserAnswers[T](correctAnswersInARow: List[UserAnswer]
         _.isPresentable(currentPromptNum, promptNumInMostRecentAnswer, numCorrectAnswersInARow))
 
 
-  def isUnfinished: Boolean = numCorrectAnswersInARow < Conf.conf.numCorrectAnswersRequired
+  def isUnfinished: Boolean = numCorrectAnswersInARow <
+      AppDependencies.conf.numCorrectAnswersRequired
   
   def numCorrectAnswersInARow = correctAnswersInARow.length
   
@@ -73,8 +74,7 @@ abstract class QuizItemWithUserAnswers[T](correctAnswersInARow: List[UserAnswer]
  * numCorrectAnswersInARowDesired: how many times this item should have been answered correctly
  * diffInPromptNumMinimum: how long ago it was last answered - may be None to omit this criterion
  */
-case class Criteria(numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int)
-    extends Platform {
+case class Criteria(numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int) {
   def isPresentable(currentPromptNum : Int, promptNumInMostRecentAnswer: Option[Int],
       numCorrectAnswersInARow: Int): Boolean = {
     def wasNotTooRecentlyUsed = promptNumInMostRecentAnswer.forall {

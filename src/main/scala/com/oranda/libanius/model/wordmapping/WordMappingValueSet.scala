@@ -16,18 +16,24 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.util.{Try, Random}
-import com.oranda.libanius.util.{StringUtil, Platform}
+import scala.util.{Random, Try}
+import com.oranda.libanius.util.{StringUtil}
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.ListBuffer
+import com.oranda.libanius.io.PlatformIO
 
+import WordMappingValueSet._
+import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.dependencies.AppDependencies
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
  * TODO: try again to convert this to a Set.
  */
-case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {    
-  
+case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {
+
+  val l = AppDependencies.logger
+
   override def toString = values.toString
     
   // Example: contract:696,697;698/treaty:796;798
@@ -97,7 +103,9 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {
 }
 
 
-object WordMappingValueSet extends Platform {
+object WordMappingValueSet {
+
+  val l = AppDependencies.logger
 
   def combineValueSets(valueSets: Iterable[WordMappingValueSetWrapperBase]):
       List[WordMappingValue] =
@@ -109,14 +117,14 @@ object WordMappingValueSet extends Platform {
   def fromCustomFormat(str: String): WordMappingValueSet = {
 
     val values = new ListBuffer[WordMappingValue]()
-    val wmvsSplitter = getSplitter('/')
+    val wmvsSplitter = AppDependencies.stringSplitterFactory.getSplitter('/')
     def parseFromCustomFormat {
       wmvsSplitter.setString(str)
       while (wmvsSplitter.hasNext)
         values += WordMappingValue.fromCustomFormat(wmvsSplitter.next)
     }
     Try(parseFromCustomFormat) recover {
-      case e: Exception => logError("WordMappingValueSet: Could not parse str " + str, e)
+      case e: Exception => l.logError("WordMappingValueSet: Could not parse str " + str, e)
     }
     WordMappingValueSet(values.toList)
   }

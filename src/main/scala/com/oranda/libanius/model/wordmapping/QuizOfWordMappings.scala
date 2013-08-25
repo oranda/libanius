@@ -19,14 +19,18 @@ package com.oranda.libanius.model.wordmapping
 import scala.collection.immutable._
 
 import com.oranda.libanius.model.{UserAnswer, Quiz}
-import com.oranda.libanius.util.{StringUtil, Platform}
-import com.oranda.libanius.{Conf}
+import com.oranda.libanius.util.{StringUtil}
 
 import scala.math.BigDecimal.double2bigDecimal
 import scala.collection.immutable.List
+import com.oranda.libanius.dependencies.{Conf, AppDependencies}
+import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.dependencies.Conf
 
 case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet())
-    extends Quiz with Platform {
+    extends Quiz {
+
+  val l = AppDependencies.logger
 
   def copy(newPromptNumber: Int) = new QuizOfWordMappings(wordMappingGroups)
 
@@ -60,17 +64,17 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
   }
      
   def findValuesFor(keyWord: String, header: QuizGroupHeader): List[String] = {
-    log("Looking for values for " + keyWord + " in " + header)
+    l.log("Looking for values for " + keyWord + " in " + header)
 
     findWordMappingGroup(header) match {
       case Some(quizGroup) => quizGroup.findValueSetFor(keyWord) match {
         case Some(wordMappingValueSet) => wordMappingValueSet.strings.toList
-        case _ => log("quizGroup numKeyWords = " + quizGroup.numKeyWords)
-            log("quizGroup first 10 wordMappings: " + quizGroup.wordMappings.take(10))
-            logError("could not find valueSet for keyWord " + keyWord)
-            Nil
+        case _ => l.log("quizGroup numKeyWords = " + quizGroup.numKeyWords)
+          l.log("quizGroup first 10 wordMappings: " + quizGroup.wordMappings.take(10))
+          l.logError("could not find valueSet for keyWord " + keyWord)
+          Nil
       }
-      case _ => logError("could not find quizGroup for " + header)
+      case _ => l.logError("could not find quizGroup for " + header)
           Nil
     }
   }
@@ -152,7 +156,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
   def addWordMappingToFrontOfTwoGroups(header: QuizGroupHeader,
       keyWord: String, value: String): QuizOfWordMappings = {
 
-    log("Adding to 2 wmgs: " + keyWord + "," + value)
+    l.log("Adding to 2 wmgs: " + keyWord + "," + value)
     // E.g. add to the English -> German group
     val quizUpdated1 = addWordMappingToFront(header, keyWord, value)
     
@@ -180,7 +184,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
    * search just failed. The point of this is to improve performance for the next search.
    */
   def updateRangeForFailedWmgs(wmgsFailed: List[WordMappingGroup]): QuizOfWordMappings = {
-    log("updating search ranges for wmgs: " + wmgsFailed.map(_.header).mkString(";"))
+    l.log("updating search ranges for wmgs: " + wmgsFailed.map(_.header).mkString(";"))
     val wmgsWithUpdatedRange = wmgsFailed.map(_.updatedSearchRange)
     wmgsWithUpdatedRange.foldLeft(this)((acc, wmg) => acc.addWordMappingGroup(wmg))
   }
@@ -194,7 +198,7 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
   override def scoreSoFar: BigDecimal = {  // out of 1.0
     val _numItemsAndCorrectAnswers = numItemsAndCorrectAnswers
     val scoreSoFar = _numItemsAndCorrectAnswers._2.toDouble / 
-        (_numItemsAndCorrectAnswers._1 * Conf.conf.numCorrectAnswersRequired).toDouble
+        (_numItemsAndCorrectAnswers._1 * AppDependencies.conf.numCorrectAnswersRequired).toDouble
     scoreSoFar
   } 
   
@@ -216,7 +220,9 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
   }
 }
 
-object QuizOfWordMappings extends Platform {
+object QuizOfWordMappings {
+
+  val l = AppDependencies.logger
 
   def findWordMappingGroup(wmgs: Set[WordMappingGroup], header: QuizGroupHeader):
       Option[WordMappingGroup] =
@@ -228,21 +234,17 @@ object QuizOfWordMappings extends Platform {
   }
 
   def fromCustomFormat(str: String): QuizOfWordMappings = {
-    
     var quiz = QuizOfWordMappings()
-    
     val wmgHeadings = str.split("wordMappingGroup").tail
 
     wmgHeadings.foreach {
-      wmgHeading => quiz = quiz.addWordMappingGroup(
-          WordMappingGroup(QuizGroupHeader(wmgHeading)))
+      wmgHeading => quiz = quiz.addWordMappingGroup(WordMappingGroup(QuizGroupHeader(wmgHeading)))
     }
     quiz
   }
 
-
   def demoQuiz(wmgsData: List[String] = demoDataInCustomFormat): QuizOfWordMappings = {
-    log("Using demo data")
+    l.log("Using demo data")
     val wmgs = wmgsData.map(WordMappingGroup.fromCustomFormat(_))
     wmgs.foldLeft(QuizOfWordMappings())((acc, wmg) => acc.addWordMappingGroup(wmg))
     // TODO: watch out when we're saving, we're not overwriting anything
@@ -262,6 +264,7 @@ object QuizOfWordMappings extends Platform {
     "unterwegs|en route\n" +
     "Vertrag|contract/treaty\n" +
     "wider|against\n" +
-    "unterhalten|entertain")
+    "unterhalten|entertain"
+  )
 
 }

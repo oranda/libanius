@@ -18,15 +18,17 @@ package com.oranda.libanius.model.wordmapping
 
 import scala.collection.JavaConversions.mapAsScalaMap
 
-import com.oranda.libanius.util.Platform
 import scala.collection.immutable.Stream
 import scala.util.Try
+import com.oranda.libanius.io.PlatformIO
+import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.dependencies.AppDependencies
 
 /**
  * A dictionary. A large read-only repository of word mappings, structured as a map
  * for fast access.
  */
-case class Dictionary() extends Platform {
+class Dictionary {
 
   // When populating, the java.util map is faster than the mutable Scala map
   private val wordMappings = new java.util.LinkedHashMap[String, WordMappingValueSetWrapperBase]
@@ -57,9 +59,11 @@ case class Dictionary() extends Platform {
 
 object Dictionary {
 
+  val l = AppDependencies.logger
+
   def fromWordMappings(wordMappingsStream: Stream[WordMappingPair]) =
     new Dictionary() {
-      log("converting wordMappings to dictionary form")
+      l.log("converting wordMappings to dictionary form")
       wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
     }
 
@@ -96,7 +100,7 @@ object Dictionary {
       }
 
       Try(parseCustomFormat) recover {
-        case e: Exception => logError("Could not parse dictionary: " + e.getMessage(), e)
+        case e: Exception => l.logError("Could not parse dictionary: " + e.getMessage(), e)
         None
       }
     }

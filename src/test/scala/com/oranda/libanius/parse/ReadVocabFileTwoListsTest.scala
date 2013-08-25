@@ -18,7 +18,7 @@ package com.oranda.libanius.parse
 
 import scala.xml.PrettyPrinter
 import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
-import com.oranda.libanius.Conf
+import com.oranda.libanius.dependencies.Conf
 
 object ReadVocabFileTwoListsTest {
 

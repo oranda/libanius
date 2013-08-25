@@ -16,8 +16,8 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.Conf
 import com.oranda.libanius.model.UserAnswer
+import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 class WordMappingGroupSpec extends Specification {
   
@@ -36,7 +36,7 @@ class WordMappingGroupSpec extends Specification {
         "rides|reitet\n" +
         "sweeps|streicht"
 
-    Conf.setUpForTest()
+    AppDependencies.conf = Conf.setUpForTest()
 
     val wmg = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
     

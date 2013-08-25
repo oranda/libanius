@@ -12,22 +12,12 @@ Suggestions for new features and code improvements will be happily received by:
 James McCabe <james@oranda.com>
 
 
-Install
-=======
+Usage
+=====
 
-On your Android phone, use Play Store to search for Libanius, and follow the instructions. In
-case you don't find it, the URL is:
+Usually Libanius will be run through an interface such as https://github.com/oranda/libanius-android, but a console UI is provided in this project. From SBT, type:
 
-https://play.google.com/store/apps/details?id=com.oranda.libanius
-
-This includes demo data.
-
-
-Screenshots
-===========
-
-![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshotQuizV05.png)
-![Libanius](https://github.com/oranda/libanius/raw/master/docs/screenshotOptionsV072_480.png)
+run
 
 
 License

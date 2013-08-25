@@ -25,7 +25,7 @@ case class UserAnswer(val wasCorrect: Boolean, val promptNumber: Int) extends Mo
 }
 
 object UserAnswer {
-  def fromXML(node: xml.Node): UserAnswer =
+  def fromXML(node: scala.xml.Node): UserAnswer =
 	  new UserAnswer(wasCorrect = (node \ "@wasCorrect").text.toBoolean,
 	      promptNumber = (node \ "@promptNumber").text.toInt)
     

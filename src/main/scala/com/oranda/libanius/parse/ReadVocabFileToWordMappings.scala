@@ -21,13 +21,15 @@ import scala.io.BufferedSource
 import scala.io.Source
 import com.oranda.libanius.io.StandardIO
 import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
-import com.oranda.libanius.{DataStore, Conf}
+import com.oranda.libanius.dependencies.{Conf, AppDependencies}
 
-abstract class ReadVocabFileToWordMappings extends DataStore {
+abstract class ReadVocabFileToWordMappings {
+
+  private[this] lazy val dataStore = AppDependencies.dataStore
 
   def fileVocab: String
   def pathVocab = "data/" + fileVocab
-  def pathQuiz = "data/" + Conf.conf.fileQuiz
+  def pathQuiz = "data/" + AppDependencies.conf.fileQuiz
 
   /*
   def readQuizAndVocabFile: QuizOfWordMappings = {
@@ -63,8 +65,8 @@ abstract class ReadVocabFileToWordMappings extends DataStore {
     val quiz = readVocabFile(new QuizOfWordMappings())
     println("quiz first wmg length is " + quiz.wordMappingGroups.toList(0).wordMappingKeys.length)
     println("Finished reading (quiz and) vocab file... Now writing quiz to " + pathQuiz + "...")
-    StandardIO.save(pathQuiz, quiz.toCustomFormat.toString)
-    saveWmgs(quiz, path = "data/")
+    new StandardIO().save(pathQuiz, quiz.toCustomFormat.toString)
+    dataStore.saveQuiz(quiz, path = "data/")
     println("Finished writing " + quiz.numKeyWords + " words with their translations!")
   }
 }

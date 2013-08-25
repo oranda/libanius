@@ -16,21 +16,23 @@
 
 package com.oranda.libanius.io
 
-import java.io.File
-import java.io.FileWriter
+import java.io._
 import scala.io.Source
+import com.oranda.libanius.model.wordmapping.QuizGroupHeader
+import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
+class StandardIO extends PlatformIO {
 
-object StandardIO {
+  private[this] lazy val conf = AppDependencies.conf
 
-  def readFile(fileName: String): String = {
+  def readFile(fileName: String): Option[String] = {
+    l.log("Reading file " + fileName)
     val myFile = new File(fileName)
     val src = Source.fromFile(myFile)
-    src.mkString
+    Some(src.mkString)
   }    
   
   def save(fileName: String, strToSave: String) {
-    val file = new File(fileName)
     writeToFile(fileName, strToSave)
   }
   
@@ -40,9 +42,29 @@ object StandardIO {
   private def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
 	  try { f(param) } finally { param.close() }
 
-  def log(message: String, module: String = "QuizScreen", t: Option[Throwable] = None) {
-    System.out.println(module + ": " + message)
-    t.foreach(_.printStackTrace())
+  def readResource(resName: String): Option[String] =
+    readFile(conf.resourcesDir + resName)
+
+  override def readWmgMetadataFromFile(wmgFileName: String): Option[QuizGroupHeader] =
+    readWmgMetadata(conf.filesDir + wmgFileName)
+
+  override def readWmgMetadataFromResource(wmgResName: String): Option[QuizGroupHeader] =
+    readWmgMetadata(conf.resourcesDir + wmgResName)
+
+  private def readWmgMetadata(wmgPath: String): Option[QuizGroupHeader] = {
+    val file = new File(wmgPath)
+    if (file.exists) {
+      l.log("readWmgMetadata: reading file " + wmgPath)
+      readWmgMetadata(new FileInputStream(file))
+    } else {
+      l.logError("File not found: " + wmgPath)
+      None
+    }
   }
-  
+
+  override def findWmgFileNamesFromFilesDir =
+    new File(conf.filesDir).listFiles.filter(_.getName.endsWith(".wmg")).map(_.getName)
+
+  override def findWmgFileNamesFromResources =
+    new File(conf.resourcesDir).listFiles.filter(_.getName.startsWith("wmg")).map(_.getName)
 }
