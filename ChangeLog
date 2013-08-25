@@ -1,11 +1,11 @@
-== 0.8 August 25 2103
+== 0.8 August 25 2013
 
   * Split Libanius into two projects:
    libanius - data model, core processing, and a Console UI
    libanius-android - Android UI, using libanius as a library JAR
 
 
-== 0.741 August 10 2103
+== 0.741 August 10 2013
 
   * Eliminated some mutable state (Dictionary) that was causing a problem.
 
