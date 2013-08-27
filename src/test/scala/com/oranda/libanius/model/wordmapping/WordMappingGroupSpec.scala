@@ -16,7 +16,7 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.model.UserAnswer
+import com.oranda.libanius.model.{QuizValueWithUserAnswers, QuizItemViewWithChoices, UserAnswer}
 import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 class WordMappingGroupSpec extends Specification {
@@ -24,7 +24,7 @@ class WordMappingGroupSpec extends Specification {
   "a word-mapping group" should {
 
     val wmgCustomFormat =
-        "wordMappingGroup keyType=\"English word\" valueType=\"German word\" currentPromptNumber=\"0\"\n" +
+        "quizGroup type=\"WordMapping\" keyType=\"English word\" valueType=\"German word\" currentPromptNumber=\"0\"\n" +
         "against|wider\n" +
         "entertain|unterhalten\n" +
         "teach|unterrichten\n" +
@@ -39,8 +39,6 @@ class WordMappingGroupSpec extends Specification {
     AppDependencies.conf = Conf.setUpForTest()
 
     val wmg = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
-    
-    sequential
 
     "be parseable from custom format" in {
       wmg.currentPromptNumber mustEqual 0
@@ -68,10 +66,10 @@ class WordMappingGroupSpec extends Specification {
     
     "generate false answers similar to a correct answer" in {
       val wmvs = WordMappingValueSet()
-      wmvs.addValueToEnd(new WordMappingValue("unterhalten"))
+      wmvs.addValueToEnd(new QuizValueWithUserAnswers("unterhalten"))
       val falseAnswers = wmg.makeFalseSimilarAnswers(
-          wordMappingCorrectValues = wmvs,
-          correctValue = new WordMappingValue("unterhalten"), 
+          correctValues = WordMappingValueSetWrapper(wmvs),
+          correctValue = new QuizValueWithUserAnswers("unterhalten"),
           numCorrectAnswersSoFar = 2, numFalseAnswersRequired = 5)
       falseAnswers.contains("unterrichten") mustEqual true
     }
@@ -81,8 +79,9 @@ class WordMappingGroupSpec extends Specification {
       quizItem.isDefined mustEqual true
       // Each time a quiz item is pulled, a user answer must be set
       val wmgUpdated = wmg.updateWithUserAnswer(quizItem.get.keyWord,
-          quizItem.get.wmvs, quizItem.get.wordMappingValue, new UserAnswer(true, 0))
-      (wmgUpdated, (quizItem.get.keyWord, quizItem.get.wordMappingValue.value))
+          quizItem.get.wmvs.asInstanceOf[WordMappingValueSet],
+          quizItem.get.quizValue, new UserAnswer(true, 0))
+      (wmgUpdated, (quizItem.get.keyWord, quizItem.get.quizValue.value))
     }
 
     "find a presentable quiz item" in {
@@ -128,23 +127,23 @@ class WordMappingGroupSpec extends Specification {
       updateWithUserAnswer(wmg, quizItem)
     }
 
-    def updateWithUserAnswer(wmg: WordMappingGroup, quizItem: QuizItemViewWithChoices) = {
+    def updateWithUserAnswer(wmg: WordMappingGroup, quizItem: QuizItemViewWithChoices[_]) = {
       val userAnswer = new UserAnswer(true, wmg.currentPromptNumber)
-      wmg.updateWithUserAnswer(quizItem.keyWord, quizItem.wmvs,
-          quizItem.wordMappingValue, userAnswer).updatedPromptNumber
+      wmg.updateWithUserAnswer(quizItem.keyWord, quizItem.wmvs.asInstanceOf[WordMappingValueSet],
+          quizItem.quizValue, userAnswer).updatedPromptNumber
     }
 
     "should present an item that has been answered before after five prompts" in {
       var wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
       val quizItem0 = wmgLocal.findPresentableQuizItem.get
-      quizItem0.wordMappingValue.value mustEqual "wider"
+      quizItem0.quizValue.value mustEqual "wider"
       wmgLocal = updateWithUserAnswer(wmgLocal, quizItem0)
 
       for (promptNum <- 1 until 5)
         wmgLocal = pullQuizItemAndAnswerCorrectly(wmgLocal)
 
       val quizItem5 = wmgLocal.findPresentableQuizItem
-      quizItem5.get.wordMappingValue.value mustEqual "wider"
+      quizItem5.get.quizValue.value mustEqual "wider"
     }
   }
       

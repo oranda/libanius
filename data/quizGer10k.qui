@@ -1,2 +1,2 @@
 quizOfWordMappings
-wordMappingGroup keyType="English word" valueType="German word"
+quizGroup type="WordMapping" keyType="English word" valueType="German word"

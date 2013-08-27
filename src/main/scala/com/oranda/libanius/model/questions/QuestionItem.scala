@@ -19,14 +19,13 @@ package com.oranda.libanius.model.questions
 import scala.xml.Node
 import com.oranda.libanius.model.UserAnswer
 import scala.util.matching.Regex
-import com.oranda.libanius.model.QuizItemWithUserAnswers
-import com.oranda.libanius.model.wordmapping.WordMappingValue
-import com.oranda.libanius.dependencies.{AppDependencies, Conf}
+import com.oranda.libanius.model.QuizValueWithUserAnswers
+import com.oranda.libanius.dependencies.AppDependencies
 
-case class QuestionItem(val correctAnswersInARow: List[UserAnswer] = Nil,
-                   val incorrectAnswers: List[UserAnswer] = Nil)
-    extends QuizItemWithUserAnswers[QuestionItem](correctAnswersInARow, incorrectAnswers) {
-
+case class QuestionItem(/*override val correctAnswersInARow: List[UserAnswer] = Nil,
+                   override val incorrectAnswers: List[UserAnswer] = Nil*/) /*
+    extends QuizValueWithUserAnswers[QuestionItem](correctAnswersInARow, incorrectAnswers)*/ {
+  /*
   def self = this
 
   // TODO: make these vals
@@ -121,11 +120,13 @@ case class QuestionItem(val correctAnswersInARow: List[UserAnswer] = Nil,
         (userAnswers map (u => u.toCustomFormat + ":")).reduceLeft[String](_+_)
     }
     customFormat
-  }  
+  }
+  */
 }
 
 
 object QuestionItem {
+  /*
     def fromXML(node: scala.xml.Node): QuestionItem =
       new QuestionItem() {
         question = (node \ "question").text
@@ -146,5 +147,5 @@ object QuestionItem {
           answersStrings.foreach(answerString => 
             addUserAnswer(UserAnswer.fromCustomFormat(answerString)))
         }
-    }
+    }*/
 }

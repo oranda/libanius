@@ -17,7 +17,7 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.model.Criteria
+import com.oranda.libanius.model.{QuizValueWithUserAnswers, Criteria}
 import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 class WordMappingValueSpec extends Specification {
@@ -28,9 +28,7 @@ class WordMappingValueSpec extends Specification {
 
     AppDependencies.conf = Conf.setUpForTest()
     
-    val wmv = WordMappingValue.fromCustomFormat(wmvCustomFormat)
-    
-    sequential 
+    val wmv = QuizValueWithUserAnswers.fromCustomFormat(wmvCustomFormat)
     
     "be parseable from custom format" in {
       wmv.value mustEqual "nachlösen"
@@ -52,7 +50,7 @@ class WordMappingValueSpec extends Specification {
     "know the number of times in a row it was answered correctly by the user" in {
       wmv.numCorrectAnswersInARow must be equalTo 2
     }
-    def isPresentable(wmv: WordMappingValue, numCorrectAnswersInARowDesired: Int,
+    def isPresentable(wmv: QuizValueWithUserAnswers, numCorrectAnswersInARowDesired: Int,
         diffInPromptNumMinimum: Int, currentPromptNum: Int) = {
       val criteria = Criteria(numCorrectAnswersInARowDesired, diffInPromptNumMinimum)
       criteria.isPresentable(currentPromptNum, wmv.promptNumInMostRecentAnswer,

@@ -31,29 +31,27 @@ import com.oranda.libanius.dependencies.AppDependencies
 class Dictionary {
 
   // When populating, the java.util map is faster than the mutable Scala map
-  private val wordMappings = new java.util.LinkedHashMap[String, WordMappingValueSetWrapperBase]
+  private val wordMappings = new java.util.LinkedHashMap[String, WordMappingValueSet]
 
   def numKeyWords = wordMappings.size
   
-  def mappingsForKeysBeginningWith(keyStart: String):
-      List[(String, WordMappingValueSetWrapperBase)] = {
+  def mappingsForKeysBeginningWith(keyStart: String): List[(String, WordMappingValueSet)] = {
     val matchingKeys = wordMappings.keys.filter(_.toLowerCase.startsWith(keyStart.toLowerCase))
     pairListForKeys(matchingKeys, 5)
   }  
    
-  def mappingsForKeysContaining(keyPart: String):
-      List[(String, WordMappingValueSetWrapperBase)] = {
+  def mappingsForKeysContaining(keyPart: String): List[(String, WordMappingValueSet)] = {
     val matchingKeys = wordMappings.keys.filter(_.toLowerCase.contains(keyPart.toLowerCase))
     pairListForKeys(matchingKeys, 5)
   }
   
   def pairListForKeys(keys: Iterable[String], size: Int):
-      List[(String, WordMappingValueSetWrapperBase)] = {
+      List[(String, WordMappingValueSet)] = {
     val keysSubset = keys.toList.sorted.slice(0, size)
     keysSubset.map(key => (key, wordMappings.get(key)))
   }
   
-  def findValuesFor(keyWord: String): WordMappingValueSetWrapperBase = wordMappings.get(keyWord)
+  def findValuesFor(keyWord: String): WordMappingValueSet = wordMappings.get(keyWord)
 }
 
 
@@ -61,7 +59,7 @@ object Dictionary {
 
   val l = AppDependencies.logger
 
-  def fromWordMappings(wordMappingsStream: Stream[WordMappingPair]) =
+  def fromWordMappings(wordMappingsStream: Stream[WordMappingQuizPair]) =
     new Dictionary() {
       l.log("converting wordMappings to dictionary form")
       wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
@@ -71,7 +69,7 @@ object Dictionary {
   /*
    * Example:
    *
-   * wordMappingGroup keyType="English word" valueType="German word"
+   * quizGroup type="WordMapping" keyType="English word" valueType="German word"
    *    against|wider
    *    entertain|unterhalten
    */

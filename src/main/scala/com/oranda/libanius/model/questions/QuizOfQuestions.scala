@@ -20,7 +20,8 @@ import scala.collection.mutable.LinkedHashSet
 import com.oranda.libanius.model.Quiz
 
 // This class is old, needs updating
-class QuizOfQuestions(val currentPromptNumber: Int) extends Quiz {
+abstract class QuizOfQuestions(val currentPromptNumber: Int) extends Quiz {
+  /*
   // TODO: convert to an immutable parameter
   private[this] val questionItems : LinkedHashSet[QuestionItem] = new LinkedHashSet()
   
@@ -94,5 +95,5 @@ object QuizOfQuestions {
           addItem(Some(QuestionItem.fromCustomFormat(line))))
     }
   }
-
+   */
 }

@@ -18,6 +18,7 @@ package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{AppDependencies, Conf}
+import com.oranda.libanius.model.QuizValueWithUserAnswers
 
 class WordMappingValueSetSpec extends Specification {
 
@@ -29,9 +30,6 @@ class WordMappingValueSetSpec extends Specification {
 
     val wmvs = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
 
-
-    sequential
-
     "be parseable from custom format" in {
       wmvs.containsValue("treaty")
       wmvs.size mustEqual 2
@@ -40,7 +38,7 @@ class WordMappingValueSetSpec extends Specification {
 
     "allow a word-mapping-value to be added" in {
       val wmvsLocal = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
-      val wmvsNew = wmvsLocal.addValueToEnd(new WordMappingValue("agreement"))
+      val wmvsNew = wmvsLocal.addValueToEnd(new QuizValueWithUserAnswers("agreement"))
       wmvsNew.size mustEqual 3
     }
     
@@ -52,7 +50,7 @@ class WordMappingValueSetSpec extends Specification {
     }
 
     "remove a value" in {
-      val wmvsUpdated = wmvs.removeValue(WordMappingValue("contract"))
+      val wmvsUpdated = wmvs.removeValue(QuizValueWithUserAnswers("contract"))
       wmvsUpdated.containsValue("contract") mustEqual false
     }
   }

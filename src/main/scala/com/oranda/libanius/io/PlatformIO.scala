@@ -17,9 +17,9 @@
 package com.oranda.libanius.io
 
 import java.io._
-import com.oranda.libanius.model.wordmapping._
 import scala.util.Try
 import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.model.QuizGroupHeader
 
 /*
  * Encapsulate platform-specific code.
@@ -34,24 +34,24 @@ trait PlatformIO {
 
   def writeToFile(fileName: String, data: String)
 
-  def readWmgMetadataFromFile(wmgFileName: String): Option[QuizGroupHeader]
+  def readQgMetadataFromFile(qgFileName: String): Option[QuizGroupHeader]
 
-  def readWmgMetadataFromResource(wmgResName: String): Option[QuizGroupHeader]
+  def readQgMetadataFromResource(qgResName: String): Option[QuizGroupHeader]
 
   def readResource(resName: String): Option[String]
 
-  def findWmgFileNamesFromFilesDir: Array[String]
+  def findQgFileNamesFromFilesDir: Array[String]
 
-  def findWmgFileNamesFromResources: Array[String]
+  def findQgFileNamesFromResources: Array[String]
 
-  def readWmgMetadata(inStream: InputStream): Option[QuizGroupHeader] = {
+  def readQgMetadata(inStream: InputStream): Option[QuizGroupHeader] = {
     var firstLine = ""
     (for {
       firstLine <- Try(readFirstLine(inStream))
-      wmgMetadata <- Try(Some(QuizGroupHeader(firstLine)))
-    } yield wmgMetadata).recover {
+      qgMetadata <- Try(Some(QuizGroupHeader(firstLine)))
+    } yield qgMetadata).recover {
       case e: Exception =>
-        l.logError("Could not read wmg file, firstLine " + firstLine, e)
+        l.logError("Could not read qg file, firstLine " + firstLine, e)
         None
     }.get
   }

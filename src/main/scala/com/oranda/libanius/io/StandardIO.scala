@@ -18,8 +18,8 @@ package com.oranda.libanius.io
 
 import java.io._
 import scala.io.Source
-import com.oranda.libanius.model.wordmapping.QuizGroupHeader
-import com.oranda.libanius.dependencies.{AppDependencies, Conf}
+import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.model.QuizGroupHeader
 
 class StandardIO extends PlatformIO {
 
@@ -45,26 +45,26 @@ class StandardIO extends PlatformIO {
   def readResource(resName: String): Option[String] =
     readFile(conf.resourcesDir + resName)
 
-  override def readWmgMetadataFromFile(wmgFileName: String): Option[QuizGroupHeader] =
-    readWmgMetadata(conf.filesDir + wmgFileName)
+  override def readQgMetadataFromFile(qgFileName: String): Option[QuizGroupHeader] =
+    readQgMetadata(conf.filesDir + qgFileName)
 
-  override def readWmgMetadataFromResource(wmgResName: String): Option[QuizGroupHeader] =
-    readWmgMetadata(conf.resourcesDir + wmgResName)
+  override def readQgMetadataFromResource(qgResName: String): Option[QuizGroupHeader] =
+    readQgMetadata(conf.resourcesDir + qgResName)
 
-  private def readWmgMetadata(wmgPath: String): Option[QuizGroupHeader] = {
-    val file = new File(wmgPath)
+  private def readQgMetadata(qgPath: String): Option[QuizGroupHeader] = {
+    val file = new File(qgPath)
     if (file.exists) {
-      l.log("readWmgMetadata: reading file " + wmgPath)
-      readWmgMetadata(new FileInputStream(file))
+      l.log("readQgMetadata: reading file " + qgPath)
+      readQgMetadata(new FileInputStream(file))
     } else {
-      l.logError("File not found: " + wmgPath)
+      l.logError("File not found: " + qgPath)
       None
     }
   }
 
-  override def findWmgFileNamesFromFilesDir =
-    new File(conf.filesDir).listFiles.filter(_.getName.endsWith(".wmg")).map(_.getName)
+  override def findQgFileNamesFromFilesDir =
+    new File(conf.filesDir).listFiles.filter(_.getName.endsWith(".qg")).map(_.getName)
 
-  override def findWmgFileNamesFromResources =
-    new File(conf.resourcesDir).listFiles.filter(_.getName.startsWith("wmg")).map(_.getName)
+  override def findQgFileNamesFromResources =
+    new File(conf.resourcesDir).listFiles.filter(_.getName.startsWith("qg")).map(_.getName)
 }

@@ -18,14 +18,13 @@ package com.oranda.libanius.model.wordmapping
 
 import scala.collection.immutable._
 
-import com.oranda.libanius.model.{UserAnswer, Quiz}
-import com.oranda.libanius.util.{StringUtil}
+import com.oranda.libanius.model._
+import com.oranda.libanius.util.StringUtil
 
 import scala.math.BigDecimal.double2bigDecimal
 import scala.collection.immutable.List
-import com.oranda.libanius.dependencies.{Conf, AppDependencies}
 import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.dependencies.Conf
+import com.oranda.libanius.model
 
 case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet())
     extends Quiz {
@@ -39,38 +38,38 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
    *
    * Example:
    * quizOfWordMappings
-   * wordMappingGroup keyType="German word" valueType="English word"
-   * wordMappingGroup keyType="English word" valueType="German word"
+   * quizGroup type="WordMapping" keyType="German word" valueType="English word"
+   * quizGroup type="WordMapping" keyType="English word" valueType="German word"
    */
   def toCustomFormat: StringBuilder = {
     // For efficiency, avoiding Scala's own StringBuilder and mkString
     val strBuilder = new StringBuilder("quizOfWordMappings\n")
 
     def wmgMetadata(strBuilder: StringBuilder, wmg: WordMappingGroup) =
-      strBuilder.append("wordMappingGroup keyType=\"").append(wmg.keyType).
+      strBuilder.append("quizGroup type=\"WordMapping\" keyType=\"").append(wmg.keyType).
           append("\" valueType=\"").append(wmg.valueType).append("\"")
 
     StringUtil.mkString(strBuilder, wordMappingGroups, wmgMetadata, '\n')
   }
 
-  def findOrAddWordMappingGroup(header: QuizGroupHeader):
+  def findOrAddWordMappingGroup(header: model.QuizGroupHeader):
       (QuizOfWordMappings, WordMappingGroup) = {
     val wordMappingGroup = findWordMappingGroup(header)
     wordMappingGroup match {
       case Some(wordMappingGroup) => (this, wordMappingGroup)
-      case None => val wordMappingGroup = WordMappingGroup(header)
+      case None => val wordMappingGroup: WordMappingGroup = WordMappingGroup(header)
                    (addWordMappingGroup(wordMappingGroup), wordMappingGroup)
-    }    
+    }
   }
-     
-  def findValuesFor(keyWord: String, header: QuizGroupHeader): List[String] = {
+
+  def findValuesFor(keyWord: String, header: model.QuizGroupHeader): List[String] = {
     l.log("Looking for values for " + keyWord + " in " + header)
 
     findWordMappingGroup(header) match {
       case Some(quizGroup) => quizGroup.findValueSetFor(keyWord) match {
         case Some(wordMappingValueSet) => wordMappingValueSet.strings.toList
         case _ => l.log("quizGroup numKeyWords = " + quizGroup.numKeyWords)
-          l.log("quizGroup first 10 wordMappings: " + quizGroup.wordMappings.take(10))
+          l.log("quizGroup first 10 wordMappings: " + quizGroup.quizPairs.take(10))
           l.logError("could not find valueSet for keyWord " + keyWord)
           Nil
       }
@@ -79,33 +78,32 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
     }
   }
 
-  def findWordMappingGroup(header: QuizGroupHeader): Option[WordMappingGroup] =
+  def findWordMappingGroup(header: model.QuizGroupHeader): Option[WordMappingGroup] =
     QuizOfWordMappings.findWordMappingGroup(wordMappingGroups, header)
-  
-  def removeWordMappingGroup(header: QuizGroupHeader): QuizOfWordMappings = {
-    //val wordMappingGroup = findWordMappingGroup(keyType, valueType)
+
+  def removeWordMappingGroup(header: model.QuizGroupHeader): QuizOfWordMappings = {
     val wordMappingGroupsFiltered = wordMappingGroups.filterNot(_.header.matches(header))
     new QuizOfWordMappings(wordMappingGroupsFiltered)
-  }
-
-  // This will replace any existing wordMappingGroup with the same key-value pair  
-  def addWordMappingGroup(wmg: WordMappingGroup): QuizOfWordMappings = {
-    val newQuiz = removeWordMappingGroup(wmg.header)
-    new QuizOfWordMappings(newQuiz.wordMappingGroups + wmg)
   }
 
   // Just a synonym for addWordMappingGroup
   def replaceWordMappingGroup(wmg: WordMappingGroup) = addWordMappingGroup(wmg)
 
-  def removeWord(keyWord: String, header: QuizGroupHeader): QuizOfWordMappings = {
+  // This will replace any existing wordMappingGroup with the same key-value pair
+  def addWordMappingGroup(wmg: WordMappingGroup): QuizOfWordMappings = {
+    val newQuiz = removeWordMappingGroup(wmg.header)
+    new QuizOfWordMappings(newQuiz.wordMappingGroups + wmg)
+  }
+
+  def removeWord(keyWord: String, header: model.QuizGroupHeader): QuizOfWordMappings = {
     val wordMappingGroup = findWordMappingGroup(header)
     wordMappingGroup match {
       case Some(wmg) => replaceWordMappingGroup(wmg.removeWordMapping(keyWord))
       case None => this
     }
   }
-  
-  def removeWordMappingValue(keyWord: String, wordMappingValue: WordMappingValue,
+
+  def removeWordMappingValue(keyWord: String, wordMappingValue: QuizValueWithUserAnswers,
       header: QuizGroupHeader): (QuizOfWordMappings, Boolean) = {
     val wordMappingGroup = findWordMappingGroup(header)
     wordMappingGroup match {
@@ -122,10 +120,10 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
    * to return anything.
    */
   def findQuizItem:
-      Pair[Option[(QuizItemViewWithChoices, WordMappingGroup)], List[WordMappingGroup]] = {
+      Pair[Option[(QuizItemViewWithChoices[_], WordMappingGroup)], List[WordMappingGroup]] = {
 
     var failedWmgs = List[WordMappingGroup]()
-    var quizItemPair: Option[(QuizItemViewWithChoices, WordMappingGroup)] = None
+    var quizItemPair: Option[(QuizItemViewWithChoices[_], WordMappingGroup)] = None
 
     val wmgIter = wordMappingGroups.iterator
     while (wmgIter.hasNext && !quizItemPair.isDefined) {
@@ -139,13 +137,13 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
     (quizItemPair, failedWmgs)
   }
 
-  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices, WordMappingGroup)] =
+  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices[_], WordMappingGroup)] =
     (for {
       wmg <- wordMappingGroups.toStream
       quizItem <- wmg.findAnyUnfinishedQuizItem.toStream
     } yield (quizItem, wmg)).headOption
 
-  def addWordMappingToFront(header: QuizGroupHeader, keyWord: String, value: String):
+  def addWordMappingToFront(header: model.QuizGroupHeader, keyWord: String, value: String):
       QuizOfWordMappings = {
     val wmg = findWordMappingGroup(header)
     wmg.map(wmg =>
@@ -153,27 +151,28 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
         getOrElse(this)
   }
 
-  def addWordMappingToFrontOfTwoGroups(header: QuizGroupHeader,
+  def addWordMappingToFrontOfTwoGroups(header: model.QuizGroupHeader,
       keyWord: String, value: String): QuizOfWordMappings = {
 
     l.log("Adding to 2 wmgs: " + keyWord + "," + value)
     // E.g. add to the English -> German group
     val quizUpdated1 = addWordMappingToFront(header, keyWord, value)
-    
+
     // E.g. add to the German -> English group
     val quizUpdated2 = quizUpdated1.addWordMappingToFront(header.reverse, value, keyWord)
 
     quizUpdated2
   }
 
-  def updateWithUserAnswer(isCorrect: Boolean, currentQuizItem: QuizItemViewWithChoices):
+  def updateWithUserAnswer(isCorrect: Boolean, currentQuizItem: QuizItemViewWithChoices[_]):
       QuizOfWordMappings = {
-    val userAnswer = new UserAnswer(isCorrect, currentQuizItem.wmgCurrentPromptNumber)
-    val wmg = findWordMappingGroup(currentQuizItem.quizGroupHeader)
+    val userAnswer = new UserAnswer(isCorrect, currentQuizItem.qgCurrentPromptNumber)
+    val wmg: Option[WordMappingGroup] = findWordMappingGroup(currentQuizItem.quizGroupHeader)
     wmg match {
       case Some(wmg) =>
         val wmgUpdated = wmg.updateWithUserAnswer(currentQuizItem.keyWord,
-            currentQuizItem.wmvs, currentQuizItem.wordMappingValue, userAnswer)
+            currentQuizItem.wmvs.asInstanceOf[WordMappingValueSet],
+            currentQuizItem.quizValue, userAnswer)
         addWordMappingGroup(wmgUpdated)
       case _ => this
     }
@@ -190,32 +189,32 @@ case class QuizOfWordMappings(wordMappingGroups: Set[WordMappingGroup] = ListSet
   }
 
   def numGroups = wordMappingGroups.size
-  
+
   def numKeyWords = wordMappingGroups.foldLeft(0)(_ + _.numKeyWords)
-  
+
   def numItems: Int = wordMappingGroups.foldLeft(0)(_ + _.numValues)
-  
+
   override def scoreSoFar: BigDecimal = {  // out of 1.0
     val _numItemsAndCorrectAnswers = numItemsAndCorrectAnswers
-    val scoreSoFar = _numItemsAndCorrectAnswers._2.toDouble / 
+    val scoreSoFar = _numItemsAndCorrectAnswers._2.toDouble /
         (_numItemsAndCorrectAnswers._1 * AppDependencies.conf.numCorrectAnswersRequired).toDouble
     scoreSoFar
-  } 
-  
+  }
+
   def numCorrectAnswers = numItemsAndCorrectAnswers._2
-    
-  def numItemsAndCorrectAnswers = 
+
+  def numItemsAndCorrectAnswers =
     wordMappingGroups.foldLeft(Pair(0, 0))((acc, group) =>
         (acc._1 + group.numItemsAndCorrectAnswers._1,
          acc._2 + group.numItemsAndCorrectAnswers._2))
-         
+
   def merge(otherQuiz: QuizOfWordMappings): QuizOfWordMappings = {
     val wordMappingGroupsCombined = otherQuiz.wordMappingGroups.foldLeft(wordMappingGroups) {
-      (acc, otherWmg) => 
+      (acc, otherWmg) =>
         val wmg = findWordMappingGroup(otherWmg.header)
         val wmgMerged = otherWmg.merge(wmg)
         wordMappingGroups.filterNot(Some(_) == wmg) + wmgMerged
-    }      
+    }
     new QuizOfWordMappings(wordMappingGroupsCombined)
   }
 }
@@ -224,13 +223,13 @@ object QuizOfWordMappings {
 
   val l = AppDependencies.logger
 
-  def findWordMappingGroup(wmgs: Set[WordMappingGroup], header: QuizGroupHeader):
+  def findWordMappingGroup(wmgs: Set[WordMappingGroup], header: model.QuizGroupHeader):
       Option[WordMappingGroup] =
     wmgs.find(_.header.matches(header))
 
-  def metadataFromCustomFormat(str: String): Set[QuizGroupHeader] = {
+  def metadataFromCustomFormat(str: String): Set[model.QuizGroupHeader] = {
     val wmgHeadings = str.split("wordMappingGroup").tail
-    wmgHeadings.map(QuizGroupHeader(_)).toSet
+    wmgHeadings.map(model.QuizGroupHeader(_)).toSet
   }
 
   def fromCustomFormat(str: String): QuizOfWordMappings = {
@@ -238,7 +237,8 @@ object QuizOfWordMappings {
     val wmgHeadings = str.split("wordMappingGroup").tail
 
     wmgHeadings.foreach {
-      wmgHeading => quiz = quiz.addWordMappingGroup(WordMappingGroup(QuizGroupHeader(wmgHeading)))
+      wmgHeading => val wmg: WordMappingGroup = WordMappingGroup(QuizGroupHeader(wmgHeading))
+                    quiz = quiz.addWordMappingGroup(wmg)
     }
     quiz
   }
@@ -253,14 +253,14 @@ object QuizOfWordMappings {
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
 
-    "wordMappingGroup keyType=\"English word\" valueType=\"German word\" currentPromptNumber=\"0\"\n" +
+    "quizGroup type=\"WordMapping\" keyType=\"English word\" valueType=\"German word\" currentPromptNumber=\"0\"\n" +
     "en route|unterwegs\n" +
     "contract|Vertrag\n" +
     "treaty|Vertrag\n" +
     "against|wider\n" +
     "entertain|unterhalten\n",
 
-    "wordMappingGroup keyType=\"German word\" valueType=\"English word\" currentPromptNumber=\"0\"\n" +
+    "quizGroup type=\"WordMapping\" keyType=\"German word\" valueType=\"English word\" currentPromptNumber=\"0\"\n" +
     "unterwegs|en route\n" +
     "Vertrag|contract/treaty\n" +
     "wider|against\n" +

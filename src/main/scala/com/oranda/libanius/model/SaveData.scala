@@ -16,22 +16,5 @@
 
 package com.oranda.libanius.model
 
-import org.specs2.mutable.Specification
-import com.oranda.libanius.dependencies.{AppDependencies, Conf}
-
-class UserAnswerSpec extends Specification {
-  
-  "a user answer" should {
-
-    AppDependencies.conf = Conf.setUpForTest()
-    
-    val uaXml = <userAnswer wasCorrect="true" promptNumber="1"></userAnswer>
-  
-    val ua = UserAnswer.fromXML(uaXml)
-
-    "be parseable from XML" in {
-      ua.wasCorrect == true
-      ua.promptNumber == 1
-    }
-  }
-}
+// simple value object used for saving a data structure to a file
+case class SaveData(fileName: String, data: String)

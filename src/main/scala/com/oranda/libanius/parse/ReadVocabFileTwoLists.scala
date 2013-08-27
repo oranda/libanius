@@ -21,6 +21,8 @@ import scala.collection.mutable.ListBuffer
 
 import com.oranda.libanius.model.wordmapping._
 import scala.collection.immutable.Stream
+import com.oranda.libanius.model
+import com.oranda.libanius.model.{WordMapping, QuizValueWithUserAnswers}
 
 abstract class ReadVocabFileTwoLists extends ReadVocabFileToWordMappings {
 
@@ -46,10 +48,13 @@ abstract class ReadVocabFileTwoLists extends ReadVocabFileToWordMappings {
   }
 
   def makeWmg(combinedWords: Seq[(String, String)], type1: String, type2: String) = {
+    /* TODO
     val wordMappings = combinedWords.map(keyValue =>
-        WordMappingPair(keyValue._1, WordMappingValueSetWrapper(
-          List(WordMappingValue(keyValue._2)))))
-    WordMappingGroup(QuizGroupHeader(type1, type2), wordMappings.toStream)
+        WordMappingQuizPair(keyValue._1, WordMappingValueSetWrapper(
+          List(QuizValueWithUserAnswers(keyValue._2)))))
+          */
+    WordMappingGroup(model.QuizGroupHeader(WordMapping, type1, type2),
+        Stream.empty /*wordMappings.toStream*/)
   }
   
   def readQuizItemFrequency(word: String) =

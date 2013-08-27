@@ -14,30 +14,33 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.model.wordmapping
+package com.oranda.libanius.model
 
 import scala.util.Random
+import com.oranda.libanius.model.wordmapping.{WordMappingValueSetWrapperBase, WordMappingValueSet, WordMappingQuizPair}
 
 /**
  * Quiz item data holder:
  * contains whatever information is necessary for the view, and for updating the backing data.
  */
-case class QuizItemViewWithChoices(val wmp: WordMappingPair,
-    val wordMappingValue: WordMappingValue,
-    val wmgCurrentPromptNumber: Int,
+class QuizItemViewWithChoices[P <: QuizPair[_]](
+    val quizPair: P,
+    val quizValue: QuizValueWithUserAnswers,
+    val qgCurrentPromptNumber: Int,
     val quizGroupHeader: QuizGroupHeader,
     val falseAnswers: Set[String],
     val numCorrectAnswersInARow: Int) {
 
-  lazy val keyWord = wmp.key
-  lazy val wmvs = wmp.valueSet
+  lazy val keyWord = quizPair.key
+  lazy val wmvs = quizPair.valueSet
   lazy val keyType = quizGroupHeader.keyType
   lazy val valueType = quizGroupHeader.valueType
 
-  lazy val allChoices = choicesInRandomOrder(wordMappingValue, falseAnswers)
+  lazy val allChoices = choicesInRandomOrder(quizValue, falseAnswers)
 
-  def choicesInRandomOrder(wmv: WordMappingValue, otherChoices: Set[String]): List[String] = {
-    val allChoices = otherChoices + wmv.value
+  def choicesInRandomOrder(quizValue: QuizValueWithUserAnswers, otherChoices: Set[String]):
+      List[String] = {
+    val allChoices = otherChoices + quizValue.value
     Random.shuffle(allChoices.toList)
   }
 

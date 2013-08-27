@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oranda.libanius.model.wordmapping
 
-case class SearchResult(quizGroupHeader: QuizGroupHeader, wmp: WordMappingPair) {
-  lazy val keyType = quizGroupHeader.keyType
-  lazy val valueType = quizGroupHeader.valueType
-  lazy val keyWord = wmp.key
-  lazy val valueSet = wmp.valueSet
-}
+package com.oranda.libanius.model
+
+/*
+ * Examples of quiz pairs:
+ *  - a question and an answer in the quiz
+ *  - a word and possible translations
+ */
+class QuizPair[+V](val key: String, val valueSet: V)

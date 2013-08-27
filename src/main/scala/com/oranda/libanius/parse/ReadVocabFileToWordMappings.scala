@@ -63,7 +63,7 @@ abstract class ReadVocabFileToWordMappings {
     Conf.setUpForParsing("quizSpan10k")
     println("Reading vocab file...")
     val quiz = readVocabFile(new QuizOfWordMappings())
-    println("quiz first wmg length is " + quiz.wordMappingGroups.toList(0).wordMappingKeys.length)
+    println("quiz first wmg length is " + quiz.wordMappingGroups.toList(0).quizKeys.length)
     println("Finished reading (quiz and) vocab file... Now writing quiz to " + pathQuiz + "...")
     new StandardIO().save(pathQuiz, quiz.toCustomFormat.toString)
     dataStore.saveQuiz(quiz, path = "data/")

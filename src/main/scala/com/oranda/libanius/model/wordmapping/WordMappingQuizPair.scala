@@ -16,5 +16,9 @@
 
 package com.oranda.libanius.model.wordmapping
 
-case class WordMappingPair(key: String, valueSet: WordMappingValueSetWrapperBase)
+import com.oranda.libanius.model.QuizPair
 
+
+case class WordMappingQuizPair(override val key: String,
+    override val valueSet: WordMappingValueSet)
+  extends QuizPair[WordMappingValueSet](key, valueSet)
