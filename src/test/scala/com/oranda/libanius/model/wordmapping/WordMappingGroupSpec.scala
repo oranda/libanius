@@ -16,12 +16,14 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.model.{QuizValueWithUserAnswers, QuizItemViewWithChoices, UserAnswer}
+import com.oranda.libanius.model._
 import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 class WordMappingGroupSpec extends Specification {
   
   "a word-mapping group" should {
+
+    // main test data
 
     val wmgCustomFormat =
         "quizGroup type=\"WordMapping\" keyType=\"English word\" valueType=\"German word\" currentPromptNumber=\"0\"\n" +
@@ -40,110 +42,29 @@ class WordMappingGroupSpec extends Specification {
 
     val wmg = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
 
-    "be parseable from custom format" in {
-      wmg.currentPromptNumber mustEqual 0
-      wmg.keyType mustEqual "English word"
-      wmg.valueType mustEqual "German word"
-      wmg.toCustomFormat(new StringBuilder()).toString mustEqual wmgCustomFormat
-      wmg.numKeyWords mustEqual 10
+    // test data for conversions with QuizGroup
+
+    val header = QuizGroupHeader(WordMapping, "English word", "German word")
+    val wmPairs = List[WordMappingPair](
+      WordMappingPair("full", WordMappingValueSet("voll", "satt")),
+      WordMappingPair("against", WordMappingValueSet("wider"))
+    )
+    val quizPairs = List[QuizPair](
+      QuizPair("full", "voll"),
+      QuizPair("full", "satt"),
+      QuizPair("against", "wider")
+    )
+
+    val wmgSmall = WordMappingGroup(header, wmPairs.toStream)
+    val dictSmall = Dictionary.fromWordMappings(wmPairs.toStream)
+    val quizGroup = QuizGroup(header, quizPairs.toStream, dictionary = dictSmall)
+
+    "be convertible to a QuizGroup" in {
+      wmgSmall.toQuizGroup mustEqual quizGroup
     }
 
-    "accept the addition of a new word-mapping" in {
-      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
-      wmgLocal.contains("good") mustEqual false
-      val wmgUpdated = wmgLocal.addWordMapping("good", "gut")
-      wmgUpdated.contains("good") mustEqual true
-    }
-
-    "accept new values for an existing word-mapping" in {
-      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
-      val valuesForAgainst = wmgLocal.findValueSetFor("against")
-      valuesForAgainst.isDefined mustEqual true
-      valuesForAgainst.get.size mustEqual 1
-      val wmgUpdated = wmgLocal.addWordMapping("against", "gegen")
-      wmgUpdated.findValueSetFor("against").get.size mustEqual 2
-    }
-    
-    "generate false answers similar to a correct answer" in {
-      val wmvs = WordMappingValueSet()
-      wmvs.addValueToEnd(new QuizValueWithUserAnswers("unterhalten"))
-      val falseAnswers = wmg.makeFalseSimilarAnswers(
-          correctValues = WordMappingValueSetWrapper(wmvs),
-          correctValue = new QuizValueWithUserAnswers("unterhalten"),
-          numCorrectAnswersSoFar = 2, numFalseAnswersRequired = 5)
-      falseAnswers.contains("unterrichten") mustEqual true
-    }
-
-    def pullQuizItem(wmg: WordMappingGroup): (WordMappingGroup, (String, String)) = {
-      val quizItem = wmg.findPresentableQuizItem
-      quizItem.isDefined mustEqual true
-      // Each time a quiz item is pulled, a user answer must be set
-      val wmgUpdated = wmg.updateWithUserAnswer(quizItem.get.keyWord,
-          quizItem.get.wmvs.asInstanceOf[WordMappingValueSet],
-          quizItem.get.quizValue, new UserAnswer(true, 0))
-      (wmgUpdated, (quizItem.get.keyWord, quizItem.get.quizValue.value))
-    }
-
-    "find a presentable quiz item" in {
-      //println("find a presentable quiz item: wmg.wordMappings: " + wmg.wordMappings)
-      pullQuizItem(wmg)._2 mustEqual ("against", "wider")
-    }
-
-    "add a new word mapping to the front of its queue" in {
-      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
-      val wmgUpdated = wmgLocal.addWordMappingToFront("to exchange", "tauschen")
-      pullQuizItem(wmgUpdated)._2 mustEqual ("to exchange", "tauschen")
-    }
-    
-    "move an existing word mapping to the front of its queue" in {
-      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
-      val numKeyWordsBefore = wmgLocal.numKeyWords
-      val wmgUpdated = wmgLocal.addWordMappingToFront("sweeps", "streicht") 
-      val numKeyWordsAfter = wmgUpdated.numKeyWords
-      numKeyWordsAfter mustEqual numKeyWordsBefore 
-      pullQuizItem(wmgUpdated)._2 mustEqual ("sweeps", "streicht")
-    }
-    
-    "move a word mapping to the front of its queue where only the key already exists" in {
-      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
-      val numKeyWordsBefore = wmgLocal.numKeyWords
-      val wmgUpdated = wmgLocal.addWordMappingToFront("entertain", "bewirten") 
-      val numKeyWordsAfter = wmgUpdated.numKeyWords
-      numKeyWordsAfter mustEqual numKeyWordsBefore      
-      pullQuizItem(wmgUpdated)._2 mustEqual ("entertain", "bewirten")
-    }  
-    
-    "add more than one new word mapping to the front of the its queue" in {
-      val wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
-      val wmgUpdated1 = wmgLocal.addWordMappingToFront("to exchange", "tauschen")
-      val wmgUpdated2 = wmgUpdated1.addWordMappingToFront("whole", "ganz")
-      val (wmgUnrolled, (keyWord, value)) = pullQuizItem(wmgUpdated2)
-      (keyWord, value) mustEqual ("whole", "ganz")
-      pullQuizItem(wmgUnrolled)._2 mustEqual ("to exchange", "tauschen")
-    }
-
-    def pullQuizItemAndAnswerCorrectly(wmg: WordMappingGroup): WordMappingGroup = {
-      val quizItem = wmg.findPresentableQuizItem.get
-      updateWithUserAnswer(wmg, quizItem)
-    }
-
-    def updateWithUserAnswer(wmg: WordMappingGroup, quizItem: QuizItemViewWithChoices[_]) = {
-      val userAnswer = new UserAnswer(true, wmg.currentPromptNumber)
-      wmg.updateWithUserAnswer(quizItem.keyWord, quizItem.wmvs.asInstanceOf[WordMappingValueSet],
-          quizItem.quizValue, userAnswer).updatedPromptNumber
-    }
-
-    "should present an item that has been answered before after five prompts" in {
-      var wmgLocal = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
-      val quizItem0 = wmgLocal.findPresentableQuizItem.get
-      quizItem0.quizValue.value mustEqual "wider"
-      wmgLocal = updateWithUserAnswer(wmgLocal, quizItem0)
-
-      for (promptNum <- 1 until 5)
-        wmgLocal = pullQuizItemAndAnswerCorrectly(wmgLocal)
-
-      val quizItem5 = wmgLocal.findPresentableQuizItem
-      quizItem5.get.quizValue.value mustEqual "wider"
+    "be constructible from a QuizGroup" in {
+      WordMappingGroup.fromQuizGroup(quizGroup) mustEqual wmgSmall
     }
   }
       

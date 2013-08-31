@@ -36,7 +36,7 @@ trait Logger {
 
 class LoggerDefault extends Logger {
   override def logImpl(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
-    System.out.println(module + ": " + message)
+    println(module + ": " + message)
     t.foreach(_.printStackTrace())
   }
 }

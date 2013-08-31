@@ -41,13 +41,6 @@ class WordMappingValueSetSpec extends Specification {
       val wmvsNew = wmvsLocal.addValueToEnd(new QuizValueWithUserAnswers("agreement"))
       wmvsNew.size mustEqual 3
     }
-    
-    "identify a word-mapping-value that is presentable in the context of the quiz" in {
-      val wmvsLocal = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
-      val wmvOpt = wmvsLocal.findPresentableWordMappingValue(currentPromptNumber = 800)
-      wmvOpt.isDefined mustEqual true
-      wmvOpt.get.value mustEqual "contract"
-    }
 
     "remove a value" in {
       val wmvsUpdated = wmvs.removeValue(QuizValueWithUserAnswers("contract"))

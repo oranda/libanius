@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.model.wordmapping
+package com.oranda.libanius.model
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{AppDependencies, Conf}
-import com.oranda.libanius.model.{QuizGroupHeader, WordMapping, QuizValueWithUserAnswers}
+import com.oranda.libanius.model._
 
-class QuizOfWordMappingsSpec extends Specification {
+class QuizSpec extends Specification {
   
   "a quiz of word-mappings" should {
     
@@ -44,12 +44,11 @@ class QuizOfWordMappingsSpec extends Specification {
 
     AppDependencies.conf = Conf.setUpForTest()
     
-    val quiz = QuizOfWordMappings.demoQuiz(quizData)
+    val quiz = Quiz.demoQuiz(quizData)
     
     "be parseable from custom format" in {
-      val wmg = quiz.findWordMappingGroup(
-          QuizGroupHeader(WordMapping, "German word", "English word"))
-      wmg.isDefined mustEqual true
+      val qg = quiz.findQuizGroup(QuizGroupHeader(WordMapping, "German word", "English word"))
+      qg.isDefined mustEqual true
       //quiz.toCustomFormat.toString mustEqual quizCustomFormat
     }
     
@@ -68,34 +67,33 @@ class QuizOfWordMappingsSpec extends Specification {
     }    
     
     "delete key-words from a particular group" in {
-      val quizBefore = QuizOfWordMappings.demoQuiz(quizData)
-      val wmgBefore = quizBefore.findWordMappingGroup(
+      val quizBefore = Quiz.demoQuiz(quizData)
+      val wmgBefore = quizBefore.findQuizGroup(
           QuizGroupHeader(WordMapping, "English word", "German word")).get
       wmgBefore.contains("full") mustEqual true
-      val quizAfter = quizBefore.removeWord("full", QuizGroupHeader(WordMapping, "English word", "German word"))
-      val wmgAfter = quizAfter.findWordMappingGroup(
+      val quizAfter = quizBefore.removeKey("full",
+          QuizGroupHeader(WordMapping, "English word", "German word"))
+      val wmgAfter = quizAfter.findQuizGroup(
           QuizGroupHeader(WordMapping, "English word", "German word")).get
       wmgAfter.contains("full") mustEqual false
     }
 
-    "delete a word mapping without deleting the word" in {
-      val quizBefore = QuizOfWordMappings.demoQuiz(quizData)
-      val (quizAfter, wasRemoved) = quizBefore.removeWordMappingValue(
-          keyWord = "Vertrag", wordMappingValue = QuizValueWithUserAnswers("contract"),
+    "delete a quiz pair without deleting all values for that key" in {
+      val quizBefore = Quiz.demoQuiz(quizData)
+      val quizAfter = quizBefore.removeQuizPair(
+          keyWord = "Vertrag", QuizValueWithUserAnswers("contract"),
           QuizGroupHeader(WordMapping, "German word", "English word"))
-
-      wasRemoved mustEqual true
       val translations = quizAfter.findValuesFor(keyWord = "Vertrag",
-          QuizGroupHeader(WordMapping, "German word", "English word")).toSet[String]
+          QuizGroupHeader(WordMapping, "German word", "English word"))
       translations.contains("contract") mustEqual false
       translations.contains("treaty") mustEqual true
     }
 
     "contain unique groups only" in {
-      val quizLocal = QuizOfWordMappings.demoQuiz(quizData)
+      val quizLocal = Quiz.demoQuiz(quizData)
       quizLocal.numGroups mustEqual 2 // precondition
-      val wmg = WordMappingGroup(QuizGroupHeader(WordMapping, "English word", "German word"))
-      val quizUpdated = quizLocal.addWordMappingGroup(wmg) // should have no effect
+      val qg = QuizGroup(QuizGroupHeader(WordMapping, "English word", "German word"))
+      val quizUpdated = quizLocal.addQuizGroup(qg) // should have no effect
       quizUpdated.numGroups mustEqual 2
     }
     

@@ -20,8 +20,8 @@ import java.io.File
 import scala.io.BufferedSource
 import scala.io.Source
 import com.oranda.libanius.io.StandardIO
-import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
 import com.oranda.libanius.dependencies.{Conf, AppDependencies}
+import com.oranda.libanius.model.Quiz
 
 abstract class ReadVocabFileToWordMappings {
 
@@ -45,13 +45,13 @@ abstract class ReadVocabFileToWordMappings {
     quiz
   } */
 
-  def readVocabFile(quiz: QuizOfWordMappings): QuizOfWordMappings = {
+  def readVocabFile(quiz: Quiz): Quiz = {
     val myFile = new File(pathVocab)
     val src = Source.fromFile(myFile)
     readIntoQuiz(src, quiz)
   }
   
-  def readIntoQuiz(src: BufferedSource, quiz: QuizOfWordMappings): QuizOfWordMappings
+  def readIntoQuiz(src: BufferedSource, quiz: Quiz): Quiz
 
   /*
   def readQuiz : QuizOfWordMappings = {
@@ -62,8 +62,8 @@ abstract class ReadVocabFileToWordMappings {
   def main(args: Array[String]) {
     Conf.setUpForParsing("quizSpan10k")
     println("Reading vocab file...")
-    val quiz = readVocabFile(new QuizOfWordMappings())
-    println("quiz first wmg length is " + quiz.wordMappingGroups.toList(0).quizKeys.length)
+    val quiz = readVocabFile(new Quiz())
+    println("quiz first wmg length is " + quiz.quizGroups.toList(0).quizKeys.length)
     println("Finished reading (quiz and) vocab file... Now writing quiz to " + pathQuiz + "...")
     new StandardIO().save(pathQuiz, quiz.toCustomFormat.toString)
     dataStore.saveQuiz(quiz, path = "data/")

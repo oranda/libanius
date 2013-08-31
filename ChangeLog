@@ -1,3 +1,15 @@
+== 0.85 August 31 2013
+
+  * Restructured the data model for clarity and performance
+    ** The central quiz processing entity has changed from WordMappingGroup to QuizGroup,
+       which has a simpler structure and is thus easier to optimize and use generically.
+       There is still a WordMappingGroup, but it is used only for persistence purposes.
+    ** Eliminated the concept of range search. It was an increasingly complex optimization that
+       should be unnecessary.
+    ** Introduced a type parameter for QuizGroups to distinguish between question-answer quizzes
+       and word translation quizzes.
+
+
 == 0.8 August 25 2013
 
   * Split Libanius into two projects:

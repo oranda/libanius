@@ -17,6 +17,7 @@ package com.oranda.libanius.model
 
 import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.model.wordmapping.WordMappingGroup
 
 
 case class QuizGroupHeader(quizGroupType: QuizGroupType, keyType: String, valueType: String)
@@ -24,11 +25,11 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, keyType: String, valueT
   // keyType example: "English word"
   // valueType example: "German word"
 
-  override def toString = keyType + "-" + valueType
+  override def toString = quizGroupType + ": " + keyType + "-" + valueType
 
   def toCustomFormat(strBuilder: StringBuilder) =
-    strBuilder.append("quizGroup type=\"WordMapping\" keyType=\"").append(keyType).
-        append("\" valueType=\"").append(valueType).append("\"")
+    strBuilder.append("quizGroup type=\"").append(quizGroupType).append("\" keyType=\"").
+        append(keyType).append("\" valueType=\"").append(valueType).append("\"")
 
   def matches(other: QuizGroupHeader) =
     keyType == other.keyType && valueType == other.valueType
@@ -37,6 +38,12 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, keyType: String, valueT
   def makeDictFileName = keyType + "-" + valueType + ".dct"
 
   def reverse = QuizGroupHeader(quizGroupType, valueType, keyType)
+
+  // TODO: improve this
+  def createQuizGroup(text: String): QuizGroup = quizGroupType match {
+    case WordMapping => WordMappingGroup.fromCustomFormat(text).toQuizGroup
+    case QuestionAndAnswer => QuizGroup.fromCustomFormat(text)
+  }
 }
 
 object QuizGroupHeader {
@@ -48,7 +55,7 @@ object QuizGroupHeader {
         parseValueType(headerLine))
 
   def parseQuizGroupType(str: String): QuizGroupType = {
-    StringUtil.parseValue(str, "keyType=\"", "\"") match {
+    StringUtil.parseValue(str, "type=\"", "\"") match {
       case "WordMapping" => WordMapping
       case "QuestionAndAnswer" => QuestionAndAnswer
       case _ => l.logError("QuizGroupType " + str + " not recognized")

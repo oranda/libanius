@@ -1,5 +1,4 @@
-/*
- * Copyright 2012-2013 James McCabe <james@oranda.com>
+/* Copyright 2012-2013 James McCabe <james@oranda.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License. You may obtain
@@ -16,9 +15,4 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.model.QuizPair
-
-
-case class WordMappingQuizPair(override val key: String,
-    override val valueSet: WordMappingValueSet)
-  extends QuizPair[WordMappingValueSet](key, valueSet)
+case class WordMappingPair(val key: String, val valueSet: WordMappingValueSet)

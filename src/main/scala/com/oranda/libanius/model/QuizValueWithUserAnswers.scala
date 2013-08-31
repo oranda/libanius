@@ -102,6 +102,7 @@ case class QuizValueWithUserAnswers(value: String,
   def hasSameEnd(otherValue: String) =
     (numOfLetters: Int) => otherValue != value &&
       value.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
+
 }
 
 object QuizValueWithUserAnswers {

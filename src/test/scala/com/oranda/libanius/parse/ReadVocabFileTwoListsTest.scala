@@ -17,15 +17,15 @@
 package com.oranda.libanius.parse
 
 import scala.xml.PrettyPrinter
-import com.oranda.libanius.model.wordmapping.QuizOfWordMappings
 import com.oranda.libanius.dependencies.Conf
+import com.oranda.libanius.model.Quiz
 
 object ReadVocabFileTwoListsTest {
 
   def main(args: Array[String]) {
    /* 
     val quizXml = 
-<quizOfWordMappings currentPromptNumber="0">
+<quiz currentPromptNumber="0">
   <quizGroup type="WordMapping" keyType="EnglishWord" valueType="GermanWord">
     <wordMapping key="against">  
       <quizValue value="wider"><userAnswers></userAnswers></quizValue>
@@ -68,7 +68,7 @@ object ReadVocabFileTwoListsTest {
       <quizValue value="treaty"><userAnswers></userAnswers></quizValue>
     </wordMapping>
   </wordMappingGroup>
-</quizOfWordMappings>
+</quiz>
 
     Conf.conf.ANDROID = false
    

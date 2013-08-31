@@ -21,8 +21,7 @@ import scala.collection.mutable.ListBuffer
 
 import com.oranda.libanius.model.wordmapping._
 import scala.collection.immutable.Stream
-import com.oranda.libanius.model
-import com.oranda.libanius.model.{WordMapping, QuizValueWithUserAnswers}
+import com.oranda.libanius.model._
 
 abstract class ReadVocabFileTwoLists extends ReadVocabFileToWordMappings {
 
@@ -30,8 +29,8 @@ abstract class ReadVocabFileTwoLists extends ReadVocabFileToWordMappings {
   val englishWords = ListBuffer[String]()
   val otherWords = ListBuffer[String]()
 
-  def readIntoQuiz(src: BufferedSource, quiz: QuizOfWordMappings,
-      keyType: String, valueType: String): QuizOfWordMappings = {
+  def readIntoQuiz(src: BufferedSource, quiz: Quiz,
+      keyType: String, valueType: String): Quiz = {
     
     src.getLines.foreach(line => readQuizItemFrequency(line.trim))
     println(keyType + "s length: " + otherWords.size)
@@ -39,22 +38,23 @@ abstract class ReadVocabFileTwoLists extends ReadVocabFileToWordMappings {
     val wordsOtherToEnglish = otherWords zip englishWords
     val wordsEnglishToOther = englishWords zip otherWords
 
-    val wmg1 = makeWmg(wordsOtherToEnglish, keyType, valueType)
-    val wmg2 = makeWmg(wordsEnglishToOther, valueType, keyType)
-    val quizUpdated = quiz.addWordMappingGroup(wmg1).addWordMappingGroup(wmg2)
+    val qg1 = makeQuizGroup(wordsOtherToEnglish, keyType, valueType)
+    val qg2 = makeQuizGroup(wordsEnglishToOther, valueType, keyType)
+    val quizUpdated = quiz.addQuizGroup(qg1).addQuizGroup(qg2)
 
-    println("Number of wmgs in quiz: " + quizUpdated.wordMappingGroups.size)
+    println("Number of wmgs in quiz: " + quizUpdated.quizGroups.size)
     quizUpdated
   }
 
-  def makeWmg(combinedWords: Seq[(String, String)], type1: String, type2: String) = {
+  def makeQuizGroup(combinedWords: Seq[(String, String)], type1: String, type2: String):
+      QuizGroup = {
     /* TODO
     val wordMappings = combinedWords.map(keyValue =>
         WordMappingQuizPair(keyValue._1, WordMappingValueSetWrapper(
           List(QuizValueWithUserAnswers(keyValue._2)))))
           */
-    WordMappingGroup(model.QuizGroupHeader(WordMapping, type1, type2),
-        Stream.empty /*wordMappings.toStream*/)
+    WordMappingGroup(QuizGroupHeader(WordMapping, type1, type2),
+        Stream.empty /*wordMappings.toStream*/).toQuizGroup
   }
   
   def readQuizItemFrequency(word: String) =
@@ -68,7 +68,7 @@ object ReadVocabTwoListsGermanEnglish extends ReadVocabFileTwoLists {
 
   val fileVocab = "vocabGer10k.txt"
 
-  override def readIntoQuiz(src: BufferedSource, quiz: QuizOfWordMappings): QuizOfWordMappings =
+  override def readIntoQuiz(src: BufferedSource, quiz: Quiz): Quiz =
     readIntoQuiz(src, quiz, "German word", "English word")
 }
 
@@ -76,7 +76,7 @@ object ReadVocabTwoListsSpanishEnglish extends ReadVocabFileTwoLists {
 
   val fileVocab = "vocabSpan10k.txt"
 
-  override def readIntoQuiz(src: BufferedSource, quiz: QuizOfWordMappings): QuizOfWordMappings =
+  override def readIntoQuiz(src: BufferedSource, quiz: Quiz): Quiz =
     readIntoQuiz(src, quiz, "Spanish word", "English word")
 
 }

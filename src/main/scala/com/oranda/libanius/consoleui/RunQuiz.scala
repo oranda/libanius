@@ -16,13 +16,11 @@
 
 package com.oranda.libanius.consoleui
 
-import com.oranda.libanius.model.wordmapping._
 import scala.util.Try
 import com.oranda.libanius.util.Util
 import Output._
 import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.model
-import com.oranda.libanius.model.QuizItemViewWithChoices
+import com.oranda.libanius.model._
 
 object RunQuiz extends App {
 
@@ -33,32 +31,32 @@ object RunQuiz extends App {
 
   def runQuiz() {
     output("Running quiz...")
-    val availableQuizGroups = dataStore.findAvailableQgs
+    val availableQuizGroups = dataStore.findAvailableQuizGroups
     val quiz =
       if (!availableQuizGroups.isEmpty)
-        QuizOfWordMappings(userQuizGroupSelection(availableQuizGroups.toList))
+        Quiz(userQuizGroupSelection(availableQuizGroups.toList))
       else {
         output("No quiz groups found. Defaulting to dummy data.\n")
-        QuizOfWordMappings.demoQuiz()
+        Quiz.demoQuiz()
       }
     output("OK, the quiz begins! To quit, type q at any time.\n")
     testUserWithQuizItem(quiz)
   }
 
-  def userQuizGroupSelection(quizGroupHeaders: List[model.QuizGroupHeader]): Set[WordMappingGroup] = {
+  def userQuizGroupSelection(quizGroupHeaders: List[QuizGroupHeader]): Set[QuizGroup] = {
     output("Choose quiz group(s). For more than one, separate with commas, e.g. 1,2,3")
-    val choices = ChoiceGroup[model.QuizGroupHeader](quizGroupHeaders)
+    val choices = ChoiceGroup[QuizGroupHeader](quizGroupHeaders)
     choices.show()
 
     def selectedQuizGroupHeaders = choices.getSelectionFromInput match {
-      case ChosenOptions(selectedChoices) => selectedChoices.asInstanceOf[List[model.QuizGroupHeader]]
-      case _ => List[model.QuizGroupHeader]()
+      case ChosenOptions(selectedChoices) => selectedChoices.asInstanceOf[List[QuizGroupHeader]]
+      case _ => List[QuizGroupHeader]()
     }
 
-    selectedQuizGroupHeaders.map(header => dataStore.loadQgCore(header)).toSet
+    selectedQuizGroupHeaders.map(header => dataStore.loadQuizGroupCore(header)).toSet
   }
 
-  def testUserWithQuizItem(quiz: QuizOfWordMappings) {
+  def testUserWithQuizItem(quiz: Quiz) {
     showScore(quiz)
     Util.stopwatch(quiz.findQuizItem, "find quiz items") match {
       case (Some((quizItem, quizGroup)), failedQuizGroups) =>
@@ -69,8 +67,8 @@ object RunQuiz extends App {
     }
   }
 
-  def keepShowingQuizItems(quiz: QuizOfWordMappings, quizItem: QuizItemViewWithChoices[_],
-      quizGroup: WordMappingGroup, failedQuizGroups: List[WordMappingGroup]) {
+  def keepShowingQuizItems(quiz: Quiz, quizItem: QuizItemViewWithChoices,
+      quizGroup: QuizGroup, failedQuizGroups: List[QuizGroup]) {
     showQuizItemAndProcessResponse(quiz, quizItem) match {
       case (Invalid, updatedQuiz) =>
         output("Invalid input\n")
@@ -84,17 +82,15 @@ object RunQuiz extends App {
     }
   }
 
-  def updateQuiz(quiz: QuizOfWordMappings, quizGroup: WordMappingGroup,
-      failedQuizGroups: List[WordMappingGroup]): QuizOfWordMappings = {
-    val updatedQuiz = quiz.addWordMappingGroup(quizGroup.updatedPromptNumber).
-        updateRangeForFailedWmgs(failedQuizGroups)
-    updatedQuiz.wordMappingGroups.foreach(quizGroup =>
-      l.log(quizGroup.keyType + " prompt number is " +
-          quizGroup.currentPromptNumber + ", range is " + quizGroup.currentSearchRange.start))
+  def updateQuiz(quiz: Quiz, quizGroup: QuizGroup,
+      failedQuizGroups: List[QuizGroup]): Quiz = {
+    val updatedQuiz = quiz.addQuizGroup(quizGroup.updatedPromptNumber)
+    updatedQuiz.quizGroups.foreach(quizGroup =>
+      l.log(quizGroup.keyType + " prompt number is " + quizGroup.currentPromptNumber))
     updatedQuiz
   }
 
-  def showScore(quiz: QuizOfWordMappings) {
+  def showScore(quiz: Quiz) {
     def formatAndPrintScore(scoreStr: String) {
       val scoreStrMaxIndex = scala.math.min(scoreStr.length, 6)
       output("Score: " + scoreStr.substring(0, scoreStrMaxIndex) + "%\n")
@@ -103,22 +99,21 @@ object RunQuiz extends App {
     formatAndPrintScore(scoreSoFar)
   }
 
-  def showQuizItemAndProcessResponse(quiz: QuizOfWordMappings, quizItem: QuizItemViewWithChoices[_]):
-      (UserResponse, QuizOfWordMappings) = {
-
-    val questionText = quizItem.keyWord + ": what is the " + quizItem.valueType +
-        " for this " + quizItem.keyType + "?" +
-        (if (quizItem.numCorrectAnswersInARow > 0)
-           " (correctly answered " + quizItem.numCorrectAnswersInARow + " times)"
-         else "")
+  def showQuizItemAndProcessResponse(quiz: Quiz, quizItem: QuizItemViewWithChoices):
+      (UserResponse, Quiz) = {
+    val wordText = ": what is the " + quizItem.valueType + " for this " + quizItem.keyType + "?"
+    val answeredText = " (correctly answered " + quizItem.numCorrectAnswersInARow + " times)"
+    val questionText = quizItem.keyWord +
+        (if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else "") +
+        (if (quizItem.numCorrectAnswersInARow > 0) answeredText else "")
     output(questionText + "\n")
 
     if (quizItem.useMultipleChoice) showChoicesAndProcessResponse(quiz, quizItem)
     else getTextResponseAndProcess(quiz, quizItem)
   }
 
-  def showChoicesAndProcessResponse(quiz: QuizOfWordMappings, quizItem: QuizItemViewWithChoices[_]):
-      (UserResponse, QuizOfWordMappings) = {
+  def showChoicesAndProcessResponse(quiz: Quiz, quizItem: QuizItemViewWithChoices):
+      (UserResponse, Quiz) = {
     val choices = ChoiceGroup[String](quizItem.allChoices)
     choices.show()
 
@@ -127,14 +122,14 @@ object RunQuiz extends App {
     }.map(userResponse => processAnswer(quiz, userResponse, quizItem)).get
   }
 
-  def getTextResponseAndProcess(quiz: QuizOfWordMappings, quizItem: QuizItemViewWithChoices[_]):
-      (UserResponse, QuizOfWordMappings) =
+  def getTextResponseAndProcess(quiz: Quiz, quizItem: QuizItemViewWithChoices):
+      (UserResponse, Quiz) =
     Try(getAnswerFromInput).recover {
       case e: Exception => Invalid
     }.map(userResponse => processAnswer(quiz, userResponse, quizItem)).get
 
-  def processAnswer(quiz: QuizOfWordMappings, userResponse: UserResponse,
-      quizItem: QuizItemViewWithChoices[_]): (UserResponse, QuizOfWordMappings) = {
+  def processAnswer(quiz: Quiz, userResponse: UserResponse,
+      quizItem: QuizItemViewWithChoices): (UserResponse, Quiz) = {
     val updatedQuiz = userResponse match {
       case answer: Answer => processUserAnswer(quiz, answer.text, quizItem)
       case _ => quiz
@@ -142,8 +137,8 @@ object RunQuiz extends App {
     (userResponse, updatedQuiz)
   }
 
-  def processUserAnswer(quiz: QuizOfWordMappings, userAnswerTxt: String,
-      quizItem: QuizItemViewWithChoices[_]): QuizOfWordMappings = {
+  def processUserAnswer(quiz: Quiz, userAnswerTxt: String,
+      quizItem: QuizItemViewWithChoices): Quiz = {
     val correctAnswer = quizItem.quizValue.value
     val isCorrect = userAnswerTxt == correctAnswer
     if (isCorrect) output("\nCorrect!\n") else output("\nWrong! It's " + correctAnswer + "\n")

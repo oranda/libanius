@@ -17,8 +17,19 @@
 package com.oranda.libanius.model
 
 /*
+ * A connection between two things, and user information associated with the connection.
+ *
  * Examples of quiz pairs:
  *  - a question and an answer in the quiz
- *  - a word and possible translations
+ *  - a word and a translation
+ *
+ * TODO: separate QuizValueWithUserAnswers into value and UserAnswers
  */
-class QuizPair[+V](val key: String, val valueSet: V)
+case class QuizPair(key: String, value: QuizValueWithUserAnswers) {
+  def sameKeyValue(other: QuizPair) = other.key == key && other.value.value == value.value
+}
+
+object QuizPair {
+  def apply(key: String, value: String): QuizPair =
+    QuizPair(key, QuizValueWithUserAnswers(value))
+}

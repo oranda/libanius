@@ -17,14 +17,13 @@
 package com.oranda.libanius.model
 
 import scala.util.Random
-import com.oranda.libanius.model.wordmapping.{WordMappingValueSetWrapperBase, WordMappingValueSet, WordMappingQuizPair}
 
 /**
  * Quiz item data holder:
  * contains whatever information is necessary for the view, and for updating the backing data.
  */
-class QuizItemViewWithChoices[P <: QuizPair[_]](
-    val quizPair: P,
+class QuizItemViewWithChoices(
+    val quizPair: QuizPair,
     val quizValue: QuizValueWithUserAnswers,
     val qgCurrentPromptNumber: Int,
     val quizGroupHeader: QuizGroupHeader,
@@ -32,7 +31,7 @@ class QuizItemViewWithChoices[P <: QuizPair[_]](
     val numCorrectAnswersInARow: Int) {
 
   lazy val keyWord = quizPair.key
-  lazy val wmvs = quizPair.valueSet
+  lazy val value = quizPair.value
   lazy val keyType = quizGroupHeader.keyType
   lazy val valueType = quizGroupHeader.valueType
 

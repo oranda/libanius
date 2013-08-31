@@ -28,10 +28,10 @@ import com.oranda.libanius.dependencies.AppDependencies
  * A dictionary. A large read-only repository of word mappings, structured as a map
  * for fast access.
  */
-class Dictionary {
 
-  // When populating, the java.util map is faster than the mutable Scala map
-  private val wordMappings = new java.util.LinkedHashMap[String, WordMappingValueSet]
+// When populating, the java.util map is faster than the mutable Scala map
+case class Dictionary(wordMappings: java.util.LinkedHashMap[String, WordMappingValueSet] =
+    new java.util.LinkedHashMap[String, WordMappingValueSet]) {
 
   def numKeyWords = wordMappings.size
   
@@ -59,7 +59,7 @@ object Dictionary {
 
   val l = AppDependencies.logger
 
-  def fromWordMappings(wordMappingsStream: Stream[WordMappingQuizPair]) =
+  def fromWordMappings(wordMappingsStream: Stream[WordMappingPair]) =
     new Dictionary() {
       l.log("converting wordMappings to dictionary form")
       wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))

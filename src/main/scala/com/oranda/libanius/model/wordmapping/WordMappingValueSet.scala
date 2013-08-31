@@ -16,26 +16,23 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.util.Try
+import scala.util.{Random, Try}
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.ListBuffer
 
 import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.model.{QuizValueWithUserAnswers, QuizValueSet}
+import com.oranda.libanius.model.{QuizPair, QuizValueWithUserAnswers}
+import com.oranda.libanius.util.StringUtil
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
  * TODO: try again to convert this to a Set.
  */
-case class WordMappingValueSet(override val values: List[QuizValueWithUserAnswers] = Nil)
-    extends QuizValueSet(values) {
+case class WordMappingValueSet(values: List[QuizValueWithUserAnswers] = Nil) {
 
-  type MyType = WordMappingValueSet
+  def updated(values: List[QuizValueWithUserAnswers]) = WordMappingValueSet(values)
 
-  override def updated(values: List[QuizValueWithUserAnswers]) =
-    WordMappingValueSet(values)
-
-  override def addValueToEnd(wordMappingValue: QuizValueWithUserAnswers) = {
+  def addValueToEnd(wordMappingValue: QuizValueWithUserAnswers) = {
     val newValues =
       if (!values.contains(wordMappingValue)) values :+ wordMappingValue
       else values
@@ -44,6 +41,63 @@ case class WordMappingValueSet(override val values: List[QuizValueWithUserAnswer
 
   def removeValue(wordMappingValue: QuizValueWithUserAnswers) =
     filterOut(wordMappingValue.value)
+
+  override def toString = values.toString
+
+  // Example: contract:696,697;698/treaty:796;798
+  def toCustomFormat(strBuilder: StringBuilder) =
+    StringUtil.mkString(strBuilder, values, wmvToCustomFormat, '/')
+
+  def wmvToCustomFormat(strBuilder: StringBuilder, value: QuizValueWithUserAnswers):
+      StringBuilder =
+    value.toCustomFormat(strBuilder)
+
+  def strings: Iterable[String] = values.map(_.toString )
+
+  def size = values.size
+
+  def numItemsAndCorrectAnswers: Pair[Int, Int] = Pair(size, numCorrectAnswers)
+
+  def numCorrectAnswers = {
+    /*
+     * This functional version is about twice as slow as the version actually used:
+     *
+     * values.iterator.foldLeft(0)(_ + _.numCorrectAnswersInARow)
+     */
+    var numCorrectAnswers = 0
+    values.foreach { wmv => numCorrectAnswers += wmv.numCorrectAnswersInARow }
+    numCorrectAnswers
+  }
+
+
+  def replaceWmv(valueNew: QuizValueWithUserAnswers): WordMappingValueSet = {
+    val quizValueSet: WordMappingValueSet = filterOut(valueNew.value)
+    quizValueSet.addValueToFront(valueNew).asInstanceOf[WordMappingValueSet]
+  }
+
+  def addValueToFront(quizValue: QuizValueWithUserAnswers): WordMappingValueSet = {
+    val newValues =
+      if (!values.contains(quizValue)) quizValue +: values
+      else values
+    updated(newValues)
+  }
+
+  def filterOut(value: String): WordMappingValueSet =
+    updated(values.filterNot(_.value == value))
+
+
+
+  def findRandomWordValue(): String = {
+    val randomIndex = Random.nextInt(values.size)
+    val valueArray: Array[QuizValueWithUserAnswers] = values.toArray[QuizValueWithUserAnswers]
+    valueArray(randomIndex).value
+  }
+
+  def findValue(value: String): Option[QuizValueWithUserAnswers] = values.find(_.value == value)
+
+  def containsValue(value: String): Boolean = findValue(value).isDefined
+
+  def valueBeginningWith(valueStart: String) = values.find(_.value.startsWith(valueStart))
 }
 
 
@@ -51,11 +105,19 @@ object WordMappingValueSet {
 
   val l = AppDependencies.logger
 
+  def apply(values: String*): WordMappingValueSet =
+    WordMappingValueSet(values.map(QuizValueWithUserAnswers(_)).toList)
+
+  def createFromQuizPairs(quizPairs: List[QuizPair]): WordMappingValueSet =
+    WordMappingValueSet(quizPairs.map(_.value).toList)
+
   def combineValueSets(valueSets: Iterable[WordMappingValueSet]):
       List[QuizValueWithUserAnswers] =
-    valueSets.foldLeft(new ArrayBuffer[QuizValueWithUserAnswers]()) {
+    valueSets.flatMap(_.values).toList
+    /*TODO: Test if this is more efficient:
+     valueSets.foldLeft(new ArrayBuffer[QuizValueWithUserAnswers]()) {
       (acc, wm) => acc ++ wm.values
-    }.toList
+    }.toList */
 
   // Example: contract:696,697;698/treaty:796;798
   def fromCustomFormat(str: String): WordMappingValueSet = {

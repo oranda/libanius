@@ -15,7 +15,9 @@
  */
 package com.oranda.libanius.model
 
-case class SearchResult(quizGroupHeader: QuizGroupHeader, wmp: QuizPair[_]) {
+import com.oranda.libanius.model.wordmapping.WordMappingPair
+
+case class SearchResult(quizGroupHeader: QuizGroupHeader, wmp: WordMappingPair) {
   lazy val keyType = quizGroupHeader.keyType
   lazy val valueType = quizGroupHeader.valueType
   lazy val keyWord = wmp.key

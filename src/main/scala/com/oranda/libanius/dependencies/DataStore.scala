@@ -16,122 +16,127 @@
 
 package com.oranda.libanius.dependencies
 
-import com.oranda.libanius.model.wordmapping._
 import com.oranda.libanius.util.Util
 import scala.collection.immutable.Set
 import scala.concurrent.{ future, Future, ExecutionContext }
 import ExecutionContext.Implicits.global
 import scala.util.Try
 import com.oranda.libanius.io.PlatformIO
-import com.oranda.libanius.model
+import com.oranda.libanius.model.wordmapping.Dictionary
+import com.oranda.libanius.model.{QuizGroup, Quiz, QuizGroupHeader}
 
 case class DataStore(io: PlatformIO) {
 
   private[this] lazy val l = AppDependencies.logger
   private[this] lazy val conf = AppDependencies.conf
 
-  def readQuizMetadata: Set[model.QuizGroupHeader] = {
+  def readQuizMetadata: Set[QuizGroupHeader] = {
     // TODO: consider changing to Platform.readFile
     def readRawMetadata: String =
       io.readFile(conf.fileQuiz).getOrElse(io.readResource(conf.resQuizPublic).get)
 
-    Try(QuizOfWordMappings.metadataFromCustomFormat(readRawMetadata)).recover {
+    Try(Quiz.metadataFromCustomFormat(readRawMetadata)).recover {
       // for absent data files, security access exceptions or anything else unexpected
       case e: Exception => l.log("Error reading quiz: " + e.getMessage)
-                           Set[model.QuizGroupHeader]()
+                           Set[QuizGroupHeader]()
     }.get
   }
 
-  def loadQg(header: model.QuizGroupHeader, loadedQuizGroups: List[WordMappingGroup]):
-      Future[WordMappingGroup] = {
+  def loadQuizGroup(header: QuizGroupHeader, loadedQuizGroups: List[QuizGroup]):
+      Future[QuizGroup] = {
     future {
       l.log("seeing if qg was loaded for " + header)
       val loadedQg = loadedQuizGroups.find(_.header == header).getOrElse {
         l.log("no, so loading qg for " + header)
-        loadQgCore(header)
+        loadQuizGroupCore(header)
       }
 
       // TODO: move this to a separate Future
       val loadedQgWithDictionary = Util.stopwatch(loadDictionary(loadedQg),
           "preparing dictionary for " + header)
 
-      l.log("loaded qg with numItemsAndCorrectAnswers: " +
-          loadedQgWithDictionary.numItemsAndCorrectAnswers +
+      l.log("loaded qg with size " + loadedQgWithDictionary.size +
+          " and numCorrectAnswers " + loadedQgWithDictionary.numCorrectAnswers +
           " and dictionary with " + loadedQgWithDictionary.dictionary.numKeyWords + " key words")
 
       loadedQgWithDictionary
     }
   }
 
-  def saveQuiz(quiz: QuizOfWordMappings, path: String = "") {
+  def saveQuiz(quiz: Quiz, path: String = "") {
 
-    def saveToFile(qg: WordMappingGroup) = {
+    def saveToFile(qg: QuizGroup) = {
       val saveData = qg.getSaveData
       l.log("Saving qg " + qg.keyType + ", qg has promptNumber " +
           qg.currentPromptNumber + " to " + saveData.fileName)
       io.writeToFile(path + saveData.fileName, saveData.data)
     }
-    quiz.wordMappingGroups.foreach(saveToFile(_))
+    quiz.quizGroups.foreach(saveToFile(_))
     io.writeToFile(path + conf.fileQuiz, quiz.toCustomFormat.toString)
   }
 
-  private def loadDictionary(qg: WordMappingGroup): WordMappingGroup = {
+  private def loadDictionary(qg: QuizGroup): QuizGroup = {
     val dictFileName = qg.header.makeDictFileName
-    val dictionary = readDictionary(dictFileName).getOrElse(
-        Dictionary.fromWordMappings(qg.quizPairs))
-    qg.updatedDictionary(dictionary)
+    readDictionary(dictFileName) match {
+      case Some(dictionary) => qg.updatedDictionary(dictionary)
+      case _ => qg
+    }
   }
 
-  def loadQgCore(header: model.QuizGroupHeader): WordMappingGroup =
-    findQgInFilesDir(header) match {
+  def loadQuizGroupCore(header: QuizGroupHeader): QuizGroup =
+    findQuizGroupInFilesDir(header) match {
       case Some(qgFileName) =>
-        Util.stopwatch(readQgFromFilesDir(qgFileName).getOrElse(WordMappingGroup(header)),
+        Util.stopwatch(readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup(header)),
             "reading qg from file" + qgFileName)
       case _ =>
-        findQgInResources(header) match {
+        findQuizGroupInResources(header) match {
           case Some(qgResName) =>
             val qgText = Util.stopwatch(io.readResource(qgResName).get,
                 "reading qg resource " + qgResName)
-            io.writeToFile(header.makeQgFileName, qgText) // TODO: eliminate side-effect
             //log("read text from qg resource starting " + qgText.take(200))
-            WordMappingGroup.fromCustomFormat(qgText)
+            header.createQuizGroup(qgText)
           case _ =>
             l.logError("failed to load qg " + header)
-            WordMappingGroup(header)
+            QuizGroup(header)
         }
     }
 
-  private def readQgFromFilesDir(qgFileName: String):
-      Option[WordMappingGroup] = {
+  private def readQuizGroupFromFilesDir(qgFileName: String):
+      Option[QuizGroup] = {
     val qgPath = conf.filesDir + qgFileName
     l.log("reading qg from file " + qgPath)
     for {
       qgText <- io.readFile(qgPath)
       //log("have read qgText " + qgText.take(200) + "... ")
-    } yield WordMappingGroup.fromCustomFormat(qgText)
+    } yield QuizGroupHeader(qgText).createQuizGroup(qgText)
   }
 
-  private def findQgInFilesDir(header: model.QuizGroupHeader): Option[String] = {
+  private def findQuizGroupInFilesDir(header: QuizGroupHeader): Option[String] = {
     val fileNames = io.findQgFileNamesFromFilesDir
     l.log("fileNames: " + fileNames.toList)
     fileNames.find(io.readQgMetadataFromFile(_) == Some(header))
   }
 
-  private def findQgInResources(header: model.QuizGroupHeader): Option[String] = {
+  private def findQuizGroupInResources(header: QuizGroupHeader): Option[String] = {
     val fileNames = io.findQgFileNamesFromResources
     l.log("fileNames: " + fileNames.toList)
     fileNames.find(io.readQgMetadataFromResource(_) == Some(header))
   }
 
-  def findAvailableQgs: Set[model.QuizGroupHeader] = findAvailableResQgs ++ findAvailableFileNameQgs
+  def findAvailableQuizGroups: Set[QuizGroupHeader] = {
+    l.log("res groups " + findAvailableResQuizGroups)
+    l.log("fileName groups " + findAvailableFileNameQuizGroups)
+    findAvailableResQuizGroups ++ findAvailableFileNameQuizGroups
+  }
 
-  private def findAvailableResQgs: Set[model.QuizGroupHeader] = {
+
+  private def findAvailableResQuizGroups: Set[QuizGroupHeader] = {
     val qgResNames = io.findQgFileNamesFromResources
     l.log("qgResNames = " + qgResNames.toList)
     qgResNames.flatMap(io.readQgMetadataFromResource(_)).toSet
   }
 
-  private def findAvailableFileNameQgs: Set[model.QuizGroupHeader] = {
+  private def findAvailableFileNameQuizGroups: Set[QuizGroupHeader] = {
     val qgFileNames = io.findQgFileNamesFromFilesDir
     l.log("qgFileNames = " + qgFileNames.toList)
     qgFileNames.flatMap(io.readQgMetadataFromFile(_)).toSet
