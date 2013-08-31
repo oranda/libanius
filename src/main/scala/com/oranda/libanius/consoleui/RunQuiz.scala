@@ -86,7 +86,7 @@ object RunQuiz extends App {
       failedQuizGroups: List[QuizGroup]): Quiz = {
     val updatedQuiz = quiz.addQuizGroup(quizGroup.updatedPromptNumber)
     updatedQuiz.quizGroups.foreach(quizGroup =>
-      l.log(quizGroup.keyType + " prompt number is " + quizGroup.currentPromptNumber))
+      l.log(quizGroup.cueType + " prompt number is " + quizGroup.currentPromptNumber))
     updatedQuiz
   }
 
@@ -101,9 +101,9 @@ object RunQuiz extends App {
 
   def showQuizItemAndProcessResponse(quiz: Quiz, quizItem: QuizItemViewWithChoices):
       (UserResponse, Quiz) = {
-    val wordText = ": what is the " + quizItem.valueType + " for this " + quizItem.keyType + "?"
+    val wordText = ": what is the " + quizItem.responseType + " for this " + quizItem.cueType + "?"
     val answeredText = " (correctly answered " + quizItem.numCorrectAnswersInARow + " times)"
-    val questionText = quizItem.keyWord +
+    val questionText = quizItem.cue +
         (if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else "") +
         (if (quizItem.numCorrectAnswersInARow > 0) answeredText else "")
     output(questionText + "\n")

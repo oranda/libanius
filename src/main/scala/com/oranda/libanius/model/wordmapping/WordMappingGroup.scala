@@ -67,7 +67,7 @@ object WordMappingGroup {
       new GroupByOrderedImplicit[A](t)
 
     val wordMappingPairs: Stream[WordMappingPair] =
-      (quizGroup.quizPairs.groupByOrdered(_.key).map {
+      (quizGroup.quizPairs.groupByOrdered(_.cue).map {
         case (str: String, quizPairs: mutable.LinkedHashSet[QuizPair]) =>
             WordMappingPair(str, WordMappingValueSet.createFromQuizPairs(quizPairs.toList))
       }).toStream
@@ -77,7 +77,7 @@ object WordMappingGroup {
   /*
    * Example:
    *
-   * quizGroup type="WordMapping" keyType="English word" valueType="German word" currentPromptNumber="0"
+   * quizGroup type="WordMapping" cueType="English word" responseType="German word" currentPromptNumber="0"
    *    against|wider
    *    entertain|unterhalten
    */
@@ -109,7 +109,7 @@ object WordMappingGroup {
             }
           }
           Try(parseKeyValue) recover {
-            case e: Exception => l.logError("could not parse key-value string: " + strKeyValue)
+            case e: Exception => l.logError("could not parse cue-response string: " + strKeyValue)
           }
         }
       }

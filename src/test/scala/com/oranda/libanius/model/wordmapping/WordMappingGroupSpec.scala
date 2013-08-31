@@ -26,7 +26,7 @@ class WordMappingGroupSpec extends Specification {
     // main test data
 
     val wmgCustomFormat =
-        "quizGroup type=\"WordMapping\" keyType=\"English word\" valueType=\"German word\" currentPromptNumber=\"0\"\n" +
+        "quizGroup type=\"WordMapping\" cueType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
         "against|wider\n" +
         "entertain|unterhalten\n" +
         "teach|unterrichten\n" +

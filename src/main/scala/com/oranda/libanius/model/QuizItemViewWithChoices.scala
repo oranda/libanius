@@ -30,10 +30,10 @@ class QuizItemViewWithChoices(
     val falseAnswers: Set[String],
     val numCorrectAnswersInARow: Int) {
 
-  lazy val keyWord = quizPair.key
-  lazy val value = quizPair.value
-  lazy val keyType = quizGroupHeader.keyType
-  lazy val valueType = quizGroupHeader.valueType
+  lazy val cue = quizPair.cue
+  lazy val response = quizPair.response
+  lazy val cueType = quizGroupHeader.cueType
+  lazy val responseType = quizGroupHeader.responseType
 
   lazy val allChoices = choicesInRandomOrder(quizValue, falseAnswers)
 

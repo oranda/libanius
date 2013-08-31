@@ -16,5 +16,5 @@
 
 package com.oranda.libanius.model
 
-// simple value object used for saving a data structure to a file
+// simple response object used for saving a data structure to a file
 case class SaveData(fileName: String, data: String)

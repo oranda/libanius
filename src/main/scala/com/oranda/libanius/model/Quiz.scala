@@ -36,8 +36,8 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
    *
    * Example:
    * quiz
-   *   quizGroup type="WordMapping" keyType="German word" valueType="English word"
-   *   quizGroup type="WordMapping" keyType="English word" valueType="German word"
+   *   quizGroup type="WordMapping" cueType="German word" responseType="English word"
+   *   quizGroup type="WordMapping" cueType="English word" responseType="German word"
    */
   def toCustomFormat: StringBuilder = {
     // For efficiency, avoiding Scala's own StringBuilder and mkString
@@ -81,17 +81,17 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
   // Just a synonym for addQuizGroup
   def replaceQuizGroup(quizGroup: QuizGroup) = addQuizGroup(quizGroup)
 
-  // This will replace any existing wordMappingGroup with the same key-value pair
+  // This will replace any existing wordMappingGroup with the same cue-response pair
   def addQuizGroup(quizGroup: QuizGroup): Quiz = {
     val newQuiz: Quiz = removeQuizGroup(quizGroup.header)
     Quiz(newQuiz.quizGroups + quizGroup)
   }
 
 
-  def removeKey(keyWord: String, header: QuizGroupHeader): Quiz = {
+  def removeQuizPairsForCue(cue: String, header: QuizGroupHeader): Quiz = {
     val quizGroup = findQuizGroup(header)
     quizGroup match {
-      case Some(quizGroup) => replaceQuizGroup(quizGroup.removeQuizPairsForKey(keyWord))
+      case Some(quizGroup) => replaceQuizGroup(quizGroup.removeQuizPairsForCue(cue))
       case None => this
     }
   }
@@ -113,8 +113,7 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
    * Return a quiz item, the quiz group it belongs to, and a list of quiz groups which failed
    * to return anything.
    */
-  def findQuizItem:
-      Pair[Option[(QuizItemViewWithChoices, QuizGroup)], List[QuizGroup]] = {
+  def findQuizItem: Pair[Option[(QuizItemViewWithChoices, QuizGroup)], List[QuizGroup]] = {
 
     var failedWmgs = List[QuizGroup]()
     var quizItemPair: Option[(QuizItemViewWithChoices, QuizGroup)] = None
@@ -161,7 +160,7 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     val quizGroup: Option[QuizGroup] = findQuizGroup(currentQuizItem.quizGroupHeader)
     quizGroup match {
       case Some(quizGroup) =>
-        val quizGroupUpdated = quizGroup.updatedWithUserAnswer(currentQuizItem.keyWord,
+        val quizGroupUpdated = quizGroup.updatedWithUserAnswer(currentQuizItem.cue,
             currentQuizItem.quizValue, userAnswer)
         addQuizGroup(quizGroupUpdated)
       case _ => this
@@ -169,8 +168,8 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
   }
 
   def numGroups = quizGroups.size
-  def numKeyWords = quizGroups.map(_.numKeyWords).sum
-  def numValues = quizGroups.map(_.numValues).sum
+  def numCues = quizGroups.map(_.numCues).sum
+  def numResponses = quizGroups.map(_.numResponses).sum
 
   def scoreSoFar: BigDecimal =   // out of 1.0
     numCorrectAnswers.toDouble / (size * AppDependencies.conf.numCorrectAnswersRequired).toDouble
@@ -223,14 +222,14 @@ object Quiz {
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
 
-    "quizGroup type=\"WordMapping\" keyType=\"English word\" valueType=\"German word\" currentPromptNumber=\"0\"\n" +
+    "quizGroup type=\"WordMapping\" cueType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
     "en route|unterwegs\n" +
     "contract|Vertrag\n" +
     "treaty|Vertrag\n" +
     "against|wider\n" +
     "entertain|unterhalten\n",
 
-    "quizGroup type=\"WordMapping\" keyType=\"German word\" valueType=\"English word\" currentPromptNumber=\"0\"\n" +
+    "quizGroup type=\"WordMapping\" cueType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\"\n" +
     "unterwegs|en route\n" +
     "Vertrag|contract/treaty\n" +
     "wider|against\n" +

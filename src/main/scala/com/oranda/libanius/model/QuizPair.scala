@@ -23,13 +23,13 @@ package com.oranda.libanius.model
  *  - a question and an answer in the quiz
  *  - a word and a translation
  *
- * TODO: separate QuizValueWithUserAnswers into value and UserAnswers
+ * TODO: separate QuizValueWithUserAnswers into response and UserAnswers
  */
-case class QuizPair(key: String, value: QuizValueWithUserAnswers) {
-  def sameKeyValue(other: QuizPair) = other.key == key && other.value.value == value.value
+case class QuizPair(cue: String, response: QuizValueWithUserAnswers) {
+  def sameCueAndResponse(other: QuizPair) = other.cue == cue && other.response.value == response.value
 }
 
 object QuizPair {
-  def apply(key: String, value: String): QuizPair =
-    QuizPair(key, QuizValueWithUserAnswers(value))
+  def apply(cue: String, response: String): QuizPair =
+    QuizPair(cue, QuizValueWithUserAnswers(response))
 }

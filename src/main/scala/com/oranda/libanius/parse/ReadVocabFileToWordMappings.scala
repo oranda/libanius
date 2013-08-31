@@ -39,9 +39,9 @@ abstract class ReadVocabFileToWordMappings {
       val fileText = StandardIO.readFile(pathQuiz)      
       quiz = QuizOfWordMappings.fromXML(xml.XML.loadString(fileText))
     }
-    println("key words before vocab file: " + quiz.numKeyWords)
+    println("cue words before vocab file: " + quiz.numKeyWords)
     readVocabFile(quiz)
-    println("key words after vocab file: " + quiz.numKeyWords)
+    println("cue words after vocab file: " + quiz.numKeyWords)
     quiz
   } */
 
@@ -63,10 +63,10 @@ abstract class ReadVocabFileToWordMappings {
     Conf.setUpForParsing("quizSpan10k")
     println("Reading vocab file...")
     val quiz = readVocabFile(new Quiz())
-    println("quiz first wmg length is " + quiz.quizGroups.toList(0).quizKeys.length)
+    println("quiz first wmg length is " + quiz.quizGroups.toList(0).quizCues.length)
     println("Finished reading (quiz and) vocab file... Now writing quiz to " + pathQuiz + "...")
     new StandardIO().save(pathQuiz, quiz.toCustomFormat.toString)
     dataStore.saveQuiz(quiz, path = "data/")
-    println("Finished writing " + quiz.numKeyWords + " words with their translations!")
+    println("Finished writing " + quiz.numCues + " words with their translations!")
   }
 }

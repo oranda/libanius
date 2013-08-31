@@ -24,7 +24,7 @@ class QuizGroupSpec extends Specification {
   "a quiz group" should {
 
     val wmgCustomFormat =
-      "quizGroup type=\"WordMapping\" keyType=\"English word\" valueType=\"German word\" currentPromptNumber=\"0\"\n" +
+      "quizGroup type=\"WordMapping\" cueType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
         "against|wider\n" +
         "entertain|unterhalten\n" +
         "teach|unterrichten\n" +
@@ -42,8 +42,8 @@ class QuizGroupSpec extends Specification {
 
     "be parseable from custom format" in {
       qg.currentPromptNumber mustEqual 0
-      qg.keyType mustEqual "English word"
-      qg.valueType mustEqual "German word"
+      qg.cueType mustEqual "English word"
+      qg.responseType mustEqual "German word"
       qg.toCustomFormat(new StringBuilder()).toString mustEqual wmgCustomFormat
       qg.size mustEqual 11
     }
@@ -75,9 +75,9 @@ class QuizGroupSpec extends Specification {
       val quizItem = qg.findPresentableQuizItem
       quizItem.isDefined mustEqual true
       // Each time a quiz item is pulled, a user answer must be set
-      val qgUpdated = qg.updatedWithUserAnswer(quizItem.get.keyWord,
+      val qgUpdated = qg.updatedWithUserAnswer(quizItem.get.cue,
           quizItem.get.quizValue, new UserAnswer(true, 0))
-      (qgUpdated, (quizItem.get.keyWord, quizItem.get.quizValue.value))
+      (qgUpdated, (quizItem.get.cue, quizItem.get.quizValue.value))
     }
 
     "find a presentable quiz item" in {
@@ -92,18 +92,18 @@ class QuizGroupSpec extends Specification {
 
     "move an existing quiz pair to the front of its queue" in {
       val qgLocal = QuizGroup.fromCustomFormat(wmgCustomFormat)
-      val numKeyWordsBefore = qgLocal.numKeyWords
+      val numKeyWordsBefore = qgLocal.numCues
       val qgUpdated = qgLocal.addQuizPairToFront("sweeps", "streicht")
-      val numKeyWordsAfter = qgUpdated.numKeyWords
+      val numKeyWordsAfter = qgUpdated.numCues
       numKeyWordsAfter mustEqual numKeyWordsBefore
       pullQuizItem(qgUpdated)._2 mustEqual ("sweeps", "streicht")
     }
 
-    "move a quiz pair to the front of its queue where only the key already exists" in {
+    "move a quiz pair to the front of its queue where only the cue already exists" in {
       val qgLocal = QuizGroup.fromCustomFormat(wmgCustomFormat)
       val sizeBefore = qgLocal.size
       val qgUpdated = qgLocal.addQuizPairToFront("entertain", "bewirten")
-      val sizeAfter = qgUpdated.numKeyWords
+      val sizeAfter = qgUpdated.numCues
       sizeAfter mustEqual sizeBefore + 1
       pullQuizItem(qgUpdated)._2 mustEqual ("entertain", "bewirten")
     }
@@ -124,7 +124,7 @@ class QuizGroupSpec extends Specification {
 
     def updateWithUserAnswer(qg: QuizGroup, quizItem: QuizItemViewWithChoices) = {
       val userAnswer = new UserAnswer(true, qg.currentPromptNumber)
-      qg.updatedWithUserAnswer(quizItem.keyWord, quizItem.quizValue, userAnswer).
+      qg.updatedWithUserAnswer(quizItem.cue, quizItem.quizValue, userAnswer).
           updatedPromptNumber
     }
 

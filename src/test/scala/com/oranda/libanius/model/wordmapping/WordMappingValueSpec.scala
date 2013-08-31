@@ -22,7 +22,7 @@ import com.oranda.libanius.dependencies.{AppDependencies, Conf}
 
 class WordMappingValueSpec extends Specification {
   
-  "a word-mapping-value" should {
+  "a word-mapping-response" should {
     
     val wmvCustomFormat = "nachlösen:9,7;6"
 

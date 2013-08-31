@@ -1,3 +1,3 @@
 quizOfWordMappings currentPromptNumber="0"
-quizGroup type="WordMapping" keyType="English word" valueType="German word"
-quizGroup type="WordMapping" keyType="German word" valueType="English word"
+quizGroup type="WordMapping" cueType="English word" responseType="German word"
+quizGroup type="WordMapping" cueType="German word" responseType="English word"

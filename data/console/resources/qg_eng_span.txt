@@ -1,4 +1,4 @@
-quizGroup type="WordMapping" keyType="English word" valueType="Spanish word" currentPromptNumber="0"
+quizGroup type="WordMapping" cueType="English word" responseType="Spanish word" currentPromptNumber="0"
 hello|hola
 goodbye|adiós
 how are you?|¿Cómo estás?

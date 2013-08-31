@@ -26,46 +26,46 @@ object ReadVocabFileTwoListsTest {
    /* 
     val quizXml = 
 <quiz currentPromptNumber="0">
-  <quizGroup type="WordMapping" keyType="EnglishWord" valueType="GermanWord">
-    <wordMapping key="against">  
-      <quizValue value="wider"><userAnswers></userAnswers></quizValue>
+  <quizGroup type="WordMapping" cueType="EnglishWord" responseType="GermanWord">
+    <wordMapping cue="against">
+      <quizValue response="wider"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping key="entertain">  
-      <quizValue value="unterhalten"><userAnswers></userAnswers></quizValue>
+    <wordMapping cue="entertain">
+      <quizValue response="unterhalten"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping key="teach">
-      <quizValue value="unterrichten"><userAnswers></userAnswers></quizValue>
+    <wordMapping cue="teach">
+      <quizValue response="unterrichten"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping key="winner"> 
-      <quizValue value="Siegerin"><userAnswers></userAnswers></quizValue>
+    <wordMapping cue="winner">
+      <quizValue response="Siegerin"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping key="en route"> 
-      <quizValue value="unterwegs"><userAnswers></userAnswers></quizValue>
+    <wordMapping cue="en route">
+      <quizValue response="unterwegs"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping key="full">
-      <quizValue value="satt"><userAnswers></userAnswers></quizValue>
-      <quizValue value="voll"><userAnswers></userAnswers></quizValue>
+    <wordMapping cue="full">
+      <quizValue response="satt"><userAnswers></userAnswers></quizValue>
+      <quizValue response="voll"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping key="interrupted"> 
-      <quizValue value="unterbrochen"><userAnswers></userAnswers></quizValue>
+    <wordMapping cue="interrupted">
+      <quizValue response="unterbrochen"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping key="contract">
-      <quizValue value="Vertrag"><userAnswers></userAnswers></quizValue>
+    <wordMapping cue="contract">
+      <quizValue response="Vertrag"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping key="rides"> 
-      <quizValue value="reitet"><userAnswers></userAnswers></quizValue>
+    <wordMapping cue="rides">
+      <quizValue response="reitet"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping key="sweeps">  
-      <quizValue value="streicht"><userAnswers></userAnswers></quizValue>
+    <wordMapping cue="sweeps">
+      <quizValue response="streicht"><userAnswers></userAnswers></quizValue>
     </wordMapping>
   </wordMappingGroup>
-  <quizGroup type="WordMapping" keyType="GermanWord" valueType="EnglishWord">
-    <wordMapping key="unterwegs">
-      <quizValue value="en route"><userAnswers></userAnswers></quizValue>
+  <quizGroup type="WordMapping" cueType="GermanWord" responseType="EnglishWord">
+    <wordMapping cue="unterwegs">
+      <quizValue response="en route"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping key="Vertrag">
-      <quizValue value="contract"><userAnswers></userAnswers></quizValue>
-      <quizValue value="treaty"><userAnswers></userAnswers></quizValue>
+    <wordMapping cue="Vertrag">
+      <quizValue response="contract"><userAnswers></userAnswers></quizValue>
+      <quizValue response="treaty"><userAnswers></userAnswers></quizValue>
     </wordMapping>
   </wordMappingGroup>
 </quiz>

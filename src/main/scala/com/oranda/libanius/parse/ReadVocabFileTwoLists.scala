@@ -30,16 +30,16 @@ abstract class ReadVocabFileTwoLists extends ReadVocabFileToWordMappings {
   val otherWords = ListBuffer[String]()
 
   def readIntoQuiz(src: BufferedSource, quiz: Quiz,
-      keyType: String, valueType: String): Quiz = {
+      cueType: String, responseType: String): Quiz = {
     
     src.getLines.foreach(line => readQuizItemFrequency(line.trim))
-    println(keyType + "s length: " + otherWords.size)
-    println(valueType + "s length: " + englishWords.size)
+    println(cueType + "s length: " + otherWords.size)
+    println(responseType + "s length: " + englishWords.size)
     val wordsOtherToEnglish = otherWords zip englishWords
     val wordsEnglishToOther = englishWords zip otherWords
 
-    val qg1 = makeQuizGroup(wordsOtherToEnglish, keyType, valueType)
-    val qg2 = makeQuizGroup(wordsEnglishToOther, valueType, keyType)
+    val qg1 = makeQuizGroup(wordsOtherToEnglish, cueType, responseType)
+    val qg2 = makeQuizGroup(wordsEnglishToOther, responseType, cueType)
     val quizUpdated = quiz.addQuizGroup(qg1).addQuizGroup(qg2)
 
     println("Number of wmgs in quiz: " + quizUpdated.quizGroups.size)

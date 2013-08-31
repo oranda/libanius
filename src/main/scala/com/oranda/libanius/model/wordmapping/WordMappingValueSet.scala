@@ -109,7 +109,7 @@ object WordMappingValueSet {
     WordMappingValueSet(values.map(QuizValueWithUserAnswers(_)).toList)
 
   def createFromQuizPairs(quizPairs: List[QuizPair]): WordMappingValueSet =
-    WordMappingValueSet(quizPairs.map(_.value).toList)
+    WordMappingValueSet(quizPairs.map(_.response).toList)
 
   def combineValueSets(valueSets: Iterable[WordMappingValueSet]):
       List[QuizValueWithUserAnswers] =
