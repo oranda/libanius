@@ -21,79 +21,82 @@ import scala.util.{Try, Random}
 
 import com.oranda.libanius.util.{StringUtil, Util}
 import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.model.wordmapping.{WordMappingGroup, Dictionary}
+import com.oranda.libanius.model.wordmapping.{WordMappingValue, WordMappingGroup, Dictionary}
 
 case class QuizGroup(
     header: QuizGroupHeader,
-    quizPairs: Stream[QuizPair] = Stream.empty,
+    quizItems: Stream[QuizItem] = Stream.empty,
     currentPromptNumber: Int = 0,
     dictionary: Dictionary = new Dictionary)
   extends ModelComponent {
 
   private[this] lazy val l = AppDependencies.logger
 
-  def cueType = header.cueType           // example: "English word"
+  def promptType = header.promptType           // example: "English word"
   def responseType = header.responseType // example: "German word"
 
-  def updatedQuizPairs(newQuizPairs: Stream[QuizPair]): QuizGroup =
-    new QuizGroup(header, newQuizPairs, currentPromptNumber, dictionary)
+  def updatedQuizItems(newQuizItems: Stream[QuizItem]): QuizGroup =
+    new QuizGroup(header, newQuizItems, currentPromptNumber, dictionary)
 
   def updatedPromptNumber: QuizGroup =
-    new QuizGroup(header, quizPairs, currentPromptNumber + 1, dictionary)
+    new QuizGroup(header, quizItems, currentPromptNumber + 1, dictionary)
 
 
-  def updatedWithUserAnswer(key: String, quizValue: QuizValueWithUserAnswers,
-      userAnswer: UserAnswer) = {
-    val quizValueUpdated = quizValue.addUserAnswer(userAnswer)
-    addQuizPair(key, quizValueUpdated)
+  def updatedWithUserAnswer(prompt: Value, response: Value, wasCorrect: Boolean,
+      userResponses: UserResponses, userAnswer: UserResponse) = {
+    val userResponseUpdated = userResponses.addUserAnswer(userAnswer, wasCorrect)
+    addQuizItem(prompt, response, userResponseUpdated)
   }
 
-  def addQuizPair(key: String, value: String): QuizGroup =
-    addQuizPair(key, QuizValueWithUserAnswers(value))
+  def addQuizItem(prompt: Value, response: Value, userResponses: UserResponses = UserResponses()):
+      QuizGroup =
+    addQuizItemToFront(QuizItem(prompt, response, userResponses))
 
-  def addQuizPair(key: String, value: QuizValueWithUserAnswers): QuizGroup =
-    if (!key.isEmpty && !value.value.isEmpty && key.toLowerCase != value.value.toLowerCase)
-      addQuizPairToFront(QuizPair(key, value))
+  def addNewQuizItem(prompt: String, response: String): QuizGroup =
+    if (!prompt.isEmpty && !response.isEmpty && prompt.toLowerCase != response.toLowerCase)
+      addQuizItemToFront(QuizItem(prompt, response))
     else
       this
 
-  protected[model] def addQuizPairToFront(key: String, value: String): QuizGroup =
-    addQuizPairToFront(QuizPair(key, value))
+  protected[model] def addQuizItemToFront(key: Value, value: Value): QuizGroup =
+    addQuizItemToFront(QuizItem(key, value))
 
-  protected[model] def addQuizPairToFront(quizPair: QuizPair): QuizGroup =
-    addQuizPairToFront(quizPairs, quizPair)
+  protected[model] def addQuizItemToFront(quizItem: QuizItem): QuizGroup =
+    addQuizItemToFront(quizItems, quizItem)
 
-  protected[model] def addQuizPairToFront(quizPairs: Stream[QuizPair],
-      quizPair: QuizPair): QuizGroup =
-    updatedQuizPairs(quizPair +: quizPairs.filterNot(_.sameCueAndResponse(quizPair)))
+  protected[model] def addQuizItemToFront(quizItems: Stream[QuizItem],
+      quizItem: QuizItem): QuizGroup =
+    updatedQuizItems(quizItem +: remove(quizItem))
 
-  protected[model] def addQuizPairToEnd(quizPair: QuizPair): QuizGroup =
-    addQuizPairToEnd(quizPairs, quizPair)
+  protected[model] def addQuizItemToEnd(quizItem: QuizItem): QuizGroup =
+    addQuizItemToEnd(quizItems, quizItem)
 
-  protected[model] def addQuizPairToEnd(quizPairs: Stream[QuizPair], quizPair: QuizPair):
-      QuizGroup = {
-    val newQuizPairs = quizPairs.filterNot(_.sameCueAndResponse(quizPair)) :+ quizPair
-    updatedQuizPairs(newQuizPairs)
-  }
+  protected[model] def addQuizItemToEnd(quizItems: Stream[QuizItem], quizItem: QuizItem):
+      QuizGroup =
+    updatedQuizItems(remove(quizItem) :+ quizItem)
 
+  def removeQuizItem(quizItem: QuizItem) = updatedQuizItems(remove(quizItem))
 
-  def removeQuizPair(pair: QuizPair) = updatedQuizPairs(quizPairs.filterNot(_.sameCueAndResponse(pair)))
-  def removeQuizPairsForCue(cue: String) = updatedQuizPairs(quizPairs.filter(_.cue != cue))
-  def removeQuizPairsForResponse(response: String) =
-    updatedQuizPairs(quizPairs.filter(_.response.value != response))
+  private def remove(quizItem: QuizItem): Stream[QuizItem] =
+    quizItems.filterNot(_.samePromptAndResponse(quizItem))
+
+  def removeQuizItemsForPrompt(prompt: String) =
+    updatedQuizItems(quizItems.filter(_.prompt.text != prompt))
+  def removeQuizItemsForResponse(response: String) =
+    updatedQuizItems(quizItems.filter(_.response.text != response))
 
   def updatedDictionary(newDictionary: Dictionary) =
-    new QuizGroup(header, quizPairs, currentPromptNumber, newDictionary)
+    new QuizGroup(header, quizItems, currentPromptNumber, newDictionary)
 
-  def quizCues: Stream[String] = quizPairs.map(_.cue)
-  def quizResponses: Stream[QuizValueWithUserAnswers] = quizPairs.map(_.response)
+  def quizPrompts: Stream[Value] = quizItems.map(_.prompt)
+  def quizResponses: Stream[Value] = quizItems.map(_.response)
 
   def matches(qgOther: QuizGroup): Boolean = header.matches(qgOther.header)
 
   /*
    * Example of custom format:
    *
-   * quizGroup type="WordMapping" cueType="English word" responseType="German word" currentPromptNumber="0"
+   * quizGroup type="WordMapping" promptType="English word" responseType="German word" currentPromptNumber="0"
    *    against|wider
    *    entertain|unterhalten
    */
@@ -104,9 +107,9 @@ case class QuizGroup(
     // Imperative code is used for speed
     val iter = wordMappingGroup.wordMappingPairs.iterator
     while (iter.hasNext) {
-      val quizPair = iter.next
-      strBuilder.append('\n').append(quizPair.key).append('|')
-      quizPair.valueSet.toCustomFormat(strBuilder)
+      val quizItem = iter.next
+      strBuilder.append('\n').append(quizItem.key).append('|')
+      quizItem.valueSet.toCustomFormat(strBuilder)
     }
     strBuilder
   }
@@ -117,42 +120,43 @@ case class QuizGroup(
     SaveData(fileName, serialized.toString)
   }
 
-  def contains(key: String): Boolean = quizCues.contains(key)
-  def size = quizPairs.size
-  def numCues = size
+  def contains(prompt: String): Boolean = contains(TextValue(prompt))
+  def contains(prompt: Value): Boolean = quizPrompts.contains(prompt)
+  def size = quizItems.size
+  def numPrompts = size
   def numResponses = size
-  def numCorrectAnswers: Int = quizPairs.map(_.response.numCorrectAnswersInARow).sum
+  def numCorrectAnswers: Int = quizItems.map(_.userResponses.numCorrectAnswersInARow).sum
 
 
-  // Low usage expected. Slow because we are not using a Map for quizPairs.
-  def findValuesFor(cue: String): List[QuizValueWithUserAnswers] =
-    quizPairs.filter(_.cue == cue).map(_.response).toList
+  // Low usage expected. Slow because we are not using a Map for quizItems.
+  def findValuesFor(prompt: String): List[String] =
+    quizItems.filter(_.prompt.text == prompt).map(_.response.text).toList
 
   def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] = {
     l.log("findAnyUnfinishedQuizItem " + header)
-    quizPairs.iterator.find(_.response.isUnfinished).map(
-        pair => quizItemWithOptions(pair, pair.response))
+    quizItems.iterator.find(_.userResponses.isUnfinished).map(
+        pair => quizItemWithOptions(pair, pair.response.text))
   }
 
-  protected def quizItemWithOptions(wmp: QuizPair,
-      quizValueCorrect: QuizValueWithUserAnswers): QuizItemViewWithChoices = {
-    val numCorrectAnswers = quizValueCorrect.numCorrectAnswersInARow
-    val falseAnswers = makeFalseAnswers(wmp, quizValueCorrect, numCorrectAnswers)
-    new QuizItemViewWithChoices(wmp, quizValueCorrect,
-      currentPromptNumber, header, falseAnswers, numCorrectAnswers)
+  protected def quizItemWithOptions(quizItem: QuizItem,
+      quizValueCorrect: String): QuizItemViewWithChoices = {
+    val numCorrectAnswers = quizItem.userResponses.numCorrectAnswersInARow
+    val falseAnswers = makeFalseAnswers(quizItem, quizValueCorrect, numCorrectAnswers)
+    new QuizItemViewWithChoices(quizItem, currentPromptNumber, header, falseAnswers,
+        numCorrectAnswers)
   }
 
 
-  protected def findPresentableQuizItem(quizPair: QuizPair, currentPromptNumber: Int):
+  protected def findPresentableQuizItem(quizItem: QuizItem, currentPromptNumber: Int):
       Option[QuizItemViewWithChoices] = {
-    if (quizPair.response.isPresentable(currentPromptNumber))
-      Util.stopwatch(Some(quizItemWithOptions(quizPair, quizPair.response)),
-          "quizItemWithOptions for " + quizPair.response)
+    if (quizItem.isPresentable(currentPromptNumber))
+      Util.stopwatch(Some(quizItemWithOptions(quizItem, quizItem.response.text)),
+          "quizItemWithOptions for " + quizItem.response)
     else
       None
   }
 
-  def makeFalseAnswers(wmpCorrect: QuizPair, quizValueCorrect: QuizValueWithUserAnswers,
+  def makeFalseAnswers(wmpCorrect: QuizItem, quizValueCorrect: String,
       numCorrectAnswersSoFar: Int): Set[String] = {
 
     var falseAnswers = new ListSet[String]
@@ -163,7 +167,7 @@ case class QuizGroup(
      * fill the falseAnswers with similar-looking words.
      */
     if (numCorrectAnswersSoFar >= 1) {
-      val correctValues = findValuesFor(wmpCorrect.cue)
+      val correctValues = findValuesFor(wmpCorrect.prompt.text)
       falseAnswers ++= Util.stopwatch(makeFalseSimilarAnswers(correctValues,
           quizValueCorrect, numCorrectAnswersSoFar, numFalseAnswersRequired),
           "makeFalseSimilarAnswers")
@@ -175,7 +179,7 @@ case class QuizGroup(
       totalTries = totalTries - 1
       val randomAnswer: Option[String] = findRandomWordValue(randomValues(100))
       randomAnswer.foreach( randomAnswer =>
-        if (wmpCorrect.response.value != randomAnswer)
+        if (wmpCorrect.response.text != randomAnswer)
           falseAnswers += randomAnswer
       )
     }
@@ -189,38 +193,36 @@ case class QuizGroup(
   }
 
 
-  def makeFalseSimilarAnswers(correctQuizValues: List[QuizValueWithUserAnswers],
-      correctValue: QuizValueWithUserAnswers,
+  def makeFalseSimilarAnswers(correctValues: List[String], correctValue: String,
       numCorrectAnswersSoFar: Int, numFalseAnswersRequired: Int): Set[String] = {
 
     var similarWords = new HashSet[String]
 
-    def hasSameStart = (wmv: QuizValueWithUserAnswers, value: String) => wmv.hasSameStart(value)
-    def hasSameEnd = (wmv: QuizValueWithUserAnswers, value: String) => wmv.hasSameEnd(value)
+    def hasSameStart = (value1: Value, value2: String) => value1.hasSameStart(value2)
+    def hasSameEnd = (value1: Value, value2: String) => value1.hasSameEnd(value2)
     val similarityFunction = if (numCorrectAnswersSoFar % 2 == 1) hasSameStart else hasSameEnd
 
     var numValueSetsSearched = 0
     val numSimilarLettersRequired = 2
-    quizPairs.iterator.takeWhile(_ => similarWords.size < numFalseAnswersRequired).
-        foreach(quizPair => {
+    quizItems.iterator.takeWhile(_ => similarWords.size < numFalseAnswersRequired).
+        foreach(quizItem => {
       numValueSetsSearched = numValueSetsSearched + 1
       // Avoid selecting values belonging to the "correct" response set
-      val correctValues = correctQuizValues.map(_.value)
-      if (!correctValues.contains(quizPair.response)) {
+      if (!correctValues.contains(quizItem.response)) {
         if (similarWords.size < numFalseAnswersRequired &&
-            similarityFunction(quizPair.response, correctValue.value)(numSimilarLettersRequired))
-          similarWords += quizPair.response.value
+            similarityFunction(quizItem.response, correctValue)(numSimilarLettersRequired))
+          similarWords += quizItem.response.text
       }
     })
     similarWords
   }
 
-  def findRandomWordValue(quizValues: Seq[QuizValueWithUserAnswers]): Option[String] = {
+  def findRandomWordValue(quizValues: Seq[Value]): Option[String] = {
     if (quizValues.isEmpty)
       None
     else {
       val randomIndex = Random.nextInt(quizValues.length)
-      Some(quizValues(randomIndex).value)
+      Some(quizValues(randomIndex).text)
     }
   }
 
@@ -228,33 +230,33 @@ case class QuizGroup(
     otherWmg.map(merge(_)).getOrElse(this)
 
   def merge(otherWmg: QuizGroup): QuizGroup = {
-    val quizPairsCombined = (quizPairs ++ otherWmg.quizPairs).asInstanceOf[Stream[QuizPair]]
-    updatedQuizPairs(quizPairsCombined)
+    val quizItemsCombined = (quizItems ++ otherWmg.quizItems).asInstanceOf[Stream[QuizItem]]
+    updatedQuizItems(quizItemsCombined)
   }
 
-  def hasCue(cue: String): Boolean = quizCues.contains(cue)
-  def cueBeginningWith(cueStart: String) = quizCues.find(_.startsWith(cueStart))
+  def hasPrompt(prompt: String): Boolean = quizPrompts.contains(prompt)
+  //def promptBeginningWith(promptStart: String): Boolean = quizPrompts.find(_.hasSameStart(promptStart))
 
 
   def findPresentableQuizItem: Option[QuizItemViewWithChoices] = {
     val quizItem =
       (for {
-        quizPair <- quizPairs.toStream
-        quizItem <- findPresentableQuizItem(quizPair, currentPromptNumber)
+        quizItem <- quizItems.toStream
+        quizItem <- findPresentableQuizItem(quizItem, currentPromptNumber)
       } yield quizItem).headOption
     l.log("found quiz item " + quizItem)
     quizItem
   }
 
 
-  def randomValues(sliceSize: Int): List[QuizValueWithUserAnswers] =
-    randomSliceOfQuizPairs(sliceSize).map(_.response).toList
+  def randomValues(sliceSize: Int): List[Value] =
+    randomSliceOfQuizItems(sliceSize).map(_.response).toList
 
-  def randomSliceOfQuizPairs(sliceSize: Int): Iterable[QuizPair] =
-    if (sliceSize >= size) quizPairs.toList
+  def randomSliceOfQuizItems(sliceSize: Int): Iterable[QuizItem] =
+    if (sliceSize >= size) quizItems.toList
     else {
       val randomStart = Random.nextInt(size - sliceSize)
-      quizPairs.slice(randomStart, randomStart + sliceSize)
+      quizItems.slice(randomStart, randomStart + sliceSize)
     }
 
 }

@@ -31,7 +31,7 @@ case class ChoiceGroup[T](choices: List[T]) {
     }
   }
 
-  def getSelectionFromInput: UserResponse =
+  def getSelectionFromInput: UserConsoleResponse =
     readLine match {
       case "q" => Quit
       case "quit" => Quit

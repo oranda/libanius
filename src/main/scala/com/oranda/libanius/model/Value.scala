@@ -16,22 +16,13 @@
 
 package com.oranda.libanius.model
 
-import org.specs2.mutable.Specification
-import com.oranda.libanius.dependencies.{AppDependencies, Conf}
+abstract class Value(val text: String) {
 
-class UserAnswerSpec extends Specification {
-  
-  "a user answer" should {
+  def hasSameStart(otherValue: String) =
+    (numOfLetters: Int) => otherValue != text &&
+      text.take(numOfLetters) == otherValue.take(numOfLetters)
 
-    AppDependencies.conf = Conf.setUpForTest()
-    
-    val uaXml = <userAnswer wasCorrect="true" promptNumber="1"></userAnswer>
-  
-    val ua = UserAnswer.fromXML(uaXml)
-
-    "be parseable from XML" in {
-      ua.wasCorrect == true
-      ua.promptNumber == 1
-    }
-  }
+  def hasSameEnd(otherValue: String) =
+    (numOfLetters: Int) => otherValue != text &&
+      text.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
 }

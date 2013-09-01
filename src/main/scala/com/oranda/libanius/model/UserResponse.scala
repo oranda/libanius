@@ -13,13 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.oranda.libanius.model
 
-import com.oranda.libanius.model.wordmapping.WordMappingPair
-
-case class SearchResult(quizGroupHeader: QuizGroupHeader, wmp: WordMappingPair) {
-  lazy val promptType = quizGroupHeader.promptType
-  lazy val responseType = quizGroupHeader.responseType
-  lazy val keyWord = wmp.key
-  lazy val valueSet = wmp.valueSet
-}
+case class UserResponse(promptNumber: Int) extends ModelComponent

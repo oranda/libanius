@@ -1,12 +1,23 @@
+== 0.86 September 1 2013
+
+  * Changes to QuizPair, resulting in tweaks throughout the codebase:
+
+    1. QuizPair is now called QuizItem.
+    2. "key" is now "prompt".
+    3. "value" is now "response" (i.e. the desired response).
+    4. The user history of actual responses is separated out from the response field.
+
+
 == 0.85 August 31 2013
 
   * Restructured the data model for clarity and performance
-    ** The central quiz processing entity has changed from WordMappingGroup to QuizGroup,
+
+   1. The central quiz processing entity has changed from WordMappingGroup to QuizGroup,
        which has a simpler structure and is thus easier to optimize and use generically.
        There is still a WordMappingGroup, but it is used only for persistence purposes.
-    ** Eliminated the concept of range search. It was an increasingly complex optimization that
+   2. Eliminated the concept of range search. It was an increasingly complex optimization that
        should be unnecessary.
-    ** Introduced a type parameter for QuizGroups to distinguish between question-answer quizzes
+   3. Introduced a type parameter for QuizGroups to distinguish between question-answer quizzes
        and word translation quizzes.
 
 

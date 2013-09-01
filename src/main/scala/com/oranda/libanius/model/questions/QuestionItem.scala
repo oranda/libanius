@@ -17,14 +17,14 @@
 package com.oranda.libanius.model.questions
 
 import scala.xml.Node
-import com.oranda.libanius.model.UserAnswer
+import com.oranda.libanius.model.UserResponse
 import scala.util.matching.Regex
-import com.oranda.libanius.model.QuizValueWithUserAnswers
+import com.oranda.libanius.model.UserResponses
 import com.oranda.libanius.dependencies.AppDependencies
 
 case class QuestionItem(/*override val correctAnswersInARow: List[UserAnswer] = Nil,
                    override val incorrectAnswers: List[UserAnswer] = Nil*/) /*
-    extends QuizValueWithUserAnswers[QuestionItem](correctAnswersInARow, incorrectAnswers)*/ {
+    extends UserResponses[QuestionItem](correctAnswersInARow, incorrectAnswers)*/ {
   /*
   def self = this
 

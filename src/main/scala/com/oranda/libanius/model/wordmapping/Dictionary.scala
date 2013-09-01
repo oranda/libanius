@@ -69,7 +69,7 @@ object Dictionary {
   /*
    * Example:
    *
-   * quizGroup type="WordMapping" cueType="English word" responseType="German word"
+   * quizGroup type="WordMapping" promptType="English word" responseType="German word"
    *    against|wider
    *    entertain|unterhalten
    */

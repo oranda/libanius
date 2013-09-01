@@ -67,7 +67,7 @@ case class DataStore(io: PlatformIO) {
 
     def saveToFile(qg: QuizGroup) = {
       val saveData = qg.getSaveData
-      l.log("Saving qg " + qg.cueType + ", qg has promptNumber " +
+      l.log("Saving qg " + qg.promptType + ", qg has promptNumber " +
           qg.currentPromptNumber + " to " + saveData.fileName)
       io.writeToFile(path + saveData.fileName, saveData.data)
     }
@@ -147,7 +147,7 @@ case class DataStore(io: PlatformIO) {
     val fileText = Util.stopwatch(io.readFile(fileName), "reading dictionary " + fileName)
     val dictionary = Util.stopwatch(fileText.map(Dictionary.fromCustomFormat(_)),
         "parsing dictionary")
-    l.log("Finished reading " + dictionary.map(_.numKeyWords).getOrElse(0) + " dictionary cue words")
+    l.log("Finished reading " + dictionary.map(_.numKeyWords).getOrElse(0) + " dictionary prompt words")
     dictionary
   }
 }

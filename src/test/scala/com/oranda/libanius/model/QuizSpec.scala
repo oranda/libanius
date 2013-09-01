@@ -26,7 +26,7 @@ class QuizSpec extends Specification {
     
     val quizData = List(
 
-        "quizGroup type=\"WordMapping\" cueType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
+        "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
         "against|wider\n" +
         "entertain|unterhalten\n" +
         "teach|unterrichten\n" +
@@ -38,7 +38,7 @@ class QuizSpec extends Specification {
         "rides|reitet\n" +
         "sweeps|streicht\n",
 
-        "quizGroup type=\"WordMapping\" cueType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\"\n" +
+        "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\"\n" +
         "unterwegs|en route\n" +
         "Vertrag|contract:697,696;698/treaty:796;798")
 
@@ -60,30 +60,30 @@ class QuizSpec extends Specification {
     }*/
     
     "offer translations for a word, given the group of the word" in { 
-      val translations = quiz.findValuesFor(keyWord = "Vertrag", 
+      val translations = quiz.findValuesFor(prompt = "Vertrag",
           QuizGroupHeader(WordMapping, "German word", "English word")).toSet[String]
       translations.contains("contract") mustEqual true
       translations.contains("treaty") mustEqual true
     }    
     
-    "delete cue-words from a particular group" in {
+    "delete prompt-words from a particular group" in {
       val quizBefore = Quiz.demoQuiz(quizData)
       val wmgBefore = quizBefore.findQuizGroup(
           QuizGroupHeader(WordMapping, "English word", "German word")).get
       wmgBefore.contains("full") mustEqual true
-      val quizAfter = quizBefore.removeQuizPairsForCue("full",
+      val quizAfter = quizBefore.removeQuizItemsForPrompt("full",
           QuizGroupHeader(WordMapping, "English word", "German word"))
       val wmgAfter = quizAfter.findQuizGroup(
           QuizGroupHeader(WordMapping, "English word", "German word")).get
       wmgAfter.contains("full") mustEqual false
     }
 
-    "delete a quiz pair without deleting all values for that cue" in {
+    "delete a quiz pair without deleting all values for that prompt" in {
       val quizBefore = Quiz.demoQuiz(quizData)
-      val quizAfter = quizBefore.removeQuizPair(
-          keyWord = "Vertrag", QuizValueWithUserAnswers("contract"),
+      val quizAfter = quizBefore.removeQuizItem(
+          prompt = "Vertrag", response = "contract",
           QuizGroupHeader(WordMapping, "German word", "English word"))
-      val translations = quizAfter.findValuesFor(keyWord = "Vertrag",
+      val translations = quizAfter.findValuesFor(prompt = "Vertrag",
           QuizGroupHeader(WordMapping, "German word", "English word"))
       translations.contains("contract") mustEqual false
       translations.contains("treaty") mustEqual true

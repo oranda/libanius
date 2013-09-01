@@ -34,12 +34,12 @@ case class WordMappingGroup(
   private[this] lazy val l = AppDependencies.logger
 
   def toQuizGroup: QuizGroup = {
-    def makeQuizPairs(wmPair: WordMappingPair): Iterable[QuizPair] =
-      wmPair.valueSet.values.map(value => QuizPair(wmPair.key, value))
+    def makeQuizItems(wmPair: WordMappingPair): Iterable[QuizItem] =
+      wmPair.valueSet.values.map(value => QuizItem(TextValue(wmPair.key), TextValue(value.value)))
 
-    val quizPairs: Stream[QuizPair] = wordMappingPairs.flatMap(makeQuizPairs(_))
+    val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems(_))
     val dictionary = Dictionary.fromWordMappings(wordMappingPairs)
-    QuizGroup(header, quizPairs, 0, dictionary)
+    QuizGroup(header, quizItems, 0, dictionary)
   }
 
   def findValueSetFor(key: String): Option[WordMappingValueSet] =
@@ -67,9 +67,9 @@ object WordMappingGroup {
       new GroupByOrderedImplicit[A](t)
 
     val wordMappingPairs: Stream[WordMappingPair] =
-      (quizGroup.quizPairs.groupByOrdered(_.cue).map {
-        case (str: String, quizPairs: mutable.LinkedHashSet[QuizPair]) =>
-            WordMappingPair(str, WordMappingValueSet.createFromQuizPairs(quizPairs.toList))
+      (quizGroup.quizItems.groupByOrdered(_.prompt).map {
+        case (prompt: Value, quizItems: mutable.LinkedHashSet[QuizItem]) =>
+            WordMappingPair(prompt.text, WordMappingValueSet.createFromQuizItems(quizItems.toList))
       }).toStream
     WordMappingGroup(quizGroup.header, wordMappingPairs)
   }
@@ -77,7 +77,7 @@ object WordMappingGroup {
   /*
    * Example:
    *
-   * quizGroup type="WordMapping" cueType="English word" responseType="German word" currentPromptNumber="0"
+   * quizGroup type="WordMapping" promptType="English word" responseType="German word" currentPromptNumber="0"
    *    against|wider
    *    entertain|unterhalten
    */
@@ -109,7 +109,7 @@ object WordMappingGroup {
             }
           }
           Try(parseKeyValue) recover {
-            case e: Exception => l.logError("could not parse cue-response string: " + strKeyValue)
+            case e: Exception => l.logError("could not parse prompt-response string: " + strKeyValue)
           }
         }
       }

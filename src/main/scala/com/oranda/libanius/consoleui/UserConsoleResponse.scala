@@ -16,13 +16,13 @@
 
 package com.oranda.libanius.consoleui
 
-abstract class UserResponse
-abstract class Answer extends UserResponse {
+abstract class UserConsoleResponse
+abstract class Answer extends UserConsoleResponse {
   def text: String
 }
 case class TextAnswer(text: String) extends Answer
 case class ChosenOptions(chosenOptions: List[_]) extends Answer {
   override def text = chosenOptions.iterator.next.toString
 }
-case object Invalid extends UserResponse
-case object Quit extends UserResponse
+case object Invalid extends UserConsoleResponse
+case object Quit extends UserConsoleResponse

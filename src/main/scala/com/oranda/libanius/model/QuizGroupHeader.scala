@@ -20,24 +20,24 @@ import com.oranda.libanius.dependencies.AppDependencies
 import com.oranda.libanius.model.wordmapping.WordMappingGroup
 
 
-case class QuizGroupHeader(quizGroupType: QuizGroupType, cueType: String, responseType: String)
+case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String, responseType: String)
     extends ModelComponent {
-  // cueType example: "English word"
+  // promptType example: "English word"
   // responseType example: "German word"
 
-  override def toString = quizGroupType + ": " + cueType + "-" + responseType
+  override def toString = quizGroupType + ": " + promptType + "-" + responseType
 
   def toCustomFormat(strBuilder: StringBuilder) =
-    strBuilder.append("quizGroup type=\"").append(quizGroupType).append("\" cueType=\"").
-        append(cueType).append("\" responseType=\"").append(responseType).append("\"")
+    strBuilder.append("quizGroup type=\"").append(quizGroupType).append("\" promptType=\"").
+        append(promptType).append("\" responseType=\"").append(responseType).append("\"")
 
   def matches(other: QuizGroupHeader) =
-    cueType == other.cueType && responseType == other.responseType
+    promptType == other.promptType && responseType == other.responseType
 
-  def makeQgFileName = cueType + "-" + responseType + ".qg"
-  def makeDictFileName = cueType + "-" + responseType + ".dct"
+  def makeQgFileName = promptType + "-" + responseType + ".qg"
+  def makeDictFileName = promptType + "-" + responseType + ".dct"
 
-  def reverse = QuizGroupHeader(quizGroupType, responseType, cueType)
+  def reverse = QuizGroupHeader(quizGroupType, responseType, promptType)
 
   // TODO: improve this
   def createQuizGroup(text: String): QuizGroup = quizGroupType match {
@@ -51,7 +51,7 @@ object QuizGroupHeader {
   private[this] val l = AppDependencies.logger
 
   def apply(headerLine: String): QuizGroupHeader =
-    this(parseQuizGroupType(headerLine), parseCueType(headerLine),
+    this(parseQuizGroupType(headerLine), parsePromptType(headerLine),
         parseResponseType(headerLine))
 
   def parseQuizGroupType(str: String): QuizGroupType = {
@@ -63,7 +63,7 @@ object QuizGroupHeader {
     }
   }
 
-  def parseCueType(str: String): String = StringUtil.parseValue(str, "cueType=\"", "\"")
+  def parsePromptType(str: String): String = StringUtil.parseValue(str, "promptType=\"", "\"")
   def parseResponseType(str: String): String = StringUtil.parseValue(str, "responseType=\"", "\"")
 }
 

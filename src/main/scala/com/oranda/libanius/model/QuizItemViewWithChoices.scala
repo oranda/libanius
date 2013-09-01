@@ -23,23 +23,22 @@ import scala.util.Random
  * contains whatever information is necessary for the view, and for updating the backing data.
  */
 class QuizItemViewWithChoices(
-    val quizPair: QuizPair,
-    val quizValue: QuizValueWithUserAnswers,
+    val quizItem: QuizItem,
     val qgCurrentPromptNumber: Int,
     val quizGroupHeader: QuizGroupHeader,
     val falseAnswers: Set[String],
     val numCorrectAnswersInARow: Int) {
 
-  lazy val cue = quizPair.cue
-  lazy val response = quizPair.response
-  lazy val cueType = quizGroupHeader.cueType
+  lazy val prompt = quizItem.prompt
+  lazy val response = quizItem.response
+  lazy val promptType = quizGroupHeader.promptType
   lazy val responseType = quizGroupHeader.responseType
 
-  lazy val allChoices = choicesInRandomOrder(quizValue, falseAnswers)
+  lazy val allChoices = choicesInRandomOrder(quizItem.userResponses, falseAnswers)
 
-  def choicesInRandomOrder(quizValue: QuizValueWithUserAnswers, otherChoices: Set[String]):
+  def choicesInRandomOrder(quizValue: UserResponses, otherChoices: Set[String]):
       List[String] = {
-    val allChoices = otherChoices + quizValue.value
+    val allChoices = otherChoices + quizItem.response.text
     Random.shuffle(allChoices.toList)
   }
 

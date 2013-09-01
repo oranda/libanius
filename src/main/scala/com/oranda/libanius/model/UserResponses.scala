@@ -18,34 +18,25 @@ package com.oranda.libanius.model
 
 import com.oranda.libanius.dependencies.AppDependencies
 import com.oranda.libanius.util.StringUtil
-import QuizValueWithUserAnswers._
+import UserResponses._
+import com.oranda.libanius.model.wordmapping.WordMappingValue
 
-case class QuizValueWithUserAnswers(value: String,
-    correctAnswersInARow: List[UserAnswer] = Nil, incorrectAnswers: List[UserAnswer] = Nil)
+case class UserResponses(correctAnswersInARow: List[UserResponse] = Nil,
+    incorrectAnswers: List[UserResponse] = Nil)
   extends ModelComponent {
 
-  def updated(value: String, correctAnswersInARow: List[UserAnswer],
-      incorrectAnswers: List[UserAnswer]): QuizValueWithUserAnswers =
-    new QuizValueWithUserAnswers(value, correctAnswersInARow, incorrectAnswers)
+  def updated(value: String, correctAnswersInARow: List[UserResponse],
+      incorrectAnswers: List[UserResponse]): UserResponses =
+    new UserResponses(correctAnswersInARow, incorrectAnswers)
 
   def userAnswers = correctAnswersInARow ++ incorrectAnswers
 
-  def addUserAnswer(userAnswer : UserAnswer): QuizValueWithUserAnswers =
-    if (userAnswer.wasCorrect)
-      updated(value, userAnswer :: correctAnswersInARow, incorrectAnswers)
+  def addUserAnswer(userAnswer : UserResponse, wasCorrect: Boolean): UserResponses =
+    if (wasCorrect)
+      updated(userAnswer :: correctAnswersInARow, incorrectAnswers)
     else
-      updated(value, Nil, userAnswer :: incorrectAnswers) // old correct answers are discarded
+      updated(Nil, userAnswer :: incorrectAnswers) // old correct answers are discarded
 
-  
-  def addUserAnswersBatch(correctPromptNumStrs: List[String],
-      incorrectPromptNumStrs: List[String]): QuizValueWithUserAnswers = {
-    // TODO: see if an imperative version is faster
-    val newCorrectAnswersInARow = correctPromptNumStrs.map(correctPromptNum =>
-        new UserAnswer(wasCorrect = false, promptNumber = correctPromptNum.toInt))
-    val newIncorrectAnswers = incorrectPromptNumStrs.map(incorrectPromptNum =>
-        new UserAnswer(wasCorrect = false, promptNumber = incorrectPromptNum.toInt))
-    updated(newCorrectAnswersInARow, newIncorrectAnswers)
-  }
 
   /*
    * See if this quiz item meets any of the defined criteria sets that would make it presentable.
@@ -70,16 +61,12 @@ case class QuizValueWithUserAnswers(value: String,
         map(_.promptNumber)
 
 
-  def updated(correctAnswersInARow: List[UserAnswer], incorrectAnswers: List[UserAnswer]):
-      QuizValueWithUserAnswers =
-    QuizValueWithUserAnswers(value, correctAnswersInARow, incorrectAnswers)
-
-  override def toString = value   // e.g. "unterrichten"
+  def updated(correctAnswersInARow: List[UserResponse], incorrectAnswers: List[UserResponse]):
+      UserResponses =
+    UserResponses(correctAnswersInARow, incorrectAnswers)
 
   // Example: nachlösen:1,7,9;6
   def toCustomFormat(strBuilder: StringBuilder): StringBuilder = {
-    strBuilder.append(value)
-
     if (!correctAnswersInARow.isEmpty || !incorrectAnswers.isEmpty)
       strBuilder.append(':')
     if (!correctAnswersInARow.isEmpty)
@@ -91,21 +78,14 @@ case class QuizValueWithUserAnswers(value: String,
     strBuilder
   }
 
-  def answerPromptNumber(strBuilder: StringBuilder, answer: UserAnswer) =
+  def answerPromptNumber(strBuilder: StringBuilder, answer: UserResponse) =
     strBuilder.append(answer.promptNumber)
 
 
-  def hasSameStart(otherValue: String) =
-    (numOfLetters: Int) => otherValue != value &&
-      value.take(numOfLetters) == otherValue.take(numOfLetters)
-
-  def hasSameEnd(otherValue: String) =
-    (numOfLetters: Int) => otherValue != value &&
-      value.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
 
 }
 
-object QuizValueWithUserAnswers {
+object UserResponses {
 
   /*
    * Criteria sets that determine whether the current item is presentable or not.
@@ -116,35 +96,6 @@ object QuizValueWithUserAnswers {
     Criteria(numCorrectAnswersInARowDesired = 3, diffInPromptNumMinimum = 800)
     /*(4, 5000),*/
   )
-
-  // Example: str = "nachlösen:1,7,9;6"
-  def fromCustomFormat(str: String): QuizValueWithUserAnswers = {
-
-    // This code needs to be both fast and thread-safe.
-    val wmvSplitter = AppDependencies.stringSplitterFactory.getSplitter(':')
-    val allAnswersSplitter = AppDependencies.stringSplitterFactory.getSplitter(';')
-    val answersSplitter = AppDependencies.stringSplitterFactory.getSplitter(',')
-
-    wmvSplitter.setString(str)
-    var wmv = new QuizValueWithUserAnswers(wmvSplitter.next, Nil, Nil)
-    if (wmvSplitter.hasNext) {
-      val strAllAnswers = wmvSplitter.next
-      allAnswersSplitter.setString(strAllAnswers)
-
-      val correctPromptNums = allAnswersSplitter.next
-      answersSplitter.setString(correctPromptNums)
-      val correctAnswers = answersSplitter.toList
-      val incorrectAnswers =
-        if (allAnswersSplitter.hasNext) {
-          val incorrectPromptNums = allAnswersSplitter.next
-          answersSplitter.setString(incorrectPromptNums)
-          answersSplitter.toList
-        } else
-          Nil
-      wmv = wmv.addUserAnswersBatch(correctAnswers, incorrectAnswers)
-    }
-    wmv
-  }
 }
 
 /*

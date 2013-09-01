@@ -36,8 +36,8 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
    *
    * Example:
    * quiz
-   *   quizGroup type="WordMapping" cueType="German word" responseType="English word"
-   *   quizGroup type="WordMapping" cueType="English word" responseType="German word"
+   *   quizGroup type="WordMapping" promptType="German word" responseType="English word"
+   *   quizGroup type="WordMapping" promptType="English word" responseType="German word"
    */
   def toCustomFormat: StringBuilder = {
     // For efficiency, avoiding Scala's own StringBuilder and mkString
@@ -59,12 +59,11 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     }
   }
 
-  def findValuesFor(keyWord: String, header: QuizGroupHeader): List[String] = {
-    l.log("Looking for values for " + keyWord + " in " + header)
+  def findValuesFor(prompt: String, header: QuizGroupHeader): List[String] = {
+    l.log("Looking for values for " + prompt + " in " + header)
 
     findQuizGroup(header) match {
-      case Some(quizGroup) =>
-        quizGroup.findValuesFor(keyWord).map(_.value)
+      case Some(quizGroup) => quizGroup.findValuesFor(prompt)
       case _ => l.logError("could not find quizGroup for " + header)
         Nil
     }
@@ -81,53 +80,42 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
   // Just a synonym for addQuizGroup
   def replaceQuizGroup(quizGroup: QuizGroup) = addQuizGroup(quizGroup)
 
-  // This will replace any existing wordMappingGroup with the same cue-response pair
+  // This will replace any existing wordMappingGroup with the same prompt-response pair
   def addQuizGroup(quizGroup: QuizGroup): Quiz = {
     val newQuiz: Quiz = removeQuizGroup(quizGroup.header)
     Quiz(newQuiz.quizGroups + quizGroup)
   }
 
 
-  def removeQuizPairsForCue(cue: String, header: QuizGroupHeader): Quiz = {
+  def removeQuizItemsForPrompt(prompt: String, header: QuizGroupHeader): Quiz = {
     val quizGroup = findQuizGroup(header)
     quizGroup match {
-      case Some(quizGroup) => replaceQuizGroup(quizGroup.removeQuizPairsForCue(cue))
+      case Some(quizGroup) => replaceQuizGroup(quizGroup.removeQuizItemsForPrompt(prompt))
       case None => this
     }
   }
 
-  def removeQuizPair(keyWord: String, quizValue: QuizValueWithUserAnswers,
-      header: QuizGroupHeader): Quiz = {
+  def removeQuizItem(prompt: String, response: String, header: QuizGroupHeader): Quiz = {
     val wordMappingGroup = findQuizGroup(header)
     wordMappingGroup match {
       case Some(quizGroup) =>
-        val quizPair = QuizPair(keyWord, quizValue)
-        val newQuizGroup = quizGroup.removeQuizPair(quizPair)
+        val quizItem = QuizItem(prompt, response)
+        val newQuizGroup = quizGroup.removeQuizItem(quizItem)
         replaceQuizGroup(newQuizGroup)
       case None => this
     }
   }
 
   /*
-   * Find the first available "presentable" word mapping: imperative version.
-   * Return a quiz item, the quiz group it belongs to, and a list of quiz groups which failed
-   * to return anything.
+   * Find the first available "presentable" quiz item.
+   * Return a quiz item and the quiz group it belongs to.
    */
-  def findQuizItem: Pair[Option[(QuizItemViewWithChoices, QuizGroup)], List[QuizGroup]] = {
-
-    var failedWmgs = List[QuizGroup]()
-    var quizItemPair: Option[(QuizItemViewWithChoices, QuizGroup)] = None
-
-    val quizGroupIter = quizGroups.iterator
-    while (quizGroupIter.hasNext && !quizItemPair.isDefined) {
-      val quizGroup = quizGroupIter.next
-      quizGroup.findPresentableQuizItem match {
-        case Some(quizItem) => quizItemPair = Some(Pair(quizItem, quizGroup))
-        case _ => failedWmgs ::= quizGroup
-      }
-    }
-    quizItemPair = quizItemPair.orElse(findAnyUnfinishedQuizItem)
-    (quizItemPair, failedWmgs)
+  def findPresentableQuizItem: Option[(QuizItemViewWithChoices, QuizGroup)] = {
+    val quizItem = (for {
+      quizGroup <- quizGroups.toStream
+      quizItem <- quizGroup.findPresentableQuizItem.toStream
+    } yield (quizItem, quizGroup)).headOption
+    quizItem.orElse(findAnyUnfinishedQuizItem)
   }
 
   def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices, QuizGroup)] =
@@ -136,10 +124,10 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
       quizItem <- quizGroup.findAnyUnfinishedQuizItem.toStream
     } yield (quizItem, quizGroup)).headOption
 
-  def addWordMappingToFront(header: QuizGroupHeader, keyWord: String, value: String): Quiz = {
+  def addWordMappingToFront(header: QuizGroupHeader, prompt: String, value: String): Quiz = {
     val quizGroup = findQuizGroup(header)
-    quizGroup.map(quizGroup => replaceQuizGroup(quizGroup.addQuizPairToFront(
-        QuizPair(keyWord, QuizValueWithUserAnswers(value))))).getOrElse(this)
+    quizGroup.map(quizGroup => replaceQuizGroup(quizGroup.addQuizItemToFront(
+        QuizItem(prompt, value)))).getOrElse(this)
   }
 
   def addWordMappingToFrontOfTwoGroups(header: QuizGroupHeader,
@@ -156,19 +144,19 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
   }
 
   def updateWithUserAnswer(isCorrect: Boolean, currentQuizItem: QuizItemViewWithChoices): Quiz = {
-    val userAnswer = new UserAnswer(isCorrect, currentQuizItem.qgCurrentPromptNumber)
+    val userAnswer = new UserResponse(currentQuizItem.qgCurrentPromptNumber)
     val quizGroup: Option[QuizGroup] = findQuizGroup(currentQuizItem.quizGroupHeader)
     quizGroup match {
       case Some(quizGroup) =>
-        val quizGroupUpdated = quizGroup.updatedWithUserAnswer(currentQuizItem.cue,
-            currentQuizItem.quizValue, userAnswer)
+        val quizGroupUpdated = quizGroup.updatedWithUserAnswer(currentQuizItem.prompt,
+            currentQuizItem.response, isCorrect, currentQuizItem.quizItem.userResponses, userAnswer)
         addQuizGroup(quizGroupUpdated)
       case _ => this
     }
   }
 
   def numGroups = quizGroups.size
-  def numCues = quizGroups.map(_.numCues).sum
+  def numPrompts = quizGroups.map(_.numPrompts).sum
   def numResponses = quizGroups.map(_.numResponses).sum
 
   def scoreSoFar: BigDecimal =   // out of 1.0
@@ -222,14 +210,14 @@ object Quiz {
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
 
-    "quizGroup type=\"WordMapping\" cueType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
+    "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
     "en route|unterwegs\n" +
     "contract|Vertrag\n" +
     "treaty|Vertrag\n" +
     "against|wider\n" +
     "entertain|unterhalten\n",
 
-    "quizGroup type=\"WordMapping\" cueType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\"\n" +
+    "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\"\n" +
     "unterwegs|en route\n" +
     "Vertrag|contract/treaty\n" +
     "wider|against\n" +

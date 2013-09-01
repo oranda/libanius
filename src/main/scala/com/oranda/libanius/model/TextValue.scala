@@ -16,20 +16,4 @@
 
 package com.oranda.libanius.model
 
-/*
- * A connection between two things, and user information associated with the connection.
- *
- * Examples of quiz pairs:
- *  - a question and an answer in the quiz
- *  - a word and a translation
- *
- * TODO: separate QuizValueWithUserAnswers into response and UserAnswers
- */
-case class QuizPair(cue: String, response: QuizValueWithUserAnswers) {
-  def sameCueAndResponse(other: QuizPair) = other.cue == cue && other.response.value == response.value
-}
-
-object QuizPair {
-  def apply(cue: String, response: String): QuizPair =
-    QuizPair(cue, QuizValueWithUserAnswers(response))
-}
+case class TextValue(override val text: String) extends Value(text)

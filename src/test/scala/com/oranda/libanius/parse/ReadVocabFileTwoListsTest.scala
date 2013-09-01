@@ -26,44 +26,44 @@ object ReadVocabFileTwoListsTest {
    /* 
     val quizXml = 
 <quiz currentPromptNumber="0">
-  <quizGroup type="WordMapping" cueType="EnglishWord" responseType="GermanWord">
-    <wordMapping cue="against">
+  <quizGroup type="WordMapping" promptType="EnglishWord" responseType="GermanWord">
+    <wordMapping prompt="against">
       <quizValue response="wider"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping cue="entertain">
+    <wordMapping prompt="entertain">
       <quizValue response="unterhalten"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping cue="teach">
+    <wordMapping prompt="teach">
       <quizValue response="unterrichten"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping cue="winner">
+    <wordMapping prompt="winner">
       <quizValue response="Siegerin"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping cue="en route">
+    <wordMapping prompt="en route">
       <quizValue response="unterwegs"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping cue="full">
+    <wordMapping prompt="full">
       <quizValue response="satt"><userAnswers></userAnswers></quizValue>
       <quizValue response="voll"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping cue="interrupted">
+    <wordMapping prompt="interrupted">
       <quizValue response="unterbrochen"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping cue="contract">
+    <wordMapping prompt="contract">
       <quizValue response="Vertrag"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping cue="rides">
+    <wordMapping prompt="rides">
       <quizValue response="reitet"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping cue="sweeps">
+    <wordMapping prompt="sweeps">
       <quizValue response="streicht"><userAnswers></userAnswers></quizValue>
     </wordMapping>
   </wordMappingGroup>
-  <quizGroup type="WordMapping" cueType="GermanWord" responseType="EnglishWord">
-    <wordMapping cue="unterwegs">
+  <quizGroup type="WordMapping" promptType="GermanWord" responseType="EnglishWord">
+    <wordMapping prompt="unterwegs">
       <quizValue response="en route"><userAnswers></userAnswers></quizValue>
     </wordMapping>
-    <wordMapping cue="Vertrag">
+    <wordMapping prompt="Vertrag">
       <quizValue response="contract"><userAnswers></userAnswers></quizValue>
       <quizValue response="treaty"><userAnswers></userAnswers></quizValue>
     </wordMapping>

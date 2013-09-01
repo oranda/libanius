@@ -26,7 +26,7 @@ class WordMappingGroupSpec extends Specification {
     // main test data
 
     val wmgCustomFormat =
-        "quizGroup type=\"WordMapping\" cueType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
+        "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
         "against|wider\n" +
         "entertain|unterhalten\n" +
         "teach|unterrichten\n" +
@@ -46,18 +46,18 @@ class WordMappingGroupSpec extends Specification {
 
     val header = QuizGroupHeader(WordMapping, "English word", "German word")
     val wmPairs = List[WordMappingPair](
-      WordMappingPair("full", WordMappingValueSet("voll", "satt")),
-      WordMappingPair("against", WordMappingValueSet("wider"))
+      WordMappingPair("full", WordMappingValueSet.createFromStrings("voll", "satt")),
+      WordMappingPair("against", WordMappingValueSet.createFromStrings("wider"))
     )
-    val quizPairs = List[QuizPair](
-      QuizPair("full", "voll"),
-      QuizPair("full", "satt"),
-      QuizPair("against", "wider")
+    val quizItems = List[QuizItem](
+      QuizItem("full", "voll"),
+      QuizItem("full", "satt"),
+      QuizItem("against", "wider")
     )
 
     val wmgSmall = WordMappingGroup(header, wmPairs.toStream)
     val dictSmall = Dictionary.fromWordMappings(wmPairs.toStream)
-    val quizGroup = QuizGroup(header, quizPairs.toStream, dictionary = dictSmall)
+    val quizGroup = QuizGroup(header, quizItems.toStream, dictionary = dictSmall)
 
     "be convertible to a QuizGroup" in {
       wmgSmall.toQuizGroup mustEqual quizGroup

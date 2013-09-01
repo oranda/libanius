@@ -58,21 +58,20 @@ object RunQuiz extends App {
 
   def testUserWithQuizItem(quiz: Quiz) {
     showScore(quiz)
-    Util.stopwatch(quiz.findQuizItem, "find quiz items") match {
-      case (Some((quizItem, quizGroup)), failedQuizGroups) =>
-        val updatedQuiz = updateQuiz(quiz, quizGroup, failedQuizGroups)
-        keepShowingQuizItems(updatedQuiz, quizItem, quizGroup, failedQuizGroups)
+    Util.stopwatch(quiz.findPresentableQuizItem, "find quiz items") match {
+      case (Some((quizItem, quizGroup))) =>
+        val updatedQuiz = updateQuiz(quiz, quizGroup)
+        keepShowingQuizItems(updatedQuiz, quizItem, quizGroup)
       case _ =>
         output("No more questions found! Done!")
     }
   }
 
-  def keepShowingQuizItems(quiz: Quiz, quizItem: QuizItemViewWithChoices,
-      quizGroup: QuizGroup, failedQuizGroups: List[QuizGroup]) {
+  def keepShowingQuizItems(quiz: Quiz, quizItem: QuizItemViewWithChoices, quizGroup: QuizGroup) {
     showQuizItemAndProcessResponse(quiz, quizItem) match {
       case (Invalid, updatedQuiz) =>
         output("Invalid input\n")
-        keepShowingQuizItems(updatedQuiz, quizItem, quizGroup, failedQuizGroups)
+        keepShowingQuizItems(updatedQuiz, quizItem, quizGroup)
       case (Quit, updatedQuiz) =>
         output("Exiting")
         dataStore.saveQuiz(updatedQuiz, path = AppDependencies.conf.filesDir)
@@ -82,11 +81,10 @@ object RunQuiz extends App {
     }
   }
 
-  def updateQuiz(quiz: Quiz, quizGroup: QuizGroup,
-      failedQuizGroups: List[QuizGroup]): Quiz = {
+  def updateQuiz(quiz: Quiz, quizGroup: QuizGroup): Quiz = {
     val updatedQuiz = quiz.addQuizGroup(quizGroup.updatedPromptNumber)
     updatedQuiz.quizGroups.foreach(quizGroup =>
-      l.log(quizGroup.cueType + " prompt number is " + quizGroup.currentPromptNumber))
+      l.log(quizGroup.promptType + " prompt number is " + quizGroup.currentPromptNumber))
     updatedQuiz
   }
 
@@ -100,10 +98,10 @@ object RunQuiz extends App {
   }
 
   def showQuizItemAndProcessResponse(quiz: Quiz, quizItem: QuizItemViewWithChoices):
-      (UserResponse, Quiz) = {
-    val wordText = ": what is the " + quizItem.responseType + " for this " + quizItem.cueType + "?"
+      (UserConsoleResponse, Quiz) = {
+    val wordText = ": what is the " + quizItem.responseType + " for this " + quizItem.promptType + "?"
     val answeredText = " (correctly answered " + quizItem.numCorrectAnswersInARow + " times)"
-    val questionText = quizItem.cue +
+    val questionText = quizItem.prompt +
         (if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else "") +
         (if (quizItem.numCorrectAnswersInARow > 0) answeredText else "")
     output(questionText + "\n")
@@ -113,7 +111,7 @@ object RunQuiz extends App {
   }
 
   def showChoicesAndProcessResponse(quiz: Quiz, quizItem: QuizItemViewWithChoices):
-      (UserResponse, Quiz) = {
+      (UserConsoleResponse, Quiz) = {
     val choices = ChoiceGroup[String](quizItem.allChoices)
     choices.show()
 
@@ -123,13 +121,13 @@ object RunQuiz extends App {
   }
 
   def getTextResponseAndProcess(quiz: Quiz, quizItem: QuizItemViewWithChoices):
-      (UserResponse, Quiz) =
+      (UserConsoleResponse, Quiz) =
     Try(getAnswerFromInput).recover {
       case e: Exception => Invalid
     }.map(userResponse => processAnswer(quiz, userResponse, quizItem)).get
 
-  def processAnswer(quiz: Quiz, userResponse: UserResponse,
-      quizItem: QuizItemViewWithChoices): (UserResponse, Quiz) = {
+  def processAnswer(quiz: Quiz, userResponse: UserConsoleResponse,
+      quizItem: QuizItemViewWithChoices): (UserConsoleResponse, Quiz) = {
     val updatedQuiz = userResponse match {
       case answer: Answer => processUserAnswer(quiz, answer.text, quizItem)
       case _ => quiz
@@ -139,14 +137,14 @@ object RunQuiz extends App {
 
   def processUserAnswer(quiz: Quiz, userAnswerTxt: String,
       quizItem: QuizItemViewWithChoices): Quiz = {
-    val correctAnswer = quizItem.quizValue.value
+    val correctAnswer: String = quizItem.response.text
     val isCorrect = userAnswerTxt == correctAnswer
     if (isCorrect) output("\nCorrect!\n") else output("\nWrong! It's " + correctAnswer + "\n")
 
     Util.stopwatch(quiz.updateWithUserAnswer(isCorrect, quizItem), "updateQuiz")
   }
 
-  def getAnswerFromInput: UserResponse =
+  def getAnswerFromInput: UserConsoleResponse =
     readLine match {
       case "q" => Quit
       case "quit" => Quit
