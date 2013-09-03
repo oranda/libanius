@@ -1,6 +1,7 @@
 package com.oranda.libanius.model
 
 import org.specs2.mutable.Specification
+import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 
 class QuizItemSpec extends Specification {
 

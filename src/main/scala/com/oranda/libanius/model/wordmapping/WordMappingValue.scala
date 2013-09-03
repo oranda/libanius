@@ -16,9 +16,10 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.model.{Value, UserResponse}
+import com.oranda.libanius.model.{UserResponse}
 import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.model.quizitem.Value
 
 case class WordMappingValue(value: String, correctAnswersInARow: List[UserResponse] = Nil,
     incorrectAnswers: List[UserResponse] = Nil) extends Value(value) {
@@ -27,7 +28,7 @@ case class WordMappingValue(value: String, correctAnswersInARow: List[UserRespon
       WordMappingValue =
     WordMappingValue(value, correctAnswersInARow, incorrectAnswers)
 
-  override def toString = value   // e.g. "unterrichten"
+  override def matches(otherText: String) = text == otherText
 
   def userAnswers = correctAnswersInARow ++ incorrectAnswers
 

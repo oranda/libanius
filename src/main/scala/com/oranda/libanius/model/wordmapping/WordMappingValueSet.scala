@@ -20,8 +20,8 @@ import scala.util.{Random, Try}
 import scala.collection.mutable.ListBuffer
 
 import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.model.{Value, QuizItem}
 import com.oranda.libanius.util.StringUtil
+import com.oranda.libanius.model.quizitem.QuizItem
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
@@ -52,7 +52,7 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {
       StringBuilder =
     wmv.toCustomFormat(strBuilder)
 
-  def strings: Iterable[String] = values.map(_.toString )
+  def strings: Iterable[String] = values.map(_.value)
 
   def size = values.size
   /*
@@ -150,10 +150,10 @@ object WordMappingValueSetWrapperBase {
  * Because deserializing a WordMappingValueSet is slow, it is wrapped in a Proxy that
  * supports lazy initialization.
  */
-case class WordMappingValueSetLazyProxy(valuesString: String) 
+case class WordMappingValueSetLazyProxy(strValues: String)
     extends WordMappingValueSetWrapperBase {   
   
-  lazy val wmvs: WordMappingValueSet = WordMappingValueSet.fromCustomFormat(valuesString)
+  lazy val wmvs: WordMappingValueSet = WordMappingValueSet.fromCustomFormat(strValues)
 }
 
 /*

@@ -21,6 +21,7 @@ import com.oranda.libanius.util.Util
 import Output._
 import com.oranda.libanius.dependencies.AppDependencies
 import com.oranda.libanius.model._
+import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 
 object RunQuiz extends App {
 
@@ -57,10 +58,12 @@ object RunQuiz extends App {
   }
 
   def testUserWithQuizItem(quiz: Quiz) {
+    l.log("numGroups: " + quiz.numGroups)
     showScore(quiz)
     Util.stopwatch(quiz.findPresentableQuizItem, "find quiz items") match {
       case (Some((quizItem, quizGroup))) =>
         val updatedQuiz = updateQuiz(quiz, quizGroup)
+        l.log("numGroups updated: " + quiz.numGroups)
         keepShowingQuizItems(updatedQuiz, quizItem, quizGroup)
       case _ =>
         output("No more questions found! Done!")
@@ -137,8 +140,8 @@ object RunQuiz extends App {
 
   def processUserAnswer(quiz: Quiz, userAnswerTxt: String,
       quizItem: QuizItemViewWithChoices): Quiz = {
-    val correctAnswer: String = quizItem.response.text
-    val isCorrect = userAnswerTxt == correctAnswer
+    val correctAnswer = quizItem.response
+    val isCorrect = correctAnswer.matches(userAnswerTxt)
     if (isCorrect) output("\nCorrect!\n") else output("\nWrong! It's " + correctAnswer + "\n")
 
     Util.stopwatch(quiz.updateWithUserAnswer(isCorrect, quizItem), "updateQuiz")

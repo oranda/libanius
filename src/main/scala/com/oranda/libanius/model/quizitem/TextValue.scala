@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.model
+package com.oranda.libanius.model.quizitem
 
-// simple response object used for saving a data structure to a file
-case class SaveData(fileName: String, data: String)
+case class TextValue(override val text: String) extends Value(text) {
+
+  override def toString = text
+  def matches(otherText: String) = text == otherText
+}

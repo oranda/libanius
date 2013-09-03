@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.model
+package com.oranda.libanius.model.quizitem
 
 import scala.util.Random
+import com.oranda.libanius.model.{UserResponses, QuizGroupHeader}
 
 /**
  * Quiz item data holder:
  * contains whatever information is necessary for the view, and for updating the backing data.
  */
-class QuizItemViewWithChoices(
+case class QuizItemViewWithChoices(
     val quizItem: QuizItem,
     val qgCurrentPromptNumber: Int,
     val quizGroupHeader: QuizGroupHeader,
@@ -36,8 +37,7 @@ class QuizItemViewWithChoices(
 
   lazy val allChoices = choicesInRandomOrder(quizItem.userResponses, falseAnswers)
 
-  def choicesInRandomOrder(quizValue: UserResponses, otherChoices: Set[String]):
-      List[String] = {
+  def choicesInRandomOrder(quizValue: UserResponses, otherChoices: Set[String]): List[String] = {
     val allChoices = otherChoices + quizItem.response.text
     Random.shuffle(allChoices.toList)
   }

@@ -1,3 +1,8 @@
+== 0.87 September 3 2013
+
+  * Miscellaneous little fixes, ensuring it works with libanius-android.
+
+
 == 0.86 September 1 2013
 
   * Changes to QuizPair, resulting in tweaks throughout the codebase:
@@ -6,6 +11,7 @@
     2. "key" is now "prompt".
     3. "value" is now "response" (i.e. the desired response).
     4. The user history of actual responses is separated out from the response field.
+    5. prompt and response are contained in Value objects, rather than being simple Strings.
 
 
 == 0.85 August 31 2013
@@ -13,12 +19,12 @@
   * Restructured the data model for clarity and performance
 
    1. The central quiz processing entity has changed from WordMappingGroup to QuizGroup,
-       which has a simpler structure and is thus easier to optimize and use generically.
-       There is still a WordMappingGroup, but it is used only for persistence purposes.
+     which has a simpler structure and is thus easier to optimize and use generically.
+     There is still a WordMappingGroup, but it is used only for persistence purposes.
    2. Eliminated the concept of range search. It was an increasingly complex optimization that
-       should be unnecessary.
+     should be unnecessary.
    3. Introduced a type parameter for QuizGroups to distinguish between question-answer quizzes
-       and word translation quizzes.
+     and word translation quizzes.
 
 
 == 0.8 August 25 2013

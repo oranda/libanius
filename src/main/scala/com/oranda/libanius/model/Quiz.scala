@@ -23,7 +23,7 @@ import com.oranda.libanius.util.StringUtil
 import scala.math.BigDecimal.double2bigDecimal
 import scala.collection.immutable.List
 import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.model.wordmapping.WordMappingValueSet
+import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, QuizItem}
 
 case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
 
@@ -59,11 +59,27 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     }
   }
 
-  def findValuesFor(prompt: String, header: QuizGroupHeader): List[String] = {
+  /*
+   * Do not call in a loop: not fast.
+   */
+  def findResponsesFor(prompt: String, header: QuizGroupHeader): List[String] = {
     l.log("Looking for values for " + prompt + " in " + header)
 
     findQuizGroup(header) match {
-      case Some(quizGroup) => quizGroup.findValuesFor(prompt)
+      case Some(quizGroup) => quizGroup.findResponsesFor(prompt)
+      case _ => l.logError("could not find quizGroup for " + header)
+        Nil
+    }
+  }
+
+  /*
+   *  Do not call in a loop: not fast.
+   */
+  def findPromptsFor(response: String, header: QuizGroupHeader): List[String] = {
+    l.log("Looking for prompt for " + response + " in " + header)
+
+    findQuizGroup(header) match {
+      case Some(quizGroup) => quizGroup.findPromptsFor(response)
       case _ => l.logError("could not find quizGroup for " + header)
         Nil
     }
@@ -86,24 +102,21 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     Quiz(newQuiz.quizGroups + quizGroup)
   }
 
+  def removeQuizItemsForPrompt(prompt: String, header: QuizGroupHeader): Quiz =
+    (for (quizGroup <- findQuizGroup(header))
+      yield quizGroup.removeQuizItemsForPrompt(prompt)).map(replaceQuizGroup(_)).getOrElse(this)
 
-  def removeQuizItemsForPrompt(prompt: String, header: QuizGroupHeader): Quiz = {
-    val quizGroup = findQuizGroup(header)
-    quizGroup match {
-      case Some(quizGroup) => replaceQuizGroup(quizGroup.removeQuizItemsForPrompt(prompt))
-      case None => this
-    }
-  }
+  def removeQuizItem(prompt: String, response: String, header: QuizGroupHeader): (Quiz, Boolean) =
+    removeQuizItem(QuizItem(prompt, response), header)
 
-  def removeQuizItem(prompt: String, response: String, header: QuizGroupHeader): Quiz = {
-    val wordMappingGroup = findQuizGroup(header)
-    wordMappingGroup match {
-      case Some(quizGroup) =>
-        val quizItem = QuizItem(prompt, response)
-        val newQuizGroup = quizGroup.removeQuizItem(quizItem)
-        replaceQuizGroup(newQuizGroup)
-      case None => this
-    }
+  def removeQuizItem(quizItem: QuizItem, header: QuizGroupHeader): (Quiz, Boolean) = {
+    val updatedQuiz: Option[Quiz] = (for (
+      quizGroup <- findQuizGroup(header)
+      if quizGroup.contains(quizItem)
+    ) yield quizGroup.removeQuizItem(quizItem)).map(replaceQuizGroup(_))
+
+    val wasRemoved = updatedQuiz.isDefined
+    (updatedQuiz.getOrElse(this), wasRemoved)
   }
 
   /*
@@ -156,14 +169,14 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
   }
 
   def numGroups = quizGroups.size
-  def numPrompts = quizGroups.map(_.numPrompts).sum
-  def numResponses = quizGroups.map(_.numResponses).sum
+  def numPrompts = (0 /: quizGroups) { case (sum, qg) => sum + qg.numPrompts }
+  def numResponses = (0 /: quizGroups) { case (sum, qg) => sum + qg.numResponses }
 
-  def scoreSoFar: BigDecimal =   // out of 1.0
+  def scoreSoFar: BigDecimal = // out of 1.0
     numCorrectAnswers.toDouble / (size * AppDependencies.conf.numCorrectAnswersRequired).toDouble
 
-  def size = quizGroups.map(_.size).sum
-  def numCorrectAnswers = quizGroups.map(_.numCorrectAnswers).sum
+  def size = (0 /: quizGroups) { case (sum, qg) => sum + qg.size }
+  def numCorrectAnswers = (0 /: quizGroups) { case (sum, qg) => sum + qg.numCorrectAnswers }
 
   def merge(otherQuiz: Quiz): Quiz = {
     val wordMappingGroupsCombined = otherQuiz.quizGroups.foldLeft(quizGroups) {
@@ -190,20 +203,15 @@ object Quiz {
   }
 
   def fromCustomFormat(str: String): Quiz = {
-    var quiz = Quiz()
     val quizGroupHeadings = str.split("quizGroup").tail
-
-    quizGroupHeadings.foreach {
-      quizGroupHeading => val quizGroup = QuizGroup(QuizGroupHeader(quizGroupHeading))
-                    quiz = quiz.addQuizGroup(quizGroup)
-    }
-    quiz
+    val quizGroups = quizGroupHeadings.map(headerText => QuizGroup(QuizGroupHeader(headerText)))
+    Quiz(quizGroups.toSet)
   }
 
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
     val quizGroups = quizGroupsData.map(QuizGroup.fromCustomFormat(_))
-    quizGroups.foldLeft(Quiz())((acc, quizGroup) => acc.addQuizGroup(quizGroup))
+    Quiz(quizGroups.toSet)
     // TODO: watch out when we're saving, we're not overwriting anything
   }
 

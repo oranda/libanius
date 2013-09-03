@@ -36,11 +36,16 @@ class QuizSpec extends Specification {
         "interrupted|unterbrochen\n" +
         "contract|Vertrag\n" +
         "rides|reitet\n" +
-        "sweeps|streicht\n",
+        "on|auf\n" +
+        "sweeps|streicht:100,200,300;405\n",
 
         "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\"\n" +
         "unterwegs|en route\n" +
         "Vertrag|contract:697,696;698/treaty:796;798")
+
+    val quizHeaderText = "quiz\n" +
+        "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\"\n" +
+        "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\""
 
     AppDependencies.conf = Conf.setUpForTest()
     
@@ -49,9 +54,15 @@ class QuizSpec extends Specification {
     "be parseable from custom format" in {
       val qg = quiz.findQuizGroup(QuizGroupHeader(WordMapping, "German word", "English word"))
       qg.isDefined mustEqual true
-      //quiz.toCustomFormat.toString mustEqual quizCustomFormat
+      quiz.toCustomFormat.toString mustEqual quizHeaderText
     }
-    
+
+    "find values for a prompt" in {
+      val quizLocal = Quiz.demoQuiz(quizData)
+      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
+      quizLocal.findResponsesFor("on", qgHeader) mustEqual List("auf")
+    }
+
     /* TODO
     "find a presentable quiz item" in {
       val quizItem = quiz.findQuizItem(numCorrectAnswersInARowDesired = 0, 
@@ -60,7 +71,7 @@ class QuizSpec extends Specification {
     }*/
     
     "offer translations for a word, given the group of the word" in { 
-      val translations = quiz.findValuesFor(prompt = "Vertrag",
+      val translations = quiz.findResponsesFor(prompt = "Vertrag",
           QuizGroupHeader(WordMapping, "German word", "English word")).toSet[String]
       translations.contains("contract") mustEqual true
       translations.contains("treaty") mustEqual true
@@ -80,10 +91,11 @@ class QuizSpec extends Specification {
 
     "delete a quiz pair without deleting all values for that prompt" in {
       val quizBefore = Quiz.demoQuiz(quizData)
-      val quizAfter = quizBefore.removeQuizItem(
+      val (quizAfter, wasRemoved) = quizBefore.removeQuizItem(
           prompt = "Vertrag", response = "contract",
           QuizGroupHeader(WordMapping, "German word", "English word"))
-      val translations = quizAfter.findValuesFor(prompt = "Vertrag",
+      wasRemoved mustEqual true
+      val translations = quizAfter.findResponsesFor(prompt = "Vertrag",
           QuizGroupHeader(WordMapping, "German word", "English word"))
       translations.contains("contract") mustEqual false
       translations.contains("treaty") mustEqual true
@@ -96,7 +108,11 @@ class QuizSpec extends Specification {
       val quizUpdated = quizLocal.addQuizGroup(qg) // should have no effect
       quizUpdated.numGroups mustEqual 2
     }
-    
+
+    "sum the number of correct answers" in {
+      quiz.numCorrectAnswers mustEqual 6
+    }
+
     /*
      * XML on Android is too slow, so a custom format is used    
      *

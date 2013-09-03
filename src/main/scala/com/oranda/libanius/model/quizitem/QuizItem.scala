@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.model
+package com.oranda.libanius.model.quizitem
+
+import com.oranda.libanius.model.UserResponses
 
 /*
  * A connection between two things, and user information associated with the connection.

@@ -23,6 +23,7 @@ import scala.collection.mutable.ListBuffer
 import scala.util.Try
 import com.oranda.libanius.util.GroupByOrderedImplicit
 import scala.collection.mutable
+import com.oranda.libanius.model.quizitem.{Value, TextValue, QuizItem}
 
 /*
  * A type of QuizGroup where the quiz pairs are mappings from a word to possible translations.
@@ -35,7 +36,9 @@ case class WordMappingGroup(
 
   def toQuizGroup: QuizGroup = {
     def makeQuizItems(wmPair: WordMappingPair): Iterable[QuizItem] =
-      wmPair.valueSet.values.map(value => QuizItem(TextValue(wmPair.key), TextValue(value.value)))
+      wmPair.valueSet.values.map(value =>
+        QuizItem(TextValue(wmPair.key), TextValue(value.value),
+            UserResponses(value.correctAnswersInARow, value.incorrectAnswers)))
 
     val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems(_))
     val dictionary = Dictionary.fromWordMappings(wordMappingPairs)
@@ -109,7 +112,8 @@ object WordMappingGroup {
             }
           }
           Try(parseKeyValue) recover {
-            case e: Exception => l.logError("could not parse prompt-response string: " + strKeyValue)
+            case e: Exception => l.logError("could not parse prompt-response string: " +
+                strKeyValue)
           }
         }
       }

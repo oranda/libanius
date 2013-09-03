@@ -22,6 +22,7 @@ import scala.util.{Try, Random}
 import com.oranda.libanius.util.{StringUtil, Util}
 import com.oranda.libanius.dependencies.AppDependencies
 import com.oranda.libanius.model.wordmapping.{WordMappingValue, WordMappingGroup, Dictionary}
+import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, Value, TextValue, QuizItem}
 
 case class QuizGroup(
     header: QuizGroupHeader,
@@ -120,17 +121,38 @@ case class QuizGroup(
     SaveData(fileName, serialized.toString)
   }
 
+  def contains(quizItem: QuizItem): Boolean = quizItems.exists(_.samePromptAndResponse(quizItem))
   def contains(prompt: String): Boolean = contains(TextValue(prompt))
   def contains(prompt: Value): Boolean = quizPrompts.contains(prompt)
   def size = quizItems.size
   def numPrompts = size
   def numResponses = size
-  def numCorrectAnswers: Int = quizItems.map(_.userResponses.numCorrectAnswersInARow).sum
+  def numCorrectAnswers: Int = (0 /: quizItems) {
+    case (sum, quizItem) => sum + quizItem.numCorrectAnswersInARow
+  }
 
+  /*
+   * This may give similar results to findResponseFor but it uses the dictionary
+   * and does not take into account any edits to the quiz group during a quiz run.
+   */
+  def findValuesFor(prompt: String): List[String] =
+    dictionary.findValuesFor(prompt).values.map(_.value)
+
+  /*
+   * Low usage expected. Slow because we are not using a Map for quizItems.
+   */
+  def findResponsesFor(prompt: String): List[String] = {
+    val values = quizItems.filter(_.prompt.matches(prompt)).map(_.response.text).toList
+    l.log("findResponsesFor " + prompt + " gives " + values)
+    values
+  }
 
   // Low usage expected. Slow because we are not using a Map for quizItems.
-  def findValuesFor(prompt: String): List[String] =
-    quizItems.filter(_.prompt.text == prompt).map(_.response.text).toList
+  def findPromptsFor(response: String): List[String] = {
+    val values = quizItems.filter(_.response.matches(response)).map(_.prompt.text).toList
+    l.log("findPromptsFor " + response + " gives " + values)
+    values
+  }
 
   def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] = {
     l.log("findAnyUnfinishedQuizItem " + header)
@@ -167,7 +189,7 @@ case class QuizGroup(
      * fill the falseAnswers with similar-looking words.
      */
     if (numCorrectAnswersSoFar >= 1) {
-      val correctValues = findValuesFor(wmpCorrect.prompt.text)
+      val correctValues = findResponsesFor(wmpCorrect.prompt.text)
       falseAnswers ++= Util.stopwatch(makeFalseSimilarAnswers(correctValues,
           quizValueCorrect, numCorrectAnswersSoFar, numFalseAnswersRequired),
           "makeFalseSimilarAnswers")
@@ -286,3 +308,6 @@ object QuizGroup {
     WordMappingGroup.fromCustomFormat(text).toQuizGroup
 
 }
+
+// simple response object used for saving a data structure to a file
+case class SaveData(fileName: String, data: String)

@@ -18,6 +18,7 @@ package com.oranda.libanius.model
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{Conf, AppDependencies}
 import com.oranda.libanius.model.wordmapping.{WordMappingValueSetWrapper, WordMappingValueSet, WordMappingGroup}
+import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, TextValue, QuizItem}
 
 class QuizGroupSpec extends Specification {
 
@@ -34,6 +35,7 @@ class QuizGroupSpec extends Specification {
         "interrupted|unterbrochen\n" +
         "contract|Vertrag\n" +
         "rides|reitet\n" +
+        "on|auf\n" +
         "sweeps|streicht"
 
     AppDependencies.conf = Conf.setUpForTest()
@@ -45,7 +47,11 @@ class QuizGroupSpec extends Specification {
       qg.promptType mustEqual "English word"
       qg.responseType mustEqual "German word"
       qg.toCustomFormat(new StringBuilder()).toString mustEqual wmgCustomFormat
-      qg.size mustEqual 11
+      qg.size mustEqual 12
+    }
+
+    "find values for a prompt" in {
+      qg.findResponsesFor("on") mustEqual List("auf")
     }
 
     "accept the addition of a new word-mapping" in {
@@ -57,10 +63,10 @@ class QuizGroupSpec extends Specification {
 
     "accept new values for an existing word-mapping" in {
       val qgLocal = QuizGroup.fromCustomFormat(wmgCustomFormat)
-      val valuesForAgainst = qgLocal.findValuesFor("against")
+      val valuesForAgainst = qgLocal.findResponsesFor("against")
       valuesForAgainst.size mustEqual 1
       val qgUpdated = qgLocal.addQuizItem(TextValue("against"), TextValue("gegen"))
-      qgUpdated.findValuesFor("against").size mustEqual 2
+      qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
     "generate false answers similar to a correct answer" in {

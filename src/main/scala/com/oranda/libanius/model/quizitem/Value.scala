@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.model
+package com.oranda.libanius.model.quizitem
 
-case class TextValue(override val text: String) extends Value(text)
+abstract class Value(val text: String) {
+
+  def matches(otherText: String): Boolean
+
+  def hasSameStart(otherValue: String) =
+    (numOfLetters: Int) => otherValue != text &&
+      text.take(numOfLetters) == otherValue.take(numOfLetters)
+
+  def hasSameEnd(otherValue: String) =
+    (numOfLetters: Int) => otherValue != text &&
+      text.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
+}
