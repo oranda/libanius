@@ -24,6 +24,9 @@ import scala.math.BigDecimal.double2bigDecimal
 import scala.collection.immutable.List
 import com.oranda.libanius.dependencies.AppDependencies
 import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, QuizItem}
+import scala._
+import scala.collection.immutable.Nil
+import com.oranda.libanius.model.wordmapping.Dictionary
 
 case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
 
@@ -187,6 +190,16 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     }
     Quiz(wordMappingGroupsCombined)
   }
+
+  def resultsBeginningWith(input: String): List[SearchResult] =
+    quizGroups.flatMap(quizGroup =>
+      Dictionary.convertToSearchResults(
+          quizGroup.dictionary.mappingsForKeysBeginningWith(input), quizGroup)).toList
+
+  def resultsContaining(input: String): List[SearchResult] =
+    quizGroups.flatMap(quizGroup =>
+      Dictionary.convertToSearchResults(
+          quizGroup.dictionary.mappingsForKeysContaining(input), quizGroup)).toList
 }
 
 object Quiz {

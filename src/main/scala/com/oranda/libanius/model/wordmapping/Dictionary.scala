@@ -23,6 +23,7 @@ import scala.util.Try
 import com.oranda.libanius.io.PlatformIO
 import com.oranda.libanius.dependencies.AppDependencies
 import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.model.{Quiz, SearchResult, QuizGroup}
 
 /**
  * A dictionary. A large read-only repository of word mappings, structured as a map
@@ -102,4 +103,14 @@ object Dictionary {
         None
       }
     }
+
+  // Useful functions for search:
+
+  def convertToSearchResults(pairs: List[(String, WordMappingValueSet)], quizGroup: QuizGroup) =
+    pairs.map(pair => SearchResult(quizGroup.header, WordMappingPair(pair._1, pair._2)))
+
+  def searchFunction(param: => List[SearchResult]) = () => param
+
+  def tryUntilResults(functionsToTry: List[() => List[SearchResult]]): List[SearchResult] =
+    functionsToTry.find(!_.apply.isEmpty).map(_.apply).getOrElse(Nil)
 }
