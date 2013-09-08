@@ -20,18 +20,16 @@ import scala.collection.immutable._
 import scala.util.{Try, Random}
 
 import com.oranda.libanius.util.{StringUtil, Util}
-import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.model.wordmapping.{WordMappingValue, WordMappingGroup, Dictionary}
+import com.oranda.libanius.model.wordmapping.{WordMappingGroup, Dictionary}
 import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, Value, TextValue, QuizItem}
+import com.oranda.libanius.dependencies.AppDependencyAccess
 
-case class QuizGroup(
+case class QuizGroup (
     header: QuizGroupHeader,
     quizItems: Stream[QuizItem] = Stream.empty,
     currentPromptNumber: Int = 0,
     dictionary: Dictionary = new Dictionary)
   extends ModelComponent {
-
-  private[this] lazy val l = AppDependencies.logger
 
   def promptType = header.promptType           // example: "English word"
   def responseType = header.responseType // example: "German word"
@@ -283,10 +281,7 @@ case class QuizGroup(
 
 }
 
-
-object QuizGroup {
-
-  private[this] val l = AppDependencies.logger
+object QuizGroup extends AppDependencyAccess {
 
   def parseCurrentPromptNumber(str: String): Int =
     Try(StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt).recover {
@@ -303,7 +298,6 @@ object QuizGroup {
     }
   } */
 
-  // TODO: improve... is it really necessary to go through WordMappingGroup?
   def fromCustomFormat(text: String): QuizGroup =
     WordMappingGroup.fromCustomFormat(text).toQuizGroup
 

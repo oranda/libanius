@@ -18,10 +18,16 @@ package com.oranda.libanius.dependencies
 
 import com.typesafe.config.ConfigFactory
 
-object Conf {
+abstract class ConfigProvider {
+  def conf: Conf
+}
 
-  def setUp() = {
-    val config = ConfigFactory.load()
+/*
+ * Configuration in a PC context.
+ */
+class ConfigProviderDefault extends ConfigProvider {
+  lazy val config = ConfigFactory.load()
+  override def conf =
     new Conf(
       enableLogging = config.getBoolean("libanius.enableLogging"),
       numCorrectAnswersRequired = config.getInt("libanius.numCorrectAnswersRequired"),
@@ -30,10 +36,13 @@ object Conf {
       resourcesDir = config.getString("libanius.file.resourcesDir"),
       resQuizPublic = config.getString("libanius.res.quizPublic")
     )
-  }
+}
 
-  // Mock configuration for tests
-  def setUpForTest() = {
+/*
+ * Mock configuration for tests.
+ */
+class ConfigProviderTest extends ConfigProvider {
+  override def conf =
     new Conf(
       enableLogging = false,
       numCorrectAnswersRequired = 4,
@@ -42,33 +51,4 @@ object Conf {
       resourcesDir = "",
       resQuizPublic = ""
     )
-  }
-
-  // Configuration for preparing data files before the app is deployed
-  def setUpForParsing(fileQuizRoot: String) = {
-    new Conf(
-      enableLogging = true,
-      numCorrectAnswersRequired = 4,
-      fileQuizRoot,
-      filesDir = "",
-      resourcesDir = "",
-      resQuizPublic = ""
-    )
-  }
 }
-
-/*
- * This could be extended in applications that use these classes as a library.
- */
-class Conf(
-    val enableLogging: Boolean,
-    val numCorrectAnswersRequired: Int,
-    val fileQuizRoot: String,
-    val filesDir: String,
-    val resourcesDir: String,
-    val resQuizPublic: String) {
-
-  lazy val fileQuiz = fileQuizRoot + ".qui"
-  lazy val fileQuizLastBackup = fileQuizRoot + "Backup" + ".qui"
-}
-

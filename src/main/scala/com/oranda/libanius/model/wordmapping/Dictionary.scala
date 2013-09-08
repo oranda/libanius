@@ -20,10 +20,7 @@ import scala.collection.JavaConversions.mapAsScalaMap
 
 import scala.collection.immutable.Stream
 import scala.util.Try
-import com.oranda.libanius.io.PlatformIO
-import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.model.{Quiz, SearchResult, QuizGroup}
+import com.oranda.libanius.model.{ModelComponent, QuizGroup, SearchResult}
 
 /**
  * A dictionary. A large read-only repository of word mappings, structured as a map
@@ -32,7 +29,7 @@ import com.oranda.libanius.model.{Quiz, SearchResult, QuizGroup}
 
 // When populating, the java.util map is faster than the mutable Scala map
 case class Dictionary(wordMappings: java.util.LinkedHashMap[String, WordMappingValueSet] =
-    new java.util.LinkedHashMap[String, WordMappingValueSet]) {
+    new java.util.LinkedHashMap[String, WordMappingValueSet]) extends ModelComponent {
 
   def numKeyWords = wordMappings.size
   
@@ -58,14 +55,10 @@ case class Dictionary(wordMappings: java.util.LinkedHashMap[String, WordMappingV
 
 object Dictionary {
 
-  val l = AppDependencies.logger
-
   def fromWordMappings(wordMappingsStream: Stream[WordMappingPair]) =
     new Dictionary() {
-      l.log("converting wordMappings to dictionary form")
       wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
     }
-
 
   /*
    * Example:
@@ -79,8 +72,10 @@ object Dictionary {
     new Dictionary() {
 
       def parseCustomFormat = {
-        val splitterLineBreak = WordMappingGroup.splitterLineBreak
-        val splitterKeyValue = WordMappingGroup.splitterKeyValue
+
+        val splitterLineBreak = stringSplitterFactory.getSplitter('\n')
+        val splitterKeyValue = stringSplitterFactory.getSplitter('|')
+
         splitterLineBreak.setString(str)
         splitterLineBreak.next // skip the first line, which has already been parsed
 

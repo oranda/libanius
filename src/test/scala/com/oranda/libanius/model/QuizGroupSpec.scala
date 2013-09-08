@@ -16,11 +16,10 @@
 package com.oranda.libanius.model
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.dependencies.{Conf, AppDependencies}
-import com.oranda.libanius.model.wordmapping.{WordMappingValueSetWrapper, WordMappingValueSet, WordMappingGroup}
+import com.oranda.libanius.dependencies.{AppDependencyAccess}
 import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, TextValue, QuizItem}
 
-class QuizGroupSpec extends Specification {
+class QuizGroupSpec extends Specification with AppDependencyAccess {
 
   "a quiz group" should {
 
@@ -37,8 +36,6 @@ class QuizGroupSpec extends Specification {
         "rides|reitet\n" +
         "on|auf\n" +
         "sweeps|streicht"
-
-    AppDependencies.conf = Conf.setUpForTest()
 
     val qg = QuizGroup.fromCustomFormat(wmgCustomFormat)
 
@@ -123,8 +120,7 @@ class QuizGroupSpec extends Specification {
 
     "add more than one new quiz pair to the front of its queue" in {
       val qgLocal = QuizGroup.fromCustomFormat(wmgCustomFormat)
-      val qgUpdated1 = qgLocal.addQuizItemToFront(TextValue("to exchange"),
-          TextValue("tauschen"))
+      val qgUpdated1 = qgLocal.addQuizItemToFront(TextValue("to exchange"), TextValue("tauschen"))
       val qgUpdated2 = qgUpdated1.addQuizItemToFront(TextValue("whole"), TextValue("ganz"))
       val (qgUnrolled, (keyWord, value)) = pullQuizItem(qgUpdated2)
       (keyWord, value) mustEqual ("whole", "ganz")

@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.util
+package com.oranda.libanius.dependencies
 
-import com.oranda.libanius.dependencies.{AppDependencyAccess}
+class AppDependencyAccessTest extends AppDependencyAccess {
 
-object Util extends AppDependencyAccess {
-
-  def stopwatch[X](fn: => X, actionDescription: String): X = {
-    val start = System.currentTimeMillis()
-    val result = fn
-    val end = System.currentTimeMillis()
-    l.log("time taken for " + actionDescription + " was " + (end - start) + "ms")
-    result
-  }
+  override lazy val conf: Conf = (new ConfigProviderTest).conf
 }

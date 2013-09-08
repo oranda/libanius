@@ -18,12 +18,12 @@ package com.oranda.libanius.io
 
 import java.io._
 import scala.io.Source
-import com.oranda.libanius.dependencies.AppDependencies
 import com.oranda.libanius.model.QuizGroupHeader
 
-class StandardIO extends PlatformIO {
-
-  private[this] lazy val conf = AppDependencies.conf
+/*
+ * Assumes an ordinary Unix/Windows filesystem.
+ */
+class DefaultIO extends PlatformIO {
 
   def readFile(fileName: String): Option[String] = {
     l.log("Reading file " + fileName)

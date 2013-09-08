@@ -16,48 +16,10 @@
 
 package com.oranda.libanius.model.questions
 
-import scala.xml.Node
-import com.oranda.libanius.model.UserResponse
-import scala.util.matching.Regex
-import com.oranda.libanius.model.UserResponses
-import com.oranda.libanius.dependencies.AppDependencies
 
-case class QuestionItem(/*override val correctAnswersInARow: List[UserAnswer] = Nil,
-                   override val incorrectAnswers: List[UserAnswer] = Nil*/) /*
-    extends UserResponses[QuestionItem](correctAnswersInARow, incorrectAnswers)*/ {
+case class QuestionItem() {
   /*
-  def self = this
-
-  // TODO: make these vals
-  var question: String = _
-  var correctAnswer: String = _
-
-  def updated(correctAnswersInARow: List[UserAnswer], incorrectAnswers: List[UserAnswer]):
-      QuestionItem =
-    QuestionItem(correctAnswersInARow, incorrectAnswers)
-
-  override def equals(other: Any) = other match {
-    case that: QuestionItem =>
-      this.question == that.question
-      case _ => false
-  }
-  override def hashCode = question.hashCode
-  
-  def addUserAnswer(userAnswer : Node) {
-    val newAnswer = UserAnswer.fromXML(userAnswer)
-    addUserAnswer(newAnswer)
-  }
-  
-  def evaluateUserAnswer(promptNum: Int, userAnswerStr: String): Boolean = {
-
-    val wasCorrectAnswer = isCorrect(userAnswerStr)
-
-    val userAnswer = new UserAnswer(wasCorrect = wasCorrectAnswer,
-        promptNumber = promptNum)
-    addUserAnswer(userAnswer)
-    
-    wasCorrectAnswer
-  }
+ TODO
   
   def isCorrect(userAnswerStr: String): Boolean =    
     userAnswerStr == correctAnswer || isSimilarToCorrectAnswer(userAnswerStr)
@@ -101,51 +63,6 @@ case class QuestionItem(/*override val correctAnswersInARow: List[UserAnswer] = 
     }
     true
   }
-  
-  def scoreSoFar : BigDecimal =  // out of 1
-    numCorrectAnswersInARow.toFloat / AppDependencies.conf.numCorrectAnswersRequired : BigDecimal
-    
-  def toXML =
-<quizItem>
-  <question>{question}</question>
-  <answer>{correctAnswer}</answer>
-  <userAnswers>{userAnswers map (u => u.toXML) }</userAnswers>
-</quizItem>
- 
-  def toCustomFormat : String = {
-    var customFormat = question + "§§" + correctAnswer + "§§"
-    userAnswers.toSeq match {
-      case Nil => 
-      case _ => customFormat += 
-        (userAnswers map (u => u.toCustomFormat + ":")).reduceLeft[String](_+_)
-    }
-    customFormat
-  }
+
   */
-}
-
-
-object QuestionItem {
-  /*
-    def fromXML(node: scala.xml.Node): QuestionItem =
-      new QuestionItem() {
-        question = (node \ "question").text
-        correctAnswer = (node \ "answer").text
-        val answers = (node \ "userAnswers")
-        for (userAnswer <- answers \\ "userAnswer")
-          addUserAnswer(userAnswer)
-	  }
-    
-    def fromCustomFormat(strCustomFormat: String): QuestionItem = 
-      new QuestionItem() {
-        val parts = strCustomFormat.split("§§")
-        question = parts(0)
-        correctAnswer = parts(1)
-        if (parts.length > 2) {
-          val answersText = parts(2)
-          val answersStrings = answersText.split(":")
-          answersStrings.foreach(answerString => 
-            addUserAnswer(UserAnswer.fromCustomFormat(answerString)))
-        }
-    }*/
 }

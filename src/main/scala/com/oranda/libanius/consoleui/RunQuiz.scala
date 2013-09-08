@@ -17,21 +17,21 @@
 package com.oranda.libanius.consoleui
 
 import scala.util.Try
-import com.oranda.libanius.util.Util
+import com.oranda.libanius.util.{Util}
 import Output._
-import com.oranda.libanius.dependencies.AppDependencies
 import com.oranda.libanius.model._
+import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 
-object RunQuiz extends App {
-
-  private[this] lazy val l = AppDependencies.logger
-  private[this] lazy val dataStore = AppDependencies.dataStore
+object RunQuiz extends App with AppDependencyAccess {
 
   runQuiz()
 
   def runQuiz() {
+
     output("Running quiz...")
+    output("numCorrectAnswersRequired: " + conf.numCorrectAnswersRequired)
+
     val availableQuizGroups = dataStore.findAvailableQuizGroups
     val quiz =
       if (!availableQuizGroups.isEmpty)
@@ -58,12 +58,10 @@ object RunQuiz extends App {
   }
 
   def testUserWithQuizItem(quiz: Quiz) {
-    l.log("numGroups: " + quiz.numGroups)
     showScore(quiz)
     Util.stopwatch(quiz.findPresentableQuizItem, "find quiz items") match {
       case (Some((quizItem, quizGroup))) =>
         val updatedQuiz = updateQuiz(quiz, quizGroup)
-        l.log("numGroups updated: " + quiz.numGroups)
         keepShowingQuizItems(updatedQuiz, quizItem, quizGroup)
       case _ =>
         output("No more questions found! Done!")
@@ -77,19 +75,15 @@ object RunQuiz extends App {
         keepShowingQuizItems(updatedQuiz, quizItem, quizGroup)
       case (Quit, updatedQuiz) =>
         output("Exiting")
-        dataStore.saveQuiz(updatedQuiz, path = AppDependencies.conf.filesDir)
+        dataStore.saveQuiz(updatedQuiz, path = conf.filesDir)
         System.exit(0)
       case (_, updatedQuiz) =>
         testUserWithQuizItem(updatedQuiz)
     }
   }
 
-  def updateQuiz(quiz: Quiz, quizGroup: QuizGroup): Quiz = {
-    val updatedQuiz = quiz.addQuizGroup(quizGroup.updatedPromptNumber)
-    updatedQuiz.quizGroups.foreach(quizGroup =>
-      l.log(quizGroup.promptType + " prompt number is " + quizGroup.currentPromptNumber))
-    updatedQuiz
-  }
+  def updateQuiz(quiz: Quiz, quizGroup: QuizGroup): Quiz =
+    quiz.replaceQuizGroup(quizGroup.updatedPromptNumber)
 
   def showScore(quiz: Quiz) {
     def formatAndPrintScore(scoreStr: String) {

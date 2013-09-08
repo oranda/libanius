@@ -16,10 +16,8 @@
 
 package com.oranda.libanius.model
 
-import com.oranda.libanius.dependencies.AppDependencies
 import com.oranda.libanius.util.StringUtil
 import UserResponses._
-import com.oranda.libanius.model.wordmapping.WordMappingValue
 
 case class UserResponses(correctAnswersInARow: List[UserResponse] = Nil,
     incorrectAnswers: List[UserResponse] = Nil)
@@ -52,7 +50,7 @@ case class UserResponses(correctAnswersInARow: List[UserResponse] = Nil,
 
 
   def isUnfinished: Boolean = numCorrectAnswersInARow <
-      AppDependencies.conf.numCorrectAnswersRequired
+      conf.numCorrectAnswersRequired
   
   def numCorrectAnswersInARow = correctAnswersInARow.length
   

@@ -17,10 +17,10 @@
 package com.oranda.libanius.model
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.dependencies.{AppDependencies, Conf}
+import com.oranda.libanius.dependencies.{AppDependencyAccess}
 import com.oranda.libanius.model._
 
-class QuizSpec extends Specification {
+class QuizSpec extends Specification with AppDependencyAccess {
   
   "a quiz of word-mappings" should {
     
@@ -46,8 +46,6 @@ class QuizSpec extends Specification {
     val quizHeaderText = "quiz\n" +
         "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\"\n" +
         "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\""
-
-    AppDependencies.conf = Conf.setUpForTest()
     
     val quiz = Quiz.demoQuiz(quizData)
     

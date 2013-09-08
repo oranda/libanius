@@ -21,18 +21,12 @@ import scala.collection.immutable._
 import com.oranda.libanius.util.StringUtil
 
 import scala.math.BigDecimal.double2bigDecimal
-import scala.collection.immutable.List
-import com.oranda.libanius.dependencies.AppDependencies
-import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, QuizItem}
-import scala._
-import scala.collection.immutable.Nil
+import com.oranda.libanius.dependencies._
+import com.oranda.libanius.model.quizitem.{QuizItem}
 import com.oranda.libanius.model.wordmapping.Dictionary
+import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 
 case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
-
-  val l = AppDependencies.logger
-
-  def copy(newPromptNumber: Int) = Quiz(quizGroups)
 
   /*
    * This serialization does not include QuizGroup data, only metadata.
@@ -52,8 +46,7 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     StringUtil.mkString(strBuilder, quizGroups, quizGroupMetadata, '\n')
   }
 
-  def findOrAddQuizGroup(header: QuizGroupHeader):
-      (Quiz, QuizGroup) = {
+  def findOrAddQuizGroup(header: QuizGroupHeader): (Quiz, QuizGroup) = {
     val wordMappingGroup = findQuizGroup(header)
     wordMappingGroup match {
       case Some(wordMappingGroup) => (this, wordMappingGroup)
@@ -175,10 +168,10 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
   def numPrompts = (0 /: quizGroups) { case (sum, qg) => sum + qg.numPrompts }
   def numResponses = (0 /: quizGroups) { case (sum, qg) => sum + qg.numResponses }
 
-  def scoreSoFar: BigDecimal = // out of 1.0
-    numCorrectAnswers.toDouble / (size * AppDependencies.conf.numCorrectAnswersRequired).toDouble
+  def scoreSoFar: BigDecimal =  // out of 1.0
+    numCorrectAnswers.toDouble / (numItems * conf.numCorrectAnswersRequired).toDouble
 
-  def size = (0 /: quizGroups) { case (sum, qg) => sum + qg.size }
+  def numItems = (0 /: quizGroups) { case (sum, qg) => sum + qg.size }
   def numCorrectAnswers = (0 /: quizGroups) { case (sum, qg) => sum + qg.numCorrectAnswers }
 
   def merge(otherQuiz: Quiz): Quiz = {
@@ -202,9 +195,7 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
           quizGroup.dictionary.mappingsForKeysContaining(input), quizGroup)).toList
 }
 
-object Quiz {
-
-  val l = AppDependencies.logger
+object Quiz extends AppDependencyAccess {
 
   def findQuizGroup(quizGroups: Set[QuizGroup], header: QuizGroupHeader):
       Option[QuizGroup] =

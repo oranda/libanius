@@ -18,15 +18,13 @@ package com.oranda.libanius.io
 
 import java.io._
 import scala.util.Try
-import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.QuizGroupHeader
 
 /*
  * Encapsulate platform-specific code.
  */
-trait PlatformIO {
-
-  val l = AppDependencies.logger
+trait PlatformIO extends AppDependencyAccess {
 
   def readFile(file: File): Option[String] = readFile(file.getName)
 
@@ -45,13 +43,12 @@ trait PlatformIO {
   def findQgFileNamesFromResources: Array[String]
 
   def readQgMetadata(inStream: InputStream): Option[QuizGroupHeader] = {
-    var firstLine = ""
     (for {
       firstLine <- Try(readFirstLine(inStream))
       qgMetadata <- Try(Some(QuizGroupHeader(firstLine)))
     } yield qgMetadata).recover {
       case e: Exception =>
-        l.logError("Could not read qg file, firstLine " + firstLine, e)
+        l.logError("Could not read quiz group file")
         None
     }.get
   }

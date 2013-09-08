@@ -2,8 +2,9 @@ package com.oranda.libanius.model
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.dependencies.AppDependencyAccess
 
-class QuizItemSpec extends Specification {
+class QuizItemSpec extends Specification with AppDependencyAccess {
 
   "a quiz pair" should {
 

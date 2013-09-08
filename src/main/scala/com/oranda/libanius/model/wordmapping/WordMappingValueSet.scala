@@ -16,18 +16,19 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.util.{Random, Try}
+import scala.util.Try
 import scala.collection.mutable.ListBuffer
 
-import com.oranda.libanius.dependencies.AppDependencies
 import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.ModelComponent
+import com.oranda.libanius.dependencies.AppDependencyAccess
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
  * TODO: try again to convert this to a Set.
  */
-case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {
+case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends ModelComponent {
 
   def updated(values: List[WordMappingValue]) = WordMappingValueSet(values)
 
@@ -55,41 +56,7 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {
   def strings: Iterable[String] = values.map(_.value)
 
   def size = values.size
-  /*
-  def numItemsAndCorrectAnswers: Pair[Int, Int] = Pair(size, numCorrectAnswers)
 
-  def numCorrectAnswers = {
-     *
-     * This functional version is about twice as slow as the version actually used:
-     *
-     * values.foldLeft(0)(_ + _.numCorrectAnswersInARow)
-     *
-    var numCorrectAnswers = 0
-    values.foreach { wmv => numCorrectAnswers += wmv.numCorrectAnswersInARow }
-    numCorrectAnswers
-  }
-
-
-  def replaceWmv(valueNew: String): WordMappingValueSet = {
-    val quizValueSet: WordMappingValueSet = filterOut(valueNew.value)
-    quizValueSet.addValueToFront(valueNew).asInstanceOf[WordMappingValueSet]
-  }
-
-  def addValueToFront(quizValue: String): WordMappingValueSet = {
-    val newValues =
-      if (!values.contains(quizValue)) quizValue +: values
-      else values
-    updated(newValues)
-  }
-
-
-
-  def findRandomWordValue(): String = {
-    val randomIndex = Random.nextInt(values.size)
-    val valueArray: Array[String] = values.toArray[String]
-    valueArray(randomIndex).value
-  }
-  */
   def findValue(value: String): Option[String] = values.find(_.value == value).map(_.value)
 
   def containsValue(value: String): Boolean = findValue(value).isDefined
@@ -98,10 +65,7 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) {
 
 }
 
-
-object WordMappingValueSet {
-
-  val l = AppDependencies.logger
+object WordMappingValueSet extends AppDependencyAccess {
 
   def apply(values: WordMappingValue*): WordMappingValueSet = WordMappingValueSet(values:_*)
 
@@ -119,13 +83,14 @@ object WordMappingValueSet {
 
   // Example: contract:696,697;698/treaty:796;798
   def fromCustomFormat(str: String): WordMappingValueSet = {
-
     val values = new ListBuffer[WordMappingValue]()
-    val wmvsSplitter = AppDependencies.stringSplitterFactory.getSplitter('/')
+    val wmvsSplitter = stringSplitterFactory.getSplitter('/')
     def parseFromCustomFormat {
       wmvsSplitter.setString(str)
-      while (wmvsSplitter.hasNext)
-        values += WordMappingValue.fromCustomFormat(wmvsSplitter.next)
+      while (wmvsSplitter.hasNext) {
+        val nextVal = wmvsSplitter.next
+        values += WordMappingValue.fromCustomFormat(nextVal)
+      }
     }
     Try(parseFromCustomFormat) recover {
       case e: Exception => l.logError("WordMappingValueSet: Could not parse str " + str, e)

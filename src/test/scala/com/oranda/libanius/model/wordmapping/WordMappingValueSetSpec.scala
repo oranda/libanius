@@ -17,14 +17,11 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.dependencies.{AppDependencies, Conf}
-import com.oranda.libanius.model.UserResponses
+import com.oranda.libanius.dependencies.{AppDependencyAccess}
 
-class WordMappingValueSetSpec extends Specification {
+class WordMappingValueSetSpec extends Specification with AppDependencyAccess {
 
   "a word-mapping-response-set" should {
-
-    AppDependencies.conf = Conf.setUpForTest()
 
     val wmvsCustomFormat = "contract:698,696;697/treaty:796;798"
 

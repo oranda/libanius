@@ -16,7 +16,7 @@
 
 package com.oranda.libanius.dependencies
 
-trait Logger {
+abstract class Logger extends AppDependencyAccess {
 
   def logError(message: String, t: Throwable) {
     logError(message, "Libanius", Some(t))
@@ -27,7 +27,7 @@ trait Logger {
   }
 
   def log(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
-    if (AppDependencies.conf.enableLogging)
+    if (conf.enableLogging)
       logImpl(message, module, t)
   }
 

@@ -21,14 +21,11 @@ import scala.collection.immutable.Set
 import scala.concurrent.{ future, Future, ExecutionContext }
 import ExecutionContext.Implicits.global
 import scala.util.Try
-import com.oranda.libanius.io.PlatformIO
+import com.oranda.libanius.io.{DefaultIO, PlatformIO}
 import com.oranda.libanius.model.wordmapping.Dictionary
 import com.oranda.libanius.model.{QuizGroup, Quiz, QuizGroupHeader}
 
-case class DataStore(io: PlatformIO) {
-
-  private[this] lazy val l = AppDependencies.logger
-  private[this] lazy val conf = AppDependencies.conf
+class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
   def readQuizMetadata: Set[QuizGroupHeader] = {
     // TODO: consider changing to Platform.readFile
@@ -45,19 +42,15 @@ case class DataStore(io: PlatformIO) {
   def loadQuizGroup(header: QuizGroupHeader, loadedQuizGroups: List[QuizGroup]):
       Future[QuizGroup] = {
     future {
-      l.log("seeing if qg was loaded for " + header)
+      l.log("seeing if quiz group was loaded for " + header)
       val loadedQg = loadedQuizGroups.find(_.header == header).getOrElse {
-        l.log("no, so loading qg for " + header)
+        l.log("no, so loading quiz group for " + header)
         loadQuizGroupCore(header)
       }
 
       // TODO: move this to a separate Future
       val loadedQgWithDictionary = Util.stopwatch(loadDictionary(loadedQg),
           "preparing dictionary for " + header)
-
-      l.log("loaded qg with size " + loadedQgWithDictionary.size +
-          " and numCorrectAnswers " + loadedQgWithDictionary.numCorrectAnswers +
-          " and dictionary with " + loadedQgWithDictionary.dictionary.numKeyWords + " key words")
 
       loadedQgWithDictionary
     }
@@ -67,7 +60,7 @@ case class DataStore(io: PlatformIO) {
 
     def saveToFile(qg: QuizGroup) = {
       val saveData = qg.getSaveData
-      l.log("Saving qg " + qg.promptType + ", qg has promptNumber " +
+      l.log("Saving quiz group " + qg.promptType + ", quiz group has promptNumber " +
           qg.currentPromptNumber + " to " + saveData.fileName)
       io.writeToFile(path + saveData.fileName, saveData.data)
     }
@@ -87,16 +80,16 @@ case class DataStore(io: PlatformIO) {
     findQuizGroupInFilesDir(header) match {
       case Some(qgFileName) =>
         Util.stopwatch(readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup(header)),
-            "reading qg from file" + qgFileName)
+            "reading quiz group from file " + qgFileName)
       case _ =>
         findQuizGroupInResources(header) match {
           case Some(qgResName) =>
             val qgText = Util.stopwatch(io.readResource(qgResName).get,
-                "reading qg resource " + qgResName)
+                "reading quiz group resource " + qgResName)
             //log("read text from qg resource starting " + qgText.take(200))
             header.createQuizGroup(qgText)
           case _ =>
-            l.logError("failed to load qg " + header)
+            l.logError("failed to load quiz group " + header)
             QuizGroup(header)
         }
     }
@@ -104,7 +97,7 @@ case class DataStore(io: PlatformIO) {
   private def readQuizGroupFromFilesDir(qgFileName: String):
       Option[QuizGroup] = {
     val qgPath = conf.filesDir + qgFileName
-    l.log("reading qg from file " + qgPath)
+    l.log("reading quiz group from file " + qgPath)
     for {
       qgText <- io.readFile(qgPath)
       //log("have read qgText " + qgText.take(200) + "... ")
@@ -113,32 +106,24 @@ case class DataStore(io: PlatformIO) {
 
   private def findQuizGroupInFilesDir(header: QuizGroupHeader): Option[String] = {
     val fileNames = io.findQgFileNamesFromFilesDir
-    l.log("fileNames: " + fileNames.toList)
     fileNames.find(io.readQgMetadataFromFile(_) == Some(header))
   }
 
   private def findQuizGroupInResources(header: QuizGroupHeader): Option[String] = {
     val fileNames = io.findQgFileNamesFromResources
-    l.log("fileNames: " + fileNames.toList)
     fileNames.find(io.readQgMetadataFromResource(_) == Some(header))
   }
 
-  def findAvailableQuizGroups: Set[QuizGroupHeader] = {
-    l.log("res groups " + findAvailableResQuizGroups)
-    l.log("fileName groups " + findAvailableFileNameQuizGroups)
+  def findAvailableQuizGroups: Set[QuizGroupHeader] =
     findAvailableResQuizGroups ++ findAvailableFileNameQuizGroups
-  }
-
 
   private def findAvailableResQuizGroups: Set[QuizGroupHeader] = {
     val qgResNames = io.findQgFileNamesFromResources
-    l.log("qgResNames = " + qgResNames.toList)
     qgResNames.flatMap(io.readQgMetadataFromResource(_)).toSet
   }
 
   private def findAvailableFileNameQuizGroups: Set[QuizGroupHeader] = {
     val qgFileNames = io.findQgFileNamesFromFilesDir
-    l.log("qgFileNames = " + qgFileNames.toList)
     qgFileNames.flatMap(io.readQgMetadataFromFile(_)).toSet
   }
 
@@ -147,7 +132,10 @@ case class DataStore(io: PlatformIO) {
     val fileText = Util.stopwatch(io.readFile(fileName), "reading dictionary " + fileName)
     val dictionary = Util.stopwatch(fileText.map(Dictionary.fromCustomFormat(_)),
         "parsing dictionary")
-    l.log("Finished reading " + dictionary.map(_.numKeyWords).getOrElse(0) + " dictionary prompt words")
+    l.log("Finished reading " + dictionary.map(_.numKeyWords).getOrElse(0) +
+        " dictionary prompt words")
     dictionary
   }
 }
+
+class DataStoreDefault(io: PlatformIO) extends DataStore(new DefaultIO)

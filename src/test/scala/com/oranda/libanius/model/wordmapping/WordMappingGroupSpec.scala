@@ -17,10 +17,10 @@ package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.model._
-import com.oranda.libanius.dependencies.{AppDependencies, Conf}
+import com.oranda.libanius.dependencies.{AppDependencyAccess, Conf}
 import com.oranda.libanius.model.quizitem.QuizItem
 
-class WordMappingGroupSpec extends Specification {
+class WordMappingGroupSpec extends Specification with AppDependencyAccess {
   
   "a word-mapping group" should {
 
@@ -38,8 +38,6 @@ class WordMappingGroupSpec extends Specification {
         "contract|Vertrag\n" +
         "rides|reitet\n" +
         "sweeps|streicht"
-
-    AppDependencies.conf = Conf.setUpForTest()
 
     val wmg = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
 

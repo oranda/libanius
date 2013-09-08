@@ -18,10 +18,10 @@ package com.oranda.libanius.model.wordmapping
 
 import com.oranda.libanius.model._
 import scala.collection.immutable.{Stream, Iterable}
-import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.dependencies.{AppDependencyAccess}
 import scala.collection.mutable.ListBuffer
 import scala.util.Try
-import com.oranda.libanius.util.GroupByOrderedImplicit
+import com.oranda.libanius.util.{GroupByOrderedImplicit}
 import scala.collection.mutable
 import com.oranda.libanius.model.quizitem.{Value, TextValue, QuizItem}
 
@@ -30,9 +30,7 @@ import com.oranda.libanius.model.quizitem.{Value, TextValue, QuizItem}
  */
 case class WordMappingGroup(
     val header: QuizGroupHeader,
-    val wordMappingPairs: Stream[WordMappingPair] = Stream.empty) {
-
-  private[this] lazy val l = AppDependencies.logger
+    val wordMappingPairs: Stream[WordMappingPair] = Stream.empty) extends ModelComponent {
 
   def toQuizGroup: QuizGroup = {
     def makeQuizItems(wmPair: WordMappingPair): Iterable[QuizItem] =
@@ -54,13 +52,7 @@ case class WordMappingGroup(
 
 }
 
-object WordMappingGroup {
-
-  private[this] val l = AppDependencies.logger
-
-  def splitterLineBreak = AppDependencies.stringSplitterFactory.getSplitter('\n')
-  def splitterKeyValue = AppDependencies.stringSplitterFactory.getSplitter('|')
-
+object WordMappingGroup extends AppDependencyAccess {
 
   def fromQuizGroup(quizGroup: QuizGroup): WordMappingGroup = {
 
@@ -86,8 +78,8 @@ object WordMappingGroup {
    */
   def fromCustomFormat(str: String): WordMappingGroup = {
 
-    val splitterLineBreak = WordMappingGroup.splitterLineBreak
-    val splitterKeyValue = WordMappingGroup.splitterKeyValue
+    val splitterLineBreak = stringSplitterFactory.getSplitter('\n')
+    val splitterKeyValue = stringSplitterFactory.getSplitter('|')
 
     // TODO: write directly to the Stream not a ListBuffer
     val wordMappingsMutable = new ListBuffer[WordMappingPair]()
@@ -104,7 +96,6 @@ object WordMappingGroup {
 
           def parseKeyValue {
             val strKey = splitterKeyValue.next
-
             if (splitterKeyValue.hasNext) {
               val strValues = splitterKeyValue.next
               wordMappingsMutable += WordMappingPair(strKey,

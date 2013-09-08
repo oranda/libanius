@@ -16,9 +16,9 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.model.{UserResponse}
+import com.oranda.libanius.model.UserResponse
 import com.oranda.libanius.util.StringUtil
-import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.Value
 
 case class WordMappingValue(value: String, correctAnswersInARow: List[UserResponse] = Nil,
@@ -63,15 +63,15 @@ case class WordMappingValue(value: String, correctAnswersInARow: List[UserRespon
   }
 }
 
-object WordMappingValue {
+object WordMappingValue extends AppDependencyAccess {
 
   // Example: str = "nachlösen:1,7,9;6"
   def fromCustomFormat(str: String): WordMappingValue = {
 
     // This code needs to be both fast and thread-safe so special "splitters" are used.
-    val wmvSplitter = AppDependencies.stringSplitterFactory.getSplitter(':')
-    val allAnswersSplitter = AppDependencies.stringSplitterFactory.getSplitter(';')
-    val answersSplitter = AppDependencies.stringSplitterFactory.getSplitter(',')
+    val wmvSplitter = stringSplitterFactory.getSplitter(':')
+    val allAnswersSplitter = stringSplitterFactory.getSplitter(';')
+    val answersSplitter = stringSplitterFactory.getSplitter(',')
 
     wmvSplitter.setString(str)
     var wmv = new WordMappingValue(wmvSplitter.next)

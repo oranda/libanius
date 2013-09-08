@@ -19,17 +19,15 @@ package com.oranda.libanius.parse
 import java.io.File
 import scala.io.BufferedSource
 import scala.io.Source
-import com.oranda.libanius.io.StandardIO
-import com.oranda.libanius.dependencies.{Conf, AppDependencies}
+import com.oranda.libanius.io.DefaultIO
+import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.Quiz
 
-abstract class ReadVocabFileToWordMappings {
-
-  private[this] lazy val dataStore = AppDependencies.dataStore
+abstract class ReadVocabFileToWordMappings extends AppDependencyAccess {
 
   def fileVocab: String
   def pathVocab = "data/" + fileVocab
-  def pathQuiz = "data/" + AppDependencies.conf.fileQuiz
+  def pathQuiz = "data/" + conf.fileQuiz
 
   /*
   def readQuizAndVocabFile: QuizOfWordMappings = {
@@ -65,7 +63,7 @@ abstract class ReadVocabFileToWordMappings {
     val quiz = readVocabFile(new Quiz())
     println("quiz first wmg length is " + quiz.quizGroups.toList(0).quizPrompts.length)
     println("Finished reading (quiz and) vocab file... Now writing quiz to " + pathQuiz + "...")
-    new StandardIO().save(pathQuiz, quiz.toCustomFormat.toString)
+    new DefaultIO().save(pathQuiz, quiz.toCustomFormat.toString)
     dataStore.saveQuiz(quiz, path = "data/")
     println("Finished writing " + quiz.numPrompts + " words with their translations!")
   }

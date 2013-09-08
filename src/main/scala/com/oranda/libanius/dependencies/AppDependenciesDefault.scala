@@ -16,15 +16,17 @@
 
 package com.oranda.libanius.dependencies
 
-import com.oranda.libanius.io.PlatformIO
-import com.oranda.libanius.util.StringSplitterFactory
+import com.oranda.libanius.io.{DefaultIO, PlatformIO}
+import com.oranda.libanius.util.{StringSplitterFactoryDefault, StringSplitterFactory}
 
-trait AppDependencies {
-  val l: Logger
-  val c: ConfigProvider
-  val io: PlatformIO
-  val dataStore: DataStore
-  val stringSplitterFactory: StringSplitterFactory
+/*
+ * Defaults for application dependencies. Can be used in a PC/Unix environment.
+ */
+object AppDependenciesDefault extends AppDependencies {
 
-  def conf = c.conf
+  lazy val l: Logger            = new LoggerDefault
+  lazy val c: ConfigProvider    = new ConfigProviderDefault
+  lazy val io: PlatformIO       = new DefaultIO
+  lazy val dataStore: DataStore = new DataStoreDefault(io)
+  lazy val stringSplitterFactory: StringSplitterFactory = new StringSplitterFactoryDefault
 }

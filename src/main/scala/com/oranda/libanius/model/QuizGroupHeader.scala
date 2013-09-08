@@ -16,7 +16,7 @@
 package com.oranda.libanius.model
 
 import com.oranda.libanius.util.StringUtil
-import com.oranda.libanius.dependencies.AppDependencies
+import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.wordmapping.WordMappingGroup
 
 
@@ -46,9 +46,7 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String, res
   }
 }
 
-object QuizGroupHeader {
-
-  private[this] val l = AppDependencies.logger
+object QuizGroupHeader extends AppDependencyAccess {
 
   def apply(headerLine: String): QuizGroupHeader =
     this(parseQuizGroupType(headerLine), parsePromptType(headerLine),
