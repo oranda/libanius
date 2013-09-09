@@ -1,3 +1,10 @@
+== 0.88 September 9 2013
+
+  * Implemented minimal Dependency Injection scheme.
+
+  * Miscellaneous code clarity fixes, including changes to false answer generation.
+
+
 == 0.87 September 3 2013
 
   * Miscellaneous little fixes, ensuring it works with libanius-android.
