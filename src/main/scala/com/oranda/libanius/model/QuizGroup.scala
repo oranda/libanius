@@ -26,22 +26,18 @@ import com.oranda.libanius.model.wordmapping.{WordMappingGroup, Dictionary}
 import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, Value, TextValue, QuizItem}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
-case class QuizGroup (
-    header: QuizGroupHeader,
-    quizItems: Stream[QuizItem] = Stream.empty,
-    currentPromptNumber: Int = 0,
-    dictionary: Dictionary = new Dictionary)
+case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stream.empty,
+    currentPromptNumber: Int = 0, dictionary: Dictionary = new Dictionary)
   extends ModelComponent {
 
   def promptType = header.promptType           // example: "English word"
-  def responseType = header.responseType // example: "German word"
+  def responseType = header.responseType       // example: "German word"
 
   def updatedQuizItems(newQuizItems: Stream[QuizItem]): QuizGroup =
     new QuizGroup(header, newQuizItems, currentPromptNumber, dictionary)
 
   def updatedPromptNumber: QuizGroup =
     new QuizGroup(header, quizItems, currentPromptNumber + 1, dictionary)
-
 
   def updatedWithUserAnswer(prompt: Value, response: Value, wasCorrect: Boolean,
       userResponses: UserResponses, userAnswer: UserResponse) = {
@@ -157,13 +153,12 @@ case class QuizGroup (
   def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] = {
     l.log("findAnyUnfinishedQuizItem " + header)
     quizItems.iterator.find(_.userResponses.isUnfinished).map(
-        pair => quizItemWithOptions(pair, pair.response.text))
+        pair => quizItemWithOptions(pair))
   }
 
-  protected def quizItemWithOptions(quizItem: QuizItem,
-      quizValueCorrect: String): QuizItemViewWithChoices = {
+  protected def quizItemWithOptions(quizItem: QuizItem): QuizItemViewWithChoices = {
     val numCorrectAnswers = quizItem.userResponses.numCorrectAnswersInARow
-    val falseAnswers = makeFalseAnswers(quizItem, quizValueCorrect, numCorrectAnswers)
+    val falseAnswers = makeFalseAnswers(quizItem, numCorrectAnswers)
     new QuizItemViewWithChoices(quizItem, currentPromptNumber, header, falseAnswers,
         numCorrectAnswers)
   }
@@ -172,50 +167,69 @@ case class QuizGroup (
   protected def findPresentableQuizItem(quizItem: QuizItem, currentPromptNumber: Int):
       Option[QuizItemViewWithChoices] = {
     if (quizItem.isPresentable(currentPromptNumber))
-      Util.stopwatch(Some(quizItemWithOptions(quizItem, quizItem.response.text)),
+      Util.stopwatch(Some(quizItemWithOptions(quizItem)),
           "quizItemWithOptions for " + quizItem.response)
     else
       None
   }
 
-  def makeFalseAnswers(wmpCorrect: QuizItem, quizValueCorrect: String,
-      numCorrectAnswersSoFar: Int): Set[String] = {
-
-    var falseAnswers = new ListSet[String]
-    val numFalseAnswersRequired = 2
+  protected[model] def makeFalseAnswers(itemCorrect: QuizItem,
+      numCorrectAnswersSoFar: Int, numFalseAnswersRequired: Int = 2): Set[String] = {
 
     /*
      * If the user has already been having success with this word, first try to
-     * fill the falseAnswers with similar-looking words.
+     * find similar-looking words.
      */
-    if (numCorrectAnswersSoFar >= 1) {
-      val correctValues = findResponsesFor(wmpCorrect.prompt.text)
-      falseAnswers ++= Util.stopwatch(makeFalseSimilarAnswers(correctValues,
-          quizValueCorrect, numCorrectAnswersSoFar, numFalseAnswersRequired),
-          "makeFalseSimilarAnswers")
+    val falseSimilarAnswers: Set[String] =
+      if (numCorrectAnswersSoFar == 0) ListSet[String]()
+      else {
+        val correctValues = findResponsesFor(itemCorrect.prompt.text)
+        val correctValuePresented = itemCorrect.response.text
+        Util.stopwatch(makeFalseSimilarAnswers(correctValues, correctValuePresented,
+            numCorrectAnswersSoFar, numFalseAnswersRequired), "makeFalseSimilarAnswers")
+      }
+
+    val numFalseAnswersStillToBeFound1 = numFalseAnswersRequired - falseSimilarAnswers.size
+    val randomFalseAnswers = makeRandomFalseAnswers(numFalseAnswersStillToBeFound1, itemCorrect)
+
+    val falseAnswersSoFar: Set[String] = falseSimilarAnswers ++ randomFalseAnswers
+
+    val numFalseAnswersStillToBeFound2 = numFalseAnswersRequired - falseAnswersSoFar.size
+
+    // numFalseAnswersStillToBeFound2 should be 0, but deal with the edge case of bad data.
+    val dummyAnswers = uniqueDummyAnswers(numFalseAnswersStillToBeFound2, falseAnswersSoFar)
+
+    falseAnswersSoFar ++ dummyAnswers
+  }
+
+  protected[model] def makeRandomFalseAnswers(numFalseAnswersRequired: Int,
+      itemCorrect: QuizItem): Set[String] = {
+
+    def randomFalseWordValue(sliceIndex: Int) =
+      findRandomWordValue(sliceOfResponses(sliceIndex, numSlices = numFalseAnswersRequired)).
+          filter(itemCorrect.response.text != _)
+
+    (0 until numFalseAnswersRequired).map(
+        sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toSet
+  }
+
+  protected[model] def uniqueDummyAnswers(numFalseAnswersRequired: Int,
+      falseAnswersSoFar: Set[String]): Set[String] = {
+    if (numFalseAnswersRequired == 0) Set.empty[String]
+    else {
+      val characters = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray
+      if (numFalseAnswersRequired > characters.length) {
+        l.logError("Too many dummy answers requested.")
+        Set.empty[String]
+      } else
+        characters.map(_.toString).take(numFalseAnswersRequired).toSet
     }
-
-    // try again to fill the falseAnswers
-    var totalTries = 20 // to stop any infinite loop
-    while (falseAnswers.size < numFalseAnswersRequired && totalTries > 0) {
-      totalTries = totalTries - 1
-      val randomAnswer: Option[String] = findRandomWordValue(randomValues(100))
-      randomAnswer.foreach( randomAnswer =>
-        if (wmpCorrect.response.text != randomAnswer)
-          falseAnswers += randomAnswer
-      )
-    }
-
-    // final try to fill false answers: use dummy data
-    if (falseAnswers.isEmpty) falseAnswers += ""
-    while (falseAnswers.size < numFalseAnswersRequired)
-      falseAnswers += (falseAnswers.last + " ")
-
-    falseAnswers
   }
 
 
-  def makeFalseSimilarAnswers(correctValues: List[String], correctValue: String,
+
+
+  protected[model] def makeFalseSimilarAnswers(correctValues: List[String], correctValue: String,
       numCorrectAnswersSoFar: Int, numFalseAnswersRequired: Int): Set[String] = {
 
     var similarWords = new HashSet[String]
@@ -270,6 +284,14 @@ case class QuizGroup (
     quizItem
   }
 
+  def sliceOfResponses(sliceIndex: Int, numSlices: Int): List[Value] =
+    sliceOfQuizItems(sliceIndex, numSlices).map(_.response).toList
+
+  def sliceOfQuizItems(sliceIndex: Int, numSlices: Int): Iterable[QuizItem] = {
+    val sliceSize = size / numSlices
+    val start = sliceIndex * sliceSize
+    quizItems.slice(start, start + sliceSize)
+  }
 
   def randomValues(sliceSize: Int): List[Value] =
     randomSliceOfQuizItems(sliceSize).map(_.response).toList

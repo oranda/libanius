@@ -39,18 +39,18 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
         "on|auf\n" +
         "sweeps|streicht"
 
-    val qg = QuizGroup.fromCustomFormat(wmgCustomFormat)
+    val quizGroup = QuizGroup.fromCustomFormat(wmgCustomFormat)
 
     "be parseable from custom format" in {
-      qg.currentPromptNumber mustEqual 0
-      qg.promptType mustEqual "English word"
-      qg.responseType mustEqual "German word"
-      qg.toCustomFormat(new StringBuilder()).toString mustEqual wmgCustomFormat
-      qg.size mustEqual 12
+      quizGroup.currentPromptNumber mustEqual 0
+      quizGroup.promptType mustEqual "English word"
+      quizGroup.responseType mustEqual "German word"
+      quizGroup.toCustomFormat(new StringBuilder()).toString mustEqual wmgCustomFormat
+      quizGroup.size mustEqual 12
     }
 
     "find values for a prompt" in {
-      qg.findResponsesFor("on") mustEqual List("auf")
+      quizGroup.findResponsesFor("on") mustEqual List("auf")
     }
 
     "accept the addition of a new word-mapping" in {
@@ -68,11 +68,24 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
+
+
+
     "generate false answers similar to a correct answer" in {
-      val falseAnswers = qg.makeFalseSimilarAnswers(
+      val falseAnswers = quizGroup.makeFalseSimilarAnswers(
           correctValues = List("unterhalten"),
           correctValue = "unterhalten",
           numCorrectAnswersSoFar = 2, numFalseAnswersRequired = 5)
+
+      falseAnswers.contains("unterrichten") mustEqual true
+    }
+
+    "make false answers" in {
+      val quizItemCorrect: QuizItem = quizGroup.quizItems.find(_.prompt.text == "entertain").get
+
+      val falseAnswers = quizGroup.makeFalseAnswers(quizItemCorrect: QuizItem,
+          numCorrectAnswersSoFar = 2)
+
       falseAnswers.contains("unterrichten") mustEqual true
     }
 
@@ -86,7 +99,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     "find a presentable quiz item" in {
-      pullQuizItem(qg)._2 mustEqual ("against", "wider")
+      pullQuizItem(quizGroup)._2 mustEqual ("against", "wider")
     }
 
     "remove a quiz pair" in {
@@ -152,6 +165,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val quizItem5 = qgLocal.findPresentableQuizItem
       quizItem5.get.prompt.text mustEqual "against"
     }
+
   }
 
 
