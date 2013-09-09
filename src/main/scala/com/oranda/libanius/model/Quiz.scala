@@ -26,6 +26,8 @@ import com.oranda.libanius.model.quizitem.{QuizItem}
 import com.oranda.libanius.model.wordmapping.Dictionary
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 
+import java.lang.StringBuilder
+
 case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
 
   /*

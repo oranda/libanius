@@ -21,6 +21,8 @@ import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.Value
 
+import java.lang.StringBuilder
+
 case class WordMappingValue(value: String, correctAnswersInARow: List[UserResponse] = Nil,
     incorrectAnswers: List[UserResponse] = Nil) extends Value(value) {
 

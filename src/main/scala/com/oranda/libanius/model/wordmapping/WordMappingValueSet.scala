@@ -24,6 +24,8 @@ import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.ModelComponent
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
+import java.lang.StringBuilder
+
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
  * TODO: try again to convert this to a Set.
@@ -49,8 +51,7 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends Mod
   def toCustomFormat(strBuilder: StringBuilder) =
     StringUtil.mkString(strBuilder, values, wmvToCustomFormat, '/')
 
-  def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue):
-      StringBuilder =
+  def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue): StringBuilder =
     wmv.toCustomFormat(strBuilder)
 
   def strings: Iterable[String] = values.map(_.value)

@@ -19,6 +19,8 @@ import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{AppDependencyAccess}
 import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, TextValue, QuizItem}
 
+import java.lang.StringBuilder
+
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
   "a quiz group" should {

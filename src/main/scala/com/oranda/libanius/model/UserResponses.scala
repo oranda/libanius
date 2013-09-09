@@ -19,6 +19,8 @@ package com.oranda.libanius.model
 import com.oranda.libanius.util.StringUtil
 import UserResponses._
 
+import java.lang.StringBuilder
+
 case class UserResponses(correctAnswersInARow: List[UserResponse] = Nil,
     incorrectAnswers: List[UserResponse] = Nil)
   extends ModelComponent {
@@ -78,8 +80,6 @@ case class UserResponses(correctAnswersInARow: List[UserResponse] = Nil,
 
   def answerPromptNumber(strBuilder: StringBuilder, answer: UserResponse) =
     strBuilder.append(answer.promptNumber)
-
-
 
 }
 

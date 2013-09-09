@@ -19,6 +19,8 @@ package com.oranda.libanius.model
 import scala.collection.immutable._
 import scala.util.{Try, Random}
 
+import java.lang.StringBuilder
+
 import com.oranda.libanius.util.{StringUtil, Util}
 import com.oranda.libanius.model.wordmapping.{WordMappingGroup, Dictionary}
 import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, Value, TextValue, QuizItem}

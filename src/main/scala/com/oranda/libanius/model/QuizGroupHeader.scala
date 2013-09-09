@@ -19,6 +19,7 @@ import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.wordmapping.WordMappingGroup
 
+import java.lang.StringBuilder
 
 case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String, responseType: String)
     extends ModelComponent {

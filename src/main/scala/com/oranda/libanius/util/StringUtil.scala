@@ -17,7 +17,7 @@
 package com.oranda.libanius.util
 
 import java.lang.Character
-import java.util.zip.Deflater
+import java.lang.StringBuilder
 
 object StringUtil {
     
