@@ -16,12 +16,11 @@
 
 package com.oranda.libanius.parse
 
+import com.oranda.libanius.model._
 import scala.io.BufferedSource
 import scala.collection.mutable.ListBuffer
 
-import com.oranda.libanius.model.wordmapping._
 import scala.collection.immutable.Stream
-import com.oranda.libanius.model._
 
 abstract class ReadVocabFileTwoLists extends ReadVocabFileToWordMappings {
 
