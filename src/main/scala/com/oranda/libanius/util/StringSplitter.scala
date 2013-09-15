@@ -26,7 +26,7 @@ abstract class StringSplitter(char: Character) extends Iterator[String] {
 
 /*
  * Created to have a similar interface to the Android splitter, but done in
- * regular Scala/Java. It will be slower, but will work for unit tests.
+ * regular Scala/Java. This is used on a PC and for unit tests.
  */
 class StringSplitterDefault(_char: Character) extends StringSplitter(_char) {
 

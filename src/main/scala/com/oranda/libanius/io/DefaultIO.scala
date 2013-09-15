@@ -18,7 +18,9 @@ package com.oranda.libanius.io
 
 import java.io._
 import scala.io.Source
+import scala.language.reflectiveCalls
 import com.oranda.libanius.model.QuizGroupHeader
+
 
 /*
  * Assumes an ordinary Unix/Windows filesystem.

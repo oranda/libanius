@@ -41,7 +41,7 @@ class ConfigProviderDefault extends ConfigProvider {
 /*
  * Mock configuration for tests.
  */
-class ConfigProviderTest extends ConfigProvider {
+class ConfigProviderMock extends ConfigProvider {
   override def conf =
     new Conf(
       enableLogging = false,

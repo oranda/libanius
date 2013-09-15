@@ -21,6 +21,8 @@ import UserResponses._
 
 import java.lang.StringBuilder
 
+import scalaz._
+
 case class UserResponses(correctAnswersInARow: List[UserResponse] = Nil,
     incorrectAnswers: List[UserResponse] = Nil)
   extends ModelComponent {
@@ -33,9 +35,12 @@ case class UserResponses(correctAnswersInARow: List[UserResponse] = Nil,
 
   def addUserAnswer(userAnswer : UserResponse, wasCorrect: Boolean): UserResponses =
     if (wasCorrect)
-      updated(userAnswer :: correctAnswersInARow, incorrectAnswers)
-    else
-      updated(Nil, userAnswer :: incorrectAnswers) // old correct answers are discarded
+      UserResponses.userResponsesCorrectAnswersLens.set(this, userAnswer :: correctAnswersInARow)
+    else {
+      // on an incorrect answer, old correct answers are discarded
+      val ur = UserResponses.userResponsesCorrectAnswersLens.set(this, Nil)
+      UserResponses.userResponsesIncorrectAnswersLens.set(ur, userAnswer :: incorrectAnswers)
+    }
 
 
   /*
@@ -51,8 +56,7 @@ case class UserResponses(correctAnswersInARow: List[UserResponse] = Nil,
         _.isPresentable(currentPromptNum, promptNumInMostRecentAnswer, numCorrectAnswersInARow))
 
 
-  def isUnfinished: Boolean = numCorrectAnswersInARow <
-      conf.numCorrectAnswersRequired
+  def isUnfinished: Boolean = numCorrectAnswersInARow < conf.numCorrectAnswersRequired
   
   def numCorrectAnswersInARow = correctAnswersInARow.length
   
@@ -84,6 +88,14 @@ case class UserResponses(correctAnswersInARow: List[UserResponse] = Nil,
 }
 
 object UserResponses {
+
+  val userResponsesCorrectAnswersLens = Lens.lensu(
+      get = (_: UserResponses).correctAnswersInARow,
+      set = (ur: UserResponses, urs: List[UserResponse]) => ur.copy(correctAnswersInARow = urs))
+
+  val userResponsesIncorrectAnswersLens = Lens.lensu(
+      get = (_: UserResponses).incorrectAnswers,
+      set = (ur: UserResponses, urs: List[UserResponse]) => ur.copy(incorrectAnswers = urs))
 
   /*
    * Criteria sets that determine whether the current item is presentable or not.

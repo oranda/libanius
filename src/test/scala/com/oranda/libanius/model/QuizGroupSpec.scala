@@ -17,7 +17,7 @@ package com.oranda.libanius.model
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{AppDependencyAccess}
-import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices, TextValue}
 
 import java.lang.StringBuilder
 
@@ -53,6 +53,12 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       quizGroup.findResponsesFor("on") mustEqual List("auf")
     }
 
+    "accept an updated prompt number" in {
+      val qgLocal = QuizGroup.fromCustomFormat(wmgCustomFormat)
+      val qgUpdated = qgLocal.updatedPromptNumber
+      qgUpdated.currentPromptNumber mustEqual 1
+    }
+
     "accept the addition of a new word-mapping" in {
       val qgLocal = QuizGroup.fromCustomFormat(wmgCustomFormat)
       qgLocal.contains("good") mustEqual false
@@ -67,9 +73,6 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val qgUpdated = qgLocal.addQuizItem(TextValue("against"), TextValue("gegen"))
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
-
-
-
 
     "generate false answers similar to a correct answer" in {
       val falseAnswers = quizGroup.makeFalseSimilarAnswers(
@@ -109,7 +112,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       qgUpdated.contains("against") mustEqual false
     }
 
-    "add a new quiz pair to the front of its queue" in {
+    "add a new quiz item to the front of its queue" in {
       val qgLocal = QuizGroup.fromCustomFormat(wmgCustomFormat)
       val qgUpdated = qgLocal.addNewQuizItem("to exchange", "tauschen")
       pullQuizItem(qgUpdated)._2 mustEqual ("to exchange", "tauschen")
@@ -118,7 +121,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     "move an existing quiz pair to the front of its queue" in {
       val qgLocal = QuizGroup.fromCustomFormat(wmgCustomFormat)
       val numPromptsBefore = qgLocal.numPrompts
-      val qgUpdated = qgLocal.addQuizItemToFront(TextValue("sweeps"), TextValue("streicht"))
+      val qgUpdated = qgLocal.addQuizItemToFront(QuizItem("sweeps", "streicht"))
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
       pullQuizItem(qgUpdated)._2 mustEqual ("sweeps", "streicht")
@@ -127,7 +130,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     "move a quiz pair to the front of its queue where only the prompt already exists" in {
       val qgLocal = QuizGroup.fromCustomFormat(wmgCustomFormat)
       val sizeBefore = qgLocal.size
-      val qgUpdated = qgLocal.addQuizItemToFront(TextValue("entertain"), TextValue("bewirten"))
+      val qgUpdated = qgLocal.addQuizItemToFront(QuizItem("entertain", "bewirten"))
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
       pullQuizItem(qgUpdated)._2 mustEqual ("entertain", "bewirten")
@@ -135,8 +138,8 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "add more than one new quiz pair to the front of its queue" in {
       val qgLocal = QuizGroup.fromCustomFormat(wmgCustomFormat)
-      val qgUpdated1 = qgLocal.addQuizItemToFront(TextValue("to exchange"), TextValue("tauschen"))
-      val qgUpdated2 = qgUpdated1.addQuizItemToFront(TextValue("whole"), TextValue("ganz"))
+      val qgUpdated1 = qgLocal.addQuizItemToFront(QuizItem("to exchange", "tauschen"))
+      val qgUpdated2 = qgUpdated1.addQuizItemToFront(QuizItem("whole", "ganz"))
       val (qgUnrolled, (keyWord, value)) = pullQuizItem(qgUpdated2)
       (keyWord, value) mustEqual ("whole", "ganz")
       pullQuizItem(qgUnrolled)._2 mustEqual ("to exchange", "tauschen")

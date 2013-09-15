@@ -25,6 +25,7 @@ import com.oranda.libanius.model.ModelComponent
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import java.lang.StringBuilder
+import scala.language.implicitConversions
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.

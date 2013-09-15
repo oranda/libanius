@@ -28,6 +28,8 @@ import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 
 import java.lang.StringBuilder
 
+import scalaz._
+
 case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
 
   /*
@@ -49,26 +51,23 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
   }
 
   def findOrAddQuizGroup(header: QuizGroupHeader): (Quiz, QuizGroup) = {
-    val wordMappingGroup = findQuizGroup(header)
-    wordMappingGroup match {
-      case Some(wordMappingGroup) => (this, wordMappingGroup)
-      case None => val wordMappingGroup: QuizGroup = QuizGroup(header)
-                   (addQuizGroup(wordMappingGroup), wordMappingGroup)
+    val quizGroup = findQuizGroup(header)
+    quizGroup match {
+      case Some(quizGroup) => (this, quizGroup)
+      case None => val quizGroup = QuizGroup(header)
+                   (addQuizGroup(quizGroup), quizGroup)
     }
   }
 
   /*
    * Do not call in a loop: not fast.
    */
-  def findResponsesFor(prompt: String, header: QuizGroupHeader): List[String] = {
-    l.log("Looking for values for " + prompt + " in " + header)
-
+  def findResponsesFor(prompt: String, header: QuizGroupHeader): List[String] =
     findQuizGroup(header) match {
       case Some(quizGroup) => quizGroup.findResponsesFor(prompt)
       case _ => l.logError("could not find quizGroup for " + header)
-        Nil
+                Nil
     }
-  }
 
   /*
    *  Do not call in a loop: not fast.
@@ -79,7 +78,7 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     findQuizGroup(header) match {
       case Some(quizGroup) => quizGroup.findPromptsFor(response)
       case _ => l.logError("could not find quizGroup for " + header)
-        Nil
+                Nil
     }
   }
 
@@ -88,16 +87,19 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
 
   def removeQuizGroup(header: QuizGroupHeader): Quiz = {
     val wordMappingGroupsFiltered = quizGroups.filterNot(_.header.matches(header))
-    Quiz(wordMappingGroupsFiltered)
+    updatedQuizGroups(wordMappingGroupsFiltered)
   }
 
-  // Just a synonym for addQuizGroup
-  def replaceQuizGroup(quizGroup: QuizGroup) = addQuizGroup(quizGroup)
+  def updatedQuizGroups(newQuizGroups: Set[QuizGroup]): Quiz =
+    Quiz.quizGroupsLens.set(this, newQuizGroups)
+
+  // Just a synonym for replaceQuizGroup
+  def addQuizGroup(quizGroup: QuizGroup): Quiz = replaceQuizGroup(quizGroup)
 
   // This will replace any existing wordMappingGroup with the same prompt-response pair
-  def addQuizGroup(quizGroup: QuizGroup): Quiz = {
+  def replaceQuizGroup(quizGroup: QuizGroup) = {
     val newQuiz: Quiz = removeQuizGroup(quizGroup.header)
-    Quiz(newQuiz.quizGroups + quizGroup)
+    Quiz.quizGroupsLens.set(this, newQuiz.quizGroups + quizGroup)
   }
 
   def removeQuizItemsForPrompt(prompt: String, header: QuizGroupHeader): Quiz =
@@ -111,7 +113,7 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     val updatedQuiz: Option[Quiz] = (for (
       quizGroup <- findQuizGroup(header)
       if quizGroup.contains(quizItem)
-    ) yield quizGroup.removeQuizItem(quizItem)).map(replaceQuizGroup(_))
+    ) yield QuizGroup.quizItemsLens.set(quizGroup, quizGroup.remove(quizItem))).map(replaceQuizGroup(_))
 
     val wasRemoved = updatedQuiz.isDefined
     (updatedQuiz.getOrElse(this), wasRemoved)
@@ -135,21 +137,36 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
       quizItem <- quizGroup.findAnyUnfinishedQuizItem.toStream
     } yield (quizItem, quizGroup)).headOption
 
-  def addWordMappingToFront(header: QuizGroupHeader, prompt: String, value: String): Quiz = {
-    val quizGroup = findQuizGroup(header)
-    quizGroup.map(quizGroup => replaceQuizGroup(quizGroup.addQuizItemToFront(
-        QuizItem(prompt, value)))).getOrElse(this)
+  def addQuizItemToFront(header: QuizGroupHeader, prompt: String, response: String): Quiz =
+    addQuizItemToFront(header, QuizItem(prompt, response))
+
+  def addQuizItemToFront(header: QuizGroupHeader, quizItem: QuizItem): Quiz = {
+    val quizGroup = findQuizGroup(header) //.get
+
+    //val newQuiz: Quiz = removeQuizGroup(quizGroup.header)
+    //Quiz.quizGroupsLens.set(this, newQuiz.quizGroups + quizGroup)
+
+    quizGroup.map { case quizGroup: QuizGroup =>
+      // TODO: compose lenses
+      val newQuizGroup = QuizGroup.quizItemsLens.set(quizGroup, quizItem +: quizGroup.remove(quizItem))
+      val newQuiz: Quiz = removeQuizGroup(newQuizGroup.header)
+      Quiz.quizGroupsLens.set(this, newQuiz.quizGroups + quizGroup)
+      replaceQuizGroup(newQuizGroup)
+    }.getOrElse(this)
   }
 
-  def addWordMappingToFrontOfTwoGroups(header: QuizGroupHeader,
-      keyWord: String, value: String): Quiz = {
+  /*
+   * This is intended for reversible quiz items, principally word translations.
+   */
+  def addQuizItemToFrontOfTwoGroups(header: QuizGroupHeader,
+      prompt: String, response: String): Quiz = {
 
-    l.log("Adding to 2 quizGroups: " + keyWord + "," + value)
+    l.log("Adding to 2 quizGroups: " + prompt + "," + response)
     // E.g. add to the English -> German group
-    val quizUpdated1 = addWordMappingToFront(header, keyWord, value)
+    val quizUpdated1 = addQuizItemToFront(header, prompt, response)
 
     // E.g. add to the German -> English group
-    val quizUpdated2 = quizUpdated1.addWordMappingToFront(header.reverse, value, keyWord)
+    val quizUpdated2 = quizUpdated1.addQuizItemToFront(header.reverse, response, prompt)
 
     quizUpdated2
   }
@@ -183,7 +200,7 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
         val quizGroupMerged = otherWmg.merge(quizGroup)
         quizGroups.filterNot(Some(_) == quizGroup) + quizGroupMerged
     }
-    Quiz(wordMappingGroupsCombined)
+    updatedQuizGroups(wordMappingGroupsCombined)
   }
 
   def resultsBeginningWith(input: String): List[SearchResult] =
@@ -198,6 +215,10 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
 }
 
 object Quiz extends AppDependencyAccess {
+
+  val quizGroupsLens: Lens[Quiz, Set[QuizGroup]] = Lens.lensu(
+      get = (_: Quiz).quizGroups,
+      set = (q: Quiz, qgs: Set[QuizGroup]) => q.copy(quizGroups = qgs))
 
   def findQuizGroup(quizGroups: Set[QuizGroup], header: QuizGroupHeader):
       Option[QuizGroup] =

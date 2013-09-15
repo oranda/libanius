@@ -21,6 +21,10 @@ import com.oranda.libanius.model.UserResponses
 /*
  * A connection between two things, and user information associated with the connection.
  *
+ * prompt: the cue given to the user
+ * response: the desired response
+ * userResponses: a history of actual responses
+ *
  * Examples of QuizItems:
  *  - a question and an answer in the quiz
  *  - a word and a translation

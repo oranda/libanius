@@ -17,6 +17,7 @@
 package com.oranda.libanius.model
 
 import scala.collection.immutable._
+import scala.language.postfixOps
 import scala.util.{Try, Random}
 
 import java.lang.StringBuilder
@@ -26,6 +27,9 @@ import com.oranda.libanius.model.wordmapping.{WordMappingGroup, Dictionary}
 import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, Value, TextValue, QuizItem}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
+import scalaz._
+import scalaz.std.set
+
 case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stream.empty,
     currentPromptNumber: Int = 0, dictionary: Dictionary = new Dictionary)
   extends ModelComponent {
@@ -34,13 +38,12 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
   def responseType = header.responseType       // example: "German word"
 
   def updatedQuizItems(newQuizItems: Stream[QuizItem]): QuizGroup =
-    new QuizGroup(header, newQuizItems, currentPromptNumber, dictionary)
+    QuizGroup.quizItemsLens.set(this, newQuizItems)
 
-  def updatedPromptNumber: QuizGroup =
-    new QuizGroup(header, quizItems, currentPromptNumber + 1, dictionary)
+  def updatedPromptNumber: QuizGroup = QuizGroup.promptNumberLens.mod((1+), this)
 
   def updatedWithUserAnswer(prompt: Value, response: Value, wasCorrect: Boolean,
-      userResponses: UserResponses, userAnswer: UserResponse) = {
+      userResponses: UserResponses, userAnswer: UserResponse): QuizGroup = {
     val userResponseUpdated = userResponses.addUserAnswer(userAnswer, wasCorrect)
     addQuizItem(prompt, response, userResponseUpdated)
   }
@@ -55,15 +58,12 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
     else
       this
 
-  protected[model] def addQuizItemToFront(key: Value, value: Value): QuizGroup =
-    addQuizItemToFront(QuizItem(key, value))
-
   protected[model] def addQuizItemToFront(quizItem: QuizItem): QuizGroup =
     addQuizItemToFront(quizItems, quizItem)
 
   protected[model] def addQuizItemToFront(quizItems: Stream[QuizItem],
       quizItem: QuizItem): QuizGroup =
-    updatedQuizItems(quizItem +: remove(quizItem))
+    QuizGroup.quizItemsLens.set(this, quizItem +: remove(quizItem))
 
   protected[model] def addQuizItemToEnd(quizItem: QuizItem): QuizGroup =
     addQuizItemToEnd(quizItems, quizItem)
@@ -72,9 +72,9 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
       QuizGroup =
     updatedQuizItems(remove(quizItem) :+ quizItem)
 
-  def removeQuizItem(quizItem: QuizItem) = updatedQuizItems(remove(quizItem))
+  def removeQuizItem(quizItem: QuizItem) = QuizGroup.quizItemsLens.set(this, remove(quizItem))
 
-  private def remove(quizItem: QuizItem): Stream[QuizItem] =
+  def remove(quizItem: QuizItem): Stream[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
 
   def removeQuizItemsForPrompt(prompt: String) =
@@ -104,9 +104,9 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
     // Imperative code is used for speed
     val iter = wordMappingGroup.wordMappingPairs.iterator
     while (iter.hasNext) {
-      val quizItem = iter.next
-      strBuilder.append('\n').append(quizItem.key).append('|')
-      quizItem.valueSet.toCustomFormat(strBuilder)
+      val wmPair = iter.next
+      strBuilder.append('\n').append(wmPair.key).append('|')
+      wmPair.valueSet.toCustomFormat(strBuilder)
     }
     strBuilder
   }
@@ -137,18 +137,14 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
   /*
    * Low usage expected. Slow because we are not using a Map for quizItems.
    */
-  def findResponsesFor(prompt: String): List[String] = {
-    val values = quizItems.filter(_.prompt.matches(prompt)).map(_.response.text).toList
-    l.log("findResponsesFor " + prompt + " gives " + values)
-    values
-  }
+  def findResponsesFor(prompt: String): List[String] =
+    quizItems.filter(_.prompt.matches(prompt)).map(_.response.text).toList
 
-  // Low usage expected. Slow because we are not using a Map for quizItems.
-  def findPromptsFor(response: String): List[String] = {
-    val values = quizItems.filter(_.response.matches(response)).map(_.prompt.text).toList
-    l.log("findPromptsFor " + response + " gives " + values)
-    values
-  }
+  /*
+   * Low usage expected. Slow because we are not using a Map for quizItems.
+   */
+  def findPromptsFor(response: String): List[String] =
+    quizItems.filter(_.response.matches(response)).map(_.prompt.text).toList
 
   def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] = {
     l.log("findAnyUnfinishedQuizItem " + header)
@@ -162,7 +158,6 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
     new QuizItemViewWithChoices(quizItem, currentPromptNumber, header, falseAnswers,
         numCorrectAnswers)
   }
-
 
   protected def findPresentableQuizItem(quizItem: QuizItem, currentPromptNumber: Int):
       Option[QuizItemViewWithChoices] = {
@@ -226,9 +221,6 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
     }
   }
 
-
-
-
   protected[model] def makeFalseSimilarAnswers(correctValues: List[String], correctValue: String,
       numCorrectAnswersSoFar: Int, numFalseAnswersRequired: Int): Set[String] = {
 
@@ -273,7 +265,6 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
   def hasPrompt(prompt: String): Boolean = quizPrompts.contains(prompt)
   //def promptBeginningWith(promptStart: String): Boolean = quizPrompts.find(_.hasSameStart(promptStart))
 
-
   def findPresentableQuizItem: Option[QuizItemViewWithChoices] = {
     val quizItem =
       (for {
@@ -302,10 +293,18 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
       val randomStart = Random.nextInt(size - sliceSize)
       quizItems.slice(randomStart, randomStart + sliceSize)
     }
-
 }
 
 object QuizGroup extends AppDependencyAccess {
+
+  val quizItemsLens: Lens[QuizGroup, Stream[QuizItem]] = Lens.lensu(
+    get = (_: QuizGroup).quizItems,
+    set = (qGroup: QuizGroup, qItems: Stream[QuizItem]) => qGroup.copy(quizItems = qItems))
+
+  val promptNumberLens: Lens[QuizGroup, Int] = Lens.lensu(
+    get = (_: QuizGroup).currentPromptNumber,
+    set = (qGroup: QuizGroup, promptNum: Int) => qGroup.copy(currentPromptNumber = promptNum))
+
 
   def parseCurrentPromptNumber(str: String): Int =
     Try(StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt).recover {

@@ -16,7 +16,7 @@
 
 package com.oranda.libanius.dependencies
 
-class AppDependencyAccessTest extends AppDependencyAccess {
+class AppDependencyAccessMock extends AppDependencyAccess {
 
-  override lazy val conf: Conf = (new ConfigProviderTest).conf
+  override lazy val conf: Conf = (new ConfigProviderMock).conf
 }

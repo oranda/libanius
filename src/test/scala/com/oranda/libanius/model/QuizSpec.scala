@@ -19,6 +19,7 @@ package com.oranda.libanius.model
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{AppDependencyAccess}
 import com.oranda.libanius.model._
+import com.oranda.libanius.model.quizitem.QuizItem
 
 class QuizSpec extends Specification with AppDependencyAccess {
   
@@ -73,8 +74,16 @@ class QuizSpec extends Specification with AppDependencyAccess {
           QuizGroupHeader(WordMapping, "German word", "English word")).toSet[String]
       translations.contains("contract") mustEqual true
       translations.contains("treaty") mustEqual true
-    }    
-    
+    }
+
+    "add a new quiz item to a specified group" in {
+      val quizBefore = Quiz.demoQuiz(quizData)
+      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
+      val newQuizItem = QuizItem("to exchange", "tauschen")
+      val quizUpdated = quizBefore.addQuizItemToFront(qgHeader, newQuizItem)
+      quizUpdated.findQuizGroup(qgHeader).get.contains(newQuizItem) mustEqual true
+    }
+
     "delete prompt-words from a particular group" in {
       val quizBefore = Quiz.demoQuiz(quizData)
       val wmgBefore = quizBefore.findQuizGroup(
@@ -89,14 +98,18 @@ class QuizSpec extends Specification with AppDependencyAccess {
 
     "delete a quiz pair without deleting all values for that prompt" in {
       val quizBefore = Quiz.demoQuiz(quizData)
+      val qgHeader = QuizGroupHeader(WordMapping, "German word", "English word")
+      def translationsOfVertrag(quiz: Quiz) = quiz.findResponsesFor(prompt = "Vertrag", qgHeader)
+      translationsOfVertrag(quizBefore).contains("contract") mustEqual true
+
       val (quizAfter, wasRemoved) = quizBefore.removeQuizItem(
           prompt = "Vertrag", response = "contract",
           QuizGroupHeader(WordMapping, "German word", "English word"))
+
       wasRemoved mustEqual true
-      val translations = quizAfter.findResponsesFor(prompt = "Vertrag",
-          QuizGroupHeader(WordMapping, "German word", "English word"))
-      translations.contains("contract") mustEqual false
-      translations.contains("treaty") mustEqual true
+      val translationsOfVertragAfter = translationsOfVertrag(quizAfter)
+      translationsOfVertragAfter.contains("contract") mustEqual false
+      translationsOfVertragAfter.contains("treaty") mustEqual true
     }
 
     "contain unique groups only" in {

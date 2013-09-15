@@ -24,6 +24,7 @@ import scala.util.Try
 import com.oranda.libanius.util.{GroupByOrderedImplicit}
 import scala.collection.mutable
 import com.oranda.libanius.model.quizitem.{Value, TextValue, QuizItem}
+import scala.language.implicitConversions
 
 /*
  * A type of QuizGroup where the quiz pairs are mappings from a word to possible translations.
