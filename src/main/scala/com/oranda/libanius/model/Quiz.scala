@@ -51,15 +51,6 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
     StringUtil.mkString(strBuilder, quizGroups.keySet, quizGroupMetadata, '\n')
   }
 
-  def findOrAddQuizGroup(header: QuizGroupHeader): (Quiz, QuizGroup) = {
-    val quizGroup = findQuizGroup(header)
-    quizGroup match {
-      case Some(quizGroup) => (this, quizGroup)
-      case None => val quizGroup = QuizGroup()
-                   (addQuizGroup(header, quizGroup), quizGroup)
-    }
-  }
-
   /*
    * Do not call in a loop: not fast.
    */
