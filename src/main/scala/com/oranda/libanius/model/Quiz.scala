@@ -181,14 +181,14 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
   }
 
   def numGroups = quizGroups.size
-  def numPrompts = (0 /: quizGroups.values) { case (sum, qg) => sum + qg.numPrompts }
-  def numResponses = (0 /: quizGroups.values) { case (sum, qg) => sum + qg.numResponses }
+  def numPrompts = (0 /: quizGroups.values)(_ + _.numPrompts)
+  def numResponses = (0 /: quizGroups.values)(_ + _.numResponses)
 
   def scoreSoFar: BigDecimal =  // out of 1.0
     numCorrectAnswers.toDouble / (numItems * conf.numCorrectAnswersRequired).toDouble
 
-  def numItems = (0 /: quizGroups.values) { case (sum, qg) => sum + qg.size }
-  def numCorrectAnswers = (0 /: quizGroups.values) { case (sum, qg) => sum + qg.numCorrectAnswers }
+  def numItems = (0 /: quizGroups.values)(_ + _.size)
+  def numCorrectAnswers = (0 /: quizGroups.values)(_ + _.numCorrectAnswers)
 
   def resultsBeginningWith(input: String): List[SearchResult] =
     quizGroups.flatMap {

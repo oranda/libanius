@@ -111,9 +111,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
   def size = quizItems.size
   def numPrompts = size
   def numResponses = size
-  def numCorrectAnswers: Int = (0 /: quizItems) {
-    case (sum, quizItem) => sum + quizItem.numCorrectAnswersInARow
-  }
+  def numCorrectAnswers: Int = (0 /: quizItems)(_ + _.numCorrectAnswersInARow)
 
   /*
    * This may give similar results to findResponseFor but it uses the dictionary
