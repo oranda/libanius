@@ -30,12 +30,17 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import scalaz._
 import scalaz.std.set
 
+/*
+ * Contains quiz items for a topic in a given order. This is currently a Stream
+ * of QuizItem's where each QuizItem includes a user's responses. (Formerly it was a ListMap
+ * but this data structure was too slow for inserting large numbers of quiz items.)
+ */
 case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     currentPromptNumber: Int = 0, dictionary: Dictionary = new Dictionary)
   extends ModelComponent {
 
   def updatedQuizItems(newQuizItems: Stream[QuizItem]): QuizGroup =
-    QuizGroup.quizItemsLens.set(this, newQuizItems)
+    QuizGroup.quizGroupItemsLens.set(this, newQuizItems)
 
   def updatedPromptNumber: QuizGroup = QuizGroup.promptNumberLens.mod((1+), this)
 
@@ -62,7 +67,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
 
   protected[model] def addQuizItemToFront(quizItems: Stream[QuizItem],
       quizItem: QuizItem): QuizGroup =
-    QuizGroup.quizItemsLens.set(this, quizItem +: remove(quizItem))
+    QuizGroup.quizGroupItemsLens.set(this, quizItem +: remove(quizItem))
 
   protected[model] def addQuizItemToEnd(quizItem: QuizItem): QuizGroup =
     addQuizItemToEnd(quizItems, quizItem)
@@ -71,7 +76,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
       QuizGroup =
     updatedQuizItems(remove(quizItem) :+ quizItem)
 
-  def removeQuizItem(quizItem: QuizItem) = QuizGroup.quizItemsLens.set(this, remove(quizItem))
+  def removeQuizItem(quizItem: QuizItem) = QuizGroup.quizGroupItemsLens.set(this, remove(quizItem))
 
   def remove(quizItem: QuizItem): Stream[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
@@ -284,7 +289,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
 
 object QuizGroup extends AppDependencyAccess {
 
-  val quizItemsLens: Lens[QuizGroup, Stream[QuizItem]] = Lens.lensu(
+  val quizGroupItemsLens: Lens[QuizGroup, Stream[QuizItem]] = Lens.lensu(
     get = (_: QuizGroup).quizItems,
     set = (qGroup: QuizGroup, qItems: Stream[QuizItem]) => qGroup.copy(quizItems = qItems))
 

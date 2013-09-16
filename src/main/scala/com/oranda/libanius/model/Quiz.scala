@@ -20,6 +20,7 @@ import scala.collection.immutable._
 
 import com.oranda.libanius.util.StringUtil
 
+import scala.language.postfixOps
 import scala.math.BigDecimal.double2bigDecimal
 import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.{QuizItem}
@@ -29,7 +30,9 @@ import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import java.lang.StringBuilder
 
 import scalaz._
+import scalaz.PLens._
 import scalaz.std.set
+
 
 case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends ModelComponent {
 
@@ -65,7 +68,6 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
    *  Do not call in a loop: not fast.
    */
   def findPromptsFor(response: String, header: QuizGroupHeader): List[String] = {
-    l.log("Looking for prompt for " + response + " in " + header)
 
     findQuizGroup(header) match {
       case Some(quizGroup) => quizGroup.findPromptsFor(response)
@@ -77,7 +79,9 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
   def findQuizGroup(header: QuizGroupHeader): Option[QuizGroup] = quizGroups.get(header)
 
   def updatedPromptNumber(qgWithHeader: QuizGroupWithHeader): Quiz =
-    replaceQuizGroup(qgWithHeader.header, qgWithHeader.quizGroup.updatedPromptNumber)
+    //replaceQuizGroup(qgWithHeader.header, qgWithHeader.quizGroup.updatedPromptNumber)
+    replaceQuizGroup(qgWithHeader.header, QuizGroup.promptNumberLens.mod( (1+), qgWithHeader.quizGroup))
+
 
   def removeQuizGroup(header: QuizGroupHeader): Quiz =
     updatedQuizGroups(quizGroups - header)
@@ -90,29 +94,8 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
     replaceQuizGroup(header, quizGroup)
 
   // This will replace any existing wordMappingGroup with the same prompt-response pair
-  def replaceQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup) = {
-    val newQuiz: Quiz = removeQuizGroup(header)
-    Quiz.quizGroupsLens.set(this, newQuiz.quizGroups + (header -> quizGroup))
-  }
-
-  def removeQuizItemsForPrompt(prompt: String, header: QuizGroupHeader): Quiz =
-    (for (quizGroup <- findQuizGroup(header))
-      yield quizGroup.removeQuizItemsForPrompt(prompt)).map(
-          replaceQuizGroup(header, _)).getOrElse(this)
-
-  def removeQuizItem(prompt: String, response: String, header: QuizGroupHeader): (Quiz, Boolean) =
-    removeQuizItem(QuizItem(prompt, response), header)
-
-  def removeQuizItem(quizItem: QuizItem, header: QuizGroupHeader): (Quiz, Boolean) = {
-    val updatedQuiz: Option[Quiz] = (for (
-      quizGroup <- findQuizGroup(header)
-      if quizGroup.contains(quizItem)
-    ) yield QuizGroup.quizItemsLens.set(quizGroup, quizGroup.remove(quizItem))).map(
-          replaceQuizGroup(header, _))
-
-    val wasRemoved = updatedQuiz.isDefined
-    (updatedQuiz.getOrElse(this), wasRemoved)
-  }
+  def replaceQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup) =
+    Quiz.quizGroupsLens.set(this, quizGroups + (header -> quizGroup))
 
   /*
    * Find the first available "presentable" quiz item.
@@ -136,19 +119,38 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
     addQuizItemToFront(header, QuizItem(prompt, response))
 
   def addQuizItemToFront(header: QuizGroupHeader, quizItem: QuizItem): Quiz = {
-    val quizGroup = findQuizGroup(header) //.get
+    Quiz.quizGroupsLens.set(this,
+      mapVPLens(header) mod ((_: QuizGroup).addQuizItemToFront(quizItem), quizGroups)
+    )
+  }
 
-    //val newQuiz: Quiz = removeQuizGroup(quizGroup.header)
-    //Quiz.quizGroupsLens.set(this, newQuiz.quizGroups + quizGroup)
+  def removeQuizItemsForPrompt(prompt: String, header: QuizGroupHeader): Quiz =
+    Quiz.quizGroupsLens.set(this,
+      mapVPLens(header) mod ((_: QuizGroup).removeQuizItemsForPrompt(prompt), quizGroups)
+    )
 
-    quizGroup.map { case quizGroup: QuizGroup =>
-      // TODO: compose lenses
-      val newQuizGroup = QuizGroup.quizItemsLens.set(
-          quizGroup, quizItem +: quizGroup.remove(quizItem))
-      val newQuiz: Quiz = removeQuizGroup(header)
-      Quiz.quizGroupsLens.set(this, newQuiz.quizGroups + (header -> quizGroup))
-      replaceQuizGroup(header, newQuizGroup)
-    }.getOrElse(this)
+  def removeQuizItem(prompt: String, response: String, header: QuizGroupHeader): (Quiz, Boolean) =
+    removeQuizItem(QuizItem(prompt, response), header)
+
+  def existsQuizItem(quizItem: QuizItem, header: QuizGroupHeader) = {
+    val quizGroup = Quiz.quizGroupMapLens(header).get(quizGroups)
+    quizGroup.map(_.contains(quizItem)).isDefined
+  }
+
+  def removeQuizItem(quizItem: QuizItem, header: QuizGroupHeader): (Quiz, Boolean) = {
+    val quizItemExisted = existsQuizItem(quizItem, header)
+    val quiz = Quiz.quizGroupsLens.set(this,
+      mapVPLens(header) mod ((_: QuizGroup).removeQuizItem(quizItem), quizGroups)
+    )
+    (quiz, quizItemExisted)
+  }
+
+  // TODO: replace this with proper lens composition or abandon
+  private def setQuizItems(qgHeader: QuizGroupHeader, quizGroup: QuizGroup,
+      quizItems: Stream[QuizItem]): Quiz = {
+    val newQuizGroup = QuizGroup.quizGroupItemsLens.set(quizGroup, quizItems)
+    Quiz.quizGroupMapLens(qgHeader).set(quizGroups, Some(newQuizGroup))
+    Quiz.quizGroupsLens.set(this, quizGroups + (qgHeader -> newQuizGroup))
   }
 
   /*
@@ -169,15 +171,12 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
 
   def updateWithUserAnswer(isCorrect: Boolean, currentQuizItem: QuizItemViewWithChoices): Quiz = {
     val userAnswer = new UserResponse(currentQuizItem.qgCurrentPromptNumber)
-    val quizGroup: Option[QuizGroup] = findQuizGroup(currentQuizItem.quizGroupHeader)
-    quizGroup match {
-      case Some(quizGroup) =>
-        val quizGroupUpdated = quizGroup.updatedWithUserAnswer(
+
+    Quiz.quizGroupsLens.set(this,
+        mapVPLens(currentQuizItem.quizGroupHeader) mod ((_: QuizGroup).updatedWithUserAnswer(
             currentQuizItem.prompt, currentQuizItem.response, isCorrect,
-            currentQuizItem.quizItem.userResponses, userAnswer)
-        addQuizGroup(currentQuizItem.quizGroupHeader, quizGroupUpdated)
-      case _ => this
-    }
+            currentQuizItem.quizItem.userResponses, userAnswer), quizGroups)
+    )
   }
 
   def numGroups = quizGroups.size
@@ -208,6 +207,15 @@ object Quiz extends AppDependencyAccess {
   val quizGroupsLens: Lens[Quiz, Map[QuizGroupHeader, QuizGroup]] = Lens.lensu(
       get = (_: Quiz).quizGroups,
       set = (q: Quiz, qgs: Map[QuizGroupHeader, QuizGroup]) => q.copy(quizGroups = qgs))
+
+  def quizGroupMapLens[QuizGroupHeader, QuizGroup](header: QuizGroupHeader):
+      Lens[Map[QuizGroupHeader, QuizGroup], Option[QuizGroup]] =
+    Lens.lensu(
+      get = _ get header,
+      set = (quizGroups, qg) => qg match {
+        case None => quizGroups - header
+        case Some(quizGroup) => quizGroups + ((header, quizGroup))
+      })
 
   def metadataFromCustomFormat(str: String): Set[QuizGroupHeader] = {
     val quizGroupHeadings = str.split("quizGroup").tail
