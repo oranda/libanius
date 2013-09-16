@@ -30,12 +30,9 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import scalaz._
 import scalaz.std.set
 
-case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stream.empty,
+case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     currentPromptNumber: Int = 0, dictionary: Dictionary = new Dictionary)
   extends ModelComponent {
-
-  def promptType = header.promptType           // example: "English word"
-  def responseType = header.responseType       // example: "German word"
 
   def updatedQuizItems(newQuizItems: Stream[QuizItem]): QuizGroup =
     QuizGroup.quizItemsLens.set(this, newQuizItems)
@@ -47,6 +44,8 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
     val userResponseUpdated = userResponses.addUserAnswer(userAnswer, wasCorrect)
     addQuizItem(prompt, response, userResponseUpdated)
   }
+
+  def updatedDictionary(newDictionary: Dictionary) = QuizGroup.dictionaryLens.set(this, newDictionary)
 
   def addQuizItem(prompt: Value, response: Value, userResponses: UserResponses = UserResponses()):
       QuizGroup =
@@ -82,13 +81,8 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
   def removeQuizItemsForResponse(response: String) =
     updatedQuizItems(quizItems.filter(_.response.text != response))
 
-  def updatedDictionary(newDictionary: Dictionary) =
-    new QuizGroup(header, quizItems, currentPromptNumber, newDictionary)
-
   def quizPrompts: Stream[Value] = quizItems.map(_.prompt)
   def quizResponses: Stream[Value] = quizItems.map(_.response)
-
-  def matches(qgOther: QuizGroup): Boolean = header.matches(qgOther.header)
 
   /*
    * Example of custom format:
@@ -97,8 +91,8 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
    *    against|wider
    *    entertain|unterhalten
    */
-  def toCustomFormat(strBuilder: StringBuilder) = {
-    val wordMappingGroup = WordMappingGroup.fromQuizGroup(this)
+  def toCustomFormat(strBuilder: StringBuilder, header: QuizGroupHeader) = {
+    val wordMappingGroup = WordMappingGroup.fromQuizGroup(header, this)
     header.toCustomFormat(strBuilder).append(" currentPromptNumber=\"").
         append(currentPromptNumber).append("\"")
     // Imperative code is used for speed
@@ -109,12 +103,6 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
       wmPair.valueSet.toCustomFormat(strBuilder)
     }
     strBuilder
-  }
-
-  def getSaveData: SaveData = {
-    val serialized = toCustomFormat(new StringBuilder())
-    val fileName = header.makeQgFileName
-    SaveData(fileName, serialized.toString)
   }
 
   def contains(quizItem: QuizItem): Boolean = quizItems.exists(_.samePromptAndResponse(quizItem))
@@ -146,23 +134,24 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
   def findPromptsFor(response: String): List[String] =
     quizItems.filter(_.response.matches(response)).map(_.prompt.text).toList
 
-  def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] = {
-    l.log("findAnyUnfinishedQuizItem " + header)
+  def findAnyUnfinishedQuizItem(header: QuizGroupHeader): Option[QuizItemViewWithChoices] = {
+    l.log("findAnyUnfinishedQuizItem for " + header)
     quizItems.iterator.find(_.userResponses.isUnfinished).map(
-        pair => quizItemWithOptions(pair))
+        pair => quizItemWithOptions(pair, header))
   }
 
-  protected def quizItemWithOptions(quizItem: QuizItem): QuizItemViewWithChoices = {
+  protected def quizItemWithOptions(quizItem: QuizItem, header: QuizGroupHeader):
+       QuizItemViewWithChoices = {
     val numCorrectAnswers = quizItem.userResponses.numCorrectAnswersInARow
     val falseAnswers = makeFalseAnswers(quizItem, numCorrectAnswers)
     new QuizItemViewWithChoices(quizItem, currentPromptNumber, header, falseAnswers,
         numCorrectAnswers)
   }
 
-  protected def findPresentableQuizItem(quizItem: QuizItem, currentPromptNumber: Int):
-      Option[QuizItemViewWithChoices] = {
+  protected def findPresentableQuizItem(quizItem: QuizItem, header: QuizGroupHeader,
+      currentPromptNumber: Int): Option[QuizItemViewWithChoices] = {
     if (quizItem.isPresentable(currentPromptNumber))
-      Util.stopwatch(Some(quizItemWithOptions(quizItem)),
+      Util.stopwatch(Some(quizItemWithOptions(quizItem, header)),
           "quizItemWithOptions for " + quizItem.response)
     else
       None
@@ -265,11 +254,11 @@ case class QuizGroup(header: QuizGroupHeader, quizItems: Stream[QuizItem] = Stre
   def hasPrompt(prompt: String): Boolean = quizPrompts.contains(prompt)
   //def promptBeginningWith(promptStart: String): Boolean = quizPrompts.find(_.hasSameStart(promptStart))
 
-  def findPresentableQuizItem: Option[QuizItemViewWithChoices] = {
+  def findPresentableQuizItem(header: QuizGroupHeader): Option[QuizItemViewWithChoices] = {
     val quizItem =
       (for {
         quizItem <- quizItems.toStream
-        quizItem <- findPresentableQuizItem(quizItem, currentPromptNumber)
+        quizItem <- findPresentableQuizItem(quizItem, header, currentPromptNumber)
       } yield quizItem).headOption
     l.log("found quiz item " + quizItem)
     quizItem
@@ -305,6 +294,9 @@ object QuizGroup extends AppDependencyAccess {
     get = (_: QuizGroup).currentPromptNumber,
     set = (qGroup: QuizGroup, promptNum: Int) => qGroup.copy(currentPromptNumber = promptNum))
 
+  val dictionaryLens: Lens[QuizGroup, Dictionary] = Lens.lensu(
+    get = (_: QuizGroup).dictionary,
+    set = (qGroup: QuizGroup, d: Dictionary) => qGroup.copy(dictionary = d))
 
   def parseCurrentPromptNumber(str: String): Int =
     Try(StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt).recover {
@@ -321,8 +313,11 @@ object QuizGroup extends AppDependencyAccess {
     }
   } */
 
-  def fromCustomFormat(text: String): QuizGroup =
-    WordMappingGroup.fromCustomFormat(text).toQuizGroup
+  def fromCustomFormat(text: String): QuizGroupWithHeader = {
+    val wmg = WordMappingGroup.fromCustomFormat(text)
+    QuizGroupWithHeader(wmg.header, wmg.toQuizGroup)
+  }
+
 
 }
 

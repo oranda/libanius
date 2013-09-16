@@ -39,37 +39,37 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     }.get
   }
 
-  def loadQuizGroup(header: QuizGroupHeader, loadedQuizGroups: List[QuizGroup]):
+  def loadQuizGroup(header: QuizGroupHeader, loadedQuizGroups: Map[QuizGroupHeader, QuizGroup]):
       Future[QuizGroup] = {
     future {
       l.log("seeing if quiz group was loaded for " + header)
-      val loadedQg = loadedQuizGroups.find(_.header == header).getOrElse {
+      val loadedQg: QuizGroup = loadedQuizGroups.find(_._1 == header).map(_._2).getOrElse {
         l.log("no, so loading quiz group for " + header)
         loadQuizGroupCore(header)
       }
 
       // TODO: move this to a separate Future
-      val loadedQgWithDictionary = Util.stopwatch(loadDictionary(loadedQg),
-          "preparing dictionary for " + header)
-
+      val loadedQgWithDictionary = Util.stopwatch(loadDictionary(header, loadedQg),
+        "preparing dictionary for " + header)
       loadedQgWithDictionary
     }
   }
 
+
   def saveQuiz(quiz: Quiz, path: String = "") {
 
-    def saveToFile(qg: QuizGroup) = {
-      val saveData = qg.getSaveData
-      l.log("Saving quiz group " + qg.promptType + ", quiz group has promptNumber " +
+    def saveToFile(header: QuizGroupHeader, qg: QuizGroup) = {
+      val saveData = header.getSaveData
+      l.log("Saving quiz group " + header.promptType + ", quiz group has promptNumber " +
           qg.currentPromptNumber + " to " + saveData.fileName)
       io.writeToFile(path + saveData.fileName, saveData.data)
     }
-    quiz.quizGroups.foreach(saveToFile(_))
+    quiz.quizGroups.foreach { case (header, qg) => saveToFile(header, qg) }
     io.writeToFile(path + conf.fileQuiz, quiz.toCustomFormat.toString)
   }
 
-  private def loadDictionary(qg: QuizGroup): QuizGroup = {
-    val dictFileName = qg.header.makeDictFileName
+  private def loadDictionary(header: QuizGroupHeader, qg: QuizGroup): QuizGroup = {
+    val dictFileName = header.makeDictFileName
     readDictionary(dictFileName) match {
       case Some(dictionary) => qg.updatedDictionary(dictionary)
       case _ => qg
@@ -79,7 +79,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
   def loadQuizGroupCore(header: QuizGroupHeader): QuizGroup =
     findQuizGroupInFilesDir(header) match {
       case Some(qgFileName) =>
-        Util.stopwatch(readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup(header)),
+        Util.stopwatch(readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup()),
             "reading quiz group from file " + qgFileName)
       case _ =>
         findQuizGroupInResources(header) match {
@@ -90,7 +90,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
             header.createQuizGroup(qgText)
           case _ =>
             l.logError("failed to load quiz group " + header)
-            QuizGroup(header)
+            QuizGroup()
         }
     }
 

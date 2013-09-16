@@ -18,7 +18,6 @@ package com.oranda.libanius.model
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{AppDependencyAccess}
-import com.oranda.libanius.model._
 import com.oranda.libanius.model.quizitem.QuizItem
 
 class QuizSpec extends Specification with AppDependencyAccess {
@@ -115,8 +114,8 @@ class QuizSpec extends Specification with AppDependencyAccess {
     "contain unique groups only" in {
       val quizLocal = Quiz.demoQuiz(quizData)
       quizLocal.numGroups mustEqual 2 // precondition
-      val qg = QuizGroup(QuizGroupHeader(WordMapping, "English word", "German word"))
-      val quizUpdated = quizLocal.addQuizGroup(qg) // should have no effect
+      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
+      val quizUpdated = quizLocal.addQuizGroup(qgHeader, QuizGroup()) // should have no effect
       quizUpdated.numGroups mustEqual 2
     }
 

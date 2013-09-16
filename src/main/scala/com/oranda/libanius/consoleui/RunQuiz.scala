@@ -44,7 +44,8 @@ object RunQuiz extends App with AppDependencyAccess {
     testUserWithQuizItem(quiz)
   }
 
-  def userQuizGroupSelection(quizGroupHeaders: List[QuizGroupHeader]): Set[QuizGroup] = {
+  def userQuizGroupSelection(quizGroupHeaders: List[QuizGroupHeader]):
+      Map[QuizGroupHeader, QuizGroup] = {
     output("Choose quiz group(s). For more than one, separate with commas, e.g. 1,2,3")
     val choices = ChoiceGroup[QuizGroupHeader](quizGroupHeaders)
     choices.show()
@@ -54,15 +55,15 @@ object RunQuiz extends App with AppDependencyAccess {
       case _ => List[QuizGroupHeader]()
     }
 
-    selectedQuizGroupHeaders.map(header => dataStore.loadQuizGroupCore(header)).toSet
+    selectedQuizGroupHeaders.map(header => (header, dataStore.loadQuizGroupCore(header))).toMap
   }
 
   def testUserWithQuizItem(quiz: Quiz) {
     showScore(quiz)
     Util.stopwatch(quiz.findPresentableQuizItem, "find quiz items") match {
-      case (Some((quizItem, quizGroup))) =>
-        val updatedQuiz = updateQuiz(quiz, quizGroup)
-        keepShowingQuizItems(updatedQuiz, quizItem, quizGroup)
+      case (Some((quizItem, qgWithHeader))) =>
+        val updatedQuiz = quiz.updatedPromptNumber(qgWithHeader)
+        keepShowingQuizItems(updatedQuiz, quizItem, qgWithHeader.quizGroup)
       case _ =>
         output("No more questions found! Done!")
     }
@@ -81,9 +82,6 @@ object RunQuiz extends App with AppDependencyAccess {
         testUserWithQuizItem(updatedQuiz)
     }
   }
-
-  def updateQuiz(quiz: Quiz, quizGroup: QuizGroup): Quiz =
-    quiz.replaceQuizGroup(quizGroup.updatedPromptNumber)
 
   def showScore(quiz: Quiz) {
     def formatAndPrintScore(scoreStr: String) {

@@ -41,7 +41,7 @@ case class WordMappingGroup(
 
     val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems(_))
     val dictionary = Dictionary.fromWordMappings(wordMappingPairs)
-    QuizGroup(header, quizItems, 0, dictionary)
+    QuizGroup(quizItems, 0, dictionary)
   }
 
   def findValueSetFor(key: String): Option[WordMappingValueSet] =
@@ -55,7 +55,7 @@ case class WordMappingGroup(
 
 object WordMappingGroup extends AppDependencyAccess {
 
-  def fromQuizGroup(quizGroup: QuizGroup): WordMappingGroup = {
+  def fromQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup): WordMappingGroup = {
 
     // Get access to the groupByOrdered functor
     implicit def traversableToGroupByOrderedImplicit[A](t: Traversable[A]):
@@ -67,7 +67,7 @@ object WordMappingGroup extends AppDependencyAccess {
         case (prompt: Value, quizItems: mutable.LinkedHashSet[QuizItem]) =>
             WordMappingPair(prompt.text, WordMappingValueSet.createFromQuizItems(quizItems.toList))
       }).toStream
-    WordMappingGroup(quizGroup.header, wordMappingPairs)
+    WordMappingGroup(header, wordMappingPairs)
   }
 
   /*

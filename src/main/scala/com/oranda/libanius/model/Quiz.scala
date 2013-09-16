@@ -29,8 +29,9 @@ import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import java.lang.StringBuilder
 
 import scalaz._
+import scalaz.std.set
 
-case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
+case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends ModelComponent {
 
   /*
    * This serialization does not include QuizGroup data, only metadata.
@@ -44,18 +45,18 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     // For efficiency, avoiding Scala's own StringBuilder and mkString
     val strBuilder = new StringBuilder("quiz\n")
 
-    def quizGroupMetadata(strBuilder: StringBuilder, quizGroup: QuizGroup) =
-      quizGroup.header.toCustomFormat(strBuilder)
+    def quizGroupMetadata(strBuilder: StringBuilder, quizGroupHeader: QuizGroupHeader) =
+      quizGroupHeader.toCustomFormat(strBuilder)
 
-    StringUtil.mkString(strBuilder, quizGroups, quizGroupMetadata, '\n')
+    StringUtil.mkString(strBuilder, quizGroups.keySet, quizGroupMetadata, '\n')
   }
 
   def findOrAddQuizGroup(header: QuizGroupHeader): (Quiz, QuizGroup) = {
     val quizGroup = findQuizGroup(header)
     quizGroup match {
       case Some(quizGroup) => (this, quizGroup)
-      case None => val quizGroup = QuizGroup(header)
-                   (addQuizGroup(quizGroup), quizGroup)
+      case None => val quizGroup = QuizGroup()
+                   (addQuizGroup(header, quizGroup), quizGroup)
     }
   }
 
@@ -82,29 +83,31 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     }
   }
 
-  def findQuizGroup(header: QuizGroupHeader): Option[QuizGroup] =
-    Quiz.findQuizGroup(quizGroups, header)
+  def findQuizGroup(header: QuizGroupHeader): Option[QuizGroup] = quizGroups.get(header)
 
-  def removeQuizGroup(header: QuizGroupHeader): Quiz = {
-    val wordMappingGroupsFiltered = quizGroups.filterNot(_.header.matches(header))
-    updatedQuizGroups(wordMappingGroupsFiltered)
-  }
+  def updatedPromptNumber(qgWithHeader: QuizGroupWithHeader): Quiz =
+    replaceQuizGroup(qgWithHeader.header, qgWithHeader.quizGroup.updatedPromptNumber)
 
-  def updatedQuizGroups(newQuizGroups: Set[QuizGroup]): Quiz =
+  def removeQuizGroup(header: QuizGroupHeader): Quiz =
+    updatedQuizGroups(quizGroups - header)
+
+  def updatedQuizGroups(newQuizGroups: Map[QuizGroupHeader, QuizGroup]): Quiz =
     Quiz.quizGroupsLens.set(this, newQuizGroups)
 
   // Just a synonym for replaceQuizGroup
-  def addQuizGroup(quizGroup: QuizGroup): Quiz = replaceQuizGroup(quizGroup)
+  def addQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup): Quiz =
+    replaceQuizGroup(header, quizGroup)
 
   // This will replace any existing wordMappingGroup with the same prompt-response pair
-  def replaceQuizGroup(quizGroup: QuizGroup) = {
-    val newQuiz: Quiz = removeQuizGroup(quizGroup.header)
-    Quiz.quizGroupsLens.set(this, newQuiz.quizGroups + quizGroup)
+  def replaceQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup) = {
+    val newQuiz: Quiz = removeQuizGroup(header)
+    Quiz.quizGroupsLens.set(this, newQuiz.quizGroups + (header -> quizGroup))
   }
 
   def removeQuizItemsForPrompt(prompt: String, header: QuizGroupHeader): Quiz =
     (for (quizGroup <- findQuizGroup(header))
-      yield quizGroup.removeQuizItemsForPrompt(prompt)).map(replaceQuizGroup(_)).getOrElse(this)
+      yield quizGroup.removeQuizItemsForPrompt(prompt)).map(
+          replaceQuizGroup(header, _)).getOrElse(this)
 
   def removeQuizItem(prompt: String, response: String, header: QuizGroupHeader): (Quiz, Boolean) =
     removeQuizItem(QuizItem(prompt, response), header)
@@ -113,7 +116,8 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     val updatedQuiz: Option[Quiz] = (for (
       quizGroup <- findQuizGroup(header)
       if quizGroup.contains(quizItem)
-    ) yield QuizGroup.quizItemsLens.set(quizGroup, quizGroup.remove(quizItem))).map(replaceQuizGroup(_))
+    ) yield QuizGroup.quizItemsLens.set(quizGroup, quizGroup.remove(quizItem))).map(
+          replaceQuizGroup(header, _))
 
     val wasRemoved = updatedQuiz.isDefined
     (updatedQuiz.getOrElse(this), wasRemoved)
@@ -123,19 +127,19 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
    * Find the first available "presentable" quiz item.
    * Return a quiz item and the quiz group it belongs to.
    */
-  def findPresentableQuizItem: Option[(QuizItemViewWithChoices, QuizGroup)] = {
+  def findPresentableQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] = {
     val quizItem = (for {
-      quizGroup <- quizGroups.toStream
-      quizItem <- quizGroup.findPresentableQuizItem.toStream
-    } yield (quizItem, quizGroup)).headOption
+      (header, quizGroup) <- quizGroups
+      quizItem <- quizGroup.findPresentableQuizItem(header).toStream
+    } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption
     quizItem.orElse(findAnyUnfinishedQuizItem)
   }
 
-  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices, QuizGroup)] =
+  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] =
     (for {
-      quizGroup <- quizGroups.toStream
-      quizItem <- quizGroup.findAnyUnfinishedQuizItem.toStream
-    } yield (quizItem, quizGroup)).headOption
+      (header, quizGroup) <- quizGroups
+      quizItem <- quizGroup.findAnyUnfinishedQuizItem(header).toStream
+    } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption
 
   def addQuizItemToFront(header: QuizGroupHeader, prompt: String, response: String): Quiz =
     addQuizItemToFront(header, QuizItem(prompt, response))
@@ -148,10 +152,11 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
 
     quizGroup.map { case quizGroup: QuizGroup =>
       // TODO: compose lenses
-      val newQuizGroup = QuizGroup.quizItemsLens.set(quizGroup, quizItem +: quizGroup.remove(quizItem))
-      val newQuiz: Quiz = removeQuizGroup(newQuizGroup.header)
-      Quiz.quizGroupsLens.set(this, newQuiz.quizGroups + quizGroup)
-      replaceQuizGroup(newQuizGroup)
+      val newQuizGroup = QuizGroup.quizItemsLens.set(
+          quizGroup, quizItem +: quizGroup.remove(quizItem))
+      val newQuiz: Quiz = removeQuizGroup(header)
+      Quiz.quizGroupsLens.set(this, newQuiz.quizGroups + (header -> quizGroup))
+      replaceQuizGroup(header, newQuizGroup)
     }.getOrElse(this)
   }
 
@@ -176,53 +181,42 @@ case class Quiz(quizGroups: Set[QuizGroup] = ListSet()) extends ModelComponent {
     val quizGroup: Option[QuizGroup] = findQuizGroup(currentQuizItem.quizGroupHeader)
     quizGroup match {
       case Some(quizGroup) =>
-        val quizGroupUpdated = quizGroup.updatedWithUserAnswer(currentQuizItem.prompt,
-            currentQuizItem.response, isCorrect, currentQuizItem.quizItem.userResponses, userAnswer)
-        addQuizGroup(quizGroupUpdated)
+        val quizGroupUpdated = quizGroup.updatedWithUserAnswer(
+            currentQuizItem.prompt, currentQuizItem.response, isCorrect,
+            currentQuizItem.quizItem.userResponses, userAnswer)
+        addQuizGroup(currentQuizItem.quizGroupHeader, quizGroupUpdated)
       case _ => this
     }
   }
 
   def numGroups = quizGroups.size
-  def numPrompts = (0 /: quizGroups) { case (sum, qg) => sum + qg.numPrompts }
-  def numResponses = (0 /: quizGroups) { case (sum, qg) => sum + qg.numResponses }
+  def numPrompts = (0 /: quizGroups.values) { case (sum, qg) => sum + qg.numPrompts }
+  def numResponses = (0 /: quizGroups.values) { case (sum, qg) => sum + qg.numResponses }
 
   def scoreSoFar: BigDecimal =  // out of 1.0
     numCorrectAnswers.toDouble / (numItems * conf.numCorrectAnswersRequired).toDouble
 
-  def numItems = (0 /: quizGroups) { case (sum, qg) => sum + qg.size }
-  def numCorrectAnswers = (0 /: quizGroups) { case (sum, qg) => sum + qg.numCorrectAnswers }
-
-  def merge(otherQuiz: Quiz): Quiz = {
-    val wordMappingGroupsCombined = otherQuiz.quizGroups.foldLeft(quizGroups) {
-      (acc, otherWmg) =>
-        val quizGroup = findQuizGroup(otherWmg.header)
-        val quizGroupMerged = otherWmg.merge(quizGroup)
-        quizGroups.filterNot(Some(_) == quizGroup) + quizGroupMerged
-    }
-    updatedQuizGroups(wordMappingGroupsCombined)
-  }
+  def numItems = (0 /: quizGroups.values) { case (sum, qg) => sum + qg.size }
+  def numCorrectAnswers = (0 /: quizGroups.values) { case (sum, qg) => sum + qg.numCorrectAnswers }
 
   def resultsBeginningWith(input: String): List[SearchResult] =
-    quizGroups.flatMap(quizGroup =>
-      Dictionary.convertToSearchResults(
-          quizGroup.dictionary.mappingsForKeysBeginningWith(input), quizGroup)).toList
+    quizGroups.flatMap {
+      case (header, quizGroup) => Dictionary.convertToSearchResults(
+          quizGroup.dictionary.mappingsForKeysBeginningWith(input), header)
+    }.toList
 
   def resultsContaining(input: String): List[SearchResult] =
-    quizGroups.flatMap(quizGroup =>
-      Dictionary.convertToSearchResults(
-          quizGroup.dictionary.mappingsForKeysContaining(input), quizGroup)).toList
+    quizGroups.flatMap {
+      case (header, quizGroup) => Dictionary.convertToSearchResults(
+          quizGroup.dictionary.mappingsForKeysContaining(input), header)
+    }.toList
 }
 
 object Quiz extends AppDependencyAccess {
 
-  val quizGroupsLens: Lens[Quiz, Set[QuizGroup]] = Lens.lensu(
+  val quizGroupsLens: Lens[Quiz, Map[QuizGroupHeader, QuizGroup]] = Lens.lensu(
       get = (_: Quiz).quizGroups,
-      set = (q: Quiz, qgs: Set[QuizGroup]) => q.copy(quizGroups = qgs))
-
-  def findQuizGroup(quizGroups: Set[QuizGroup], header: QuizGroupHeader):
-      Option[QuizGroup] =
-    quizGroups.find(_.header.matches(header))
+      set = (q: Quiz, qgs: Map[QuizGroupHeader, QuizGroup]) => q.copy(quizGroups = qgs))
 
   def metadataFromCustomFormat(str: String): Set[QuizGroupHeader] = {
     val quizGroupHeadings = str.split("quizGroup").tail
@@ -231,14 +225,16 @@ object Quiz extends AppDependencyAccess {
 
   def fromCustomFormat(str: String): Quiz = {
     val quizGroupHeadings = str.split("quizGroup").tail
-    val quizGroups = quizGroupHeadings.map(headerText => QuizGroup(QuizGroupHeader(headerText)))
-    Quiz(quizGroups.toSet)
+    val quizGroups = quizGroupHeadings.map(
+        headerText => QuizGroupHeader(headerText) -> QuizGroup()).toMap
+    Quiz(quizGroups)
   }
 
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
-    val quizGroups = quizGroupsData.map(QuizGroup.fromCustomFormat(_))
-    Quiz(quizGroups.toSet)
+    val quizGroups: Iterable[QuizGroupWithHeader] =
+      quizGroupsData.map(QuizGroup.fromCustomFormat(_))
+    Quiz(quizGroups.map(qgWithHeader => Pair(qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
     // TODO: watch out when we're saving, we're not overwriting anything
   }
 

@@ -20,7 +20,7 @@ import scala.collection.JavaConversions.mapAsScalaMap
 
 import scala.collection.immutable.Stream
 import scala.util.Try
-import com.oranda.libanius.model.{ModelComponent, QuizGroup, SearchResult}
+import com.oranda.libanius.model.{QuizGroupHeader, ModelComponent, SearchResult}
 
 /**
  * A dictionary. A large read-only repository of word mappings, structured as a map
@@ -101,8 +101,8 @@ object Dictionary {
 
   // Useful functions for search:
 
-  def convertToSearchResults(pairs: List[(String, WordMappingValueSet)], quizGroup: QuizGroup) =
-    pairs.map(pair => SearchResult(quizGroup.header, WordMappingPair(pair._1, pair._2)))
+  def convertToSearchResults(pairs: List[(String, WordMappingValueSet)], header: QuizGroupHeader) =
+    pairs.map(pair => SearchResult(header, WordMappingPair(pair._1, pair._2)))
 
   def searchFunction(param: => List[SearchResult]) = () => param
 

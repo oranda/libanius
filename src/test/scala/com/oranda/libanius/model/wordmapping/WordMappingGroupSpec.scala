@@ -56,14 +56,14 @@ class WordMappingGroupSpec extends Specification with AppDependencyAccess {
 
     val wmgSmall = WordMappingGroup(header, wmPairs.toStream)
     val dictSmall = Dictionary.fromWordMappings(wmPairs.toStream)
-    val quizGroup = QuizGroup(header, quizItems.toStream, dictionary = dictSmall)
+    val quizGroup = QuizGroup(quizItems.toStream, dictionary = dictSmall)
 
     "be convertible to a QuizGroup" in {
       wmgSmall.toQuizGroup mustEqual quizGroup
     }
 
     "be constructible from a QuizGroup" in {
-      WordMappingGroup.fromQuizGroup(quizGroup) mustEqual wmgSmall
+      WordMappingGroup.fromQuizGroup(header, quizGroup) mustEqual wmgSmall
     }
   }
       
