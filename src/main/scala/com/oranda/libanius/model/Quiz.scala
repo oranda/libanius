@@ -23,7 +23,7 @@ import com.oranda.libanius.util.StringUtil
 import scala.language.postfixOps
 import scala.math.BigDecimal.double2bigDecimal
 import com.oranda.libanius.dependencies._
-import com.oranda.libanius.model.quizitem.{QuizItem}
+import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.wordmapping.Dictionary
 
 import java.lang.StringBuilder
@@ -71,16 +71,22 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
     // TODO: compose lenses
     replaceQuizGroup(qgWithHeader.header, QuizGroup.promptNumberLens.mod( (1+), qgWithHeader.quizGroup))
 
-  def removeQuizGroup(header: QuizGroupHeader): Quiz =
-    Quiz.quizGroupsLens.set(this, quizGroups - header)
 
-  // Just a synonym for replaceQuizGroup
+  /*
+   * Just a synonym for replaceQuizGroup.
+   */
   def addQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup): Quiz =
     replaceQuizGroup(header, quizGroup)
 
-  // This will replace any existing wordMappingGroup with the same prompt-response pair
+  /*
+   * Add or replace any existing quiz group with the given header.
+   */
   def replaceQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup) =
     Quiz.quizGroupsLens.set(this, quizGroups + (header -> quizGroup))
+
+
+  def removeQuizGroup(header: QuizGroupHeader): Quiz =
+    Quiz.quizGroupsLens.set(this, quizGroups - header)
 
   /*
    * Find the first available "presentable" quiz item.
@@ -124,7 +130,7 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
     val quizItemExisted = existsQuizItem(quizItem, header)
     val quizItemsLens = ~QuizGroup.quizGroupItemsLens compose mapVPLens(header)
     val quiz: Quiz = Quiz.quizGroupsLens.set(this,
-        quizItemsLens.mod(QuizGroup.remove(_, quizItem), quizGroups))
+        quizItemsLens.mod(QuizGroup.remove(_: Stream[QuizItem], quizItem), quizGroups))
     (quiz, quizItemExisted)
   }
 
