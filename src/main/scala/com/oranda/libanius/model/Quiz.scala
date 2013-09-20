@@ -57,23 +57,13 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
    * Do not call in a loop: not fast.
    */
   def findResponsesFor(prompt: String, header: QuizGroupHeader): List[String] =
-    findQuizGroup(header) match {
-      case Some(quizGroup) => quizGroup.findResponsesFor(prompt)
-      case _ => l.logError("could not find quizGroup for " + header)
-                Nil
-    }
+    findQuizGroup(header).map(_.findResponsesFor(prompt)).getOrElse(Nil)
 
   /*
    *  Do not call in a loop: not fast.
    */
-  def findPromptsFor(response: String, header: QuizGroupHeader): List[String] = {
-
-    findQuizGroup(header) match {
-      case Some(quizGroup) => quizGroup.findPromptsFor(response)
-      case _ => l.logError("could not find quizGroup for " + header)
-                Nil
-    }
-  }
+  def findPromptsFor(response: String, header: QuizGroupHeader): List[String] =
+    findQuizGroup(header).map(_.findPromptsFor(response)).getOrElse(Nil)
 
   def findQuizGroup(header: QuizGroupHeader): Option[QuizGroup] = quizGroups.get(header)
 
@@ -81,12 +71,8 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
     // TODO: compose lenses
     replaceQuizGroup(qgWithHeader.header, QuizGroup.promptNumberLens.mod( (1+), qgWithHeader.quizGroup))
 
-
   def removeQuizGroup(header: QuizGroupHeader): Quiz =
-    updatedQuizGroups(quizGroups - header)
-
-  def updatedQuizGroups(newQuizGroups: Map[QuizGroupHeader, QuizGroup]): Quiz =
-    Quiz.quizGroupsLens.set(this, newQuizGroups)
+    Quiz.quizGroupsLens.set(this, quizGroups - header)
 
   // Just a synonym for replaceQuizGroup
   def addQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup): Quiz =
