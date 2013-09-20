@@ -301,6 +301,9 @@ object QuizGroup extends AppDependencyAccess {
     get = (_: QuizGroup).dictionary,
     set = (qGroup: QuizGroup, d: Dictionary) => qGroup.copy(dictionary = d))
 
+  def remove(quizItems: Stream[QuizItem], quizItem: QuizItem): Stream[QuizItem] =
+    quizItems.filterNot(_.samePromptAndResponse(quizItem))
+
   def parseCurrentPromptNumber(str: String): Int =
     Try(StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt).recover {
       case e: Exception => l.logError("Could not parse prompt number from " + str)
