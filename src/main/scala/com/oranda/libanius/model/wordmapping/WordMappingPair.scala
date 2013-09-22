@@ -15,4 +15,4 @@
 
 package com.oranda.libanius.model.wordmapping
 
-case class WordMappingPair(val key: String, val valueSet: WordMappingValueSet)
+case class WordMappingPair(key: String, valueSet: WordMappingValueSet)

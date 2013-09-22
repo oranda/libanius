@@ -18,6 +18,4 @@ package com.oranda.libanius.model
 
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
-abstract class ModelComponent extends AppDependencyAccess {
-
-}
+abstract class ModelComponent extends AppDependencyAccess

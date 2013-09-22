@@ -60,13 +60,6 @@ class QuizSpec extends Specification with AppDependencyAccess {
       val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
       quizLocal.findResponsesFor("on", qgHeader) mustEqual List("auf")
     }
-
-    /* TODO
-    "find a presentable quiz item" in {
-      val quizItem = quiz.findQuizItem(numCorrectAnswersInARowDesired = 0, 
-          diffInPromptNum = 0)
-      quizItem.isDefined mustEqual true
-    }*/
     
     "offer translations for a word, given the group of the word" in { 
       val translations = quiz.findResponsesFor(prompt = "Vertrag",
@@ -123,24 +116,5 @@ class QuizSpec extends Specification with AppDependencyAccess {
       quiz.numCorrectAnswers mustEqual 6
     }
 
-    /*
-     * XML on Android is too slow, so a custom format is used    
-     *
-     * This is not the main performance test, just a sanity check. 
-     * (Real performance tests can be done manually using logging with both the 
-     * emulator and a real device.)
-     */
-    "deserialize a big quiz quickly" in {
-      done
-      /* TODO
-      val fileText = StandardIO.readFile("data/quizGer20k.qui")
-      val startParse = System.currentTimeMillis()
-      QuizOfWordMappings.fromCustomFormat(fileText)
-      val endParse = System.currentTimeMillis()
-      println("Time to parse: " + (endParse - startParse))
-      endParse - startParse must be<(2500L)
-      */
-    }
-    
   }
 }

@@ -28,7 +28,6 @@ import com.oranda.libanius.model.{QuizGroup, Quiz, QuizGroupHeader}
 class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
   def readQuizMetadata: Set[QuizGroupHeader] = {
-    // TODO: consider changing to Platform.readFile
     def readRawMetadata: String =
       io.readFile(conf.fileQuiz).getOrElse(io.readResource(conf.resQuizPublic).get)
 
@@ -48,7 +47,6 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
         loadQuizGroupCore(header)
       }
 
-      // TODO: move this to a separate Future
       val loadedQgWithDictionary = Util.stopwatch(loadDictionary(header, loadedQg),
         "preparing dictionary for " + header)
       loadedQgWithDictionary

@@ -46,7 +46,6 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String, res
     SaveData(fileName, serialized.toString)
   }
 
-  // TODO: improve the QuestionAndAnswer case
   def createQuizGroup(text: String): QuizGroup = quizGroupType match {
     case WordMapping => WordMappingGroup.fromCustomFormat(text).toQuizGroup
     case QuestionAndAnswer => QuizGroup.fromCustomFormat(text).quizGroup

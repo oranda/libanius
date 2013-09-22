@@ -82,7 +82,6 @@ object WordMappingGroup extends AppDependencyAccess {
     val splitterLineBreak = stringSplitterFactory.getSplitter('\n')
     val splitterKeyValue = stringSplitterFactory.getSplitter('|')
 
-    // TODO: write directly to the Stream not a ListBuffer
     val wordMappingsMutable = new ListBuffer[WordMappingPair]()
 
     def parseQuizGroup {

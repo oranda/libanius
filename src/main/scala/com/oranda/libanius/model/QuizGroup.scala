@@ -255,7 +255,6 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
   }
 
   def hasPrompt(prompt: String): Boolean = quizPrompts.contains(prompt)
-  //def promptBeginningWith(promptStart: String): Boolean = quizPrompts.find(_.hasSameStart(promptStart))
 
   def findPresentableQuizItem(header: QuizGroupHeader): Option[QuizItemViewWithChoices] = {
     val quizItem =
@@ -290,16 +289,16 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
 object QuizGroup extends AppDependencyAccess {
 
   val quizGroupItemsLens: Lens[QuizGroup, Stream[QuizItem]] = Lens.lensu(
-    get = (_: QuizGroup).quizItems,
-    set = (qGroup: QuizGroup, qItems: Stream[QuizItem]) => qGroup.copy(quizItems = qItems))
+      get = (_: QuizGroup).quizItems,
+      set = (qGroup: QuizGroup, qItems: Stream[QuizItem]) => qGroup.copy(quizItems = qItems))
 
   val promptNumberLens: Lens[QuizGroup, Int] = Lens.lensu(
-    get = (_: QuizGroup).currentPromptNumber,
-    set = (qGroup: QuizGroup, promptNum: Int) => qGroup.copy(currentPromptNumber = promptNum))
+      get = (_: QuizGroup).currentPromptNumber,
+      set = (qGroup: QuizGroup, promptNum: Int) => qGroup.copy(currentPromptNumber = promptNum))
 
   val dictionaryLens: Lens[QuizGroup, Dictionary] = Lens.lensu(
-    get = (_: QuizGroup).dictionary,
-    set = (qGroup: QuizGroup, d: Dictionary) => qGroup.copy(dictionary = d))
+      get = (_: QuizGroup).dictionary,
+      set = (qGroup: QuizGroup, d: Dictionary) => qGroup.copy(dictionary = d))
 
   def remove(quizItems: Stream[QuizItem], quizItem: QuizItem): Stream[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
@@ -310,14 +309,6 @@ object QuizGroup extends AppDependencyAccess {
                            0
     }.get
 
-  /*
-  def apply(header: QuizGroupHeader): QuizGroup = {
-    // TODO: fix this
-    header.quizGroupType match {
-      case WordMapping => QuizGroup(header)
-      case QuestionAndAnswer => QuizGroup(header)
-    }
-  } */
 
   def fromCustomFormat(text: String): QuizGroupWithHeader = {
     val wmg = WordMappingGroup.fromCustomFormat(text)

@@ -75,7 +75,6 @@ trait PlatformIO extends AppDependencyAccess {
     allText
   }
 
-  // TODO: combine with readInputStream
   def readFirstLine(is: InputStream): String = {
     try {
       val br = new BufferedReader(new InputStreamReader(is))

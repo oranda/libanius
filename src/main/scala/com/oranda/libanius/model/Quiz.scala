@@ -68,7 +68,6 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
   def findQuizGroup(header: QuizGroupHeader): Option[QuizGroup] = quizGroups.get(header)
 
   def updatedPromptNumber(qgWithHeader: QuizGroupWithHeader): Quiz =
-    // TODO: compose lenses
     replaceQuizGroup(qgWithHeader.header, QuizGroup.promptNumberLens.mod( (1+), qgWithHeader.quizGroup))
 
 
@@ -152,8 +151,6 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
 
   def updateWithUserAnswer(isCorrect: Boolean, currentQuizItem: QuizItemViewWithChoices): Quiz = {
     val userAnswer = new UserResponse(currentQuizItem.qgCurrentPromptNumber)
-
-    // TODO: compose lenses
     Quiz.quizGroupsLens.set(this,
         mapVPLens(currentQuizItem.quizGroupHeader) mod ((_: QuizGroup).updatedWithUserAnswer(
             currentQuizItem.prompt, currentQuizItem.response, isCorrect,
@@ -216,7 +213,6 @@ object Quiz extends AppDependencyAccess {
     val quizGroups: Iterable[QuizGroupWithHeader] =
       quizGroupsData.map(QuizGroup.fromCustomFormat(_))
     Quiz(quizGroups.map(qgWithHeader => Pair(qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
-    // TODO: watch out when we're saving, we're not overwriting anything
   }
 
   // Demo data to use as a fallback if no file is available

@@ -29,7 +29,6 @@ import scala.language.implicitConversions
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
- * TODO: try again to convert this to a Set.
  */
 case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends ModelComponent {
 
@@ -78,10 +77,6 @@ object WordMappingValueSet extends AppDependencyAccess {
 
   def combineValueSets(valueSets: Iterable[WordMappingValueSet]): List[WordMappingValue] =
     valueSets.flatMap(_.values).toList
-    /*TODO: Test if this is more efficient:
-     valueSets.foldLeft(new ArrayBuffer[String]()) {
-      (acc, wm) => acc ++ wm.values
-    }.toList */
 
   // Example: contract:696,697;698/treaty:796;798
   def fromCustomFormat(str: String): WordMappingValueSet = {

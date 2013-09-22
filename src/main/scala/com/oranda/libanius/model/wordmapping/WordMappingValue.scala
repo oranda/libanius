@@ -56,7 +56,6 @@ case class WordMappingValue(value: String, correctAnswersInARow: List[UserRespon
 
   def addUserAnswersBatch(correctPromptNumStrs: List[String],
       incorrectPromptNumStrs: List[String]): WordMappingValue = {
-    // TODO: see if an imperative version is faster
     val newCorrectAnswersInARow = correctPromptNumStrs.map(correctPromptNum =>
         new UserResponse(correctPromptNum.toInt))
     val newIncorrectAnswers = incorrectPromptNumStrs.map(incorrectPromptNum =>
