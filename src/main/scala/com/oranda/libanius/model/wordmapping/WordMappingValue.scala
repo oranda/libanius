@@ -19,7 +19,7 @@ package com.oranda.libanius.model.wordmapping
 import com.oranda.libanius.model.UserResponse
 import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.quizitem.Value
+import com.oranda.libanius.model.quizitem.{QuizItem, Value}
 
 import java.lang.StringBuilder
 
@@ -65,6 +65,10 @@ case class WordMappingValue(value: String, correctAnswersInARow: List[UserRespon
 }
 
 object WordMappingValue extends AppDependencyAccess {
+
+  def apply(quizItem: QuizItem): WordMappingValue =
+    WordMappingValue(quizItem.response.text, quizItem.userResponses.correctAnswersInARow,
+        quizItem.userResponses.incorrectAnswers)
 
   // Example: str = "nachlösen:1,7,9;6"
   def fromCustomFormat(str: String): WordMappingValue = {

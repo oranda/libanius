@@ -24,6 +24,7 @@ import scala.util.Try
 import com.oranda.libanius.io.{DefaultIO, PlatformIO}
 import com.oranda.libanius.model.wordmapping.Dictionary
 import com.oranda.libanius.model.{QuizGroup, Quiz, QuizGroupHeader}
+import java.lang.StringBuilder
 
 class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
@@ -56,12 +57,14 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
   def saveQuiz(quiz: Quiz, path: String = "") {
 
-    def saveToFile(header: QuizGroupHeader, qg: QuizGroup) = {
-      val saveData = header.getSaveData
+    def saveToFile(header: QuizGroupHeader, quizGroup: QuizGroup) = {
+      val fileName = header.makeQgFileName
+      val serialized = quizGroup.toCustomFormat(new StringBuilder, header)
       l.log("Saving quiz group " + header.promptType + ", quiz group has promptNumber " +
-          qg.currentPromptNumber + " to " + saveData.fileName)
-      io.writeToFile(path + saveData.fileName, saveData.data)
+          quizGroup.currentPromptNumber + " to " + fileName)
+      io.writeToFile(path + fileName, serialized.toString)
     }
+
     quiz.quizGroups.foreach { case (header, qg) => saveToFile(header, qg) }
     io.writeToFile(path + conf.fileQuiz, quiz.toCustomFormat.toString)
   }
@@ -74,8 +77,9 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     }
   }
 
-  def loadQuizGroupCore(header: QuizGroupHeader): QuizGroup =
-    findQuizGroupInFilesDir(header) match {
+  def loadQuizGroupCore(header: QuizGroupHeader): QuizGroup = {
+
+    val quizGroup = findQuizGroupInFilesDir(header) match {
       case Some(qgFileName) =>
         Util.stopwatch(readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup()),
             "reading quiz group from file " + qgFileName)
@@ -84,13 +88,16 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
           case Some(qgResName) =>
             val qgText = Util.stopwatch(io.readResource(qgResName).get,
                 "reading quiz group resource " + qgResName)
-            //log("read text from qg resource starting " + qgText.take(200))
             header.createQuizGroup(qgText)
           case _ =>
             l.logError("failed to load quiz group " + header)
             QuizGroup()
         }
     }
+
+    if (quizGroup.isEmpty) l.logError("No quiz items loaded for " + header)
+    quizGroup
+  }
 
   private def readQuizGroupFromFilesDir(qgFileName: String):
       Option[QuizGroup] = {

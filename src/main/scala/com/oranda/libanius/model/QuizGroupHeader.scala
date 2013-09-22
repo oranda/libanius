@@ -40,12 +40,6 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String, res
 
   def reverse = QuizGroupHeader(quizGroupType, responseType, promptType)
 
-  def getSaveData: SaveData = {
-    val serialized = toCustomFormat(new StringBuilder())
-    val fileName = makeQgFileName
-    SaveData(fileName, serialized.toString)
-  }
-
   def createQuizGroup(text: String): QuizGroup = quizGroupType match {
     case WordMapping => WordMappingGroup.fromCustomFormat(text).toQuizGroup
     case QuestionAndAnswer => QuizGroup.fromCustomFormat(text).quizGroup

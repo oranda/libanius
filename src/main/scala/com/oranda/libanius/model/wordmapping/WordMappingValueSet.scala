@@ -73,7 +73,7 @@ object WordMappingValueSet extends AppDependencyAccess {
   def createFromStrings(values: String*): WordMappingValueSet = WordMappingValueSet(values.map(
     WordMappingValue(_)).toList)
   def createFromQuizItems(quizItems: List[QuizItem]): WordMappingValueSet =
-    WordMappingValueSet(quizItems.map(quizItem => WordMappingValue(quizItem.response.text)).toList)
+    WordMappingValueSet(quizItems.map(WordMappingValue(_)).toList)
 
   def combineValueSets(valueSets: Iterable[WordMappingValueSet]): List[WordMappingValue] =
     valueSets.flatMap(_.values).toList

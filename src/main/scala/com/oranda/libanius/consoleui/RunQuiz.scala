@@ -30,7 +30,6 @@ object RunQuiz extends App with AppDependencyAccess {
   def runQuiz() {
 
     output("Running quiz...")
-    output("numCorrectAnswersRequired: " + conf.numCorrectAnswersRequired)
 
     val availableQuizGroups = dataStore.findAvailableQuizGroups
     val quiz =
@@ -63,17 +62,18 @@ object RunQuiz extends App with AppDependencyAccess {
     Util.stopwatch(quiz.findPresentableQuizItem, "find quiz items") match {
       case (Some((quizItem, qgWithHeader))) =>
         val updatedQuiz = quiz.updatedPromptNumber(qgWithHeader)
-        keepShowingQuizItems(updatedQuiz, quizItem, qgWithHeader.quizGroup)
+        keepShowingQuizItems(updatedQuiz, quizItem)
       case _ =>
         output("No more questions found! Done!")
     }
   }
 
-  def keepShowingQuizItems(quiz: Quiz, quizItem: QuizItemViewWithChoices, quizGroup: QuizGroup) {
+  def keepShowingQuizItems(quiz: Quiz, quizItem: QuizItemViewWithChoices) {
+    quiz.quizGroups.foreach(qg => l.log("numCorrectAnswers: " + qg._2.numCorrectAnswers))
     showQuizItemAndProcessResponse(quiz, quizItem) match {
       case (Invalid, updatedQuiz) =>
         output("Invalid input\n")
-        keepShowingQuizItems(updatedQuiz, quizItem, quizGroup)
+        keepShowingQuizItems(updatedQuiz, quizItem)
       case (Quit, updatedQuiz) =>
         output("Exiting")
         dataStore.saveQuiz(updatedQuiz, path = conf.filesDir)
