@@ -16,15 +16,12 @@
 
 package com.oranda.libanius.model.quizitem
 
-abstract class Value(val text: String) {
+abstract class Value[V](val value: V) {
 
-  def matches(otherText: String): Boolean
+  def matches(otherValue: String): Boolean
 
-  def hasSameStart(otherValue: String) =
-    (numOfLetters: Int) => otherValue != text &&
-      text.take(numOfLetters) == otherValue.take(numOfLetters)
+  def hasSameStart(otherValue: String): Int => Boolean
 
-  def hasSameEnd(otherValue: String) =
-    (numOfLetters: Int) => otherValue != text &&
-      text.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
+  def hasSameEnd(otherValue: String): Int => Boolean
+
 }

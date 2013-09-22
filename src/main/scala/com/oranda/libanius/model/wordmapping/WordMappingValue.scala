@@ -19,18 +19,24 @@ package com.oranda.libanius.model.wordmapping
 import com.oranda.libanius.model.UserResponse
 import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.quizitem.{QuizItem, Value}
+import com.oranda.libanius.model.quizitem.{TextValue, QuizItem, Value}
 
 import java.lang.StringBuilder
 
-case class WordMappingValue(value: String, correctAnswersInARow: List[UserResponse] = Nil,
-    incorrectAnswers: List[UserResponse] = Nil) extends Value(value) {
+case class WordMappingValue(override val value: String, correctAnswersInARow: List[UserResponse] = Nil,
+    incorrectAnswers: List[UserResponse] = Nil) extends Value[String](value) {
 
   def updated(correctAnswersInARow: List[UserResponse], incorrectAnswers: List[UserResponse]):
       WordMappingValue =
     WordMappingValue(value, correctAnswersInARow, incorrectAnswers)
 
-  override def matches(otherText: String) = text == otherText
+  override def matches(otherText: String) = value == otherText
+
+  override def hasSameStart(otherValue: String): Int => Boolean =
+    TextValue.hasSameStart(value, otherValue)
+
+  override def hasSameEnd(otherValue: String): Int => Boolean =
+    TextValue.hasSameEnd(value, otherValue)
 
   def userAnswers = correctAnswersInARow ++ incorrectAnswers
 
@@ -67,7 +73,7 @@ case class WordMappingValue(value: String, correctAnswersInARow: List[UserRespon
 object WordMappingValue extends AppDependencyAccess {
 
   def apply(quizItem: QuizItem): WordMappingValue =
-    WordMappingValue(quizItem.response.text, quizItem.userResponses.correctAnswersInARow,
+    WordMappingValue(quizItem.response.toString, quizItem.userResponses.correctAnswersInARow,
         quizItem.userResponses.incorrectAnswers)
 
   // Example: str = "nachlösen:1,7,9;6"

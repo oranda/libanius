@@ -29,7 +29,7 @@ import com.oranda.libanius.model.UserResponses
  *  - a question and an answer in the quiz
  *  - a word and a translation
  */
-case class QuizItem(prompt: Value, response: Value,
+case class QuizItem(prompt: TextValue, response: TextValue,
     userResponses: UserResponses = UserResponses()) {
 
   def samePromptAndResponse(other: QuizItem) = other.prompt == prompt && other.response == response

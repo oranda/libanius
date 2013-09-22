@@ -44,7 +44,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
 
   def updatedPromptNumber: QuizGroup = QuizGroup.promptNumberLens.mod((1+), this)
 
-  def updatedWithUserAnswer(prompt: Value, response: Value, wasCorrect: Boolean,
+  def updatedWithUserAnswer(prompt: TextValue, response: TextValue, wasCorrect: Boolean,
       userResponses: UserResponses, userAnswer: UserResponse): QuizGroup = {
     val userResponseUpdated = userResponses.addUserAnswer(userAnswer, wasCorrect)
     addQuizItem(prompt, response, userResponseUpdated)
@@ -52,7 +52,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
 
   def updatedDictionary(newDictionary: Dictionary) = QuizGroup.dictionaryLens.set(this, newDictionary)
 
-  def addQuizItem(prompt: Value, response: Value, userResponses: UserResponses = UserResponses()):
+  def addQuizItem(prompt: TextValue, response: TextValue, userResponses: UserResponses = UserResponses()):
       QuizGroup =
     addQuizItemToFront(QuizItem(prompt, response, userResponses))
 
@@ -82,12 +82,12 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
 
   def removeQuizItemsForPrompt(prompt: String) =
-    updatedQuizItems(quizItems.filter(_.prompt.text != prompt))
+    updatedQuizItems(quizItems.filter(_.prompt.value != prompt))
   def removeQuizItemsForResponse(response: String) =
-    updatedQuizItems(quizItems.filter(_.response.text != response))
+    updatedQuizItems(quizItems.filter(_.response.value != response))
 
-  def quizPrompts: Stream[Value] = quizItems.map(_.prompt)
-  def quizResponses: Stream[Value] = quizItems.map(_.response)
+  def quizPrompts: Stream[TextValue] = quizItems.map(_.prompt)
+  def quizResponses: Stream[TextValue] = quizItems.map(_.response)
 
   /*
    * Example of custom format:
@@ -112,7 +112,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
 
   def contains(quizItem: QuizItem): Boolean = quizItems.exists(_.samePromptAndResponse(quizItem))
   def contains(prompt: String): Boolean = contains(TextValue(prompt))
-  def contains(prompt: Value): Boolean = quizPrompts.contains(prompt)
+  def contains(prompt: TextValue): Boolean = quizPrompts.contains(prompt)
   def numQuizItems = quizItems.size
   def size = numQuizItems
   def isEmpty = quizItems.isEmpty
@@ -131,13 +131,13 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
    * Low usage expected. Slow because we are not using a Map for quizItems.
    */
   def findResponsesFor(prompt: String): List[String] =
-    quizItems.filter(_.prompt.matches(prompt)).map(_.response.text).toList
+    quizItems.filter(_.prompt.matches(prompt)).map(_.response.value).toList
 
   /*
    * Low usage expected. Slow because we are not using a Map for quizItems.
    */
   def findPromptsFor(response: String): List[String] =
-    quizItems.filter(_.response.matches(response)).map(_.prompt.text).toList
+    quizItems.filter(_.response.matches(response)).map(_.prompt.value).toList
 
   def findAnyUnfinishedQuizItem(header: QuizGroupHeader): Option[QuizItemViewWithChoices] = {
     l.log("findAnyUnfinishedQuizItem for " + header)
@@ -172,8 +172,8 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     val falseSimilarAnswers: Set[String] =
       if (numCorrectAnswersSoFar == 0) ListSet[String]()
       else {
-        val correctValues = findResponsesFor(itemCorrect.prompt.text)
-        val correctValuePresented = itemCorrect.response.text
+        val correctValues = findResponsesFor(itemCorrect.prompt.value)
+        val correctValuePresented = itemCorrect.response.value
         Util.stopwatch(makeFalseSimilarAnswers(correctValues, correctValuePresented,
             numCorrectAnswersSoFar, numFalseAnswersRequired), "makeFalseSimilarAnswers")
       }
@@ -196,7 +196,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
 
     def randomFalseWordValue(sliceIndex: Int) =
       findRandomWordValue(sliceOfResponses(sliceIndex, numSlices = numFalseAnswersRequired)).
-          filter(itemCorrect.response.text != _)
+          filter(itemCorrect.response.value != _)
 
     (0 until numFalseAnswersRequired).map(
         sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toSet
@@ -220,8 +220,8 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
 
     var similarWords = new HashSet[String]
 
-    def hasSameStart = (value1: Value, value2: String) => value1.hasSameStart(value2)
-    def hasSameEnd = (value1: Value, value2: String) => value1.hasSameEnd(value2)
+    def hasSameStart = (value1: TextValue, value2: String) => value1.hasSameStart(value2)
+    def hasSameEnd = (value1: TextValue, value2: String) => value1.hasSameEnd(value2)
     val similarityFunction = if (numCorrectAnswersSoFar % 2 == 1) hasSameStart else hasSameEnd
 
     var numValueSetsSearched = 0
@@ -233,18 +233,18 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
       if (!correctValues.contains(quizItem.response)) {
         if (similarWords.size < numFalseAnswersRequired &&
             similarityFunction(quizItem.response, correctValue)(numSimilarLettersRequired))
-          similarWords += quizItem.response.text
+          similarWords += quizItem.response.value
       }
     })
     similarWords
   }
 
-  def findRandomWordValue(quizValues: Seq[Value]): Option[String] = {
+  def findRandomWordValue(quizValues: Seq[TextValue]): Option[String] = {
     if (quizValues.isEmpty)
       None
     else {
       val randomIndex = Random.nextInt(quizValues.length)
-      Some(quizValues(randomIndex).text)
+      Some(quizValues(randomIndex).value)
     }
   }
 
@@ -268,7 +268,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     quizItem
   }
 
-  def sliceOfResponses(sliceIndex: Int, numSlices: Int): List[Value] =
+  def sliceOfResponses(sliceIndex: Int, numSlices: Int): List[TextValue] =
     sliceOfQuizItems(sliceIndex, numSlices).map(_.response).toList
 
   def sliceOfQuizItems(sliceIndex: Int, numSlices: Int): Iterable[QuizItem] = {
@@ -277,7 +277,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     quizItems.slice(start, start + sliceSize)
   }
 
-  def randomValues(sliceSize: Int): List[Value] =
+  def randomValues(sliceSize: Int): List[TextValue] =
     randomSliceOfQuizItems(sliceSize).map(_.response).toList
 
   def randomSliceOfQuizItems(sliceSize: Int): Iterable[QuizItem] =

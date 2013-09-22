@@ -64,8 +64,8 @@ object WordMappingGroup extends AppDependencyAccess {
 
     val wordMappingPairs: Stream[WordMappingPair] =
       (quizGroup.quizItems.groupByOrdered(_.prompt).map {
-        case (prompt: Value, quizItems: mutable.LinkedHashSet[QuizItem]) =>
-            WordMappingPair(prompt.text, WordMappingValueSet.createFromQuizItems(quizItems.toList))
+        case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
+            WordMappingPair(prompt.value, WordMappingValueSet.createFromQuizItems(quizItems.toList))
       }).toStream
     WordMappingGroup(header, wordMappingPairs)
   }

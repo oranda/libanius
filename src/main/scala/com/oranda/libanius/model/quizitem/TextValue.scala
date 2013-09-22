@@ -16,8 +16,23 @@
 
 package com.oranda.libanius.model.quizitem
 
-case class TextValue(override val text: String) extends Value(text) {
+case class TextValue(override val value: String) extends Value[String](value) {
 
-  override def toString = text
-  def matches(otherText: String) = text == otherText
+  override def toString = value
+  def matches(otherText: String) = value == otherText
+
+  override def hasSameStart(otherValue: String): Int => Boolean =
+    TextValue.hasSameStart(value, otherValue)
+  override def hasSameEnd(otherValue: String): Int => Boolean =
+    TextValue.hasSameEnd(value, otherValue)
+}
+
+object TextValue {
+  def hasSameStart(value: String, otherValue: String): Int => Boolean =
+    (numOfLetters: Int) => otherValue != value &&
+        value.take(numOfLetters) == otherValue.take(numOfLetters)
+
+  def hasSameEnd(value: String, otherValue: String): Int => Boolean =
+    (numOfLetters: Int) => otherValue != value &&
+        value.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
 }

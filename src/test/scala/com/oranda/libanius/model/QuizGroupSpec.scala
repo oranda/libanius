@@ -90,7 +90,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     "make false answers" in {
-      val quizItemCorrect: QuizItem = quizGroup.quizItems.find(_.prompt.text == "entertain").get
+      val quizItemCorrect: QuizItem = quizGroup.quizItems.find(_.prompt.value == "entertain").get
 
       val falseAnswers = quizGroup.makeFalseAnswers(quizItemCorrect: QuizItem,
           numCorrectAnswersSoFar = 2)
@@ -104,7 +104,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       // Each time a quiz item is pulled, a user answer must be set
       val qgUpdated = qg.updatedWithUserAnswer(quizItem.get.prompt,
           quizItem.get.response, true, UserResponses(), new UserResponse(0))
-      (qgUpdated, (quizItem.get.prompt.text, quizItem.get.response.text))
+      (qgUpdated, (quizItem.get.prompt.value, quizItem.get.response.value))
     }
 
     "find a presentable quiz item" in {
@@ -165,7 +165,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     "present an item that has been answered before after five prompts" in {
       var qgLocal = makeQuizGroup
       val quizItem0 = qgLocal.quizGroup.findPresentableQuizItem(qgLocal.header).get
-      quizItem0.prompt.text mustEqual "against"
+      quizItem0.prompt.value mustEqual "against"
       qgLocal = QuizGroupWithHeader(qgLocal.header,
           updateWithUserAnswer(qgLocal.quizGroup, quizItem0))
 
@@ -173,7 +173,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
         qgLocal = pullQuizItemAndAnswerCorrectly(qgLocal)
 
       val quizItem5 = qgLocal.quizGroup.findPresentableQuizItem(qgLocal.header)
-      quizItem5.get.prompt.text mustEqual "against"
+      quizItem5.get.prompt.value mustEqual "against"
     }
 
   }

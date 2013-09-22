@@ -38,7 +38,7 @@ case class QuizItemViewWithChoices(
   lazy val allChoices = choicesInRandomOrder(quizItem.userResponses, falseAnswers)
 
   def choicesInRandomOrder(quizValue: UserResponses, otherChoices: Set[String]): List[String] = {
-    val allChoices = otherChoices + quizItem.response.text
+    val allChoices = otherChoices + quizItem.response.value
     Random.shuffle(allChoices.toList)
   }
 
