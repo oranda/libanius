@@ -18,10 +18,8 @@ package com.oranda.libanius.model.quizitem
 
 abstract class Value[V](val value: V) {
 
-  def matches(otherValue: String): Boolean
+  def matches(otherValue: V): Boolean
 
-  def hasSameStart(otherValue: String): Int => Boolean
-
-  def hasSameEnd(otherValue: String): Int => Boolean
-
+  def hasSameStart(otherValue: V): Int => Boolean
+  def hasSameEnd(otherValue: V): Int => Boolean
 }
