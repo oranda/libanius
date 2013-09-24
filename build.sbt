@@ -10,8 +10,6 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
           "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
 		  "releases"  at "http://oss.sonatype.org/content/repositories/releases")
 
-
-
 libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
                             "org.specs2" %% "specs2" % "2.1",
                             "org.scalaz" %% "scalaz-core" % "7.0.3")
