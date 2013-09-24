@@ -29,6 +29,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import scalaz._
 import scalaz.std.set
+import Scalaz._
 
 /*
  * Contains quiz items for a topic in a given order. This is currently a Stream
@@ -57,6 +58,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     addQuizItemToFront(QuizItem(prompt, response, userResponses))
 
   def addNewQuizItem(prompt: String, response: String): QuizGroup =
+
     if (!prompt.isEmpty && !response.isEmpty && prompt.toLowerCase != response.toLowerCase)
       addQuizItemToFront(QuizItem(prompt, response))
     else
@@ -154,13 +156,10 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
   }
 
   protected def findPresentableQuizItem(quizItem: QuizItem, header: QuizGroupHeader,
-      currentPromptNumber: Int): Option[QuizItemViewWithChoices] = {
-    if (quizItem.isPresentable(currentPromptNumber))
-      Util.stopwatch(Some(quizItemWithOptions(quizItem, header)),
-          "quizItemWithOptions for " + quizItem.response)
-    else
-      None
-  }
+      currentPromptNumber: Int): Option[QuizItemViewWithChoices] =
+    quizItem.isPresentable(currentPromptNumber) option
+        Util.stopwatch(quizItemWithOptions(quizItem, header),
+            "quizItemWithOptions for " + quizItem.response)
 
   protected[model] def makeFalseAnswers(itemCorrect: QuizItem,
       numCorrectAnswersSoFar: Int, numFalseAnswersRequired: Int = 2): Set[String] = {
@@ -239,14 +238,8 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     similarWords
   }
 
-  def findRandomWordValue(quizValues: Seq[TextValue]): Option[String] = {
-    if (quizValues.isEmpty)
-      None
-    else {
-      val randomIndex = Random.nextInt(quizValues.length)
-      Some(quizValues(randomIndex).value)
-    }
-  }
+  def findRandomWordValue(quizValues: Seq[TextValue]): Option[String] =
+    !quizValues.isEmpty option quizValues(Random.nextInt(quizValues.length)).value
 
   def merge(otherWmg: Option[QuizGroup]): QuizGroup =
     otherWmg.map(merge(_)).getOrElse(this)
