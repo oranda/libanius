@@ -95,7 +95,7 @@ object Dictionary {
 
       Try(parseCustomFormat) recover {
         case e: Exception => l.logError("Could not parse dictionary: " + e.getMessage(), e)
-        None
+                             None
       }
     }
 
