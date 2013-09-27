@@ -40,20 +40,14 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
   }
 
   def loadQuizGroup(header: QuizGroupHeader, loadedQuizGroups: Map[QuizGroupHeader, QuizGroup]):
-      Future[QuizGroup] = {
-    future {
-      l.log("seeing if quiz group was loaded for " + header)
-      val loadedQg: QuizGroup = loadedQuizGroups.find(_._1 == header).map(_._2).getOrElse {
-        l.log("no, so loading quiz group for " + header)
-        loadQuizGroupCore(header)
-      }
-
-      val loadedQgWithDictionary = Util.stopwatch(loadDictionary(header, loadedQg),
-        "preparing dictionary for " + header)
-      loadedQgWithDictionary
+      QuizGroup = {
+    l.log("seeing if quiz group was loaded for " + header)
+    val loadedQg: QuizGroup = loadedQuizGroups.find(_._1 == header).map(_._2).getOrElse {
+      l.log("no, so loading quiz group for " + header)
+      loadQuizGroupCore(header)
     }
+    Util.stopwatch(loadDictionary(header, loadedQg), "preparing dictionary for " + header)
   }
-
 
   def saveQuiz(quiz: Quiz, path: String = "") {
 
