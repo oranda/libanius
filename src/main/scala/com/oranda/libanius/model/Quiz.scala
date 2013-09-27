@@ -35,57 +35,15 @@ import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 
 case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends ModelComponent {
 
-  /*
-   * This serialization does not include QuizGroup data, only metadata.
-   *
-   * Example:
-   * quiz
-   *   quizGroup type="WordMapping" promptType="German word" responseType="English word"
-   *   quizGroup type="WordMapping" promptType="English word" responseType="German word"
-   */
-  def toCustomFormat: StringBuilder = {
-    // For efficiency, avoiding Scala's own StringBuilder and mkString
-    val strBuilder = new StringBuilder("quiz\n")
+  def hasQuizGroup(header: QuizGroupHeader) = quizGroups.contains(header)
 
-    def quizGroupMetadata(strBuilder: StringBuilder, quizGroupHeader: QuizGroupHeader) =
-      quizGroupHeader.toCustomFormat(strBuilder)
-
-    StringUtil.mkString(strBuilder, quizGroups.keySet, quizGroupMetadata, '\n')
-  }
-
-  /*
-   * Do not call in a loop: not fast.
-   */
-  def findResponsesFor(prompt: String, header: QuizGroupHeader): List[String] =
-    findQuizGroup(header).map(_.findResponsesFor(prompt)).getOrElse(Nil)
-
-  /*
-   *  Do not call in a loop: not fast.
-   */
-  def findPromptsFor(response: String, header: QuizGroupHeader): List[String] =
-    findQuizGroup(header).map(_.findPromptsFor(response)).getOrElse(Nil)
-
-  def findQuizGroup(header: QuizGroupHeader): Option[QuizGroup] = quizGroups.get(header)
-
-  def updatedPromptNumber(qgWithHeader: QuizGroupWithHeader): Quiz =
-    replaceQuizGroup(qgWithHeader.header, QuizGroup.promptNumberLens.mod( (1+), qgWithHeader.quizGroup))
-
-
-  /*
-   * Just a synonym for replaceQuizGroup.
-   */
-  def addQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup): Quiz =
-    replaceQuizGroup(header, quizGroup)
-
-  /*
-   * Add or replace any existing quiz group with the given header.
-   */
-  def replaceQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup) =
-    Quiz.quizGroupsLens.set(this, quizGroups + (header -> quizGroup))
-
-
-  def removeQuizGroup(header: QuizGroupHeader): Quiz =
-    Quiz.quizGroupsLens.set(this, quizGroups - header)
+  def numGroups = quizGroups.size
+  def numPrompts = (0 /: quizGroups.values)(_ + _.numPrompts)
+  def numResponses = (0 /: quizGroups.values)(_ + _.numResponses)
+  def numItems = (0 /: quizGroups.values)(_ + _.size)
+  def numCorrectAnswers = (0 /: quizGroups.values)(_ + _.numCorrectAnswers)
+  def scoreSoFar: BigDecimal =  // out of 1.0
+    numCorrectAnswers.toDouble / (numItems * conf.numCorrectAnswersRequired).toDouble
 
   /*
    * Find the first available "presentable" quiz item.
@@ -104,6 +62,53 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
       (header, quizGroup) <- quizGroups
       quizItem <- quizGroup.findAnyUnfinishedQuizItem(header).toStream
     } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption
+
+
+  def resultsBeginningWith(input: String): List[SearchResult] =
+    quizGroups.flatMap {
+      case (header, quizGroup) => Dictionary.convertToSearchResults(
+        quizGroup.dictionary.mappingsForKeysBeginningWith(input), header)
+    }.toList
+
+  def resultsContaining(input: String): List[SearchResult] =
+    quizGroups.flatMap {
+      case (header, quizGroup) => Dictionary.convertToSearchResults(
+        quizGroup.dictionary.mappingsForKeysContaining(input), header)
+    }.toList
+
+  /*
+   * Do not call in a loop: not fast.
+   */
+  def findResponsesFor(prompt: String, header: QuizGroupHeader): List[String] =
+    quizGroups.get(header).map(_.findResponsesFor(prompt)).getOrElse(Nil)
+
+  /*
+   *  Do not call in a loop: not fast.
+   */
+  def findPromptsFor(response: String, header: QuizGroupHeader): List[String] =
+    quizGroups.get(header).map(_.findPromptsFor(response)).getOrElse(Nil)
+
+  def updatedQuizGroups(quizGroups: Map[QuizGroupHeader, QuizGroup]): Quiz =
+    Quiz.quizGroupsLens.set(this, quizGroups)
+
+  def updatedPromptNumber(qgWithHeader: QuizGroupWithHeader): Quiz =
+    replaceQuizGroup(qgWithHeader.header,
+        QuizGroup.promptNumberLens.mod( (1+), qgWithHeader.quizGroup))
+
+  /*
+   * Just a synonym for replaceQuizGroup.
+   */
+  def addQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup): Quiz =
+    replaceQuizGroup(header, quizGroup)
+
+  /*
+   * Add or replace any existing quiz group with the given header.
+   */
+  def replaceQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup) =
+    Quiz.quizGroupsLens.set(this, quizGroups + (header -> quizGroup))
+
+  def removeQuizGroup(header: QuizGroupHeader): Quiz =
+    Quiz.quizGroupsLens.set(this, quizGroups - header)
 
   def addQuizItemToFront(header: QuizGroupHeader, prompt: String, response: String): Quiz =
     addQuizItemToFront(header, QuizItem(prompt, response))
@@ -158,27 +163,24 @@ case class Quiz(quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends
     )
   }
 
-  def numGroups = quizGroups.size
-  def numPrompts = (0 /: quizGroups.values)(_ + _.numPrompts)
-  def numResponses = (0 /: quizGroups.values)(_ + _.numResponses)
+  /*
+   * This serialization does not include QuizGroup data, only metadata.
+   *
+   * Example:
+   * quiz
+   *   quizGroup type="WordMapping" promptType="German word" responseType="English word"
+   *   quizGroup type="WordMapping" promptType="English word" responseType="German word"
+   */
+  def toCustomFormat: StringBuilder = {
+    // For efficiency, avoiding Scala's own StringBuilder and mkString
+    val strBuilder = new StringBuilder("quiz\n")
 
-  def scoreSoFar: BigDecimal =  // out of 1.0
-    numCorrectAnswers.toDouble / (numItems * conf.numCorrectAnswersRequired).toDouble
+    def quizGroupMetadata(strBuilder: StringBuilder, quizGroupHeader: QuizGroupHeader) =
+      quizGroupHeader.toCustomFormat(strBuilder)
 
-  def numItems = (0 /: quizGroups.values)(_ + _.size)
-  def numCorrectAnswers = (0 /: quizGroups.values)(_ + _.numCorrectAnswers)
+    StringUtil.mkString(strBuilder, quizGroups.keySet, quizGroupMetadata, '\n')
+  }
 
-  def resultsBeginningWith(input: String): List[SearchResult] =
-    quizGroups.flatMap {
-      case (header, quizGroup) => Dictionary.convertToSearchResults(
-          quizGroup.dictionary.mappingsForKeysBeginningWith(input), header)
-    }.toList
-
-  def resultsContaining(input: String): List[SearchResult] =
-    quizGroups.flatMap {
-      case (header, quizGroup) => Dictionary.convertToSearchResults(
-          quizGroup.dictionary.mappingsForKeysContaining(input), header)
-    }.toList
 }
 
 object Quiz extends AppDependencyAccess {
