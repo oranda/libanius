@@ -50,7 +50,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
     val quiz = Quiz.demoQuiz(quizData)
     
     "be parseable from custom format" in {
-      val qg = quiz.findQuizGroup(QuizGroupHeader(WordMapping, "German word", "English word"))
+      val qg = quiz.quizGroups.get(QuizGroupHeader(WordMapping, "German word", "English word"))
       qg.isDefined mustEqual true
       quiz.toCustomFormat.toString mustEqual quizHeaderText
     }
@@ -73,17 +73,17 @@ class QuizSpec extends Specification with AppDependencyAccess {
       val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
       val newQuizItem = QuizItem("to exchange", "tauschen")
       val quizUpdated = quizBefore.addQuizItemToFront(qgHeader, newQuizItem)
-      quizUpdated.findQuizGroup(qgHeader).get.contains(newQuizItem) mustEqual true
+      quizUpdated.existsQuizItem(newQuizItem, qgHeader) mustEqual true
     }
 
     "delete prompt-words from a particular group" in {
       val quizBefore = Quiz.demoQuiz(quizData)
-      val wmgBefore = quizBefore.findQuizGroup(
+      val wmgBefore = quizBefore.quizGroups.get(
           QuizGroupHeader(WordMapping, "English word", "German word")).get
       wmgBefore.contains("full") mustEqual true
       val quizAfter = quizBefore.removeQuizItemsForPrompt("full",
           QuizGroupHeader(WordMapping, "English word", "German word"))
-      val wmgAfter = quizAfter.findQuizGroup(
+      val wmgAfter = quizAfter.quizGroups.get(
           QuizGroupHeader(WordMapping, "English word", "German word")).get
       wmgAfter.contains("full") mustEqual false
     }
