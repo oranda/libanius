@@ -58,7 +58,6 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     addQuizItemToFront(QuizItem(prompt, response, userResponses))
 
   def addNewQuizItem(prompt: String, response: String): QuizGroup =
-
     if (!prompt.isEmpty && !response.isEmpty && prompt.toLowerCase != response.toLowerCase)
       addQuizItemToFront(QuizItem(prompt, response))
     else
@@ -113,8 +112,9 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
   }
 
   def contains(quizItem: QuizItem): Boolean = quizItems.exists(_.samePromptAndResponse(quizItem))
+  def hasPrompt(prompt: String): Boolean = contains(prompt)
   def contains(prompt: String): Boolean = contains(TextValue(prompt))
-  def contains(prompt: TextValue): Boolean = quizPrompts.contains(prompt)
+  def contains(prompt: TextValue): Boolean = quizItems.exists(_.prompt == prompt)
   def numQuizItems = quizItems.size
   def size = numQuizItems
   def isEmpty = quizItems.isEmpty
@@ -249,8 +249,6 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     updatedQuizItems(quizItemsCombined)
   }
 
-  def hasPrompt(prompt: String): Boolean = quizPrompts.contains(prompt)
-
   def findPresentableQuizItem(header: QuizGroupHeader): Option[QuizItemViewWithChoices] = {
     val quizItem =
       (for {
@@ -304,13 +302,10 @@ object QuizGroup extends AppDependencyAccess {
                            0
     }.get
 
-
   def fromCustomFormat(text: String): QuizGroupWithHeader = {
     val wmg = WordMappingGroup.fromCustomFormat(text)
     QuizGroupWithHeader(wmg.header, wmg.toQuizGroup)
   }
-
-
 }
 
 // simple response object used for saving a data structure to a file
