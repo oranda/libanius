@@ -39,14 +39,10 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     }.get
   }
 
-  def loadQuizGroup(header: QuizGroupHeader, loadedQuizGroups: Map[QuizGroupHeader, QuizGroup]):
-      QuizGroup = {
-    l.log("seeing if quiz group was loaded for " + header)
-    val loadedQg: QuizGroup = loadedQuizGroups.find(_._1 == header).map(_._2).getOrElse {
-      l.log("no, so loading quiz group for " + header)
-      loadQuizGroupCore(header)
-    }
-    Util.stopwatch(loadDictionary(header, loadedQg), "preparing dictionary for " + header)
+  def loadQuizGroup(header: QuizGroupHeader): QuizGroup = {
+    l.log("loading quiz group for " + header)
+    val quizGroup = loadQuizGroupCore(header)
+    Util.stopwatch(loadDictionary(header, quizGroup), "preparing dictionary for " + header)
   }
 
   def saveQuiz(quiz: Quiz, path: String = "") {
@@ -58,9 +54,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
           quizGroup.currentPromptNumber + " to " + fileName)
       io.writeToFile(path + fileName, serialized.toString)
     }
-
-    quiz.quizGroups.foreach { case (header, qg) => saveToFile(header, qg) }
-    io.writeToFile(path + conf.fileQuiz, quiz.toCustomFormat.toString)
+    quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg) }
   }
 
   private def loadDictionary(header: QuizGroupHeader, qg: QuizGroup): QuizGroup = {

@@ -26,7 +26,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
     
     val quizData = List(
 
-        "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
+        "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
         "against|wider\n" +
         "entertain|unterhalten\n" +
         "teach|unterrichten\n" +
@@ -39,21 +39,11 @@ class QuizSpec extends Specification with AppDependencyAccess {
         "on|auf\n" +
         "sweeps|streicht:100,200,300;405\n",
 
-        "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\"\n" +
+        "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
         "unterwegs|en route\n" +
         "Vertrag|contract:697,696;698/treaty:796;798")
 
-    val quizHeaderText = "quiz\n" +
-        "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\"\n" +
-        "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\""
-    
     val quiz = Quiz.demoQuiz(quizData)
-    
-    "be parseable from custom format" in {
-      val qg = quiz.quizGroups.get(QuizGroupHeader(WordMapping, "German word", "English word"))
-      qg.isDefined mustEqual true
-      quiz.toCustomFormat.toString mustEqual quizHeaderText
-    }
 
     "find values for a prompt" in {
       val quizLocal = Quiz.demoQuiz(quizData)
@@ -78,12 +68,12 @@ class QuizSpec extends Specification with AppDependencyAccess {
 
     "delete prompt-words from a particular group" in {
       val quizBefore = Quiz.demoQuiz(quizData)
-      val wmgBefore = quizBefore.quizGroups.get(
+      val wmgBefore = quizBefore.activeQuizGroups.get(
           QuizGroupHeader(WordMapping, "English word", "German word")).get
       wmgBefore.contains("full") mustEqual true
       val quizAfter = quizBefore.removeQuizItemsForPrompt("full",
           QuizGroupHeader(WordMapping, "English word", "German word"))
-      val wmgAfter = quizAfter.quizGroups.get(
+      val wmgAfter = quizAfter.activeQuizGroups.get(
           QuizGroupHeader(WordMapping, "English word", "German word")).get
       wmgAfter.contains("full") mustEqual false
     }
@@ -106,15 +96,29 @@ class QuizSpec extends Specification with AppDependencyAccess {
 
     "contain unique groups only" in {
       val quizLocal = Quiz.demoQuiz(quizData)
-      quizLocal.numGroups mustEqual 2 // precondition
+      quizLocal.numActiveGroups mustEqual 2 // precondition
       val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
-      val quizUpdated = quizLocal.addQuizGroup(qgHeader, QuizGroup()) // should have no effect
-      quizUpdated.numGroups mustEqual 2
+      val newQuizGroup =  QuizGroup(userData = QuizGroupUserData(isActive = true))
+      val quizUpdated = quizLocal.addOrReplaceQuizGroup(qgHeader, newQuizGroup)
+      quizUpdated.numActiveGroups mustEqual 2
     }
 
     "sum the number of correct answers" in {
       quiz.numCorrectAnswers mustEqual 6
     }
 
+    "get the number of active quiz groups" in {
+      quiz.numActiveGroups mustEqual 2
+    }
+
+    "activate and deactivate quiz groups" in {
+      val quizLocal = Quiz.demoQuiz(quizData)
+      val header = QuizGroupHeader(WordMapping, "English word", "German word")
+      quizLocal.isActive(header) mustEqual true
+      val quizAfterDeactivation = quizLocal.deactivate(header)
+      quizAfterDeactivation.isActive(header) mustEqual false
+      val quizAfterReactivation = quizAfterDeactivation.activate(header)
+      quizAfterReactivation.isActive(header) mustEqual true
+    }
   }
 }

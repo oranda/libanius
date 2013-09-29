@@ -22,9 +22,9 @@ import scala.util.{Try, Random}
 
 import java.lang.StringBuilder
 
-import com.oranda.libanius.util.{StringUtil, Util}
+import com.oranda.libanius.util.{Util}
 import com.oranda.libanius.model.wordmapping.{WordMappingGroup, Dictionary}
-import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, Value, TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, TextValue, QuizItem}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import scalaz._
@@ -37,8 +37,12 @@ import Scalaz._
  * but this data structure was too slow for inserting large numbers of quiz items.)
  */
 case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
-    currentPromptNumber: Int = 0, dictionary: Dictionary = new Dictionary)
+    userData: QuizGroupUserData = QuizGroupUserData(),
+    dictionary: Dictionary = new Dictionary)
   extends ModelComponent {
+
+  lazy val currentPromptNumber = userData.currentPromptNumber
+  lazy val isActive = userData.isActive
 
   def updatedQuizItems(newQuizItems: Stream[QuizItem]): QuizGroup =
     QuizGroup.quizGroupItemsLens.set(this, newQuizItems)
@@ -52,6 +56,9 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
   }
 
   def updatedDictionary(newDictionary: Dictionary) = QuizGroup.dictionaryLens.set(this, newDictionary)
+
+  def activate = QuizGroup.activeLens.set(this, true)
+  def deactivate = QuizGroup.activeLens.set(this, false)
 
   def addQuizItem(prompt: TextValue, response: TextValue, userResponses: UserResponses = UserResponses()):
       QuizGroup =
@@ -93,14 +100,13 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
   /*
    * Example of custom format:
    *
-   * quizGroup type="WordMapping" promptType="English word" responseType="German word" currentPromptNumber="0"
+   * quizGroup type="WordMapping" promptType="English word" responseType="German word" currentPromptNumber="0" isActive="true"
    *    against|wider
    *    entertain|unterhalten
    */
   def toCustomFormat(strBuilder: StringBuilder, header: QuizGroupHeader) = {
     val wordMappingGroup = WordMappingGroup.fromQuizGroup(header, this)
-    header.toCustomFormat(strBuilder).append(" currentPromptNumber=\"").
-        append(currentPromptNumber).append("\"")
+    userData.toCustomFormat(header.toCustomFormat(strBuilder))
     // Imperative code is used for speed
     val iter = wordMappingGroup.wordMappingPairs.iterator
     while (iter.hasNext) {
@@ -285,22 +291,22 @@ object QuizGroup extends AppDependencyAccess {
       get = (_: QuizGroup).quizItems,
       set = (qGroup: QuizGroup, qItems: Stream[QuizItem]) => qGroup.copy(quizItems = qItems))
 
-  val promptNumberLens: Lens[QuizGroup, Int] = Lens.lensu(
-      get = (_: QuizGroup).currentPromptNumber,
-      set = (qGroup: QuizGroup, promptNum: Int) => qGroup.copy(currentPromptNumber = promptNum))
-
   val dictionaryLens: Lens[QuizGroup, Dictionary] = Lens.lensu(
       get = (_: QuizGroup).dictionary,
       set = (qGroup: QuizGroup, d: Dictionary) => qGroup.copy(dictionary = d))
 
+  val userDataLens = Lens.lensu(
+      get = (_: QuizGroup).userData,
+      set = (qg: QuizGroup, ud: QuizGroupUserData) => qg.copy(userData = ud))
+
+  val activeLens: Lens[QuizGroup, Boolean] =
+    QuizGroupUserData.activeLens compose userDataLens
+
+  val promptNumberLens: Lens[QuizGroup, Int] =
+    QuizGroupUserData.promptNumberLens compose userDataLens
+
   def remove(quizItems: Stream[QuizItem], quizItem: QuizItem): Stream[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
-
-  def parseCurrentPromptNumber(str: String): Int =
-    Try(StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt).recover {
-      case e: Exception => l.logError("Could not parse prompt number from " + str)
-                           0
-    }.get
 
   def fromCustomFormat(text: String): QuizGroupWithHeader = {
     val wmg = WordMappingGroup.fromCustomFormat(text)

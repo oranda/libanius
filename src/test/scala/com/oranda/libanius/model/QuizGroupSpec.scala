@@ -26,7 +26,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
   "a quiz group" should {
 
     val wmgCustomFormat =
-      "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
+      "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
         "against|wider\n" +
         "entertain|unterhalten\n" +
         "teach|unterrichten\n" +

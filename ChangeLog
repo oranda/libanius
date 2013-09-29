@@ -1,3 +1,11 @@
+== 0.89 September 30 2013
+
+  * Introduced Scalaz lenses to help update the persistent data structure.
+
+  * Tightened up the data model: introduced the isActive flag for QuizGroup, making it
+    unnecessary to persist Quiz metadata.
+
+
 == 0.88 September 9 2013
 
   * Implemented minimal Dependency Injection scheme.

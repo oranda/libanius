@@ -27,11 +27,12 @@ import com.oranda.libanius.model.quizitem.{Value, TextValue, QuizItem}
 import scala.language.implicitConversions
 
 /*
- * A type of QuizGroup where the quiz pairs are mappings from a word to possible translations.
+ * An intermediate data structure used to persist a "WordMapping" type of quiz group
+ * in a concise format.
  */
-case class WordMappingGroup(
-    val header: QuizGroupHeader,
-    val wordMappingPairs: Stream[WordMappingPair] = Stream.empty) extends ModelComponent {
+case class WordMappingGroup(header: QuizGroupHeader,
+    wordMappingPairs: Stream[WordMappingPair] = Stream.empty,
+    userData: QuizGroupUserData = new QuizGroupUserData()) extends ModelComponent {
 
   def toQuizGroup: QuizGroup = {
     def makeQuizItems(wmPair: WordMappingPair): Iterable[QuizItem] =
@@ -41,16 +42,8 @@ case class WordMappingGroup(
 
     val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems(_))
     val dictionary = Dictionary.fromWordMappings(wordMappingPairs)
-    QuizGroup(quizItems, 0, dictionary)
+    QuizGroup(quizItems, userData, dictionary)
   }
-
-  def findValueSetFor(key: String): Option[WordMappingValueSet] =
-    wordMappingPairs.find(_.key == key).map(_.valueSet)
-
-  def quizKeys = wordMappingPairs.map(_.key)
-
-  def keyBeginningWith(keyStart: String) = quizKeys.find(_.startsWith(keyStart))
-
 }
 
 object WordMappingGroup extends AppDependencyAccess {
@@ -67,15 +60,15 @@ object WordMappingGroup extends AppDependencyAccess {
         case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
             WordMappingPair(prompt.value, WordMappingValueSet.createFromQuizItems(quizItems.toList))
       }).toStream
-    WordMappingGroup(header, wordMappingPairs)
+    WordMappingGroup(header, wordMappingPairs, quizGroup.userData)
   }
 
   /*
    * Example:
    *
-   * quizGroup type="WordMapping" promptType="English word" responseType="German word" currentPromptNumber="0"
-   *    against|wider
-   *    entertain|unterhalten
+   * quizGroup type="WordMapping" promptType="English word" responseType="German word" currentPromptNumber="0" isActive="true"
+   *     against|wider
+   *     entertain|unterhalten
    */
   def fromCustomFormat(str: String): WordMappingGroup = {
 
@@ -117,6 +110,6 @@ object WordMappingGroup extends AppDependencyAccess {
     val wordMappingsStream = wordMappingsMutable.toStream
 
     // Now use the persistent data structure.
-    new WordMappingGroup(QuizGroupHeader(str), wordMappingsStream)
+    new WordMappingGroup(QuizGroupHeader(str), wordMappingsStream, QuizGroupUserData(str))
   }
 }

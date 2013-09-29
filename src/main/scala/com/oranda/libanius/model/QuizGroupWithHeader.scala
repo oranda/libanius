@@ -16,7 +16,20 @@
 
 package com.oranda.libanius.model
 
+import scala.language.implicitConversions
+
 /*
  * Convenience class for passing around a key-value pair from the Quiz.quizGroups map.
  */
-case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
+case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup) {
+  def toPair = Pair(header, quizGroup)
+}
+
+object QuizGroupWithHeader {
+  // Forward access to QuizGroupHeader whenever necessary
+  implicit def qgwh2qgh(qgwh: QuizGroupWithHeader): QuizGroupHeader = qgwh.header
+
+  // Forward access to QuizGroup whenever necessary
+  implicit def qgwh2qg(qgwh: QuizGroupWithHeader): QuizGroup = qgwh.quizGroup
+}
+
