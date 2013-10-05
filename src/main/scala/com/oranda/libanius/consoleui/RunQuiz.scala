@@ -69,7 +69,6 @@ object RunQuiz extends App with AppDependencyAccess {
   }
 
   def keepShowingQuizItems(quiz: Quiz, quizItem: QuizItemViewWithChoices) {
-    quiz.activeQuizGroups.foreach(qg => l.log("numCorrectAnswers: " + qg._2.numCorrectAnswers))
     showQuizItemAndProcessResponse(quiz, quizItem) match {
       case (Invalid, updatedQuiz) =>
         output("Invalid input\n")
