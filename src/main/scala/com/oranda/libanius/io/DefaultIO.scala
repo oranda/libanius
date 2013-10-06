@@ -28,10 +28,13 @@ import com.oranda.libanius.model.QuizGroupHeader
 class DefaultIO extends PlatformIO {
 
   def readFile(fileName: String): Option[String] = {
-    l.log("Reading file " + fileName)
-    val myFile = new File(fileName)
-    val src = Source.fromFile(myFile)
-    Some(src.mkString)
+    val theFile = new File(fileName)
+    if (theFile.exists)
+      Some(Source.fromFile(theFile).mkString)
+    else {
+      l.logError("File not found: " + fileName)
+      None
+    }
   }    
   
   def save(fileName: String, strToSave: String) {
