@@ -1,4 +1,4 @@
-quizGroup type="QuestionAndAnswer" promptType="ChildrensQuizQuestion" responseType="Answer" currentPromptNumber="0"
+quizGroup type="QuestionAndAnswer" promptType="ChildrensQuizQuestion" responseType="Answer" isActive="true" currentPromptNumber="0"
 What piece of clothing is worn on the head?|Hat
 'Esoh': what common piece of clothing do you get on rearranging the letters?|Shoe
 'Acot': what common piece of clothing do you get on rearranging the letters?|Coat

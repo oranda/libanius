@@ -1,4 +1,4 @@
-quizGroup type="WordMapping" promptType="German word" responseType="English word" currentPromptNumber="0"
+quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="0"
 auf|on
 als|as
 einig|agreed

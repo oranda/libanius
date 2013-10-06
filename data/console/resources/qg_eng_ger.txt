@@ -1,4 +1,4 @@
-quizGroup type="WordMapping" promptType="English word" responseType="German word" currentPromptNumber="0"
+quizGroup type="WordMapping" promptType="English word" responseType="German word" isActive="true" currentPromptNumber="0"
 perhaps|vielleicht
 personally|persönlich
 type|art
