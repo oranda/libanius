@@ -1,3 +1,0 @@
-quizOfWordMappings currentPromptNumber="0"
-quizGroup type="WordMapping" promptType="English word" responseType="German word"
-quizGroup type="WordMapping" promptType="German word" responseType="English word"
