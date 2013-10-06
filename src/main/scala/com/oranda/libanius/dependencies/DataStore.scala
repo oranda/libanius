@@ -40,7 +40,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
   }
 
   def loadQuizGroup(header: QuizGroupHeader): QuizGroup = {
-    l.log("loading quiz group for " + header)
+    l.log("DataStore.loadQuizGroup " + header)
     val quizGroup = loadQuizGroupCore(header)
     Util.stopwatch(loadDictionary(header, quizGroup), "preparing dictionary for " + header)
   }
