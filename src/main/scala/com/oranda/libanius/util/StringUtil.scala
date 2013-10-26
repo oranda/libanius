@@ -41,4 +41,10 @@ object StringUtil {
     }
     str
   }
+
+  def formatScore(score: BigDecimal): String = {
+    val scoreStr = (score * 100).toString
+    val scoreStrMaxIndex = scala.math.min(scoreStr.length, 6)
+    scoreStr.substring(0, scoreStrMaxIndex) + "%\n"
+  }
 }
