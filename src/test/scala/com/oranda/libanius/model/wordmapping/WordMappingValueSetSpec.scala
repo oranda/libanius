@@ -22,7 +22,7 @@ import java.lang.StringBuilder
 
 class WordMappingValueSetSpec extends Specification with AppDependencyAccess {
 
-  "a word-mapping-response-set" should {
+  "a word-mapping-value-set" should {
 
     val wmvsCustomFormat = "contract:698,696;697/treaty:796;798"
 
@@ -34,13 +34,13 @@ class WordMappingValueSetSpec extends Specification with AppDependencyAccess {
       wmvs.toCustomFormat(new StringBuilder("")).toString mustEqual wmvsCustomFormat
     }
 
-    "allow a word-mapping-response to be added" in {
+    "allow a word-mapping value to be added" in {
       val wmvsLocal = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
       val wmvsNew = wmvsLocal.addValueToEnd(WordMappingValue("agreement"))
       wmvsNew.size mustEqual 3
     }
 
-    "remove a response" in {
+    "remove a value" in {
       val wmvsUpdated = wmvs.removeValue("contract")
       wmvsUpdated.containsValue("contract") mustEqual false
     }

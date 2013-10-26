@@ -31,14 +31,14 @@ case class QuizItemViewWithChoices(
     val numCorrectAnswersInARow: Int) {
 
   lazy val prompt = quizItem.prompt
-  lazy val response = quizItem.response
+  lazy val correctResponse = quizItem.correctResponse
   lazy val promptType = quizGroupHeader.promptType
   lazy val responseType = quizGroupHeader.responseType
 
   lazy val allChoices = choicesInRandomOrder(quizItem.userResponses, falseAnswers)
 
   def choicesInRandomOrder(quizValue: UserResponses, otherChoices: Set[String]): List[String] = {
-    val allChoices = otherChoices + quizItem.response.value
+    val allChoices = otherChoices + quizItem.correctResponse.value
     Random.shuffle(allChoices.toList)
   }
 

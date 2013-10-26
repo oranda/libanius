@@ -103,8 +103,8 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       quizItem.isDefined mustEqual true
       // Each time a quiz item is pulled, a user answer must be set
       val qgUpdated = qg.updatedWithUserAnswer(quizItem.get.prompt,
-          quizItem.get.response, true, UserResponses(), new UserResponse(0))
-      (qgUpdated, (quizItem.get.prompt.value, quizItem.get.response.value))
+          quizItem.get.correctResponse, true, UserResponses(), new UserResponse(0))
+      (qgUpdated, (quizItem.get.prompt.value, quizItem.get.correctResponse.value))
     }
 
     "find a presentable quiz item" in {
@@ -158,7 +158,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     def updateWithUserAnswer(qg: QuizGroup, quizItem: QuizItemViewWithChoices): QuizGroup = {
       val userAnswer = new UserResponse(qg.currentPromptNumber)
-      qg.updatedWithUserAnswer(quizItem.prompt, quizItem.response, true, UserResponses(),
+      qg.updatedWithUserAnswer(quizItem.prompt, quizItem.correctResponse, true, UserResponses(),
           userAnswer).updatedPromptNumber
     }
 

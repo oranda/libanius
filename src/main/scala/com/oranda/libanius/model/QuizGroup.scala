@@ -92,10 +92,10 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
   def removeQuizItemsForPrompt(prompt: String) =
     updatedQuizItems(quizItems.filter(_.prompt.value != prompt))
   def removeQuizItemsForResponse(response: String) =
-    updatedQuizItems(quizItems.filter(_.response.value != response))
+    updatedQuizItems(quizItems.filter(_.correctResponse.value != response))
 
   def quizPrompts: Stream[TextValue] = quizItems.map(_.prompt)
-  def quizResponses: Stream[TextValue] = quizItems.map(_.response)
+  def quizResponses: Stream[TextValue] = quizItems.map(_.correctResponse)
 
   /*
    * Example of custom format:
@@ -139,13 +139,19 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
    * Low usage expected. Slow because we are not using a Map for quizItems.
    */
   def findResponsesFor(prompt: String): List[String] =
-    quizItems.filter(_.prompt.matches(prompt)).map(_.response.value).toList
+    quizItems.filter(_.prompt.matches(prompt)).map(_.correctResponse.value).toList
 
   /*
    * Low usage expected. Slow because we are not using a Map for quizItems.
    */
   def findPromptsFor(response: String): List[String] =
-    quizItems.filter(_.response.matches(response)).map(_.prompt.value).toList
+    quizItems.filter(_.correctResponse.matches(response)).map(_.prompt.value).toList
+
+  /*
+   * Low usage expected. Slow because we are not using a Map for quizItems.
+   */
+  def findQuizItem(prompt: String, response: String) =
+    quizItems.find(_.samePromptAndResponse(QuizItem(prompt, response)))
 
   def findAnyUnfinishedQuizItem(header: QuizGroupHeader): Option[QuizItemViewWithChoices] = {
     l.log("findAnyUnfinishedQuizItem for " + header)
@@ -165,7 +171,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
       currentPromptNumber: Int): Option[QuizItemViewWithChoices] =
     quizItem.isPresentable(currentPromptNumber) option
         Util.stopwatch(quizItemWithOptions(quizItem, header),
-            "quizItemWithOptions for " + quizItem.response)
+            "quizItemWithOptions for " + quizItem.correctResponse)
 
   protected[model] def makeFalseAnswers(itemCorrect: QuizItem,
       numCorrectAnswersSoFar: Int, numFalseAnswersRequired: Int = 2): Set[String] = {
@@ -178,7 +184,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
       if (numCorrectAnswersSoFar == 0) ListSet[String]()
       else {
         val correctValues = findResponsesFor(itemCorrect.prompt.value)
-        val correctValuePresented = itemCorrect.response.value
+        val correctValuePresented = itemCorrect.correctResponse.value
         Util.stopwatch(makeFalseSimilarAnswers(correctValues, correctValuePresented,
             numCorrectAnswersSoFar, numFalseAnswersRequired), "makeFalseSimilarAnswers")
       }
@@ -201,7 +207,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
 
     def randomFalseWordValue(sliceIndex: Int) =
       findRandomWordValue(sliceOfResponses(sliceIndex, numSlices = numFalseAnswersRequired)).
-          filter(itemCorrect.response.value != _)
+          filter(itemCorrect.correctResponse.value != _)
 
     (0 until numFalseAnswersRequired).map(
         sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toSet
@@ -234,11 +240,11 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
     quizItems.iterator.takeWhile(_ => similarWords.size < numFalseAnswersRequired).
         foreach(quizItem => {
       numValueSetsSearched = numValueSetsSearched + 1
-      // Avoid selecting values belonging to the "correct" response set
-      if (!correctValues.contains(quizItem.response)) {
+      // Avoid selecting values belonging to the "correct" correctResponse set
+      if (!correctValues.contains(quizItem.correctResponse)) {
         if (similarWords.size < numFalseAnswersRequired &&
-            similarityFunction(quizItem.response, correctValue)(numSimilarLettersRequired))
-          similarWords += quizItem.response.value
+            similarityFunction(quizItem.correctResponse, correctValue)(numSimilarLettersRequired))
+          similarWords += quizItem.correctResponse.value
       }
     })
     similarWords
@@ -266,7 +272,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
   }
 
   def sliceOfResponses(sliceIndex: Int, numSlices: Int): List[TextValue] =
-    sliceOfQuizItems(sliceIndex, numSlices).map(_.response).toList
+    sliceOfQuizItems(sliceIndex, numSlices).map(_.correctResponse).toList
 
   def sliceOfQuizItems(sliceIndex: Int, numSlices: Int): Iterable[QuizItem] = {
     val sliceSize = size / numSlices
@@ -275,7 +281,7 @@ case class QuizGroup(quizItems: Stream[QuizItem] = Stream.empty,
   }
 
   def randomValues(sliceSize: Int): List[TextValue] =
-    randomSliceOfQuizItems(sliceSize).map(_.response).toList
+    randomSliceOfQuizItems(sliceSize).map(_.correctResponse).toList
 
   def randomSliceOfQuizItems(sliceSize: Int): Iterable[QuizItem] =
     if (sliceSize >= size) quizItems.toList
@@ -314,5 +320,5 @@ object QuizGroup extends AppDependencyAccess {
   }
 }
 
-// simple response object used for saving a data structure to a file
+// simple correctResponse object used for saving a data structure to a file
 case class SaveData(fileName: String, data: String)

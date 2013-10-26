@@ -34,13 +34,13 @@ class QuizPairSpec extends Specification with AppDependencyAccess {
 
 
     "be matchable against another by the first few letters" in {
-      quizItem.response.hasSameStart("nachfahren")(4) mustEqual true
-      quizItem.response.hasSameStart("nachfahren")(5) mustEqual false
+      quizItem.correctResponse.hasSameStart("nachfahren")(4) mustEqual true
+      quizItem.correctResponse.hasSameStart("nachfahren")(5) mustEqual false
     }
 
     "be matchable against another by the last few letters" in {
-      quizItem.response.hasSameEnd("nachfahren")(2) mustEqual true
-      quizItem.response.hasSameEnd("nachfahren")(3) mustEqual false
+      quizItem.correctResponse.hasSameEnd("nachfahren")(2) mustEqual true
+      quizItem.correctResponse.hasSameEnd("nachfahren")(3) mustEqual false
     }
 
     "know the number of times in a row it was answered correctly by the user" in {

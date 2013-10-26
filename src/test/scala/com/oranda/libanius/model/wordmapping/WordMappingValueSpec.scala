@@ -22,7 +22,7 @@ import java.lang.StringBuilder
 
 class WordMappingValueSpec extends Specification with AppDependencyAccess {
   
-  "a word-mapping-response" should {
+  "a word-mapping value" should {
 
     val wmvCustomFormat = "nachlösen:9,7;6"
 

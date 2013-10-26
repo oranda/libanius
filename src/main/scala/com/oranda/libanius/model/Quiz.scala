@@ -46,10 +46,10 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def numActiveGroups = activeQuizGroups.size
   def numPrompts = (0 /: activeQuizGroups.values)(_ + _.numPrompts)
   def numResponses = (0 /: activeQuizGroups.values)(_ + _.numResponses)
-  def numItems = (0 /: activeQuizGroups.values)(_ + _.size)
+  def numQuizItems = (0 /: activeQuizGroups.values)(_ + _.size)
   def numCorrectAnswers = (0 /: activeQuizGroups.values)(_ + _.numCorrectAnswers)
   def scoreSoFar: BigDecimal =  // out of 1.0
-    numCorrectAnswers.toDouble / (numItems * conf.numCorrectAnswersRequired).toDouble
+    numCorrectAnswers.toDouble / (numQuizItems * conf.numCorrectAnswersRequired).toDouble
 
   /*
    * Find the first available "presentable" quiz item.
@@ -180,13 +180,24 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
     quizUpdated2
   }
 
-  def updateWithUserAnswer(isCorrect: Boolean, currentQuizItem: QuizItemViewWithChoices): Quiz = {
-    val userAnswer = new UserResponse(currentQuizItem.qgCurrentPromptNumber)
-    Quiz.quizGroupsLens.set(this,
-        mapVPLens(currentQuizItem.quizGroupHeader) mod ((_: QuizGroup).updatedWithUserAnswer(
-            currentQuizItem.prompt, currentQuizItem.response, isCorrect,
-            currentQuizItem.quizItem.userResponses, userAnswer), quizGroups)
-    )
+  def qgCurrentPromptNumber(header: QuizGroupHeader): Option[Int] =
+    mapVPLens(header).get(activeQuizGroups).map(_.currentPromptNumber)
+
+  def findQuizItem(header: QuizGroupHeader, prompt: String, response: String): Option[QuizItem] =
+    mapVPLens(header).get(activeQuizGroups).flatMap(_.findQuizItem(prompt, response))
+
+  def updateWithUserAnswer(isCorrect: Boolean, quizGroupHeader: QuizGroupHeader,
+      quizItem: QuizItem): Quiz = {
+    qgCurrentPromptNumber(quizGroupHeader) match {
+      case Some(qgPromptNumber) =>
+        val userAnswer = new UserResponse(qgPromptNumber)
+        Quiz.quizGroupsLens.set(this,
+          mapVPLens(quizGroupHeader) mod ((_: QuizGroup).updatedWithUserAnswer(
+            quizItem.prompt, quizItem.correctResponse, isCorrect,
+            quizItem.userResponses, userAnswer), quizGroups)
+        )
+      case _ => this
+    }
   }
 }
 

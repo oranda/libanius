@@ -17,7 +17,7 @@
 package com.oranda.libanius.consoleui
 
 import scala.util.Try
-import com.oranda.libanius.util.{Util}
+import com.oranda.libanius.util.{StringUtil, Util}
 import Output._
 import com.oranda.libanius.model._
 import com.oranda.libanius.dependencies._
@@ -83,12 +83,9 @@ object RunQuiz extends App with AppDependencyAccess {
   }
 
   def showScore(quiz: Quiz) {
-    def formatAndPrintScore(scoreStr: String) {
-      val scoreStrMaxIndex = scala.math.min(scoreStr.length, 6)
-      output("Score: " + scoreStr.substring(0, scoreStrMaxIndex) + "%\n")
-    }
-    val scoreSoFar = (Util.stopwatch(quiz.scoreSoFar, "scoreSoFar") * 100).toString
-    formatAndPrintScore(scoreSoFar)
+    val score: BigDecimal = Util.stopwatch(quiz.scoreSoFar, "scoreSoFar")
+    val formattedScore = StringUtil.formatScore(score)
+    output("Score: " + formattedScore)
   }
 
   def showQuizItemAndProcessResponse(quiz: Quiz, quizItem: QuizItemViewWithChoices):
@@ -131,11 +128,12 @@ object RunQuiz extends App with AppDependencyAccess {
 
   def processUserAnswer(quiz: Quiz, userAnswerTxt: String,
       quizItem: QuizItemViewWithChoices): Quiz = {
-    val correctAnswer = quizItem.response
+    val correctAnswer = quizItem.correctResponse
     val isCorrect = correctAnswer.matches(userAnswerTxt)
     if (isCorrect) output("\nCorrect!\n") else output("\nWrong! It's " + correctAnswer + "\n")
 
-    Util.stopwatch(quiz.updateWithUserAnswer(isCorrect, quizItem), "updateQuiz")
+    Util.stopwatch(quiz.updateWithUserAnswer(isCorrect, quizItem.quizGroupHeader,
+        quizItem.quizItem), "updateQuiz")
   }
 
   def getAnswerFromInput: UserConsoleResponse =

@@ -73,7 +73,7 @@ case class WordMappingValue(override val value: String, correctAnswersInARow: Li
 object WordMappingValue extends AppDependencyAccess {
 
   def apply(quizItem: QuizItem): WordMappingValue =
-    WordMappingValue(quizItem.response.toString, quizItem.userResponses.correctAnswersInARow,
+    WordMappingValue(quizItem.correctResponse.toString, quizItem.userResponses.correctAnswersInARow,
         quizItem.userResponses.incorrectAnswers)
 
   // Example: str = "nachlösen:1,7,9;6"

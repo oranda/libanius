@@ -22,22 +22,22 @@ import com.oranda.libanius.model.UserResponses
  * A connection between two things, and user information associated with the connection.
  *
  * prompt: the cue given to the user
- * response: the desired response
+ * correctResponse: the desired correctResponse
  * userResponses: a history of actual responses
  *
  * Examples of QuizItems:
  *  - a question and an answer in the quiz
  *  - a word and a translation
  */
-case class QuizItem(prompt: TextValue, response: TextValue,
+case class QuizItem(prompt: TextValue, correctResponse: TextValue,
     userResponses: UserResponses = UserResponses()) {
 
-  def samePromptAndResponse(other: QuizItem) = other.prompt == prompt && other.response == response
+  def samePromptAndResponse(other: QuizItem) =
+    other.prompt == prompt && other.correctResponse == correctResponse
   def isPresentable(currentPromptNumber: Int) = userResponses.isPresentable(currentPromptNumber)
 
   def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentAnswer
   def numCorrectAnswersInARow = userResponses.numCorrectAnswersInARow
-
 }
 
 object QuizItem {
