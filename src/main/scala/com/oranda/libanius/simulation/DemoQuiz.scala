@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.oranda.libanius.simulation
 
-package com.oranda.libanius.model
+import com.oranda.libanius.model.Quiz
+import com.oranda.libanius.dependencies.AppDependencyAccess
 
-import scala.language.implicitConversions
+object DemoQuiz extends App with Simulation with AppDependencyAccess {
 
-/*
- * Convenience class for passing around a key-value pair from the Quiz.quizGroups map.
- */
-case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup) {
-  def toPair = Pair(header, quizGroup)
+  runQuiz()
+
+  private def runQuiz() {
+
+    val quiz = Quiz.demoQuiz()
+    testAllQuizItems(quiz)
+  }
 }
-
-object QuizGroupWithHeader {
-  // Forward access to QuizGroupHeader whenever necessary
-  implicit def qgwh2qgh(qgwh: QuizGroupWithHeader): QuizGroupHeader = qgwh.header
-
-  // Forward access to QuizGroup whenever necessary
-  implicit def qgwh2qg(qgwh: QuizGroupWithHeader): QuizGroup = qgwh.quizGroup
-}
-

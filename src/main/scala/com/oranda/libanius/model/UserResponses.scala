@@ -17,112 +17,114 @@
 package com.oranda.libanius.model
 
 import com.oranda.libanius.util.StringUtil
-import UserResponses._
 
 import java.lang.StringBuilder
 
 import scalaz._
 
-case class UserResponses(correctAnswersInARow: List[UserResponse] = Nil,
-    incorrectAnswers: List[UserResponse] = Nil)
+case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
+    incorrectResponses: List[UserResponse] = Nil)
   extends ModelComponent {
 
-  def updated(value: String, correctAnswersInARow: List[UserResponse],
-      incorrectAnswers: List[UserResponse]): UserResponses =
-    new UserResponses(correctAnswersInARow, incorrectAnswers)
+  def updated(value: String, correctResponsesInARow: List[UserResponse],
+      incorrectResponses: List[UserResponse]): UserResponses =
+    new UserResponses(correctResponsesInARow, incorrectResponses)
 
-  def userAnswers = correctAnswersInARow ++ incorrectAnswers
+  def userResponses = correctResponsesInARow ++ incorrectResponses
 
-  def addUserAnswer(userAnswer : UserResponse, wasCorrect: Boolean): UserResponses =
+  def add(userResponse: UserResponse, wasCorrect: Boolean): UserResponses =
     if (wasCorrect)
-      UserResponses.userResponsesCorrectAnswersLens.set(this, userAnswer :: correctAnswersInARow)
+      UserResponses.userResponsesCorrectResponsesLens.set(this,
+          userResponse :: correctResponsesInARow)
     else {
       // on an incorrect answer, old correct answers are discarded
-      val ur = UserResponses.userResponsesCorrectAnswersLens.set(this, Nil)
-      UserResponses.userResponsesIncorrectAnswersLens.set(ur, userAnswer :: incorrectAnswers)
+      val ur = UserResponses.userResponsesCorrectResponsesLens.set(this, Nil)
+      UserResponses.userResponsesIncorrectResponsesLens.set(ur, userResponse :: incorrectResponses)
     }
-
 
   /*
    * See if this quiz item meets any of the defined criteria sets that would make it presentable.
    * (Intended to be called over many quiz items until one fits.)
    */
   def isPresentable(currentPromptNum : Int): Boolean =
-    isPresentable(currentPromptNum, promptNumInMostRecentAnswer, numCorrectAnswersInARow)
+    isPresentable(currentPromptNum, promptNumInMostRecentResponse, numCorrectResponsesInARow)
 
   protected[model] def isPresentable(currentPromptNum : Int,
-      promptNumInMostRecentAnswer: Option[Int], numCorrectAnswersInARow: Int): Boolean =
-    numCorrectAnswersInARow == 0 || criteriaSets.exists(
-        _.isPresentable(currentPromptNum, promptNumInMostRecentAnswer, numCorrectAnswersInARow))
+      promptNumInMostRecentResponse: Option[Int], numCorrectResponsesInARow: Int): Boolean =
+    numCorrectResponsesInARow == 0 || Criteria.criteriaSets.exists(_.isPresentable(
+        currentPromptNum, promptNumInMostRecentResponse, numCorrectResponsesInARow))
 
 
-  def isUnfinished: Boolean = numCorrectAnswersInARow < conf.numCorrectAnswersRequired
+  def isUnfinished: Boolean = numCorrectResponsesInARow < conf.numCorrectAnswersRequired
   
-  def numCorrectAnswersInARow = correctAnswersInARow.length
+  def numCorrectResponsesInARow = correctResponsesInARow.length
   
-  def promptNumInMostRecentAnswer: Option[Int] =
-    correctAnswersInARow.headOption.orElse(incorrectAnswers.headOption).orElse(None).
+  def promptNumInMostRecentResponse: Option[Int] =
+    correctResponsesInARow.headOption.orElse(incorrectResponses.headOption).orElse(None).
         map(_.promptNumber)
 
-
-  def updated(correctAnswersInARow: List[UserResponse], incorrectAnswers: List[UserResponse]):
+  def updated(correctResponsesInARow: List[UserResponse], incorrectResponses: List[UserResponse]):
       UserResponses =
-    UserResponses(correctAnswersInARow, incorrectAnswers)
+    UserResponses(correctResponsesInARow, incorrectResponses)
 
   // Example: nachlösen:1,7,9;6
   def toCustomFormat(strBuilder: StringBuilder): StringBuilder = {
-    if (!correctAnswersInARow.isEmpty || !incorrectAnswers.isEmpty)
+    if (!correctResponsesInARow.isEmpty || !incorrectResponses.isEmpty)
       strBuilder.append(':')
-    if (!correctAnswersInARow.isEmpty)
-      StringUtil.mkString(strBuilder, correctAnswersInARow, answerPromptNumber, ',')
-    if (!incorrectAnswers.isEmpty) {
+    if (!correctResponsesInARow.isEmpty)
+      StringUtil.mkString(strBuilder, correctResponsesInARow, responsePromptNumber, ',')
+    if (!incorrectResponses.isEmpty) {
       strBuilder.append(';')
-      StringUtil.mkString(strBuilder, incorrectAnswers, answerPromptNumber, ',')
+      StringUtil.mkString(strBuilder, incorrectResponses, responsePromptNumber, ',')
     }
     strBuilder
   }
 
-  def answerPromptNumber(strBuilder: StringBuilder, answer: UserResponse) =
-    strBuilder.append(answer.promptNumber)
+  def responsePromptNumber(strBuilder: StringBuilder, response: UserResponse) =
+    strBuilder.append(response.promptNumber)
 
 }
 
 object UserResponses {
 
-  val userResponsesCorrectAnswersLens = Lens.lensu(
-      get = (_: UserResponses).correctAnswersInARow,
-      set = (ur: UserResponses, urs: List[UserResponse]) => ur.copy(correctAnswersInARow = urs))
+  val userResponsesCorrectResponsesLens = Lens.lensu(
+      get = (_: UserResponses).correctResponsesInARow,
+      set = (ur: UserResponses, urs: List[UserResponse]) => ur.copy(correctResponsesInARow = urs))
 
-  val userResponsesIncorrectAnswersLens = Lens.lensu(
-      get = (_: UserResponses).incorrectAnswers,
-      set = (ur: UserResponses, urs: List[UserResponse]) => ur.copy(incorrectAnswers = urs))
-
-  /*
-   * Criteria sets that determine whether the current item is presentable or not.
-   */
-  val criteriaSets = Seq[Criteria](
-    Criteria(numCorrectAnswersInARowDesired = 1, diffInPromptNumMinimum = 5),
-    Criteria(numCorrectAnswersInARowDesired = 2, diffInPromptNumMinimum = 40),
-    Criteria(numCorrectAnswersInARowDesired = 3, diffInPromptNumMinimum = 800)
-    /*(4, 5000),*/
-  )
+  val userResponsesIncorrectResponsesLens = Lens.lensu(
+      get = (_: UserResponses).incorrectResponses,
+      set = (ur: UserResponses, urs: List[UserResponse]) => ur.copy(incorrectResponses = urs))
 }
+
 
 /*
  * Criteria used to check if a quiz item is "presentable".
  *
- * numCorrectAnswersInARowDesired: how many times this item should have been answered correctly
+ * numCorrectResponsesInARowDesired: how many times this item should have been answered correctly
  * diffInPromptNumMinimum: how long ago it was last answered - may be None to omit this criterion
  */
-case class Criteria(numCorrectAnswersInARowDesired: Int, diffInPromptNumMinimum: Int) {
-  def isPresentable(currentPromptNum : Int, promptNumInMostRecentAnswer: Option[Int],
-      numCorrectAnswersInARow: Int): Boolean = {
-    def wasNotTooRecentlyUsed = promptNumInMostRecentAnswer.forall {
-      case promptNumInMostRecentAnswer =>
-          val diffInPromptNum = currentPromptNum - promptNumInMostRecentAnswer
+case class Criteria(numCorrectResponsesInARowDesired: Int, diffInPromptNumMinimum: Int) {
+  def isPresentable(currentPromptNum : Int, promptNumInMostRecentResponse: Option[Int],
+      numCorrectResponsesInARow: Int): Boolean = {
+    def wasNotTooRecentlyUsed = promptNumInMostRecentResponse.forall {
+      case promptNumInMostRecentResponse =>
+          val diffInPromptNum = currentPromptNum - promptNumInMostRecentResponse
           diffInPromptNum >= diffInPromptNumMinimum
     }
-
-    (numCorrectAnswersInARow == numCorrectAnswersInARowDesired) && wasNotTooRecentlyUsed
+    (numCorrectResponsesInARow == numCorrectResponsesInARowDesired) && wasNotTooRecentlyUsed
   }
+}
+
+object Criteria {
+  /*
+   * Criteria sets that determine whether the current item is presentable or not.
+   */
+  val criteriaSets = Seq[Criteria](
+    Criteria(numCorrectResponsesInARowDesired = 1, diffInPromptNumMinimum = 5),
+    Criteria(numCorrectResponsesInARowDesired = 2, diffInPromptNumMinimum = 40),
+    Criteria(numCorrectResponsesInARowDesired = 3, diffInPromptNumMinimum = 800)
+    /*(4, 5000),*/
+  )
+
+  def maxDiffInPromptNumMinimum = criteriaSets.map(_.diffInPromptNumMinimum).max
 }

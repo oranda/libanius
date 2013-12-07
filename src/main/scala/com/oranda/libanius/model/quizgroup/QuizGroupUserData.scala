@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.oranda.libanius.model
+package com.oranda.libanius.model.quizgroup
 
 import scala.util.Try
 import com.oranda.libanius.util.StringUtil
 import java.lang.StringBuilder
 
 import scalaz._
-import scalaz.std.set
-import scalaz.Scalaz._
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.ModelComponent
 
 case class QuizGroupUserData(isActive: Boolean = false, currentPromptNumber: Int = 0)
     extends ModelComponent {

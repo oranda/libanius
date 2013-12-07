@@ -16,9 +16,9 @@
 package com.oranda.libanius.model.wordmapping
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.model._
-import com.oranda.libanius.dependencies.{AppDependencyAccess, Conf}
+import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, WordMapping, QuizGroupHeader, QuizGroup}
 
 class WordMappingGroupSpec extends Specification with AppDependencyAccess {
   
@@ -39,8 +39,6 @@ class WordMappingGroupSpec extends Specification with AppDependencyAccess {
         "rides|reitet\n" +
         "sweeps|streicht"
 
-    val wmg = WordMappingGroup.fromCustomFormat(wmgCustomFormat)
-
     // test data for conversions with QuizGroup
 
     val header = QuizGroupHeader(WordMapping, "English word", "German word")
@@ -56,7 +54,7 @@ class WordMappingGroupSpec extends Specification with AppDependencyAccess {
 
     val wmgSmall = WordMappingGroup(header, wmPairs.toStream)
     val dictSmall = Dictionary.fromWordMappings(wmPairs.toStream)
-    val quizGroup = QuizGroup(quizItems.toStream, dictionary = dictSmall)
+    val quizGroup = QuizGroup(quizItems.toStream, QuizGroupUserData(), dictionary = dictSmall)
 
     "be convertible to a QuizGroup" in {
       wmgSmall.toQuizGroup mustEqual quizGroup

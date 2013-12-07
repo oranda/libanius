@@ -17,7 +17,8 @@
 package com.oranda.libanius.model.quizitem
 
 import scala.util.Random
-import com.oranda.libanius.model.{UserResponses, QuizGroupHeader}
+import com.oranda.libanius.model.{UserResponses}
+import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
 /**
  * Quiz item data holder:
@@ -35,7 +36,7 @@ case class QuizItemViewWithChoices(
   lazy val promptType = quizGroupHeader.promptType
   lazy val responseType = quizGroupHeader.responseType
 
-  lazy val allChoices = choicesInRandomOrder(quizItem.userResponses, falseAnswers)
+  lazy val allChoices: List[String] = choicesInRandomOrder(quizItem.userResponses, falseAnswers)
 
   def choicesInRandomOrder(quizValue: UserResponses, otherChoices: Set[String]): List[String] = {
     val allChoices = otherChoices + quizItem.correctResponse.value

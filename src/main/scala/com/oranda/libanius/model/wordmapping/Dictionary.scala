@@ -20,7 +20,8 @@ import scala.collection.JavaConversions.mapAsScalaMap
 
 import scala.collection.immutable.Stream
 import scala.util.Try
-import com.oranda.libanius.model.{QuizGroupHeader, ModelComponent, SearchResult}
+import com.oranda.libanius.model.{ModelComponent, SearchResult}
+import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
 /**
  * A dictionary. A large read-only repository of word mappings, structured as a map

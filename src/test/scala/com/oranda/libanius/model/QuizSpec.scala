@@ -19,6 +19,7 @@ package com.oranda.libanius.model
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{AppDependencyAccess}
 import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, WordMapping, QuizGroupHeader, QuizGroup}
 
 class QuizSpec extends Specification with AppDependencyAccess {
   
@@ -61,21 +62,8 @@ class QuizSpec extends Specification with AppDependencyAccess {
     "add a new quiz item to a specified group" in {
       val quizBefore = Quiz.demoQuiz(quizData)
       val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
-      val newQuizItem = QuizItem("to exchange", "tauschen")
-      val quizUpdated = quizBefore.addQuizItemToFront(qgHeader, newQuizItem)
-      quizUpdated.existsQuizItem(newQuizItem, qgHeader) mustEqual true
-    }
-
-    "delete prompt-words from a particular group" in {
-      val quizBefore = Quiz.demoQuiz(quizData)
-      val wmgBefore = quizBefore.activeQuizGroups.get(
-          QuizGroupHeader(WordMapping, "English word", "German word")).get
-      wmgBefore.contains("full") mustEqual true
-      val quizAfter = quizBefore.removeQuizItemsForPrompt("full",
-          QuizGroupHeader(WordMapping, "English word", "German word"))
-      val wmgAfter = quizAfter.activeQuizGroups.get(
-          QuizGroupHeader(WordMapping, "English word", "German word")).get
-      wmgAfter.contains("full") mustEqual false
+      val quizUpdated = quizBefore.addQuizItemToFront(qgHeader, "to exchange", "tauschen")
+      quizUpdated.existsQuizItem(QuizItem("to exchange", "tauschen"), qgHeader) mustEqual true
     }
 
     "delete a quiz pair without deleting all values for that prompt" in {
@@ -98,7 +86,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
       val quizLocal = Quiz.demoQuiz(quizData)
       quizLocal.numActiveGroups mustEqual 2 // precondition
       val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
-      val newQuizGroup =  QuizGroup(userData = QuizGroupUserData(isActive = true))
+      val newQuizGroup =  QuizGroup(QuizGroupUserData(isActive = true))
       val quizUpdated = quizLocal.addOrReplaceQuizGroup(qgHeader, newQuizGroup)
       quizUpdated.numActiveGroups mustEqual 2
     }
@@ -119,6 +107,15 @@ class QuizSpec extends Specification with AppDependencyAccess {
       quizAfterDeactivation.isActive(header) mustEqual false
       val quizAfterReactivation = quizAfterDeactivation.activate(header)
       quizAfterReactivation.isActive(header) mustEqual true
+    }
+
+    "update a quiz with a user response" in {
+      val quizLocal = Quiz.demoQuiz(quizData)
+      quizLocal.numCorrectAnswers mustEqual 6
+      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
+      val quizItem = QuizItem("against", "wider")
+      val quizUpdated = quizLocal.updateWithUserResponse(true, qgHeader, quizItem)
+      quizUpdated.numCorrectAnswers mustEqual 7
     }
   }
 }

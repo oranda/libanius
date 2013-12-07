@@ -23,7 +23,8 @@ import com.oranda.libanius.model.quizitem.{TextValue, QuizItem, Value}
 
 import java.lang.StringBuilder
 
-case class WordMappingValue(override val value: String, correctAnswersInARow: List[UserResponse] = Nil,
+case class WordMappingValue(override val value: String,
+    correctAnswersInARow: List[UserResponse] = Nil,
     incorrectAnswers: List[UserResponse] = Nil) extends Value[String](value) {
 
   def updated(correctAnswersInARow: List[UserResponse], incorrectAnswers: List[UserResponse]):
@@ -73,8 +74,8 @@ case class WordMappingValue(override val value: String, correctAnswersInARow: Li
 object WordMappingValue extends AppDependencyAccess {
 
   def apply(quizItem: QuizItem): WordMappingValue =
-    WordMappingValue(quizItem.correctResponse.toString, quizItem.userResponses.correctAnswersInARow,
-        quizItem.userResponses.incorrectAnswers)
+    WordMappingValue(quizItem.correctResponse.toString, quizItem.userResponses.correctResponsesInARow,
+        quizItem.userResponses.incorrectResponses)
 
   // Example: str = "nachlösen:1,7,9;6"
   def fromCustomFormat(str: String): WordMappingValue = {

@@ -16,7 +16,7 @@
 
 package com.oranda.libanius.model.quizitem
 
-import com.oranda.libanius.model.UserResponses
+import com.oranda.libanius.model.{UserResponse, UserResponses}
 
 /*
  * A connection between two things, and user information associated with the connection.
@@ -36,11 +36,17 @@ case class QuizItem(prompt: TextValue, correctResponse: TextValue,
     other.prompt == prompt && other.correctResponse == correctResponse
   def isPresentable(currentPromptNumber: Int) = userResponses.isPresentable(currentPromptNumber)
 
-  def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentAnswer
-  def numCorrectAnswersInARow = userResponses.numCorrectAnswersInARow
+  def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
+  def numCorrectAnswersInARow = userResponses.numCorrectResponsesInARow
 }
 
 object QuizItem {
   def apply(prompt: String, response: String): QuizItem =
     QuizItem(TextValue(prompt), TextValue(response), new UserResponses)
+
+  def apply(prompt: String, response: String, correctResponses: List[Int],
+      incorrectResponses: List[Int]): QuizItem =
+    QuizItem(TextValue(prompt), TextValue(response),
+      new UserResponses(correctResponses.map(UserResponse(_)),
+          incorrectResponses.map(UserResponse(_))))
 }

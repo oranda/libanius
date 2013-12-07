@@ -1,12 +1,12 @@
-package com.oranda.libanius.model
+package com.oranda.libanius.model.quizitem
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.{Criteria, UserResponses, UserResponse}
 
-class QuizPairSpec extends Specification with AppDependencyAccess {
+class QuizItemSpec extends Specification with AppDependencyAccess {
 
-  "a quiz pair" should {
+  "a quiz item" should {
 
     val correctAnswersInARow = List(UserResponse(9), UserResponse(7))
     val incorrectAnswers = List(UserResponse(6))

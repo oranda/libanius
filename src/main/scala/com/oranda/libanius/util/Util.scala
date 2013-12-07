@@ -16,15 +16,21 @@
 
 package com.oranda.libanius.util
 
-import com.oranda.libanius.dependencies.{AppDependencyAccess}
+import com.oranda.libanius.dependencies.AppDependencyAccess
 
 object Util extends AppDependencyAccess {
 
   def stopwatch[X](fn: => X, actionDescription: String): X = {
-    val start = System.currentTimeMillis()
-    val result = fn
-    val end = System.currentTimeMillis()
-    l.log("time taken for " + actionDescription + " was " + (end - start) + "ms")
+    val (result, timeTaken) = stopwatch(fn)
+    l.log("time taken for " + actionDescription + " was " + timeTaken + "ms")
     result
   }
+
+  def stopwatch[X](fn: => X): (X, Long) = {
+    val start = System.currentTimeMillis()
+    val result = fn
+    val timeTaken = System.currentTimeMillis() - start
+    (result, timeTaken)
+  }
+
 }

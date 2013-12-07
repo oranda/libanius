@@ -18,13 +18,13 @@ package com.oranda.libanius.dependencies
 
 import com.oranda.libanius.util.Util
 import scala.collection.immutable.Set
-import scala.concurrent.{ future, Future, ExecutionContext }
-import ExecutionContext.Implicits.global
 import scala.util.Try
 import com.oranda.libanius.io.{DefaultIO, PlatformIO}
 import com.oranda.libanius.model.wordmapping.Dictionary
-import com.oranda.libanius.model.{QuizGroup, Quiz, QuizGroupHeader}
+import com.oranda.libanius.model.Quiz
 import java.lang.StringBuilder
+import com.oranda.libanius.model.quizgroup.{QuizGroupHeader, QuizGroup}
+import scala.Some
 
 class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
@@ -93,7 +93,6 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     l.log("reading quiz group from file " + qgPath)
     for {
       qgText <- io.readFile(qgPath)
-      //log("have read qgText " + qgText.take(200) + "... ")
     } yield QuizGroupHeader(qgText).createQuizGroup(qgText)
   }
 
@@ -109,6 +108,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
   def findAvailableQuizGroups: Set[QuizGroupHeader] =
     findAvailableResQuizGroups ++ findAvailableFileNameQuizGroups
+
 
   private def findAvailableResQuizGroups: Set[QuizGroupHeader] = {
     val qgResNames = io.findQgFileNamesFromResources

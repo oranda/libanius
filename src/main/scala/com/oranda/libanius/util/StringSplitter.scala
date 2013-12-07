@@ -33,7 +33,7 @@ class StringSplitterDefault(_char: Character) extends StringSplitter(_char) {
   private var iter: Iterator[String] = _
   
   override def setString(str: String) {
-    iter = str.split("\\" +_char.toString).iterator
+    iter = str.split("\\" +_char.toString).filter(_ != "").iterator
   }
   
   override def hasNext: Boolean = iter.hasNext

@@ -13,14 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oranda.libanius.model
 
-import com.oranda.libanius.model.wordmapping.WordMappingPair
-import com.oranda.libanius.model.quizgroup.QuizGroupHeader
+package com.oranda.libanius.consoleui
 
-case class SearchResult(quizGroupHeader: QuizGroupHeader, wmp: WordMappingPair) {
-  lazy val promptType = quizGroupHeader.promptType
-  lazy val responseType = quizGroupHeader.responseType
-  lazy val keyWord = wmp.key
-  lazy val valueSet = wmp.valueSet
+import Output._
+import com.oranda.libanius.model._
+
+object DemoQuiz extends InteractiveQuiz {
+
+  runQuiz()
+
+  def runQuiz() {
+
+    output("Running demo quiz...")
+    val quiz = Quiz.demoQuiz()
+    output("OK, the quiz begins! To quit, type q at any time.\n")
+    testUserWithQuizItem(quiz)
+  }
+
+  // Don't save the small demo quiz. It should be completed in one sitting if at all.
+  override def saveQuiz(quiz: Quiz) {}
+
 }

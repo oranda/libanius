@@ -18,13 +18,14 @@ package com.oranda.libanius.model.wordmapping
 
 import com.oranda.libanius.model._
 import scala.collection.immutable.{Stream, Iterable}
-import com.oranda.libanius.dependencies.{AppDependencyAccess}
+import com.oranda.libanius.dependencies.AppDependencyAccess
 import scala.collection.mutable.ListBuffer
 import scala.util.Try
 import com.oranda.libanius.util.{GroupByOrderedImplicit}
 import scala.collection.mutable
-import com.oranda.libanius.model.quizitem.{Value, TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import scala.language.implicitConversions
+import com.oranda.libanius.model.quizgroup.{QuizGroupPartition, QuizGroupUserData, QuizGroupHeader, QuizGroup}
 
 /*
  * An intermediate data structure used to persist a "WordMapping" type of quiz group
@@ -41,8 +42,27 @@ case class WordMappingGroup(header: QuizGroupHeader,
             UserResponses(value.correctAnswersInARow, value.incorrectAnswers)))
 
     val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems(_))
-    val dictionary = Dictionary.fromWordMappings(wordMappingPairs)
-    QuizGroup(quizItems, userData, dictionary)
+
+    val quizItemsGrouped: Map[Int, Stream[QuizItem]] =
+      quizItems.groupBy(_.numCorrectAnswersInARow)
+
+    if (quizItemsGrouped.size > conf.numCorrectAnswersRequired + 1) {
+      l.logError("Corrupt data for " + header +
+          ": it looks like there is a quizItem with more than " +
+          conf.numCorrectAnswersRequired + " correct responses stored")
+      QuizGroup()
+
+    } else {
+      val partitions = Array.fill(conf.numCorrectAnswersRequired + 1)(QuizGroupPartition())
+
+      quizItemsGrouped.foreach {
+        case (numCorrectAnswers: Int, quizItems) =>
+          partitions(numCorrectAnswers) = QuizGroupPartition(quizItems)
+      }
+
+      val dictionary = Dictionary.fromWordMappings(wordMappingPairs)
+      QuizGroup(partitions, userData, dictionary)
+    }
   }
 }
 
@@ -58,7 +78,8 @@ object WordMappingGroup extends AppDependencyAccess {
     val wordMappingPairs: Stream[WordMappingPair] =
       (quizGroup.quizItems.groupByOrdered(_.prompt).map {
         case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
-            WordMappingPair(prompt.value, WordMappingValueSet.createFromQuizItems(quizItems.toList))
+            WordMappingPair(prompt.value,
+                WordMappingValueSet.createFromQuizItems(quizItems.toList))
       }).toStream
     WordMappingGroup(header, wordMappingPairs, quizGroup.userData)
   }
@@ -104,7 +125,7 @@ object WordMappingGroup extends AppDependencyAccess {
     }
     Try(parseQuizGroup) recover {
       case e: Exception => l.logError("could not parse wmg with str " + str.take(100) + "..." +
-        str.takeRight(100))
+          str.takeRight(100))
     }
 
     val wordMappingsStream = wordMappingsMutable.toStream

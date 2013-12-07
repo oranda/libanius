@@ -18,20 +18,17 @@ package com.oranda.libanius.model
 
 import scala.collection.immutable._
 
-import com.oranda.libanius.util.StringUtil
-
 import scala.language.postfixOps
 import scala.math.BigDecimal.double2bigDecimal
 import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.wordmapping.Dictionary
 
-import java.lang.StringBuilder
-
 import scalaz._
 import scalaz.std.set
 import Scalaz._, PLens._
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
+import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup}
 
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
     extends ModelComponent {
@@ -53,22 +50,26 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
   /*
    * Find the first available "presentable" quiz item.
-   * Return a quiz item and the quiz group it belongs to.
+   * Return a quiz item view and the associated quiz group header.
    */
-  def findPresentableQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] = {
-    val quizItem = (for {
+  def findPresentableQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] =
+    (for {
       (header, quizGroup) <- activeQuizGroups
-      quizItem <- quizGroup.findPresentableQuizItem(header).toStream
-    } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption
-    quizItem.orElse(findAnyUnfinishedQuizItem)
-  }
+      quizItem <- QuizGroupWithHeader(header, quizGroup).findPresentableQuizItem.toStream
+    } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption.orElse(
+        findAnyUnfinishedQuizItem)
 
+  /*
+   * Near the end of the quiz, there will be items that are "nearly learnt" because they
+   * have been answered correctly several times, but are not considered presentable under
+   * normal criteria, because the last correct response was recent. However, they do need
+   * to be presented in order for the quiz to finish, so this method is called as a last try.
+   */
   def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] =
     (for {
       (header, quizGroup) <- activeQuizGroups
-      quizItem <- quizGroup.findAnyUnfinishedQuizItem(header).toStream
+      quizItem <- QuizGroupWithHeader(header, quizGroup).findAnyUnfinishedQuizItem.toStream
     } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption
-
 
   def resultsBeginningWith(input: String): List[SearchResult] =
     activeQuizGroups.flatMap {
@@ -137,17 +138,8 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
     Quiz.quizGroupsLens.set(this, quizGroups + (header -> quizGroup))
 
   def addQuizItemToFront(header: QuizGroupHeader, prompt: String, response: String): Quiz =
-    addQuizItemToFront(header, QuizItem(prompt, response))
-
-  def addQuizItemToFront(header: QuizGroupHeader, quizItem: QuizItem): Quiz = {
     Quiz.quizGroupsLens.set(this,
-      mapVPLens(header) mod ((_: QuizGroup).addQuizItemToFront(quizItem), quizGroups)
-    )
-  }
-
-  def removeQuizItemsForPrompt(prompt: String, header: QuizGroupHeader): Quiz =
-    Quiz.quizGroupsLens.set(this,
-      mapVPLens(header) mod ((_: QuizGroup).removeQuizItemsForPrompt(prompt), quizGroups)
+      mapVPLens(header) mod ((_: QuizGroup).addNewQuizItem(prompt, response), quizGroups)
     )
 
   def removeQuizItem(prompt: String, response: String, header: QuizGroupHeader): (Quiz, Boolean) =
@@ -158,9 +150,8 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
   def removeQuizItem(quizItem: QuizItem, header: QuizGroupHeader): (Quiz, Boolean) = {
     val quizItemExisted = existsQuizItem(quizItem, header)
-    val quizItemsLens = ~QuizGroup.quizGroupItemsLens compose mapVPLens(header)
     val quiz: Quiz = Quiz.quizGroupsLens.set(this,
-        quizItemsLens.mod(QuizGroup.remove(_: Stream[QuizItem], quizItem), quizGroups))
+        mapVPLens(header) mod ((_: QuizGroup).removeQuizItem(quizItem), quizGroups))
     (quiz, quizItemExisted)
   }
 
@@ -183,22 +174,27 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def qgCurrentPromptNumber(header: QuizGroupHeader): Option[Int] =
     mapVPLens(header).get(activeQuizGroups).map(_.currentPromptNumber)
 
-  def findQuizItem(header: QuizGroupHeader, prompt: String, response: String): Option[QuizItem] =
+  def findQuizItem(header: QuizGroupHeader, prompt: String, response: String):
+      Option[QuizItem] =
     mapVPLens(header).get(activeQuizGroups).flatMap(_.findQuizItem(prompt, response))
 
-  def updateWithUserAnswer(isCorrect: Boolean, quizGroupHeader: QuizGroupHeader,
+  def updateWithUserResponse(isCorrect: Boolean, quizGroupHeader: QuizGroupHeader,
       quizItem: QuizItem): Quiz = {
     qgCurrentPromptNumber(quizGroupHeader) match {
       case Some(qgPromptNumber) =>
         val userAnswer = new UserResponse(qgPromptNumber)
+
         Quiz.quizGroupsLens.set(this,
-          mapVPLens(quizGroupHeader) mod ((_: QuizGroup).updatedWithUserAnswer(
+          mapVPLens(quizGroupHeader) mod ((_: QuizGroup).updatedWithUserResponse(
             quizItem.prompt, quizItem.correctResponse, isCorrect,
             quizItem.userResponses, userAnswer), quizGroups)
         )
       case _ => this
     }
   }
+
+  def nearTheEnd = quizGroups.exists(qgwh =>
+      (qgwh._2.numPrompts - qgwh._2.currentPromptNumber) < Criteria.maxDiffInPromptNumMinimum)
 }
 
 object Quiz extends AppDependencyAccess {
@@ -230,22 +226,23 @@ object Quiz extends AppDependencyAccess {
 
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
-    val quizGroups: Iterable[QuizGroupWithHeader] =
-      quizGroupsData.map(QuizGroup.fromCustomFormat(_))
-    Quiz(quizGroups.map(qgWithHeader => Pair(qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
+    val qgsWithHeader: Iterable[QuizGroupWithHeader] =
+      quizGroupsData.map(QuizGroupWithHeader.fromCustomFormat(_))
+    Quiz(qgsWithHeader.map(
+        qgWithHeader => Pair(qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }
 
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
 
-    "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\"\n" +
+    "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
     "en route|unterwegs\n" +
     "contract|Vertrag\n" +
     "treaty|Vertrag\n" +
     "against|wider\n" +
     "entertain|unterhalten\n",
 
-    "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\"\n" +
+    "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
     "unterwegs|en route\n" +
     "Vertrag|contract/treaty\n" +
     "wider|against\n" +

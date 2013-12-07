@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.oranda.libanius.model
+package com.oranda.libanius.model.quizgroup
 
 import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.wordmapping.WordMappingGroup
 
 import java.lang.StringBuilder
+import com.oranda.libanius.model.ModelComponent
 
 case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String, responseType: String)
     extends ModelComponent {
@@ -42,7 +43,7 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String, res
 
   def createQuizGroup(text: String): QuizGroup = quizGroupType match {
     case WordMapping => WordMappingGroup.fromCustomFormat(text).toQuizGroup
-    case QuestionAndAnswer => QuizGroup.fromCustomFormat(text).quizGroup
+    case QuestionAndAnswer => QuizGroupWithHeader.fromCustomFormat(text).quizGroup
   }
 }
 
