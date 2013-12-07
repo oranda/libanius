@@ -1,3 +1,10 @@
+== 0.9 December 8 2013
+
+  * Partitioned QuizGroup's to make the most common query operations very fast and ensure scalability.
+
+  * Introduced some basic simulations for testing performance.
+
+
 == 0.89 September 30 2013
 
   * Introduced Scalaz lenses to help update the persistent data structure.
