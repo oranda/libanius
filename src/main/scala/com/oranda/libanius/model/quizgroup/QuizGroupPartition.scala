@@ -101,7 +101,6 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
   protected[quizgroup] def isEmpty = quizItems.isEmpty
   protected[quizgroup] def numPrompts = size
   protected[quizgroup] def numResponses = size
-  protected[quizgroup] def numCorrectAnswers: Int = (0 /: quizItems)(_ + _.numCorrectAnswersInARow)
 
   /*
    * Low usage expected. Slow because we are not using a Map for quizItems.

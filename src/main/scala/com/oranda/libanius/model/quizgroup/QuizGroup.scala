@@ -62,7 +62,11 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
   def size = numQuizItems
   def numPrompts = size
   def numResponses = size
-  def numCorrectAnswers: Int = (0 /: partitions)(_ + _.numCorrectAnswers)
+
+  // Because partition index corresponds to numCorrectAnswersInARow, score computation is fast
+  def numCorrectAnswers: Int = partitions.zipWithIndex.foldLeft(0) {
+      case (accum, (partition, index)) => accum + partition.size * index
+  }
 
   def updatedDictionary(newDictionary: Dictionary) =
     QuizGroup.dictionaryLens.set(this, newDictionary)
