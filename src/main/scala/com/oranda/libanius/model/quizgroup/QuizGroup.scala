@@ -42,7 +42,7 @@ import com.oranda.libanius.model.UserResponse
 case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
     userData: QuizGroupUserData = QuizGroupUserData(),
     dictionary: Dictionary = new Dictionary)
-  extends ModelComponent { this: AppDependencyAccess =>
+  extends ModelComponent {
 
   lazy val currentPromptNumber = userData.currentPromptNumber
   lazy val isActive = userData.isActive
