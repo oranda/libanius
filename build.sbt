@@ -21,7 +21,7 @@ unmanagedClasspath in Test <+= (baseDirectory) map { bd => Attributed.blank(bd /
 parallelExecution in Test := true
 
 artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
-  artifact.name + "-0.90." + artifact.extension
+  artifact.name + "-0.91." + artifact.extension
 }
 
 scalacOptions += "-feature"
