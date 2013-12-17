@@ -1,4 +1,5 @@
 quizGroup type="QuestionAndAnswer" promptType="ChildrensQuizQuestion" responseType="Answer" isActive="true" currentPromptNumber="0"
+What are the two basic chemical elements that combine to make water?|Hydrogen (and) oxygen
 What piece of clothing is worn on the head?|Hat
 'Esoh': what common piece of clothing do you get on rearranging the letters?|Shoe
 'Acot': what common piece of clothing do you get on rearranging the letters?|Coat
@@ -256,7 +257,6 @@ What is the science that deals with the universe beyond Earth?|Astronomy
 What is the science that deals with matter and motion?|Physics
 What does a watt measure?|Power(, e.g. from a light bulb)
 What is the most important gas that humans take in when breathing?|Oxygen
-What are the two basic chemical elements that combine to make water?|Hydrogen (and) oxygen
 What is the chemical formula for water?|H2O
 What troublesome gas is emitted by automobiles?|Carbon dioxide
 What is the absence of matter called?|Vacuum

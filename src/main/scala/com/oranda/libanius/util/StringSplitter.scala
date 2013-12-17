@@ -18,7 +18,7 @@ package com.oranda.libanius.util
 
 import java.lang.Character
 
-abstract class StringSplitter(char: Character) extends Iterator[String] {
+abstract class StringSplitter(separator: Character) extends Iterator[String] {
   override def hasNext: Boolean 
   override def next: String 
   def setString(str: String)
@@ -28,12 +28,12 @@ abstract class StringSplitter(char: Character) extends Iterator[String] {
  * Created to have a similar interface to the Android splitter, but done in
  * regular Scala/Java. This is used on a PC and for unit tests.
  */
-class StringSplitterDefault(_char: Character) extends StringSplitter(_char) {
+class StringSplitterDefault(separator: Character) extends StringSplitter(separator) {
 
   private var iter: Iterator[String] = _
   
   override def setString(str: String) {
-    iter = str.split("\\" +_char.toString).filter(_ != "").iterator
+    iter = str.split("\\" + separator.toString).filter(_ != "").iterator
   }
   
   override def hasNext: Boolean = iter.hasNext

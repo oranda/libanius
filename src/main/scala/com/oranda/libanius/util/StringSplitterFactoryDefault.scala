@@ -17,5 +17,5 @@
 package com.oranda.libanius.util
 
 class StringSplitterFactoryDefault extends StringSplitterFactory {
- def getSplitter(char: java.lang.Character) = new StringSplitterDefault(char)
+ def getSplitter(separator: java.lang.Character) = new StringSplitterDefault(separator)
 }

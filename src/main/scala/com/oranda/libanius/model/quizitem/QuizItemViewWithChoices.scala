@@ -17,8 +17,9 @@
 package com.oranda.libanius.model.quizitem
 
 import scala.util.Random
-import com.oranda.libanius.model.{UserResponses}
+import com.oranda.libanius.model.UserResponses
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
+import com.oranda.libanius.dependencies.AppDependencyAccess
 
 /**
  * Quiz item data holder:
@@ -29,7 +30,7 @@ case class QuizItemViewWithChoices(
     val qgCurrentPromptNumber: Int,
     val quizGroupHeader: QuizGroupHeader,
     val falseAnswers: Set[String],
-    val numCorrectAnswersInARow: Int) {
+    val numCorrectAnswersInARow: Int) extends AppDependencyAccess {
 
   lazy val prompt = quizItem.prompt
   lazy val correctResponse = quizItem.correctResponse
@@ -43,6 +44,9 @@ case class QuizItemViewWithChoices(
     Random.shuffle(allChoices.toList)
   }
 
-  // In the future, quiz items with many correct answers might not be multiple choice.
-  def useMultipleChoice = true
+  /*
+   * A quiz item might be presented initially in multiple-choice format,
+   * then later wihout any such assistance.
+   */
+  def useMultipleChoice = numCorrectAnswersInARow < conf.useMultipleChoiceUntil
 }

@@ -25,7 +25,8 @@ import java.lang.StringBuilder
 
 case class WordMappingValue(override val value: String,
     correctAnswersInARow: List[UserResponse] = Nil,
-    incorrectAnswers: List[UserResponse] = Nil) extends Value[String](value) {
+    incorrectAnswers: List[UserResponse] = Nil)
+  extends Value[String](value) {
 
   def updated(correctAnswersInARow: List[UserResponse], incorrectAnswers: List[UserResponse]):
       WordMappingValue =
@@ -44,11 +45,11 @@ case class WordMappingValue(override val value: String,
   def numCorrectAnswersInARow = correctAnswersInARow.size
 
   // Example: nachlösen:1,7,9;6
-  def toCustomFormat(strBuilder: StringBuilder): StringBuilder = {
+  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String): StringBuilder = {
     strBuilder.append(value)
 
     if (!correctAnswersInARow.isEmpty || !incorrectAnswers.isEmpty)
-      strBuilder.append(':')
+      strBuilder.append(mainSeparator)
     if (!correctAnswersInARow.isEmpty)
       StringUtil.mkString(strBuilder, correctAnswersInARow, answerPromptNumber, ',')
     if (!incorrectAnswers.isEmpty) {
@@ -74,35 +75,46 @@ case class WordMappingValue(override val value: String,
 object WordMappingValue extends AppDependencyAccess {
 
   def apply(quizItem: QuizItem): WordMappingValue =
-    WordMappingValue(quizItem.correctResponse.toString, quizItem.userResponses.correctResponsesInARow,
+    WordMappingValue(quizItem.correctResponse.toString,
+        quizItem.userResponses.correctResponsesInARow,
         quizItem.userResponses.incorrectResponses)
 
-  // Example: str = "nachlösen:1,7,9;6"
-  def fromCustomFormat(str: String): WordMappingValue = {
+  // Example: str = "nachlösen|1,7,9;6"
+  def fromCustomFormat(str: String, mainSeparator: String): WordMappingValue = {
 
+    import com.oranda.libanius.util.StringUtil.RichString
+    str.optionalIndex(mainSeparator) match {
+      case Some(index) =>
+        val strResponse = str.substring(0, index)
+        val strAllAnswers = str.substring(index + mainSeparator.length)
+
+        val wmv = WordMappingValue(strResponse.trim)
+        if (strAllAnswers.isEmpty)
+          wmv
+        else {
+          val (correctAnswers, incorrectAnswers) = parseAnswers(strAllAnswers)
+          wmv.addUserAnswersBatch(correctAnswers, incorrectAnswers)
+        }
+      case None => WordMappingValue(str.trim)
+    }
+  }
+
+  private def parseAnswers(strAllAnswers: String): (List[String], List[String]) = {
     // This code needs to be both fast and thread-safe so special "splitters" are used.
-    val wmvSplitter = stringSplitterFactory.getSplitter(':')
     val allAnswersSplitter = stringSplitterFactory.getSplitter(';')
     val answersSplitter = stringSplitterFactory.getSplitter(',')
+    allAnswersSplitter.setString(strAllAnswers)
 
-    wmvSplitter.setString(str)
-    var wmv = new WordMappingValue(wmvSplitter.next)
-    if (wmvSplitter.hasNext) {
-      val strAllAnswers = wmvSplitter.next
-      allAnswersSplitter.setString(strAllAnswers)
-
-      val correctPromptNums = allAnswersSplitter.next
-      answersSplitter.setString(correctPromptNums)
-      val correctAnswers = answersSplitter.toList
-      val incorrectAnswers =
-        if (allAnswersSplitter.hasNext) {
-          val incorrectPromptNums = allAnswersSplitter.next
-          answersSplitter.setString(incorrectPromptNums)
-          answersSplitter.toList
-        } else
-          Nil
-      wmv = wmv.addUserAnswersBatch(correctAnswers, incorrectAnswers)
-    }
-    wmv
+    val correctPromptNums = allAnswersSplitter.next
+    answersSplitter.setString(correctPromptNums)
+    val correctAnswers = answersSplitter.toList
+    val incorrectAnswers =
+      if (allAnswersSplitter.hasNext) {
+        val incorrectPromptNums = allAnswersSplitter.next
+        answersSplitter.setString(incorrectPromptNums)
+        answersSplitter.toList
+      } else
+        Nil
+    (correctAnswers, incorrectAnswers)
   }
 }

@@ -22,6 +22,7 @@ import scala.collection.immutable.Stream
 import scala.util.Try
 import com.oranda.libanius.model.{ModelComponent, SearchResult}
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
+import com.oranda.libanius.model.quizitem.QuizItem
 
 /**
  * A dictionary. A large read-only repository of word mappings, structured as a map
@@ -61,6 +62,15 @@ object Dictionary {
       wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
     }
 
+  def fromQuizItems(quizItems: Stream[QuizItem]) = {
+    new Dictionary() {
+      val wordMappingsStream = WordMappingGroup.quizItemsToWordMappingPairs(quizItems, "|")
+      wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
+    }
+  }
+
+
+
   /*
    * Example:
    *
@@ -88,7 +98,7 @@ object Dictionary {
             if (splitterKeyValue.hasNext) {
               val strValues = splitterKeyValue.next
               // for efficiency, avoid an extra method call into Dictionary here
-              wordMappings.put(strKey, WordMappingValueSetLazyProxy(strValues))
+              wordMappings.put(strKey, WordMappingValueSetLazyProxy("|", strValues))
             }
           }
         }

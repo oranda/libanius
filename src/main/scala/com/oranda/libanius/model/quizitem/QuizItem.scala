@@ -17,6 +17,7 @@
 package com.oranda.libanius.model.quizitem
 
 import com.oranda.libanius.model.{UserResponse, UserResponses}
+import com.oranda.libanius.model.wordmapping.WordMappingValue
 
 /*
  * A connection between two things, and user information associated with the connection.
@@ -30,7 +31,7 @@ import com.oranda.libanius.model.{UserResponse, UserResponses}
  *  - a word and a translation
  */
 case class QuizItem(prompt: TextValue, correctResponse: TextValue,
-    userResponses: UserResponses = UserResponses()) {
+    userResponses: UserResponses = new UserResponses()) {
 
   def samePromptAndResponse(other: QuizItem) =
     other.prompt == prompt && other.correctResponse == correctResponse
@@ -38,15 +39,36 @@ case class QuizItem(prompt: TextValue, correctResponse: TextValue,
 
   def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
   def numCorrectAnswersInARow = userResponses.numCorrectResponsesInARow
+
+  def looselyMatches(userResponse: String): Boolean =
+    correctResponse.looselyMatches(userResponse)
+
+  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String) = {
+    strBuilder.append(prompt).append(mainSeparator).append(correctResponse).
+        append(mainSeparator)
+    userResponses.toCustomFormat(strBuilder, mainSeparator)
+    strBuilder
+  }
+
 }
 
 object QuizItem {
   def apply(prompt: String, response: String): QuizItem =
-    QuizItem(TextValue(prompt), TextValue(response), new UserResponses)
+    QuizItem(TextValue(prompt), TextValue(response))
 
   def apply(prompt: String, response: String, correctResponses: List[Int],
       incorrectResponses: List[Int]): QuizItem =
     QuizItem(TextValue(prompt), TextValue(response),
       new UserResponses(correctResponses.map(UserResponse(_)),
           incorrectResponses.map(UserResponse(_))))
+
+  def fromCustomFormat(strPromptResponse: String, mainSeparator: String = "|") = {
+    val i = strPromptResponse.indexOf(mainSeparator)
+    val strPrompt = strPromptResponse.substring(0, i).trim
+    val strResponseAndUserInfo = strPromptResponse.substring(i + mainSeparator.length)
+
+    val wmv = WordMappingValue.fromCustomFormat(strResponseAndUserInfo, mainSeparator)
+    val userResponses = UserResponses(wmv.correctAnswersInARow, wmv.incorrectAnswers)
+    QuizItem(TextValue(strPrompt), TextValue(wmv.value), userResponses)
+  }
 }

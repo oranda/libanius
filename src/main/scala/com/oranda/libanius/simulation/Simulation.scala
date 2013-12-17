@@ -145,7 +145,7 @@ trait Simulation {
   private def processUserResponse(quiz: Quiz, userResponseTxt: String,
       quizItem: QuizItemViewWithChoices): Quiz = {
     val correctAnswer = quizItem.correctResponse
-    val isCorrect = correctAnswer.matches(userResponseTxt)
+    val isCorrect = correctAnswer.looselyMatches(userResponseTxt)
     if (isCorrect) output("Correct!") else output("Wrong! It's " + correctAnswer)
     showScore(quiz)
     val (quizUpdated, timeTaken) = Util.stopwatch(quiz.updateWithUserResponse(

@@ -161,7 +161,6 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def addQuizItemToFrontOfTwoGroups(header: QuizGroupHeader,
       prompt: String, response: String): Quiz = {
 
-    l.log("Adding to 2 quizGroups: " + prompt + "," + response)
     // E.g. add to the English -> German group
     val quizUpdated1 = addQuizItemToFront(header, prompt, response)
 
@@ -227,7 +226,7 @@ object Quiz extends AppDependencyAccess {
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
     val qgsWithHeader: Iterable[QuizGroupWithHeader] =
-      quizGroupsData.map(QuizGroupWithHeader.fromCustomFormat(_))
+      quizGroupsData.map(QuizGroupWithHeader.fromCustomFormat(_) )
     Quiz(qgsWithHeader.map(
         qgWithHeader => Pair(qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }
@@ -244,7 +243,8 @@ object Quiz extends AppDependencyAccess {
 
     "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
     "unterwegs|en route\n" +
-    "Vertrag|contract/treaty\n" +
+    "Vertrag|contract\n" +
+    "Vertrag|treaty\n" +
     "wider|against\n" +
     "unterhalten|entertain"
   )

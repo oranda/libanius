@@ -25,6 +25,7 @@ object Conf {
     new Conf(
       enableLogging = config.getBoolean("libanius.enableLogging"),
       numCorrectAnswersRequired = config.getInt("libanius.numCorrectAnswersRequired"),
+      useMultipleChoiceUntil = config.getInt("libanius.useMultipleChoiceUntil"),
       fileQuizRoot = config.getString("libanius.file.quizRoot"),
       filesDir = config.getString("libanius.file.filesDir"),
       resourcesDir = config.getString("libanius.file.resourcesDir"),
@@ -37,6 +38,7 @@ object Conf {
     new Conf(
       enableLogging = false,
       numCorrectAnswersRequired = 4,
+      useMultipleChoiceUntil = 4,
       fileQuizRoot = "",
       filesDir = "",
       resourcesDir = "",
@@ -49,6 +51,7 @@ object Conf {
     new Conf(
       enableLogging = true,
       numCorrectAnswersRequired = 4,
+      useMultipleChoiceUntil = 4,
       fileQuizRoot,
       filesDir = "",
       resourcesDir = "",
@@ -63,6 +66,7 @@ object Conf {
 class Conf(
     val enableLogging: Boolean,
     val numCorrectAnswersRequired: Int,
+    val useMultipleChoiceUntil: Int,
     val fileQuizRoot: String,
     val filesDir: String,
     val resourcesDir: String,

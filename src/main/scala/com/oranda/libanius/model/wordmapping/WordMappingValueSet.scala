@@ -30,7 +30,8 @@ import scala.language.implicitConversions
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
  */
-case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends ModelComponent {
+case class WordMappingValueSet(values: List[WordMappingValue] = Nil)
+    extends ModelComponent {
 
   def updated(values: List[WordMappingValue]) = WordMappingValueSet(values)
 
@@ -42,17 +43,20 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends Mod
   def filterOut(value: String): WordMappingValueSet =
     updated(values.filterNot(_.value == value))
 
-  def removeValue(value: String) =
-    filterOut(value)
+  def removeValue(value: String) = filterOut(value)
 
   override def toString = values.toString
 
   // Example: contract:696,697;698/treaty:796;798
-  def toCustomFormat(strBuilder: StringBuilder) =
-    StringUtil.mkString(strBuilder, values, wmvToCustomFormat, '/')
+  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String) = {
 
-  def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue): StringBuilder =
-    wmv.toCustomFormat(strBuilder)
+    def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue): StringBuilder =
+      wmv.toCustomFormat(strBuilder, mainSeparator)
+
+    StringUtil.mkString(strBuilder, values, wmvToCustomFormat, '/')
+  }
+
+
 
   def strings: Iterable[String] = values.map(_.value)
 
@@ -68,25 +72,27 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends Mod
 
 object WordMappingValueSet extends AppDependencyAccess {
 
-  def apply(values: WordMappingValue*): WordMappingValueSet = WordMappingValueSet(values:_*)
+  //def apply(mainSeparator: String, values: WordMappingValue*): WordMappingValueSet =
+  //  WordMappingValueSet(mainSeparator, values:_*)
 
-  def createFromStrings(values: String*): WordMappingValueSet = WordMappingValueSet(values.map(
-    WordMappingValue(_)).toList)
-  def createFromQuizItems(quizItems: List[QuizItem]): WordMappingValueSet =
+  def createFromStrings(values: String*): WordMappingValueSet =
+    WordMappingValueSet(values.map(WordMappingValue(_)).toList)
+
+  def createFromQuizItems(quizItems: List[QuizItem], mainSeparator: String): WordMappingValueSet =
     WordMappingValueSet(quizItems.map(WordMappingValue(_)).toList)
 
   def combineValueSets(valueSets: Iterable[WordMappingValueSet]): List[WordMappingValue] =
     valueSets.flatMap(_.values).toList
 
   // Example: contract:696,697;698/treaty:796;798
-  def fromCustomFormat(str: String): WordMappingValueSet = {
+  def fromCustomFormat(str: String, mainSeparator: String): WordMappingValueSet = {
     val values = new ListBuffer[WordMappingValue]()
     val wmvsSplitter = stringSplitterFactory.getSplitter('/')
     def parseFromCustomFormat {
       wmvsSplitter.setString(str)
       while (wmvsSplitter.hasNext) {
         val nextVal = wmvsSplitter.next
-        values += WordMappingValue.fromCustomFormat(nextVal)
+        values += WordMappingValue.fromCustomFormat(nextVal, mainSeparator)
       }
     }
     Try(parseFromCustomFormat) recover {
@@ -112,20 +118,24 @@ object WordMappingValueSetWrapperBase {
  * Because deserializing a WordMappingValueSet is slow, it is wrapped in a Proxy that
  * supports lazy initialization.
  */
-case class WordMappingValueSetLazyProxy(strValues: String)
+case class WordMappingValueSetLazyProxy(strValues: String, mainSeparator: String)
     extends WordMappingValueSetWrapperBase {   
   
-  lazy val wmvs: WordMappingValueSet = WordMappingValueSet.fromCustomFormat(strValues)
+  lazy val wmvs: WordMappingValueSet =
+    WordMappingValueSet.fromCustomFormat(strValues, mainSeparator)
 }
 
 /*
  * When a new WordMappingValueSet is generated from a proxied WordMappingValueSet, it needs to be
  * wrapped in order to have a type compatible with the original WordMappingValueSetLazyProxy.
  */
-case class WordMappingValueSetWrapper(wmvs: WordMappingValueSet)
+case class WordMappingValueSetWrapper(wmvs: WordMappingValueSet, mainSeparator: String)
     extends WordMappingValueSetWrapperBase
 
 object WordMappingValueSetWrapper {
-  def apply(values: List[String]): WordMappingValueSetWrapper =
-    WordMappingValueSetWrapper(WordMappingValueSet(values.map(WordMappingValue(_))))
+  def apply(values: List[String], mainSeparator: String): WordMappingValueSetWrapper = {
+    val wmvs = values.map(WordMappingValue(_)).toList
+    WordMappingValueSetWrapper(WordMappingValueSet(wmvs), mainSeparator)
+  }
+
 }

@@ -31,6 +31,7 @@ class ConfigProviderDefault extends ConfigProvider {
     new Conf(
       enableLogging = config.getBoolean("libanius.enableLogging"),
       numCorrectAnswersRequired = config.getInt("libanius.numCorrectAnswersRequired"),
+      useMultipleChoiceUntil = config.getInt("libanius.useMultipleChoiceUntil"),
       fileQuizRoot = config.getString("libanius.file.quizRoot"),
       filesDir = config.getString("libanius.file.filesDir"),
       resourcesDir = config.getString("libanius.file.resourcesDir"),
@@ -46,6 +47,7 @@ class ConfigProviderMock extends ConfigProvider {
     new Conf(
       enableLogging = false,
       numCorrectAnswersRequired = 4,
+      useMultipleChoiceUntil = 4,
       fileQuizRoot = "",
       filesDir = "",
       resourcesDir = "",

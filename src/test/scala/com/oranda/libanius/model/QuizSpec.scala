@@ -33,48 +33,52 @@ class QuizSpec extends Specification with AppDependencyAccess {
         "teach|unterrichten\n" +
         "winner|Siegerin\n" +
         "en route|unterwegs\n" +
-        "full|satt/voll\n" +
+        "full|satt\n" +
+        "full|voll\n" +
         "interrupted|unterbrochen\n" +
         "contract|Vertrag\n" +
         "rides|reitet\n" +
         "on|auf\n" +
-        "sweeps|streicht:100,200,300;405\n",
+        "sweeps|streicht|100,200,300;405\n",
 
         "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
         "unterwegs|en route\n" +
-        "Vertrag|contract:697,696;698/treaty:796;798")
+        "Vertrag|contract|697,696;698\n" +
+        "Vertrag|treaty|796;798\n")
 
     val quiz = Quiz.demoQuiz(quizData)
 
     "find values for a prompt" in {
       val quizLocal = Quiz.demoQuiz(quizData)
-      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
+      quizLocal.numQuizItems mustEqual 15
+
+      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word", "|")
       quizLocal.findResponsesFor("on", qgHeader) mustEqual List("auf")
     }
     
     "offer translations for a word, given the group of the word" in { 
       val translations = quiz.findResponsesFor(prompt = "Vertrag",
-          QuizGroupHeader(WordMapping, "German word", "English word")).toSet[String]
+          QuizGroupHeader(WordMapping, "German word", "English word", "|")).toSet[String]
       translations.contains("contract") mustEqual true
       translations.contains("treaty") mustEqual true
     }
 
     "add a new quiz item to a specified group" in {
       val quizBefore = Quiz.demoQuiz(quizData)
-      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
+      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word", "|")
       val quizUpdated = quizBefore.addQuizItemToFront(qgHeader, "to exchange", "tauschen")
       quizUpdated.existsQuizItem(QuizItem("to exchange", "tauschen"), qgHeader) mustEqual true
     }
 
     "delete a quiz pair without deleting all values for that prompt" in {
       val quizBefore = Quiz.demoQuiz(quizData)
-      val qgHeader = QuizGroupHeader(WordMapping, "German word", "English word")
+      val qgHeader = QuizGroupHeader(WordMapping, "German word", "English word", "|")
       def translationsOfVertrag(quiz: Quiz) = quiz.findResponsesFor(prompt = "Vertrag", qgHeader)
       translationsOfVertrag(quizBefore).contains("contract") mustEqual true
 
       val (quizAfter, wasRemoved) = quizBefore.removeQuizItem(
           prompt = "Vertrag", response = "contract",
-          QuizGroupHeader(WordMapping, "German word", "English word"))
+          QuizGroupHeader(WordMapping, "German word", "English word", "|"))
 
       wasRemoved mustEqual true
       val translationsOfVertragAfter = translationsOfVertrag(quizAfter)
@@ -85,7 +89,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
     "contain unique groups only" in {
       val quizLocal = Quiz.demoQuiz(quizData)
       quizLocal.numActiveGroups mustEqual 2 // precondition
-      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
+      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word", "|")
       val newQuizGroup =  QuizGroup(QuizGroupUserData(isActive = true))
       val quizUpdated = quizLocal.addOrReplaceQuizGroup(qgHeader, newQuizGroup)
       quizUpdated.numActiveGroups mustEqual 2
@@ -101,7 +105,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
 
     "activate and deactivate quiz groups" in {
       val quizLocal = Quiz.demoQuiz(quizData)
-      val header = QuizGroupHeader(WordMapping, "English word", "German word")
+      val header = QuizGroupHeader(WordMapping, "English word", "German word", "|")
       quizLocal.isActive(header) mustEqual true
       val quizAfterDeactivation = quizLocal.deactivate(header)
       quizAfterDeactivation.isActive(header) mustEqual false
@@ -112,7 +116,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
     "update a quiz with a user response" in {
       val quizLocal = Quiz.demoQuiz(quizData)
       quizLocal.numCorrectAnswers mustEqual 6
-      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word")
+      val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word", "|")
       val quizItem = QuizItem("against", "wider")
       val quizUpdated = quizLocal.updateWithUserResponse(true, qgHeader, quizItem)
       quizUpdated.numCorrectAnswers mustEqual 7

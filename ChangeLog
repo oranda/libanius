@@ -1,3 +1,14 @@
+== 0.91 December 16 2013
+
+  * Simplification: QuizGroup is persisted directly rather than going through WordMappingGroup.
+
+  * Reintroduced: allow correct responses in quizzes to contain optional parts specified by parentheses.
+
+  * Separator strings are now configurable at the head of each quiz group file.
+
+  * New configuration option to turn off multiple choice in a quiz.
+
+
 == 0.9 December 8 2013
 
   * Partitioned QuizGroup's to make the most common query operations very fast and ensure scalability.

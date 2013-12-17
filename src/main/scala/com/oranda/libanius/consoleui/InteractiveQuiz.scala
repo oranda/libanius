@@ -27,7 +27,7 @@ import com.oranda.libanius.model.quizgroup.{WordMapping, QuizGroupHeader, QuizGr
 trait InteractiveQuiz extends App with AppDependencyAccess {
 
   def userQuizGroupSelection(quizGroupHeaders: List[QuizGroupHeader]):
-  Map[QuizGroupHeader, QuizGroup] = {
+      Map[QuizGroupHeader, QuizGroup] = {
     output("Choose quiz group(s). For more than one, separate with commas, e.g. 1,2,3")
     val choices = ChoiceGroup[QuizGroupHeader](quizGroupHeaders)
     choices.show()
@@ -76,12 +76,13 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   }
 
   def showQuizItemAndProcessResponse(quiz: Quiz, quizItem: QuizItemViewWithChoices):
-  (UserConsoleResponse, Quiz) = {
-    val wordText = ": what is the " + quizItem.responseType + " for this " + quizItem.promptType + "?"
+      (UserConsoleResponse, Quiz) = {
+    val wordText = ": what is the " + quizItem.responseType + " for this " +
+        quizItem.promptType + "?"
     val answeredText = " (correctly answered " + quizItem.numCorrectAnswersInARow + " times)"
     val questionText = quizItem.prompt +
-      (if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else "") +
-      (if (quizItem.numCorrectAnswersInARow > 0) answeredText else "")
+        (if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else "") +
+        (if (quizItem.numCorrectAnswersInARow > 0) answeredText else "")
     output(questionText + "\n")
 
     if (quizItem.useMultipleChoice) showChoicesAndProcessResponse(quiz, quizItem)
@@ -89,7 +90,7 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   }
 
   def showChoicesAndProcessResponse(quiz: Quiz, quizItem: QuizItemViewWithChoices):
-  (UserConsoleResponse, Quiz) = {
+      (UserConsoleResponse, Quiz) = {
     val choices = ChoiceGroup[String](quizItem.allChoices)
     choices.show()
 
@@ -99,13 +100,13 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   }
 
   def getTextResponseAndProcess(quiz: Quiz, quizItem: QuizItemViewWithChoices):
-  (UserConsoleResponse, Quiz) =
+      (UserConsoleResponse, Quiz) =
     Try(getAnswerFromInput).recover {
       case e: Exception => Invalid
     }.map(userResponse => processAnswer(quiz, userResponse, quizItem)).get
 
   def processAnswer(quiz: Quiz, userResponse: UserConsoleResponse,
-                    quizItem: QuizItemViewWithChoices): (UserConsoleResponse, Quiz) = {
+      quizItem: QuizItemViewWithChoices): (UserConsoleResponse, Quiz) = {
     val updatedQuiz = userResponse match {
       case answer: Answer => processUserAnswer(quiz, answer.text, quizItem)
       case _ => quiz
@@ -114,20 +115,33 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   }
 
   def processUserAnswer(quiz: Quiz, userAnswerTxt: String,
-                        quizItem: QuizItemViewWithChoices): Quiz = {
+      quizItem: QuizItemViewWithChoices): Quiz = {
     val correctAnswer = quizItem.correctResponse
-    val isCorrect = correctAnswer.matches(userAnswerTxt)
+    val isCorrect = correctAnswer.looselyMatches(userAnswerTxt)
     if (isCorrect) output("\nCorrect!\n") else output("\nWrong! It's " + correctAnswer + "\n")
 
     Util.stopwatch(quiz.updateWithUserResponse(isCorrect, quizItem.quizGroupHeader,
-      quizItem.quizItem), "updateQuiz")
+        quizItem.quizItem), "updateQuiz")
   }
 
   def getAnswerFromInput: UserConsoleResponse =
-    readLine match {
+    readLineUntilNoBackspaces match {
       case "q" => Quit
       case "quit" => Quit
       case input: String => TextAnswer(input)
     }
+
+  /*
+   * Predef readLine does not allow backspacing. This is a hack until libanius SBT is
+   * upgraded to a version that is not incompatible with jline 2.11.
+   */
+  def readLineUntilNoBackspaces: String = {
+    val s = readLine
+    val extendedCode: (Char) => Boolean = (c:Char) => (c == 127)
+    if (!s.exists(extendedCode)) s else {
+      println("backspace detected: try again")
+      readLineUntilNoBackspaces
+    }
+  }
 }
 

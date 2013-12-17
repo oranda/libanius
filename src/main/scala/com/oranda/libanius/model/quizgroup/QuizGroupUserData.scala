@@ -41,13 +41,13 @@ object QuizGroupUserData extends AppDependencyAccess {
     this(parseIsActive(headerLine), parseCurrentPromptNumber(headerLine))
 
   def parseIsActive(str: String): Boolean =
-    Try(StringUtil.parseValue(str, "isActive=\"", "\"").toBoolean).recover {
+    Try(StringUtil.parseValue(str, "isActive=\"", "\"").get.toBoolean).recover {
       case e: Exception => l.logError("Could not parse isActive from " + str)
         false
     }.get
 
   def parseCurrentPromptNumber(str: String): Int =
-    Try(StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").toInt).recover {
+    Try(StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").get.toInt).recover {
       case e: Exception => l.logError("Could not parse prompt number from " + str)
         0
     }.get

@@ -23,8 +23,7 @@ import java.lang.StringBuilder
 import scalaz._
 
 case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
-    incorrectResponses: List[UserResponse] = Nil)
-  extends ModelComponent {
+    incorrectResponses: List[UserResponse] = Nil) extends ModelComponent {
 
   def updated(value: String, correctResponsesInARow: List[UserResponse],
       incorrectResponses: List[UserResponse]): UserResponses =
@@ -54,7 +53,6 @@ case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
     numCorrectResponsesInARow == 0 || Criteria.criteriaSets.exists(_.isPresentable(
         currentPromptNum, promptNumInMostRecentResponse, numCorrectResponsesInARow))
 
-
   def isUnfinished: Boolean = numCorrectResponsesInARow < conf.numCorrectAnswersRequired
   
   def numCorrectResponsesInARow = correctResponsesInARow.length
@@ -68,9 +66,7 @@ case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
     UserResponses(correctResponsesInARow, incorrectResponses)
 
   // Example: nachlösen:1,7,9;6
-  def toCustomFormat(strBuilder: StringBuilder): StringBuilder = {
-    if (!correctResponsesInARow.isEmpty || !incorrectResponses.isEmpty)
-      strBuilder.append(':')
+  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String): StringBuilder = {
     if (!correctResponsesInARow.isEmpty)
       StringUtil.mkString(strBuilder, correctResponsesInARow, responsePromptNumber, ',')
     if (!incorrectResponses.isEmpty) {

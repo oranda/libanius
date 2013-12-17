@@ -20,6 +20,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 
 import com.oranda.libanius.model.{UserResponse, UserResponses}
+import java.lang.StringBuilder
 
 class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
 
@@ -42,20 +43,37 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
     Construct a quiz group partition.
     */
     def makeQgPartition: QuizGroupPartition = QuizGroupPartition(List(
-      QuizItem("against", "wider"),
-      QuizItem("entertain", "unterhalten"),
-      QuizItem("teach", "unterrichten"),
-      QuizItem("winner", "Siegerin"),
-      QuizItem("en route", "unterwegs"),
-      QuizItem("full", "satt/voll"),
-      QuizItem("interrupted", "unterbrochen"),
-      QuizItem("contract", "Vertrag"),
-      QuizItem("rides", "reitet"),
-      QuizItem("on", "auf"),
-      QuizItem("sweeps", "streicht")).toStream)
+        QuizItem("against", "wider"),
+        QuizItem("entertain", "unterhalten"),
+        QuizItem("teach", "unterrichten"),
+        QuizItem("winner", "Siegerin"),
+        QuizItem("en route", "unterwegs"),
+        QuizItem("full", "satt"),
+        QuizItem("full", "voll"),
+        QuizItem("interrupted", "unterbrochen"),
+        QuizItem("contract", "Vertrag"),
+        QuizItem("rides", "reitet"),
+        QuizItem("on", "auf"),
+        QuizItem("sweeps", "streicht")).toStream)
+
+    def makeQgPartitionSimple: QuizGroupPartition = QuizGroupPartition(List(
+        QuizItem("against", "wider"),
+        QuizItem("entertain", "unterhalten")).toStream)
+
 
     // defaults for read-only
     val qgPartition = makeQgPartition
+    val qgPartitionSimple = makeQgPartitionSimple
+
+    val qgPartitionSimpleCustomFormat =
+        "against|wider|\n" +
+        "entertain|unterhalten|\n"
+
+
+    "be serializable to custom format" in {
+      val customFormat = qgPartitionSimple.toCustomFormat(new StringBuilder(), "|")
+      customFormat.toString mustEqual qgPartitionSimpleCustomFormat
+    }
 
     "find values for a prompt" in {
       qgPartition.findResponsesFor("on") mustEqual List("auf")

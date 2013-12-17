@@ -21,10 +21,14 @@ import java.lang.StringBuilder
 
 object StringUtil {
     
-  def parseValue(str: String, beginStr: String, endStr: String) = {
-    val beginIndex = str.indexOf(beginStr) + beginStr.length
-    val endIndex = str.indexOf(endStr, beginIndex + 1)
-    str.substring(beginIndex, endIndex)
+  def parseValue(str: String, beginStr: String, endStr: String): Option[String] = {
+
+    val beginIndex = str.optionalIndex(beginStr)
+    beginIndex.flatMap { case beginIndex =>
+      val beginTextIndex: Int = beginIndex + beginStr.length
+      val endTextIndex: Option[Int] = str.optionalIndex(endStr, beginTextIndex + 1)
+      endTextIndex.map(str.substring(beginTextIndex, _))
+    }
   }
   
   /*
@@ -46,5 +50,18 @@ object StringUtil {
     val scoreStr = (score * 100).toString
     val scoreStrMaxIndex = scala.math.min(scoreStr.length, 6)
     scoreStr.substring(0, scoreStrMaxIndex) + "%\n"
+  }
+
+  implicit class RichString(s: String) {
+    def removeAll(substr: String): String = s.replaceAll(substr, "")
+    def optionalIndex(substr: String): Option[Int] = {
+      val index = s.indexOf(substr)
+      if (index == -1) None else Some(index)
+    }
+    def optionalIndex(substr: String, from: Int): Option[Int] = {
+      val index = s.indexOf(substr, from)
+      if (index == -1) None else Some(index)
+    }
+
   }
 }

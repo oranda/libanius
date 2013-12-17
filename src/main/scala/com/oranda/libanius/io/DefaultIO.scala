@@ -68,8 +68,8 @@ class DefaultIO extends PlatformIO {
   }
 
   override def findQgFileNamesFromFilesDir =
-    new File(conf.filesDir).listFiles.filter(_.getName.endsWith(".qg")).map(_.getName)
+    new File(conf.filesDir).listFiles.filter(_.getName.endsWith(".qgr")).map(_.getName)
 
   override def findQgFileNamesFromResources =
-    new File(conf.resourcesDir).listFiles.filter(_.getName.startsWith("qg")).map(_.getName)
+    new File(conf.resourcesDir).listFiles.filter(_.getName.startsWith("qgr")).map(_.getName)
 }

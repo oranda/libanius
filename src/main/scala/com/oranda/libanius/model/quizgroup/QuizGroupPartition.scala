@@ -33,6 +33,7 @@ import scala.collection.immutable.Stream
 import scala.collection.immutable.Seq
 import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
+import java.lang.StringBuilder
 
 /*
  * A subgroup of a QuizGroup, containing quiz items which have all been answered
@@ -185,6 +186,14 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
       val randomStart = Random.nextInt(size - sliceSize)
       quizItems.slice(randomStart, randomStart + sliceSize)
     }
+
+  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String) = {
+    for (quizItem <- quizItems.toStream) {
+      quizItem.toCustomFormat(strBuilder, mainSeparator)
+      strBuilder.append('\n')
+    }
+    strBuilder
+  }
 }
 
 object QuizGroupPartition extends AppDependencyAccess {

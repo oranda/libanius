@@ -13,6 +13,28 @@ class QuizItemSpec extends Specification with AppDependencyAccess {
     val userResponses = UserResponses(correctAnswersInARow, incorrectAnswers)
     val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponses)
 
+    val quizItemCustomFormat = "solve|nachlösen|9,7;6"
+
+    "be serializable to custom format" in {
+      val customFormat = quizItem.toCustomFormat(new StringBuilder(), "|")
+      customFormat.toString mustEqual quizItemCustomFormat
+    }
+
+    "be parseable from custom format with the standard separator" in {
+      val quizItemStr = "on|auf|"
+      val quizItem = QuizItem.fromCustomFormat(quizItemStr)
+      val quizItemExpected = QuizItem("on", "auf")
+      quizItem mustEqual quizItemExpected
+    }
+
+    "be parseable from custom format with a special separator" in {
+      val quizItemStr = "Given a String s = \"2.3\" convert it to a Double ||| s.toDouble"
+      val quizItem = QuizItem.fromCustomFormat(quizItemStr, "|||")
+      val quizItemExpected = QuizItem("Given a String s = \"2.3\" convert it to a Double",
+          "s.toDouble")
+      quizItem mustEqual quizItemExpected
+    }
+
     def isPresentable(quizItem: QuizItem, numCorrectAnswersInARowDesired: Int,
         diffInPromptNumMinimum: Int, currentPromptNum: Int) = {
       val criteria = Criteria(numCorrectAnswersInARowDesired, diffInPromptNumMinimum)
@@ -20,7 +42,7 @@ class QuizItemSpec extends Specification with AppDependencyAccess {
           quizItem.numCorrectAnswersInARow)
     }
 
-    "is presentable in the quiz, given certain criteria" in {
+    "be presentable in the quiz, given certain criteria" in {
 
       isPresentable(quizItem, numCorrectAnswersInARowDesired = 2,
           diffInPromptNumMinimum = 2, currentPromptNum = 11) mustEqual true

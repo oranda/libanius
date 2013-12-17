@@ -13,10 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.oranda.libanius.util
 
-trait StringSplitterFactory {
-  def getSplitter(separator: java.lang.Character): StringSplitter
-}
+import org.specs2.mutable.Specification
+import com.oranda.libanius.dependencies.AppDependencyAccess
 
+class StringUtilSpec extends Specification with AppDependencyAccess {
+
+  "a string should " should {
+    "allow a substring to be extracted based on enclosing substrings specified" in {
+      val str = "promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" currentPromptNumber=\"10\" isActive=\"true\""
+      val substr = StringUtil.parseValue(str, "isActive=\"", "\"")
+      substr mustEqual Some("true")
+    }
+  }
+}

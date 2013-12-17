@@ -24,18 +24,18 @@ class WordMappingValueSetSpec extends Specification with AppDependencyAccess {
 
   "a word-mapping-value-set" should {
 
-    val wmvsCustomFormat = "contract:698,696;697/treaty:796;798"
+    val wmvsCustomFormat = "contract|698,696;697/treaty|796;798"
 
-    val wmvs = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
+    val wmvs = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat, "|")
 
     "be parseable from custom format" in {
       wmvs.containsValue("treaty")
       wmvs.size mustEqual 2
-      wmvs.toCustomFormat(new StringBuilder("")).toString mustEqual wmvsCustomFormat
+      wmvs.toCustomFormat(new StringBuilder(""), "|").toString mustEqual wmvsCustomFormat
     }
 
     "allow a word-mapping value to be added" in {
-      val wmvsLocal = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat)
+      val wmvsLocal = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat, "|")
       val wmvsNew = wmvsLocal.addValueToEnd(WordMappingValue("agreement"))
       wmvsNew.size mustEqual 3
     }

@@ -25,7 +25,7 @@ import com.oranda.libanius.util.{GroupByOrderedImplicit}
 import scala.collection.mutable
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import scala.language.implicitConversions
-import com.oranda.libanius.model.quizgroup.{QuizGroupPartition, QuizGroupUserData, QuizGroupHeader, QuizGroup}
+import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, QuizGroupHeader, QuizGroup}
 
 /*
  * An intermediate data structure used to persist a "WordMapping" type of quiz group
@@ -43,45 +43,29 @@ case class WordMappingGroup(header: QuizGroupHeader,
 
     val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems(_))
 
-    val quizItemsGrouped: Map[Int, Stream[QuizItem]] =
-      quizItems.groupBy(_.numCorrectAnswersInARow)
-
-    if (quizItemsGrouped.size > conf.numCorrectAnswersRequired + 1) {
-      l.logError("Corrupt data for " + header +
-          ": it looks like there is a quizItem with more than " +
-          conf.numCorrectAnswersRequired + " correct responses stored")
-      QuizGroup()
-
-    } else {
-      val partitions = Array.fill(conf.numCorrectAnswersRequired + 1)(QuizGroupPartition())
-
-      quizItemsGrouped.foreach {
-        case (numCorrectAnswers: Int, quizItems) =>
-          partitions(numCorrectAnswers) = QuizGroupPartition(quizItems)
-      }
-
-      val dictionary = Dictionary.fromWordMappings(wordMappingPairs)
-      QuizGroup(partitions, userData, dictionary)
-    }
+    QuizGroup(quizItems, userData, new Dictionary())
   }
 }
 
 object WordMappingGroup extends AppDependencyAccess {
 
   def fromQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup): WordMappingGroup = {
+    val wordMappingPairs = quizItemsToWordMappingPairs(quizGroup.quizItems, header.mainSeparator)
+    WordMappingGroup(header, wordMappingPairs, quizGroup.userData)
+  }
 
+  def quizItemsToWordMappingPairs(quizItems: Stream[QuizItem], mainSeparator: String):
+      Stream[WordMappingPair] = {
     // Get access to the groupByOrdered functor
     implicit def traversableToGroupByOrderedImplicit[A](t: Traversable[A]):
-        GroupByOrderedImplicit[A] =
+    GroupByOrderedImplicit[A] =
       new GroupByOrderedImplicit[A](t)
 
-    val wordMappingPairs: Stream[WordMappingPair] =
-      (quizGroup.quizItems.groupByOrdered(_.prompt).map {
+    (quizItems.groupByOrdered(_.prompt).map {
         case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
-            WordMappingPair(prompt.value,
-                WordMappingValueSet.createFromQuizItems(quizItems.toList))
-      }).toStream
-    WordMappingGroup(header, wordMappingPairs, quizGroup.userData)
+          WordMappingPair(prompt.value,
+            WordMappingValueSet.createFromQuizItems(quizItems.toList, mainSeparator))
+    }).toStream
   }
 
   /*
@@ -91,10 +75,9 @@ object WordMappingGroup extends AppDependencyAccess {
    *     against|wider
    *     entertain|unterhalten
    */
-  def fromCustomFormat(str: String): WordMappingGroup = {
+  def fromCustomFormat(str: String, mainSeparator: String): WordMappingGroup = {
 
     val splitterLineBreak = stringSplitterFactory.getSplitter('\n')
-    val splitterKeyValue = stringSplitterFactory.getSplitter('|')
 
     val wordMappingsMutable = new ListBuffer[WordMappingPair]()
 
@@ -103,23 +86,20 @@ object WordMappingGroup extends AppDependencyAccess {
       splitterLineBreak.next // skip the first line, which has already been parsed
 
       while (splitterLineBreak.hasNext) {
-        val strKeyValue = splitterLineBreak.next
-        splitterKeyValue.setString(strKeyValue)
+        val strPromptResponse = splitterLineBreak.next
 
-        if (splitterKeyValue.hasNext) {
+        def parsePromptResponse = {
 
-          def parseKeyValue {
-            val strKey = splitterKeyValue.next
-            if (splitterKeyValue.hasNext) {
-              val strValues = splitterKeyValue.next
-              wordMappingsMutable += WordMappingPair(strKey,
-                  WordMappingValueSetLazyProxy(strValues))
-            }
-          }
-          Try(parseKeyValue) recover {
+          val i = strPromptResponse.indexOf(mainSeparator)
+          val strPrompt = strPromptResponse.substring(0, i).trim
+          val strResponseAndUserInfo = strPromptResponse.substring(i + mainSeparator.length)
+          wordMappingsMutable += WordMappingPair(strPrompt,
+            WordMappingValueSetLazyProxy(strResponseAndUserInfo, mainSeparator))
+        }
+
+        Try(parsePromptResponse) recover {
             case e: Exception => l.logError("could not parse prompt-response string: " +
-                strKeyValue)
-          }
+                strPromptResponse)
         }
       }
     }

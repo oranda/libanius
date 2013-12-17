@@ -26,19 +26,20 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
   "a quiz group" should {
 
-    val wmgCustomFormat =
-      "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"10\" isActive=\"true\"\n" +
-        "en route|unterwegs\n" +
-        "full|satt/voll\n" +
-        "interrupted|unterbrochen\n" +
-        "contract|Vertrag\n" +
-        "rides|reitet\n" +
-        "on|auf\n" +
-        "sweeps|streicht\n" +
-        "entertain|unterhalten:8;2\n" +
-        "winner|Siegerin:5;0\n" +
-        "against|wider:9,7;6\n" +
-        "teach|unterrichten:4,3;1"
+    val qgCustomFormat =
+      "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" currentPromptNumber=\"10\" isActive=\"true\"\n" +
+        "en route|unterwegs|\n" +
+        "full|satt|\n" +
+        "full|voll|\n" +
+        "interrupted|unterbrochen|\n" +
+        "contract|Vertrag|\n" +
+        "rides|reitet|\n" +
+        "on|auf|\n" +
+        "sweeps|streicht|\n" +
+        "entertain|unterhalten|8;2\n" +
+        "winner|Siegerin|5;0\n" +
+        "against|wider|9,7;6\n" +
+        "teach|unterrichten|4,3;1\n"
 
     def makeQgPartition0: QuizGroupPartition = QuizGroupPartition(List(
       QuizItem("en route", "unterwegs"),
@@ -63,19 +64,16 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     def makeSimpleQuizGroup = QuizGroup(List(makeQgPartition0), QuizGroupUserData(true, 0))
 
-
-
     def makeQgWithHeader: QuizGroupWithHeader = makeQgwh(makeQuizGroup)
     def makeSimpleQgWithHeader: QuizGroupWithHeader = makeQgwh(makeSimpleQuizGroup)
 
     def makeQgwh(quizGroup: QuizGroup): QuizGroupWithHeader = {
-      val header = QuizGroupHeader(WordMapping, "English word", "German word")
+      val header = QuizGroupHeader(WordMapping, "English word", "German word", "|")
       QuizGroupWithHeader(header, quizGroup)
     }
 
     // defaults for read-only
     val qgWithHeader = makeQgWithHeader
-
 
     def updateWithUserAnswer(qg: QuizGroup, quizItem: QuizItemViewWithChoices): QuizGroup = {
       val userAnswer = new UserResponse(qg.currentPromptNumber)
@@ -90,7 +88,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     "be parseable from custom format" in {
-      val qgWithHeaderLocal = QuizGroupWithHeader.fromCustomFormat(wmgCustomFormat)
+      val qgWithHeaderLocal = QuizGroupWithHeader.fromCustomFormat(qgCustomFormat)
       qgWithHeaderLocal.currentPromptNumber mustEqual 10
       qgWithHeaderLocal.promptType mustEqual "English word"
       qgWithHeaderLocal.responseType mustEqual "German word"
@@ -104,7 +102,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     "be serializable to custom format" in {
       val customFormat = qgWithHeader.quizGroup.toCustomFormat(new StringBuilder(),
           qgWithHeader.header)
-      customFormat.toString mustEqual wmgCustomFormat
+      customFormat.toString mustEqual qgCustomFormat
     }
 
     "find values for a prompt" in {

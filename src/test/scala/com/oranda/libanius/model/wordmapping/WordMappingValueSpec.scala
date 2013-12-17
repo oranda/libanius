@@ -24,15 +24,15 @@ class WordMappingValueSpec extends Specification with AppDependencyAccess {
   
   "a word-mapping value" should {
 
-    val wmvCustomFormat = "nachlösen:9,7;6"
+    val wmvCustomFormat = "nachlösen|9,7;6"
 
-    val wmv = WordMappingValue.fromCustomFormat(wmvCustomFormat)
+    val wmv = WordMappingValue.fromCustomFormat(wmvCustomFormat, "|")
     
     "be parseable from custom format" in {
       wmv.value mustEqual "nachlösen"
       wmv.userAnswers.length mustEqual 3
       wmv.numCorrectAnswersInARow mustEqual 2
-      wmv.toCustomFormat(new StringBuilder()).toString mustEqual wmvCustomFormat
+      wmv.toCustomFormat(new StringBuilder(), "|").toString mustEqual wmvCustomFormat
     }
   }
   

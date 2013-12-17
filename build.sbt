@@ -30,7 +30,7 @@ initialCommands in console := "import scalaz._, Scalaz._"
 
 exportJars := false
 
-fork := false 
+fork := false
 
 javaOptions in run += "-XX:+UseConcMarkSweepGC"
 

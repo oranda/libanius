@@ -42,16 +42,18 @@ case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup) ex
   }
 }
 
-object QuizGroupWithHeader {
+object QuizGroupWithHeader extends AppDependencyAccess {
   // Forward access to QuizGroupHeader whenever necessary
   implicit def qgwh2qgh(qgwh: QuizGroupWithHeader): QuizGroupHeader = qgwh.header
 
   // Forward access to QuizGroup whenever necessary
   implicit def qgwh2qg(qgwh: QuizGroupWithHeader): QuizGroup = qgwh.quizGroup
 
-  def fromCustomFormat(text: String): QuizGroupWithHeader = {
-    val wmg = WordMappingGroup.fromCustomFormat(text)
-    QuizGroupWithHeader(wmg.header, wmg.toQuizGroup)
+  def fromCustomFormat(text: String, mainSeparator: String = "|"): QuizGroupWithHeader = {
+    val headerLine = text.takeWhile(_ != '\n')
+    val qgHeader = QuizGroupHeader(headerLine)
+    val qg = QuizGroup.fromCustomFormat(text, mainSeparator, headerLine)
+    QuizGroupWithHeader(qgHeader, qg)
   }
 }
 
