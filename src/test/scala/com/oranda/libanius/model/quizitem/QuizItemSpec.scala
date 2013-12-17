@@ -16,7 +16,7 @@ class QuizItemSpec extends Specification with AppDependencyAccess {
     val quizItemCustomFormat = "solve|nachlösen|9,7;6"
 
     "be serializable to custom format" in {
-      val customFormat = quizItem.toCustomFormat(new StringBuilder(), "|")
+      val customFormat = quizItem.toCustomFormat(new java.lang.StringBuilder(), "|")
       customFormat.toString mustEqual quizItemCustomFormat
     }
 

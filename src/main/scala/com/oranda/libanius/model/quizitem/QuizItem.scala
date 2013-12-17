@@ -43,7 +43,7 @@ case class QuizItem(prompt: TextValue, correctResponse: TextValue,
   def looselyMatches(userResponse: String): Boolean =
     correctResponse.looselyMatches(userResponse)
 
-  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String) = {
+  def toCustomFormat(strBuilder: java.lang.StringBuilder, mainSeparator: String) = {
     strBuilder.append(prompt).append(mainSeparator).append(correctResponse).
         append(mainSeparator)
     userResponses.toCustomFormat(strBuilder, mainSeparator)
