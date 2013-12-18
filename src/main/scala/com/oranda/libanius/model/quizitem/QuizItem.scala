@@ -35,7 +35,8 @@ case class QuizItem(prompt: TextValue, correctResponse: TextValue,
 
   def samePromptAndResponse(other: QuizItem) =
     other.prompt == prompt && other.correctResponse == correctResponse
-  def isPresentable(currentPromptNumber: Int) = userResponses.isPresentable(currentPromptNumber)
+  def isPresentable(currentPromptNumber: Int) =
+    userResponses.isPresentable(currentPromptNumber)
 
   def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
   def numCorrectAnswersInARow = userResponses.numCorrectResponsesInARow

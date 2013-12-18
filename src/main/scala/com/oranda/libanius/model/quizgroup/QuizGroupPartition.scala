@@ -30,7 +30,6 @@ import com.oranda.libanius.model.{UserResponses, ModelComponent}
 import scala._
 import com.oranda.libanius.model.UserResponse
 import scala.collection.immutable.Stream
-import scala.collection.immutable.Seq
 import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
 import java.lang.StringBuilder
@@ -154,31 +153,26 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
     similarWords.toStream
   }
 
+
+
+  protected[quizgroup] def randomValues(sliceSize: Int): List[TextValue] =
+    randomSliceOfQuizItems(sliceSize).map(_.correctResponse).toList
+
   protected[quizgroup] def constructWrongChoicesRandom(correctValues: List[String],
       numFalseAnswersRequired: Int, itemCorrect: QuizItem): Stream[String] = {
 
-    def randomFalseWordValue(sliceIndex: Int): Option[String] =
-      findRandomWordValue(sliceOfResponses(sliceIndex, numSlices = numFalseAnswersRequired)).
-          filter(!correctValues.contains(_))
+    def randomFalseWordValue(sliceIndex: Int): Option[String] = {
+      val sliceSize = (numQuizItems / numFalseAnswersRequired)
+      val sliceStartIndex = sliceIndex * sliceSize
+      val randomOffset = Random.nextInt(math.max(sliceSize, 1))
+      val randomIndex = math.min(sliceStartIndex + randomOffset, numQuizItems - 1)
+      val randomItem = Some(quizItems(randomIndex).correctResponse.value)
+      randomItem.filter(!correctValues.contains(_))
+    }
 
     (0 until numFalseAnswersRequired).map(
         sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toSet.toStream
   }
-
-  protected[quizgroup] def findRandomWordValue(quizValues: Seq[TextValue]): Option[String] =
-    !quizValues.isEmpty option quizValues(Random.nextInt(quizValues.length)).value
-
-  protected[quizgroup] def sliceOfResponses(sliceIndex: Int, numSlices: Int): List[TextValue] =
-    sliceOfQuizItems(sliceIndex, numSlices).map(_.correctResponse).toList
-
-  protected[quizgroup] def sliceOfQuizItems(sliceIndex: Int, numSlices: Int): Iterable[QuizItem] = {
-    val sliceSize = size / numSlices
-    val start = sliceIndex * sliceSize
-    quizItems.slice(start, start + sliceSize)
-  }
-
-  protected[quizgroup] def randomValues(sliceSize: Int): List[TextValue] =
-    randomSliceOfQuizItems(sliceSize).map(_.correctResponse).toList
 
   protected[quizgroup] def randomSliceOfQuizItems(sliceSize: Int): Iterable[QuizItem] =
     if (sliceSize >= size) quizItems.toList
@@ -203,6 +197,7 @@ object QuizGroupPartition extends AppDependencyAccess {
       set = (qgp: QuizGroupPartition,
            qItems: Stream[QuizItem]) => qgp.copy(quizItems = qItems))
 
-  def remove(quizItems: Stream[QuizItem], quizItem: QuizItem): Stream[QuizItem] =
+  protected[quizgroup] def remove(quizItems: Stream[QuizItem], quizItem: QuizItem): Stream[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
+
 }

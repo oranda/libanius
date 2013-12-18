@@ -17,10 +17,10 @@ package com.oranda.libanius.model.quizgroup
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices, TextValue}
+import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices}
 
-import java.lang.StringBuilder
 import com.oranda.libanius.model.{UserResponse, UserResponses}
+import com.oranda.libanius.util.Util
 
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
@@ -83,7 +83,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     def pullQuizItemAndAnswerCorrectly(qgwh: QuizGroupWithHeader): QuizGroupWithHeader = {
       val quizItem = qgwh.findPresentableQuizItem.get
-      l.log("quizItem: " + quizItem)
+      println("quizItem: " + quizItem)
       QuizGroupWithHeader(qgwh.header, updateWithUserAnswer(qgwh.quizGroup, quizItem))
     }
 
@@ -100,7 +100,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     "be serializable to custom format" in {
-      val customFormat = qgWithHeader.quizGroup.toCustomFormat(new StringBuilder(),
+      val customFormat = qgWithHeader.quizGroup.toCustomFormat(new java.lang.StringBuilder(),
           qgWithHeader.header)
       customFormat.toString mustEqual qgCustomFormat
     }
@@ -176,12 +176,13 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val quizItemCorrect: QuizItem = qgWithHeader.quizGroup.quizItems.find(
           _.prompt.value == "entertain").get
 
-      val falseAnswers = qgWithHeader.quizGroup.constructWrongChoices(
+      val (falseAnswers, timeTaken) = Util.stopwatch(qgWithHeader.quizGroup.constructWrongChoices(
           quizItemCorrect: QuizItem, numCorrectResponsesSoFar = 1,
-          numWrongChoicesRequired = 2)
+          numWrongChoicesRequired = 2))
 
       l.log("falseAnswers: " + falseAnswers)
       falseAnswers.contains("unterbrochen") mustEqual true
+      timeTaken must be lessThan 100
     }
 
     "remove a quiz pair" in {

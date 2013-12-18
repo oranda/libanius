@@ -17,9 +17,9 @@
 package com.oranda.libanius.model.quizgroup
 
 import scala.language.implicitConversions
-import com.oranda.libanius.model.wordmapping.WordMappingGroup
 import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices}
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.util.Util
 
 /*
  * Convenience class for passing around a key-value pair from the Quiz.quizGroups map.
@@ -27,8 +27,10 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup) extends AppDependencyAccess {
   def toPair = Pair(header, quizGroup)
 
-  def findPresentableQuizItem: Option[QuizItemViewWithChoices] =
+  def findPresentableQuizItem: Option[QuizItemViewWithChoices] = {
+    l.log("QuizGroupWithHeader findPresentableQuizItem")
     quizGroup.findPresentableQuizItem.map(quizItemWithChoices(_))
+  }
 
   def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] =
     quizGroup.findAnyUnfinishedQuizItem.map(quizItemWithChoices(_))
@@ -36,7 +38,8 @@ case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup) ex
   protected[model] def quizItemWithChoices(quizItem: QuizItem):
       QuizItemViewWithChoices = {
     val numCorrectAnswers = quizItem.userResponses.numCorrectResponsesInARow
-    val falseAnswers = quizGroup.constructWrongChoices(quizItem, numCorrectAnswers)
+    val falseAnswers = Util.stopwatch(quizGroup.constructWrongChoices(quizItem, numCorrectAnswers),
+        "constructWrongChoices")
     new QuizItemViewWithChoices(quizItem, quizGroup.currentPromptNumber,
         header, falseAnswers, numCorrectAnswers)
   }

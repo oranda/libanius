@@ -18,7 +18,7 @@ package com.oranda.libanius.util
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
-class StringUtilSpec extends Specification with AppDependencyAccess {
+class StringUtilSpec extends Specification {
 
   "a string should " should {
     "allow a substring to be extracted based on enclosing substrings specified" in {

@@ -26,20 +26,6 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
 
   "a quiz group partition" should {
     /*
-    val wmgCustomFormat =
-      "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
-        "against|wider\n" +
-        "entertain|unterhalten\n" +
-        "teach|unterrichten\n" +
-        "winner|Siegerin\n" +
-        "en route|unterwegs\n" +
-        "full|satt/voll\n" +
-        "interrupted|unterbrochen\n" +
-        "contract|Vertrag\n" +
-        "rides|reitet\n" +
-        "on|auf\n" +
-        "sweeps|streicht"
-
     Construct a quiz group partition.
     */
     def makeQgPartition: QuizGroupPartition = QuizGroupPartition(List(

@@ -20,7 +20,7 @@ import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{AppDependencyAccess}
 import java.lang.StringBuilder
 
-class WordMappingValueSetSpec extends Specification with AppDependencyAccess {
+class WordMappingValueSetSpec extends Specification {
 
   "a word-mapping-value-set" should {
 
@@ -45,5 +45,4 @@ class WordMappingValueSetSpec extends Specification with AppDependencyAccess {
       wmvsUpdated.containsValue("contract") mustEqual false
     }
   }
-  
 }  

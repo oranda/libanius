@@ -33,6 +33,7 @@ import scala.util.Try
 import scala.Predef._
 import scala.collection.immutable.Set
 import com.oranda.libanius.model.UserResponse
+import com.oranda.libanius.util.Util
 
 /*
  * Contains quiz items for a topic.
@@ -135,7 +136,7 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
   protected[model] def constructWrongChoices(itemCorrect: QuizItem,
       numCorrectResponsesSoFar: Int, numWrongChoicesRequired: Int = 2): Set[String] = {
 
-    val correctResponses = findResponsesFor(itemCorrect.prompt.value)
+    val correctResponses = Util.stopwatch(findResponsesFor(itemCorrect.prompt.value), "findResponsesFor")
 
     val falseResponses: Stream[String] =
         constructWrongChoicesSimilar(numCorrectResponsesSoFar,
@@ -168,7 +169,7 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
 
   protected[quizgroup] def constructWrongChoicesRandom(correctResponses: List[String],
       numWrongChoicesRequired: Int, itemCorrect: QuizItem): Stream[String] =
-    partitions.toStream.flatMap(_.constructWrongChoicesRandom(
+    partitions.toStream.filterNot(_.isEmpty).flatMap(_.constructWrongChoicesRandom(
         correctResponses, numWrongChoicesRequired, itemCorrect))
 
   protected[quizgroup] def constructWrongChoicesDummy(numWrongChoicesRequired: Int):
@@ -197,34 +198,9 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
   def findPresentableQuizItem: Option[QuizItem] =
     (for {
       partition <- partitions.reverse.toStream
-      quizItem <- partition.findPresentableQuizItem(currentPromptNumber)
+      quizItem <- partition.findPresentableQuizItem(currentPromptNumber).toStream
     } yield quizItem).headOption
 
-    //partitions.reverse.find(findPresentableQuizItemInPartition(_).isDefined)
-
-  /*
-  This appears to be slower
-
-  def findPresentableQuizItem: Option[QuizItem] =
-    (for {
-       partition <- partitions.reverse
-       quizItem <- partition.quizItems.toStream
-       if quizItem.isPresentable(currentPromptNumber)
-     } yield quizItem).headOption //findPresentableQuizItemInPartition(partition)).headOption
-  */
-
-
-
-
-  /*
-  protected[model] def presentableQuizItem(quizItem: QuizItem,
-      header: QuizGroupHeader, currentPromptNumber: Int): Option[QuizItemViewWithChoices] =
-    None
-   TODO
-    quizItem.isPresentable(currentPromptNumber) option
-      Util.stopwatch(quizItemWithOptions(quizItem, header),
-        "quizItemWithOptions for " + quizItem.correctResponse)
-  */
 
   /*
    * Example of custom format:
@@ -272,8 +248,8 @@ object QuizGroup extends AppDependencyAccess {
 
     if (quizItemsGrouped.size > conf.numCorrectAnswersRequired + 1) {
       l.logError("Corrupt data for " + header +
-        ": it looks like there is a quizItem with more than " +
-        conf.numCorrectAnswersRequired + " correct responses stored")
+          ": it looks like there is a quizItem with more than " +
+          conf.numCorrectAnswersRequired + " correct responses stored")
       QuizGroup()
 
     } else {

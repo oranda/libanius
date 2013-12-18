@@ -1,3 +1,10 @@
+== 0.92 December 18 2013
+
+  * Made constructWrongChoicesRandom() at least ten times more efficient.
+
+  * Cleaned data of duplicates.
+
+
 == 0.91 December 16 2013
 
   * Simplification: QuizGroup is persisted directly rather than going through WordMappingGroup.

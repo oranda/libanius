@@ -1,38 +1,21 @@
 quizGroup type="WordMapping" promptType="German word" responseType="English word" mainSeparator="|" currentPromptNumber="0" isActive="true"
-sic|sic|
 auf|on|
 als|as|
-noc|noc|
-scholl|scholl|
-ohn|ohn|
-doc|doc|
-alleln|alleln|
-jen|jen|
-dessau|dessau|
 einig|agreed|
-jed|jed|
-währe|Währe|
 sei|was|
-damian|damian|
 art|type|
-band|band|
 genagt|gnawed|
 künsten|arts|
 deren|their|
 ging|was|
 führet|leadeth|
 eigentlich|actually|
-hattedu|hattedu|
 gemach|chamber|
-damais|damais|
-stan|stan|
 geworden|become|
 macht|power|
 sah|saw|
 einzige|single|
-vielel|vielel|
 zwar|indeed|
-einmai|einmai|
 dort|there|
 kopf|head|
 nahm|was|
@@ -40,27 +23,19 @@ dazu|to|
 weg|off|
 dabei|it|
 einigen|some|
-stellst|stellst|
-geisha|geisha|
 anderm|other things|
 jedoch|however|
 seh|see|
 soll|shall|
 vielleicht|perhaps|
-zurücj|zurücj|
-harris|harris|
 persönlich|personally|
-niemais|niemais|
-diesel|diesel|
 gehabe|affected behavior|
 wisse|know|
 gar|at all|
 stelle|location|
 verschiedene|various|
-starik|starik|
 selbem|the very same|
 jeder|each|
-form|form|
 meineid|perjury|
 fand|was|
 nachdem|after|
@@ -82,7 +57,6 @@ französin|Frenchwoman|
 sage|legend|
 stadt|city|
 versucht|tries|
-musici|musici|
 blick|view|
 schüler|student|
 gehen|go|
@@ -108,7 +82,6 @@ weit|far|
 fühlst|feel|
 aller|all|
 gibt|are|
-dennis|dennis|
 möglich|possible|
 gewiss|certainly|
 kaum|hardly|
@@ -132,10 +105,8 @@ alter|age|
 verlor|lost|
 grieche|Greek|
 derselbe|the same|
-jose|jose|
 erschien|appeared|
 frühem|early|
-obwohi|obwohi|
 polen|Poland|
 wollen|want|
 gesicht|face|
@@ -168,7 +139,6 @@ allgemeine|general|
 eben|just|
 findern|finders|
 amt|office|
-gefuhi|gefuhi|
 genug|enough|
 gerade|just|
 politische|political|
@@ -179,9 +149,7 @@ dritteil|third of|
 besondere|special|
 richtig|right|
 behaupte|contend|
-bess|bess|
 stärken|strengthen|
-deuter|deuter|
 gesehen|seen|
 hohen|high|
 vater|father|
@@ -190,7 +158,6 @@ erlebst|will experience|
 erreichst|reach|
 sowohl|both|
 weis|looking|
-palace|palace|
 schrimp|Shrimp|
 überhand|of hand|
 indem|by|
@@ -207,7 +174,6 @@ leid|sorry|
 nehm|participating|
 fort|on|
 seiten|the part|
-absichre|absichre|
 außer|except|
 beinahe|almost|
 erkannt|detected|
@@ -246,12 +212,10 @@ sohn|son|
 gemäht|mowed|
 plötzlich|suddenly|
 angst|fear|
-statue|statue|
 ägypten|Egypt|
 gesetzt|set|
 innere|internal|
 trat|was|
-august|August|
 staat|state|
 weitere|more|
 mögliches|possible|
@@ -266,16 +230,12 @@ schwarze|black|
 woche|week|
 bereist|traveled|
 bevölkere|populate|
-glaubs|glaubs|
 herr|Mr.|
 teils|partly|
 personell|staff|
 beschreibe|describe|
-bring|bring|
 erfüllst|fulfill|
-vill|vill|
 anders|different|
-entwickeit|entwickeit|
 gefügt|together|
 wort|word|
 anderer|other|
@@ -284,7 +244,6 @@ bildung|education|
 länger|more|
 nämlich|namely|
 geschrieben|written|
-lächein|lächein|
 zugleich|at the same time|
 meister|master|
 handelt|is|
@@ -294,7 +253,6 @@ werk|work|
 bekommen|get|
 gelang|succeeded|
 grenze|border|
-link|link|
 jemals|ever|
 fordere|call|
 frage|question|
@@ -309,9 +267,7 @@ hin|down|
 mutter|mother|
 deutscher|German|
 besten|best|
-kinde|kinde|
 fünf|five|
-person|person|
 dunkle|dark|
 unterschiebe|by sliding|
 sinn|sense|
@@ -335,10 +291,8 @@ heißt|is|
 tiere|animals|
 worte|words|
 volk|people|
-kaiser|Kaiser|
 weiß|white|
 bezeichnens|designating|
-bish|bish|
 länder|country|
 schwer|difficult|
 fremde|foreign|
@@ -347,7 +301,6 @@ männlich|male|
 endlich|finally|
 kapitel|chapter|
 menschlich|human|
-million|million|
 untersuche|investigate|
 wiederhole|repeat|
 bedeutung|significance|
@@ -355,7 +308,6 @@ erfolg|success|
 gleiche|same|
 raum|space|
 beginn|beginning|
-geschaft|geschaft|
 glück|happiness|
 denke|think|
 fest|fixed|
@@ -364,14 +316,12 @@ gefahr|risk|
 langen|long|
 merke|notice|
 figur|figure|
-himmei|himmei|
 männen|says about men|
 hause|home|
 häufig|often|
 krieges|War|
 kräfte|staff|
 ändere|change|
-jul|jul|
 freu|looking forward|
 meint|said|
 augenblick|moment|
@@ -388,7 +338,6 @@ bildes|image|
 gegenüber|to|
 gekommen|come|
 kamen|were|
-standby|standby|
 stolz|proud|
 wahrscheinlich|probably|
 bild|picture|
@@ -397,7 +346,6 @@ bleibet|abide|
 reiche|rich|
 schöne|nice|
 allerdings|though|
-beispiei|beispiei|
 unbekannt|unknown|
 starb|died|
 rolle|role|
@@ -405,16 +353,12 @@ wer|who|
 lang|long|
 beschrieb|described|
 ruh|rest|
-tocher|tocher|
 beschäftige|busy|
 längst|long ago|
 vielmehr|rather|
 geschlossen|closed|
 näher|closer|
-verwandele|verwandele|
 voll|fully|
-erhieit|erhieit|
-hoh|hoh|
 zunächst|first|
 beherrsche|dominant|
 schwerem|heavy|
@@ -430,7 +374,6 @@ vereinige|unite|
 wüst|waste|
 zeichnung|drawing|
 heilige|saint|
-innerhaib|innerhaib|
 meinung|opinion|
 empfahl|recommended|
 glaub|think|
@@ -452,13 +395,10 @@ gezogen|drawn|
 opfe|heads|
 versichere|assure|
 bestand|stock|
-hoc|hoc|
 wahrheit|truth|
-alexander|Alexander|
 bedrohst|threaten|
 bleiben|remain|
 herrschaft|rule|
-schneii|schneii|
 dauert|takes|
 lebens|life|
 angriff|attack|
@@ -495,15 +435,12 @@ bedeute|mean|
 bitte|Please|
 entstehe|arises|
 ernst|seriously|
-italiae|italiae|
 lehrer|teacher|
 leichte|slight|
 sollen|to|
 spreche|speak|
 vertragt|bear with|
-wass|wass|
 mitteile|notifying|
-republic|republic|
 ursache|cause|
 erwartens|expectation|
 falle|trap|
@@ -518,7 +455,6 @@ mittel|medium|
 weite|length|
 weile|while|
 betrachtung|contemplation|
-darien|darien|
 gehöft|farmstead|
 möcht|should like|
 daraus|it|
@@ -529,7 +465,6 @@ fing|started|
 lieg|lie|
 ordnung|order|
 reichens|handoff|
-wenigst|wenigst|
 bilder|pictures|
 fol|following|
 trupp|squad|
@@ -543,7 +478,6 @@ historisch|historically|
 höher|higher|
 zahlreich|numerous|
 siebe|screens|
-besteh|besteh|
 büchel|libretto|
 gespräch|conversation|
 größe|size|
@@ -566,7 +500,6 @@ trug|was|
 sicher|sure|
 verlies|dungeon|
 berichtes|Report|
-geschähe|geschähe|
 leicht|slightly|
 beenden|end|
 fähigkeit|ability|
@@ -580,7 +513,6 @@ behörde|authority|
 lesen|read|
 befand|was|
 erfahre|experience|
-hee|hee|
 ständig|constantly|
 laufe|run|
 begeistere|enthusiastic|
@@ -589,11 +521,9 @@ fiel|was|
 gewichen|given way|
 nenne|call|
 platz|place|
-schicksai|schicksai|
 stil|style|
 ergänzer|complementizer|
 fällst|fall|
-sec|sec|
 trage|wear|
 verletzt|injured|
 viertem|fourth|
@@ -601,12 +531,9 @@ jedes|each|
 keineswegs|by no means|
 verwundern|surprising|
 griechenland|Greece|
-bode|bode|
 echt|real|
-erzähi|erzähi|
 hört|hears|
 insbesondere|particularly|
-sons|sons|
 tages|day|
 endest|end up|
 entscheide|decide|
@@ -663,16 +590,10 @@ dien|serving|
 empfinde|feel|
 lernst|learn|
 russische|Russian|
-november|November|
 provinz|province|
-gegenteii|gegenteii|
-golden|golden|
 knechtes|Servant|
-ortega|ortega|
 sache|thing|
 verwirre|Mess|
-wuchre|wuchre|
-september|September|
 schliess|closing|
 eingesetzt|used|
 geschaffen|created|
@@ -682,7 +603,6 @@ neues|new|
 schwieriges|difficult|
 verbot|ban|
 angefügt|added|
-ante|ante|
 erhob|rose|
 morgen|tomorrow|
 offene|open|
@@ -712,7 +632,6 @@ beschloss|decided|
 eingefügt|inserted|
 erreiche|reach|
 gilt|is|
-hinault|Hinault|
 reicht|enough|
 hauself|house-elf|
 reden|talk|
@@ -744,10 +663,7 @@ niederlage|defeat|
 münze|coin|
 liebst|love|
 heimat|home|
-jeweilen|jeweilen|
-wah|wah|
 zuweilen|occasionally|
-epochal|epochal|
 erweitere|expand|
 gewaltig|enormous|
 haltung|attitude|
@@ -755,7 +671,6 @@ hundert|hundred|
 mai|May|
 vertraust|trust|
 erneure|renew|
-eröffnens|eröffnens|
 hingegen|however|
 neuer|new|
 sonne|Sun|
@@ -768,14 +683,12 @@ ehre|honor|
 führ|led|
 königs|king|
 mächten|Powers|
-offenbach|offenbach|
 sinne|senses|
 danach|after|
 nötig|necessary|
 rückkehr|return|
 schwester|sister|
 verlaub|pardon|
-gesellin|Gesellin|
 enttäuschst|disappoint|
 wußte|did|
 bewahrst|keep him|
@@ -784,7 +697,6 @@ verfolgst|persecute|
 allmählich|gradually|
 osten|east|
 seien|were|
-unschuid|unschuid|
 verfasst|posted|
 russland|Russia|
 stets|always|
@@ -798,7 +710,6 @@ reis|rice|
 schlug|proposed|
 sprachen|said|
 verlangst|asking|
-zunehme|zunehme|
 gearbeitet|worked|
 beziehst|referring|
 dasselbe|the same|
@@ -812,19 +723,16 @@ enthalte|contained|
 stehend|standing|
 vollständig|completely|
 äußere|external|
-behandein|behandein|
 vollende|perfecting|
 aben|ave|
 einführe|introductory|
 gelegentlich|occasionally|
 geschicks|skill|
 unmöglich|impossible|
-verfügst|verfügst|
 weiblichem|female|
 zeug|stuff|
 zukunft|future|
 betracht|consideration|
-wes|wes|
 stücke|pieces|
 bekanntes|known|
 friedlich|peacefully|
@@ -846,11 +754,9 @@ scheine|seems|
 brauches|custom|
 überraschst|to surprise|
 jenes|that|
-studia|studia|
 angegeben|given|
 lehren|teach|
 licht|light|
-nation|nation|
 stirn|forehead|
 tagen|meet|
 wert|worth|
@@ -860,19 +766,15 @@ eingestehe|been standing|
 gelte|applies|
 inzwischen|meanwhile|
 teilt|shares|
-berlin|Berlin|
 getan|done|
 athen|Athens|
 anderes|other|
-april|April|
 feue|firing|
 kultur|culture|
 tode|death|
 unabhängig|independent|
-alliierst|alliierst|
 durfen|may not carry|
 fanden|were|
-gewait|gewait|
 unerwartet|unexpectedly|
 zustand|state|
 üblich|usual|
@@ -884,7 +786,6 @@ erhobene|collected|
 sonderlich|particularly|
 antwort|answer|
 jugendliche|youth|
-kehrst|kehrst|
 meer|sea|
 monaten|months|
 trägst|wear|
@@ -905,36 +806,28 @@ menge|amount|
 nennst|call|
 wagen|venture|
 zudem|in addition|
-zweifei|zweifei|
 herz|heart|
 see|lake|
 verbindung|connection|
 verschwor|conspired|
-mantei|Mantei|
 bestände|stocks|
 desto|more|
 gegangen|gone|
 geheimnisse|secrets|
 aufgehen|rise|
 aufnahm|recorded|
-franck|franck|
 hauptsächlich|mainly|
-off|off|
 stieg|increased|
 dritte|third|
 erheblich|substantially|
 erinner|Remember|
-gefall|gefall|
 kritisch|critical|
 leser|reader|
-thomas|thomas|
 treibeis|drift|
 vereinbare|compatible|
 wege|routes|
 gelehrte|scholar|
-wind|wind|
 finanziell|financially|
-steinein|steinein|
 bibliothek|library|
 gericht|court|
 heimlich|secretly|
@@ -946,12 +839,9 @@ kämpfst|fight|
 mindesten|at least|
 probleme|problems|
 träum|dream|
-verger|verger|
 stille|silence|
 begrenze|limiting|
 erfolgt|is|
-georg|georg|
-gleichens|gleichens|
 hängig|pending|
 ziehe|draw|
 fernem|distant|
@@ -959,7 +849,6 @@ reisen|travel|
 gestand|admitted|
 klein|small|
 schwach|weak|
-situation|situation|
 sprich|ie|
 streng|strictly|
 auftrag|order|
@@ -997,13 +886,10 @@ regeln|regulate|
 spur|track|
 verstärkst|by amplifying|
 todesser|Death Eaters|
-part|part|
 schaffst|manage|
 titel|title|
 ruf|reputation|
 sieg|victory|
-artikei|artikei|
-besorgst|besorgst|
 dagegen|however|
 insel|island|
 italienisch|Italian|
@@ -1012,7 +898,6 @@ ziele|Goals|
 überwiege|outweigh|
 überzeugst|convince|
 bekleide|clothe|
-tempei|tempei|
 christliche|Christian|
 mühe|effort|
 schweigen|remain silent|
@@ -1029,7 +914,6 @@ arm|poor|
 besiegen|defeat|
 gemäß|according to|
 geplagt|plagued|
-trading|trading|
 verwendern|users|
 wunde|wound|
 besucht|visits|
@@ -1049,7 +933,6 @@ februar|February|
 lediglich|only|
 merkst|notice|
 oberhalb|above|
-all|all|
 beine|legs|
 eltern|parents|
 gesetze|legislation|
@@ -1066,27 +949,20 @@ gezwungen|forced|
 angeblich|allegedly|
 betroffen|affected|
 dankbar|grateful|
-darstellst|darstellst|
 drohst|threaten|
-einsetze|einsetze|
 heraus|out|
 märz|March|
 schiene|rail|
 siegels|Seal|
-them|them|
 verhalt|behaves|
 vernachlässige|negligible|
-versammein|versammein|
-wilhelm|wilhelm|
 prozent|percent|
 spürst|feel|
 urteil|judgment|
 verehrst|worship|
 bestimmung|determination|
 verborgen|hidden|
-gold|gold|
 gott|God|
-behait|behait|
 koste|cost|
 schade|shame|
 wechselt|changes|
@@ -1094,10 +970,8 @@ entfalle|attributable|
 leidenschaft|passion|
 anzahl|number|
 erregst|have brought them abundant|
-heiner|heiner|
 herzlich|cordially|
 künftig|future|
-lock|lock|
 söhne|sons|
 gemalt|painted|
 versenge|scorch|
@@ -1107,20 +981,16 @@ gaben|gave|
 gewöhnlich|usually|
 kennzeichen|mark|
 nase|nose|
-nähers|nähers|
 verliebst|fall in|
 beschädige|vandalize|
 gemeinschaft|community|
 indern|indians|
 liebem|the loved|
 nördlich|north|
-otto|otto|
 unterrichtens|teaching|
 verzeichne|Record at|
 anfangs|initially|
-befinde|befinde|
 bringst|bring|
-deshaib|deshaib|
 druck|pressure|
 existenz|existence|
 interesse|interest|
@@ -1139,13 +1009,11 @@ hoher|high|
 straße|road|
 künstlern|artists|
 begründern|founders|
-gewähit|gewähit|
 hoffnung|hope|
 kürzer|shorter|
 not|distress|
 verlud|were loaded|
 westlichem|Western|
-ziemer|Ziemer|
 zwölf|twelve|
 bevorzuge|prefer|
 gestühl|wooden pews|
@@ -1158,15 +1026,12 @@ nachbarn|neighbors|
 übersetzt|translated|
 anstatt|instead of|
 darf|can|
-dortig|dortig|
 empfunden|perceived|
 erkläre|explain|
 fehlen|lack|
 geschönt|fined|
 intensiv|intensive|
-jud|jud|
 leis|quietest|
-moment|moment|
 nahezu|almost|
 teilnehme|participate|
 verstorben|deceased|
@@ -1176,7 +1041,6 @@ entlasse|redundant|
 gesprochen|spoken|
 körper|body|
 unterscheide|distinguish|
-ausnahm|ausnahm|
 kindern|children|
 bessere|better|
 gegensatz|contrast|
@@ -1192,7 +1056,6 @@ fuß|foot|
 wertvoll|valuable|
 beruft|cites|
 breite|width|
-bun|bun|
 gesellschaftlich|socially|
 katastrophal|catastrophic|
 regelmäßig|regularly|
@@ -1202,8 +1065,6 @@ tut|do|
 unterhalb|below|
 angenehm|pleasant|
 beobachte|watch|
-bertha|bertha|
-johann|johann|
 quelle|source|
 sechste|sixth|
 trieb|drive|
@@ -1216,36 +1077,25 @@ bevorstehe|imminent|
 bündnis|alliance|
 haut|skin|
 leiste|bar|
-michael|michael|
-tritia|tritia|
 zwang|constraint|
 berücksichtige|take into account|
 besitzt|has|
 erfahrt|learn|
-felde|felde|
-helf|helf|
 jahrhunderte|centuries|
 niedrig|low|
 rieses|Ries|
 schatten|shadow|
-system|system|
 trugen|were|
 voller|full of|
 züge|trains|
 merkwürdig|strange|
 saß|was|
-student|student|
 gesteift|stiffened|
 mangel|lack|
 rasch|quickly|
 schlafe|sleep|
 täglich|daily|
-ISBN|ISBN|
-auftrete|auftrete|
-außerhaib|außerhaib|
-bisherig|bisherig|
 diskutiere|Discuss|
-erlangst|erlangst|
 erstmals|for the first time|
 essen|eat|
 fähig|capable|
@@ -1257,7 +1107,6 @@ schloss|lock|
 unterdrückst|suppress|
 verschwinde|away|
 angenommen|assumed|
-befördere|befördere|
 organisiere|organizing|
 spange|clasp|
 versteckst|hide|
@@ -1269,7 +1118,6 @@ wilde|wild|
 darum|therefore|
 gefäß|vessel|
 wirst|will|
-africa|africa|
 beweise|Prove|
 forsches|brisk|
 härten|harden|
@@ -1278,10 +1126,8 @@ verantworte|responsible words|
 verluste|losses|
 weitgehend|largely|
 elf|eleven|
-aufmerke|aufmerke|
 abschnitt|section|
 absolut|absolutely|
-befehi|befehi|
 blaue|blue|
 ernsthaft|seriously|
 feiern|celebrate|
@@ -1289,7 +1135,6 @@ grüne|green|
 insges|TOTAL|
 mehrheit|majority|
 plan|plane|
-prince|Prince|
 satz|rate|
 unbedingt|necessarily|
 unterstelle|were accepted|
@@ -1310,7 +1155,6 @@ achteln|eighths|
 bat|asked|
 bogen|arc|
 büchern|books|
-diesmai|diesmai|
 diplomatie|diplomacy|
 geheime|Secret|
 gewachsen|grown|
@@ -1330,10 +1174,7 @@ gefangen|captured|
 griff|handle|
 hauptstadt|capital|
 lagen|were|
-verwickele|verwickele|
-widerst|widerst|
 chinesin|chinese|
-deutschlandde|deutschlandde|
 ausdrücke|express|
 derjenige|the one|
 ergriff|seized|
@@ -1341,7 +1182,6 @@ gebäude|building|
 lache|pool|
 lief|was|
 machten|did|
-manner|manner|
 verdient|earned|
 verlag|publishing house|
 ausgesetzt|exposed|
@@ -1355,7 +1195,6 @@ stückeln|cut into pieces|
 wandte|turned|
 wählst|choose|
 angestrebt|sought|
-ausdehne|ausdehne|
 ausgeführt|executed|
 besitze|own|
 betrieb|operation|
@@ -1375,21 +1214,17 @@ dorf|village|
 fuhr|continued|
 guter|good|
 höchst|most|
-iii|iii|
 internationalem|international|
 januar|January|
 muss|must|
 offenbarst|reveal to|
-relation|relation|
 rund|about|
 schickst|send|
 schliff|cut|
 sitze|sit|
-unio|unio|
 vertiefe|deepen|
 bedeckst|coverest|
 bewunderst|admire|
-gespieit|gespieit|
 lernen|learn|
 tief|deep|
 gesamte|all|
@@ -1399,33 +1234,26 @@ gebunden|bound|
 lande|country|
 gefolgt|followed|
 kalte|cold|
-office|office|
 zeichnern|signatories|
-beliebe|beliebe|
 böse|evil|
 gegend|area|
 geheimnis|secret|
-gemeinst|gemeinst|
 gewonnen|won|
 namens|named|
 sammlung|collection|
 staates|State|
 vermehre|multiply|
-vernon|vernon|
 wünschst|want|
 überwältige|deeply touched|
 angesicht|face|
 aufstand|uprising|
 dicht|close|
 eroberung|conquest|
-fields|fields|
 freiwild|free wild|
 frisch|fresh|
 fäll|Feller|
 geholt|brought|
-generation|generation|
 geteilt|divided|
-joseph|joseph|
 männern|men|
 rahm|cream|
 reitend|riding|
@@ -1433,8 +1261,6 @@ sitz|seat|
 spät|late|
 steigen|rise|
 töte|kill|
-vorteii|vorteii|
-voldemords|voldemords|
 irgendeine|some|
 nein|no|
 prächtig|magnificently|
@@ -1466,7 +1292,6 @@ vermutens|Conjecture|
 wächst|grows|
 keinerlei|no|
 schütz|protective|
-sturst|sturst|
 systematik|system|
 zug|train|
 zugrunde|based|
@@ -1477,7 +1302,6 @@ entweder|either|
 garten|garden|
 gele|gels|
 irgendwem|anyone|
-neigst|neigst|
 reduziere|reducing|
 traure|mourn|
 vermittele|for conveys|
@@ -1485,17 +1309,13 @@ wiederherstelle|reconstructive|
 wider|against|
 ausgenommen|except|
 bürgerlich|bourgeois|
-erforderst|erforderst|
 grundlage|basis|
 handlung|action|
 klug|wise|
-kris|kris|
 leiters|conductor|
 nieder|down|
 parteien|Parties|
-pete|pete|
 preuße|Prussian|
-regulus|regulus|
 schaffen|create|
 schrecklich|terrible|
 sichern|secure|
@@ -1516,7 +1336,6 @@ gedeck|cover|
 gedicht|poem|
 geschlagen|beaten|
 gewann|won|
-male|male|
 reif|ripe|
 zeitalter|age|
 übergang|transition|
@@ -1528,7 +1347,6 @@ nachfolgen|follow|
 versprochen|promised|
 einander|each other|
 großbritannien|Great Britain|
-hal|hal|
 königliche|Royal|
 schülern|students|
 sorgfältig|careful|
@@ -1547,8 +1365,6 @@ verstöre|might destroy|
 verweigere|refuse|
 vorbild|model|
 österreichische|Austrian|
-anton|anton|
-ausführe|ausführe|
 einfluss|influence|
 herkunft|origin|
 jedenfalls|in any case|
@@ -1584,13 +1400,11 @@ zusätze|additives|
 annähere|moving closer|
 ansehe|look at|
 entkomme|escape|
-fallon|fallon|
 fühle|feel|
 katholik|Catholic|
 kreis|circle|
 krone|crown|
 langweile|bored|
-negation|negation|
 traditionell|traditionally|
 verantwortung|responsibility|
 vergrößere|magnify|
@@ -1601,14 +1415,12 @@ weigere|refuse|
 bildern|pictures|
 dauer|time|
 enden|end|
-england|England|
 erkenntnis|knowledge|
 gelb|yellow|
 mut|courage|
 reagierst|react|
 solang|as long|
 verlief|was|
-verschonst|verschonst|
 versehen|provided|
 brauche|need|
 geraubt|robbed|
@@ -1640,7 +1452,6 @@ schuljahr|school year|
 erlebnis|experience|
 gefährde|hazardous|
 gewöhnst|get used|
-offensive|offensive|
 feste|fixed|
 symbol|icon|
 öffne|open|
@@ -1650,14 +1461,12 @@ beginns|commencement|
 behielt|retained|
 gesetz|law|
 herstelle|manufacturing|
-kostest|kostest|
 lager|camp|
 schuld|responsible|
 zurückgekehrt|back|
 zustimmst|agree|
 gewiß|certainly|
 abweiche|differs|
-anführens|anführens|
 befugt|authorized|
 bzw|or|
 demokratin|Democrat|
@@ -1667,8 +1476,6 @@ gürtel|belt|
 heirat|marriage|
 jährig|year|
 literat|man of letters|
-medici|medici|
-religion|religion|
 schaut|looks|
 theoretisch|theoretically|
 tiefe|depth|
@@ -1680,11 +1487,9 @@ vorwärme|Preheating|
 marmor|marble|
 säule|column|
 begreife|understand|
-betriff|betriff|
 geschieht|done|
 kontrolliere|controlling|
 lachst|laugh|
-münchau|Münchau|
 neugier|curiosity|
 schwert|sword|
 stellvertreten|Deputy|
@@ -1708,7 +1513,6 @@ verband|association|
 vermeide|avoid|
 verwandt|related|
 verwende|use|
-wenders|wenders|
 womit|with which|
 zumindest|at least|
 zusammenarbeit|cooperation|
@@ -1727,8 +1531,6 @@ sahen|saw|
 schreck|fright|
 selbständig|independently|
 unternehme|corporate|
-verständigst|verständigst|
-verursachst|verursachst|
 aufklärst|enlightening|
 ausland|foreign countries|
 beitrag|contribution|
@@ -1736,7 +1538,6 @@ besetzung|occupation|
 denkt|thinks|
 musikalisch|musical|
 römer|Roman|
-vermeine|vermeine|
 ausgelebt|lived out|
 bereich|area|
 erledige|Kill|
@@ -1748,8 +1549,6 @@ länge|length|
 vermische|mix|
 angezeigt|displayed|
 aktive|active|
-begebt|begebt|
-geduid|geduid|
 gegenseite|against page|
 grundsätze|Principles|
 half|helped|
@@ -1776,24 +1575,17 @@ konflikte|Conflicts|
 lebendem|living|
 mangeln|lack|
 schutts|debris|
-sorgst|sorgst|
 streit|dispute|
 stürzt|crashes|
 vergleich|comparison|
 verkündern|heralds|
 vierte|fourth|
-volkers|Volkers|
-winter|winter|
-überleg|überleg|
 befürchte|fear|
 entschluß|decisive or|
-gebrauchst|gebrauchst|
 gefahren|driven|
 gefiel|liked|
 gekannt|known|
-gescheitem|gescheitem|
 geworfen|thrown|
-julian|julian|
 las|read|
 schuldig|guilty|
 überschrieb|wrote about|
@@ -1812,7 +1604,6 @@ erfolglos|unsuccessful|
 erlebnisse|experiences|
 erzeugst|are generating|
 freust|looking forward|
-friedrich|friedrich|
 froh|happy|
 gestatte|permit|
 gewarnt|warned|
@@ -1828,9 +1619,7 @@ produziere|produce|
 unglück|accident|
 verhältnisse|conditions|
 vermöge|virtue|
-verteiit|verteiit|
 wünschen|wish|
-zweimai|zweimai|
 ehrfurcht|awe|
 junger|young|
 pater|father|
@@ -1841,10 +1630,8 @@ benutze|use|
 bezeichne|call|
 deutsch|German|
 gegenstände|Items|
-geleitest|geleitest|
 gerufen|called|
 kritik|criticism|
-lord|lord|
 läufig|in heat|
 schick|chic|
 schlage|suggest|
@@ -1853,7 +1640,6 @@ wirtschaft|economy|
 zeile|line|
 zitierst|cite|
 befestige|attach|
-bestrebe|bestrebe|
 erhöhst|raise|
 erläutere|explain|
 ermordens|murdering|
@@ -1876,32 +1662,26 @@ mönch|monk|
 räum|spatial|
 souverän|sovereign|
 wohnt|lives|
-zimm|zimm|
 übersehe|overlook|
 außerordentlich|extraordinarily|
 beauftrage|instruct|
 entlaste|relieve|
 erhebe|raise|
 fröhlich|merry|
-intelligence|intelligence|
 interessierst|interested in|
-wiedervereinige|wiedervereinige|
 übrig|left|
 aussicht|view|
 berühr|Touch|
 beute|prey|
 gutes|good|
 ideen|ideas|
-jag|jag|
 langer|long|
 pläne|plans|
 schätzt|estimates|
 strebt|aims|
 umgang|handling|
 verblieb|remained|
-waff|waff|
 wähle|select|
-the|The|
 ausgehen|go out|
 bau|construction|
 bezweifele|doubt|
@@ -1919,17 +1699,12 @@ rein|purely|
 schwarm|swarm|
 suchst|looking for|
 verlege|publishing|
-verlegst|verlegst|
-verringernd|verringernd|
 wichtigere|more important|
-zuschaue|zuschaue|
 östlich|east|
-elite|elite|
 aufgehst|risest|
 begab|went|
 benötige|need|
 entdecke|discover|
-erschütterns|erschütterns|
 erziehn|educate|
 gebaut|built|
 hartnäckig|persistent|
@@ -1940,11 +1715,8 @@ verdecke|obscures|
 verheirate|marry|
 weltweit|worldwide|
 bestürme|assail|
-fritz|fritz|
 geweih|antlers|
 auß|Auss|
-berliner|Berliner|
-besagst|besagst|
 bestellst|orders of|
 bürger|citizen|
 dominierst|dominating|
@@ -1952,9 +1724,7 @@ eigentümlich|strange|
 gebung|environment|
 gelöst|solved|
 gerecht|just|
-hannes|hannes|
 herbem|bitter|
-hinterland|hinterland|
 hoffst|hope|
 hungernd|hungry|
 hübsch|pretty|
@@ -1964,12 +1734,8 @@ liegend|lying|
 nützlich|useful|
 ohr|ear|
 philosoph|philosopher|
-raschele|raschele|
 schneiden|cut|
-severa|severa|
 südlich|south|
-verfehlst|verfehlst|
-versorgst|versorgst|
 wunderbar|wonderful|
 abhandlung|treatise|
 aufsuche|exploration for|
@@ -1980,16 +1746,13 @@ eins|one|
 einsicht|insight|
 feindlichem|enemy|
 ferne|distance|
-galego|galego|
 gemein|common|
 gezeichnet|subscribed|
 gründlich|thoroughly|
-kilometer|kilometer|
 kritisiere|criticize|
 methode|method|
 münden|flow|
 reinem|pure|
-sand|sand|
 sitte|custom|
 tätigkeit|activity|
 verzichtes|waiver|
@@ -2011,7 +1774,6 @@ provinzen|provinces|
 reaktion|reaction|
 schafe|Sheep|
 schriftlich|in writing|
-spence|spence|
 treue|loyalty|
 wirksam|effective|
 allzu|all too|
@@ -2019,13 +1781,10 @@ angedeutet|implied|
 beschäme|shame|
 freilich|of course|
 mochte|did|
-ausführst|ausführst|
 autoritär|authoritarian|
 deute|interpret|
 grab|grave|
-lei|lei|
 leuchter|candlestick|
-studios|studios|
 unangenehm|unpleasant|
 unterschrieb|signed|
 verfasse|compose|
@@ -2036,7 +1795,6 @@ vorläufig|provisionally|
 vorzeige|showcase|
 warschau|warsaw|
 überprüfe|check|
-antoniae|antoniae|
 aufstelle|lays down|
 bessern|improve|
 betreibe|pursuing|
@@ -2048,7 +1806,6 @@ gereiche|redound|
 gesamtem|entire|
 gläubig|religious|
 holt|obtained|
-instrument|instrument|
 laden|invite|
 lehre|teaching|
 lässt|can|
@@ -2057,13 +1814,10 @@ prinzipiell|in principle|
 selbstverständlich|of course|
 verfolge|follow|
 wohnen|live|
-zufaii|zufaii|
 überflüsse|excesses|
 übernahm|took|
-graner|Graner|
 verschied|different|
 altert|ages|
-and|and|
 angebot|offer|
 annahm|accepted|
 araber|Arab|
@@ -2080,10 +1834,8 @@ herd|stove|
 interessant|interesting|
 klan|clan|
 kräften|forces|
-meter|meter|
 ministerien|Ministries|
 nutze|use|
-stuf|stuf|
 stützt|based|
 trete|kick|
 umgehe|Circumvent|
@@ -2093,13 +1845,11 @@ unterhaltung|entertainment|
 verlorenem|lost|
 lieblich|sweet|
 kopfe|head|
-arabia|arabia|
 bände|associations|
 eingenommen|taken|
 einrichtung|facility|
 enger|close|
 enthält|contains|
-erbaust|erbaust|
 erfindung|invention|
 fasse|summarize|
 fürchtest|fear|
@@ -2107,19 +1857,16 @@ hinterliess|left behind|
 hole|get|
 knie|knee|
 konflikt|conflict|
-ludwig|ludwig|
 meldung|message|
 mitten|in the middle|
 mühsal|toil|
 organisation|organization|
 osteuropa|Eastern Europe|
-steckst|steckst|
 stärke|strength|
 unterlag|subject|
 verbrannt|burnt|
 wahrnehme|perceive|
 warf|threw|
-ausarbeite|ausarbeite|
 geistes|humanities|
 gerügt|reprimanded|
 müßt|must|
@@ -2128,8 +1875,6 @@ ton|sound|
 überrage|about rage|
 bart|beard|
 beseitigen|eliminate|
-bewährst|bewährst|
-bundde|bundde|
 bäume|trees|
 gefaxt|faxed|
 gestalte|Create|
@@ -2144,34 +1889,26 @@ vergleiche|compare|
 wissenschaftliche|scientific|
 zurückgezogen|withdrawn|
 eigelb|yolk|
-jünglingdu|jünglingdu|
 museen|museums|
 privatem|private|
 unserm|our|
-abschaffst|abschaffst|
 anlegen|invest|
 ausgab|spending|
-bank|Bank|
 bauten|built|
 flog|Flew|
 großteil|bulk|
-herstellst|herstellst|
 jegliche|any|
 lösen|solve|
 lüg|do not lie|
 regen|rain|
 ruhm|fame|
-stabia|Stabia|
 taucht|dips|
-text|text|
 verben|verbs|
 aussprach|pronounced|
 durchführe|by lead|
 furchig|furrowed|
 prüfen|check|
 reist|travels|
-schulz|schulz|
-schwächel|schwächel|
 umgekehrt|conversely|
 verdoppele|Duplicate|
 vollzog|occurred|
@@ -2179,7 +1916,6 @@ wanderst|wander|
 zuhörens|listening|
 beispielsweise|for example|
 briefe|letters|
-empörst|empörst|
 enge|close|
 erholt|recovered|
 erstes|first|
@@ -2196,7 +1932,6 @@ nachkomme|descendant|
 nutzt|uses|
 periode|period|
 rande|the edge|
-revolution|revolution|
 sicherheit|security|
 sogleich|immediately|
 tödlich|fatal|
@@ -2213,7 +1948,6 @@ erz|ore|
 größtenteils|largely|
 ahnung|idea|
 bewußt|aware|
-drängele|drängele|
 erstaune|astonished|
 kindlich|childlike|
 vergnüge|take delight|
@@ -2228,7 +1962,6 @@ gemeinden|communities|
 gerede|talk|
 glanz|shine|
 institut|institute|
-mission|mission|
 nahrung|food|
 posten|post|
 religiös|religious|
@@ -2241,19 +1974,14 @@ verlang|slowed|
 verweint|tear-stained|
 angreife|attacking|
 bedürfnis|need|
-donald|donald|
 düsseldorf|Dusseldorf|
 einschließe|inclusive|
-erhoffst|erhoffst|
 erwies|was found|
 flamme|flame|
 fürcht|fear|
 fürst|prince|
 gleichgewicht|balance|
-gotte|gotte|
 gründung|foundation|
-hande|hande|
-hinreiche|hinreiche|
 jung|young|
 nirgends|nowhere|
 norden|north|
@@ -2265,13 +1993,10 @@ sohnes|son|
 verkehr|traffic|
 verträge|contracts|
 voraussetzt|requires|
-wolfgang|wolfgang|
 übernehm|acquiring|
-beruhigst|beruhigst|
 draußen|out|
 empfange|receive|
 hirten|shepherd|
-komplizierst|komplizierst|
 krakau|krakow|
 vermocht|been able|
 weltgeschichte|world history|
@@ -2282,8 +2007,6 @@ eng|closely|
 fließe|flowed|
 gefragt|in demand|
 konzentrier|concentrated|
-mari|mari|
-problem|problem|
 scharf|sharp|
 schuf|created|
 wachsendem|growing|
@@ -2303,7 +2026,6 @@ gelassenem|placid|
 geschont|spared|
 göttin|goddess|
 herzog|duke|
-professor|professor|
 schlüsse|connections|
 schwanes|swan|
 sichtlich|visibly|
@@ -2318,18 +2040,13 @@ herrlich|wonderful|
 prophezeie|predict|
 tragisch|tragic|
 würdig|worthy|
-jakobl|jakobl|
 auftritt|occurs|
-dimension|dimension|
 gebot|bid|
 griffe|handles|
 irrtum|error|
 jenseits|beyond|
 kunstwelt|art world|
-mask|mask|
 mittlerweile|meanwhile|
-parisa|Parisa|
-richie|richie|
 rot|red|
 schnelle|fast|
 schweiss|sweat|
@@ -2346,13 +2063,10 @@ widerspreche|contradicts|
 zentrum|center|
 zweck|purpose|
 holz|wood|
-massive|massive|
 anerkannt|recognized|
 anzeigen|show|
-belohnst|belohnst|
 beschlagnahme|seizure|
 bittere|bitter|
-brie|Brie|
 entführst|abduct|
 ergebe|apparent|
 fruchtbare|fertile|
@@ -2360,7 +2074,6 @@ fügt|adds|
 geglaubt|believed|
 gliedern|divide|
 interpretiere|interpret|
-karl|karl|
 kümmern|care|
 nachmittag|afternoon|
 ordentlich|properly|
@@ -2369,7 +2082,6 @@ scharfe|sharp|
 steuern|control|
 tee|tea|
 weh|woe|
-zwangt|zwangt|
 bezeichnung|designation|
 bezog|related|
 deswegen|therefore|
@@ -2377,22 +2089,15 @@ erhaben|sublime|
 fronten|fronts|
 fährst|are going|
 gottheit|deity|
-herman|herman|
 marsch|march|
 romane|novels|
-spiegei|spiegei|
 trafen|met|
 versammle|gather|
 buchstaben|letters|
 erstarre|freeze|
-front|front|
 kennenlerne|get to know|
-kriegend|kriegend|
 wahrhaftig|true|
-überaii|überaii|
-grazer|grazer|
 anblick|sight|
-anfordere|anfordere|
 auffinde|find me|
 aufs|again|
 ausbreite|spreading|
@@ -2404,12 +2109,9 @@ franzos|Frenchman|
 inmitten|amidst|
 korrigiere|correct|
 körperlich|physically|
-lipp|lipp|
 moral|morality|
-original|original|
 ringen|wrestle|
 seltne|Seline|
-sobaid|sobaid|
 spanns|Spann|
 tötest|kill|
 umfangreichem|extensive|
@@ -2417,10 +2119,8 @@ unsterblich|immortal|
 untergeben|subordinate|
 unterschiedlichem|different|
 unterzeichnest|with draw|
-verschulde|verschulde|
 verunsichere|rattle|
 verüben|commit|
-vögele|vögele|
 wirke|WOULD|
 wohlhabend|wealthy|
 zahlst|pay|
@@ -2429,13 +2129,10 @@ angekündigt|announced|
 architektur|architecture|
 ausgebildet|trained|
 ausländisch|foreign|
-christi|christi|
 decke|ceiling|
 engen|close|
-franta|franta|
 geruch|odor|
 gespann|team|
-jan|jan|
 klima|climate|
 merkmal|feature|
 politiken|policies|
@@ -2443,7 +2140,6 @@ sommer|summer|
 spürbar|noticeable|
 traf|met|
 ursprung|origin|
-verhängst|verhängst|
 wut|rage|
 dergleichen|like|
 alsbald|soon|
@@ -2463,13 +2159,10 @@ fläche|area|
 getrennt|separated|
 großartig|great|
 kräftig|strong|
-minute|minute|
-mitmache|mitmache|
 mond|Moon|
 moralisch|morally|
 neuem|new|
 offensichtlich|obviously|
-pflegst|pflegst|
 schal|stale|
 schauspiel|drama|
 schimmels|mold|
@@ -2481,7 +2174,6 @@ verfluche|curse|
 übt|exercises|
 abzugeben|leave|
 anstalt|institution|
-phase|phase|
 stern|star|
 treibt|drives|
 uhr|clock|
@@ -2498,7 +2190,6 @@ angabe|specification|
 aufstieg|rise|
 ausgleich|compensation|
 bedarf|demand|
-direct|direct|
 diskussion|discussion|
 durchgeführt|carried out|
 fülle|abundance|
@@ -2515,7 +2206,6 @@ rest|residual|
 schwächer|weaker|
 schülerin|student|
 seitdem|since|
-sonstig|sonstig|
 technik|technology|
 typisch|typical|
 tätig|active|
@@ -2525,19 +2215,15 @@ vorbei|past|
 vorwürfe|allegations|
 weiteres|more|
 werf|throw|
-wohi|Wohi|
 zunahm|increased|
 überblick|overview|
-oas|oas|
 abgelegen|remote|
 aufenthalt|stay|
 aufführe|performers|
-augustow|Augustow|
 gewölbe|vault|
 markiere|mark|
 müd|tired|
 persisch|Persian|
-still|still|
 aggressiv|aggressive|
 ankündige|announcing|
 aufgeführt|listed|
@@ -2549,7 +2235,6 @@ bereitens|least prepared|
 bestrafer|Punisher|
 bewirkst|causest|
 binden|bind|
-dominas|dominas|
 erbittern|incense|
 erlebe|experience|
 errang|won|
@@ -2560,12 +2245,10 @@ innen|inside|
 integriere|integral|
 kommerziell|commercially|
 konzept|concept|
-monaco|monaco|
 nachher|later|
 profitiere|benefit|
 räumst|agree that|
 staatlichem|state|
-ukraine|Ukraine|
 umfasst|includes|
 ursprünglichem|original|
 vorwahl|area code|
@@ -2585,7 +2268,6 @@ kloster|monastery|
 rücke|Skidding|
 unbegreiflich|incomprehensible|
 veranlage|person assessed|
-verhandein|verhandein|
 aktion|action|
 ans|to the|
 astronom|astronomer|
@@ -2597,8 +2279,6 @@ erbe|heritage|
 geschenkt|given|
 geöffnet|open|
 hierzu|this|
-minderem|minderem|
-rate|rate|
 reine|pure|
 schreibt|writes|
 stirb|Die|
@@ -2608,7 +2288,6 @@ unklar|unclear|
 verdienste|merits|
 vorurteil|prejudice|
 vögel|birds|
-wan|wan|
 zukünftig|future|
 zusammenbruch|collapse|
 zusammenhält|holds together|
@@ -2630,27 +2309,21 @@ abreise|departure|
 alterns|aging|
 beibringe|teach|
 brechen|break|
-christel|christel|
 funktioniere|functioning|
-genera|genera|
 gestorben|died|
 gesunde|healthy|
 gewagt|risky|
 gewohnheit|habit|
 lauf|run|
-maries|maries|
 möchten|would|
-neutral|neutral|
 panzer|tank|
 phänomen|phenomenon|
-priene|Priene|
 reichlich|abundant|
 rettern|rescuers|
 römischer|Roman|
 sachen|things|
 schilde|shields|
 territorien|territories|
-versagst|versagst|
 verschob|shifted|
 verschwamm|blurred|
 verzicht|waiver|
@@ -2661,14 +2334,12 @@ geübt|practiced|
 kolonie|colony|
 spieler|player|
 süß|sweet|
-usa|USA|
 verabrede|make a date|
 verrücke|Nutty|
 versteinere|to stone|
 völkern|overpopulate|
 zerstreust|dispel|
 anschein|appearance|
-aufzeichne|aufzeichne|
 einsam|lonely|
 einstig|erstwhile|
 geklebt|glued|
@@ -2682,7 +2353,6 @@ seid|are|
 verantwortlichem|responsible|
 verhafte|arrest|
 übereinstimme|agree|
-absichere|absichere|
 anstrengst|look hard|
 apoll|apollo|
 augenschein|eyes shining|
@@ -2690,7 +2360,6 @@ beeinflusse|influencing|
 beträfe|would affect|
 blond|blonde|
 darstelle|performing|
-dieter|dieter|
 eigner|own|
 ersparst|will spare|
 erwünscht|desirable|
@@ -2704,12 +2373,10 @@ kenner|expert|
 leiter|manager|
 mauern|support|
 meeren|oceans|
-paris|Paris|
 rang|rank|
 reformen|reforms|
 richtens|teaching|
 sammeln|collect|
-schenkst|schenkst|
 schlaf|sleep|
 schriften|regulations|
 seither|since then|
@@ -2736,13 +2403,9 @@ gewisser|some|
 gipfel|summit|
 leite|derive|
 ohre|tube|
-real|real|
-ring|ring|
-romano|romano|
 schiffe|ships|
 streite|argue|
 theorie|theory|
-verbreche|verbreche|
 verschiedenst|variously|
 wenden|turn|
 widerstanden|resisted|
@@ -2756,12 +2419,8 @@ feinem|fine|
 fischen|fish|
 genehmige|approval|
 gewand|garment|
-harmon|harmon|
-hollis|hollis|
 mußten|had|
 pilgerin|pilgrim|
-schöpfst|schöpfst|
-soviei|soviei|
 ungarn|Hungary|
 unheimlich|scary|
 verkörpere|embody|
@@ -2779,7 +2438,6 @@ ausgelöst|triggered|
 bach|creek|
 baum|tree|
 behindernd|obstructive|
-bucher|bucher|
 eingang|input|
 ertrage|bear|
 gebirg|mountains|
@@ -2797,13 +2455,10 @@ provisorien|temporaries|
 resultat|result|
 schlank|slim|
 schlimmes|bad|
-studier|studier|
 tapferes|brave|
 verfügbar|available|
-verschärfst|verschärfst|
 vertrages|contract|
 vorschlag|proposal|
-warm|warm|
 zerstöre|Destroy|
 einbilde|imagining|
 stile|styles|
@@ -2813,7 +2468,6 @@ auferlege|imposes|
 berühmtes|famous|
 besessen|possessed|
 bewundere|admire|
-einleite|einleite|
 entschädige|indemnified|
 entziehe|deprivation|
 ersticke|suffocate|
@@ -2829,16 +2483,11 @@ süßend|sweetening|
 tuch|cloth|
 tyrannei|tyranny|
 ungarisch|Hungarian|
-vereinzelnd|vereinzelnd|
 verfalle|succumb|
 zart|tender|
 zusammengehen|go together|
 überflute|on flute|
-jupiter|Jupiter|
 nachahmst|imitating|
-abermalig|abermalig|
-adam|Adam|
-albrecht|albrecht|
 aufzubauen|build|
 bemüh|Strive|
 beschluß|decision|
@@ -2850,9 +2499,7 @@ gerissen|broken|
 hinweg|of time|
 kritiken|Reviews|
 latein|Latin|
-matthew|matthew|
 neuestem|recently|
-quality|quality|
 regiere|govern|
 sank|decreased|
 schrittweise|gradually|
@@ -2877,8 +2524,6 @@ unterdeck|under deck|
 verknüpfe|linking|
 verlängere|renew|
 verwüste|devastate|
-wanderin|wanderin|
-willow|willow|
 übergebe|surrender|
 übertrage|carry on|
 angegriffen|attacked|
@@ -2888,12 +2533,9 @@ aufnehme|receiving|
 bayern|Bavaria|
 bedauerst|regret|
 bewahr|shall preserve|
-billie|billie|
-einhalte|einhalte|
 einschnitt|incision|
 enorm|enormously|
 erfreust|make glad|
-erschwerst|erschwerst|
 erwidere|reply|
 flieh|flee|
 fremd|foreign|
@@ -2908,7 +2550,6 @@ kirchlich|church|
 los|off|
 lücke|gap|
 pflicht|duty|
-region|region|
 restlich|remaining|
 samt|together with|
 sieder|boiler|
@@ -2917,17 +2558,12 @@ spannungen|voltages|
 umfang|scope|
 unseres|our|
 unweit|not far from|
-verfeinde|verfeinde|
-version|version|
 vorhang|curtain|
 wein|wine|
 weitergehe|go on|
 zusammenlebe|live together|
-überreichst|überreichst|
 aneinander|together|
-chin|chin|
 fleisch|meat|
-marcia|marcia|
 untereinander|each other|
 zärtlich|tender|
 andeutung|hint|
@@ -2941,9 +2577,7 @@ bildnis|portrait|
 blätter|Sheets|
 düstere|dark|
 entstelle|misrepresentation|
-entwende|entwende|
 ermutige|encourage|
-forum|forum|
 gereift|matured|
 geschmack|taste|
 grüß|greet|
@@ -2963,25 +2597,20 @@ weiterführe|further lead|
 überrede|persuasive|
 pyramide|pyramid|
 statistin|the extras|
-tom|tom|
 alleine|alone|
 ausgebaut|expanded|
 basis|base|
 besatzes|trimming|
 biet|territory|
 eingerichtet|set up|
-element|element|
 erben|inherit|
 flieg|fly|
-forme|forme|
 frühe|Early|
 funde|findings|
 identität|identity|
 karte|map|
 kommisses|Come isses|
 küste|coast|
-online|online|
-position|position|
 präsident|president|
 rauch|smoke|
 stamm|strain|
@@ -2996,7 +2625,6 @@ zeitweise|at times|
 abgenommen|removed|
 angestellt|employed|
 aufgestellt|placed|
-auslegst|auslegst|
 außenminister|Secretary of State|
 bildhauer|sculptor|
 durchschnitt|average|
@@ -3016,11 +2644,8 @@ hilft|help|
 hinweise|notes|
 ignorierst|ignore|
 mark|marrow|
-martin|martin|
-max|max|
 normalem|normal|
 passierst|will pass|
-paul|paul|
 pflegen|maintain|
 sachlich|objectively|
 schuhe|shoes|
@@ -3037,9 +2662,7 @@ vorübergehe|pass by|
 wahrend|while|
 warnen|warn|
 weisst|know|
-zwing|Zwing|
 alexanders|alexander|
-annektiere|annektiere|
 beabsichtige|intend|
 benennen|name|
 beweglich|mobile|
@@ -3050,7 +2673,6 @@ fleiße|diligence|
 gesengt|singed|
 gruppiere|regroup|
 heiliger|holy|
-hofe|hofe|
 jedesmal|each time|
 kindisch|childish|
 lauter|nothing but|
@@ -3061,10 +2683,8 @@ verhülle|veil|
 vernichtern|shredders|
 vorwurf|accusation|
 zelt|tent|
-zubereite|zubereite|
 überarbeite|revised|
 entwerfe|designing|
-hogwarts|hogwarts|
 vereitele|frustrates|
 beglücke|to gladden|
 römern|romans|
@@ -3079,7 +2699,6 @@ beanspruche|Please claim|
 bekräftige|reaffirm|
 bescheid|decision|
 beschwor|urged|
-besichtige|besichtige|
 einwanderer|immigrant|
 ermuntere|encourage|
 evangeliar|Gospel|
@@ -3094,7 +2713,6 @@ siegreich|victorious|
 slawische|Slavic|
 teilnahm|participated|
 verschlimmere|getting worse|
-verse|verse|
 vorgang|process|
 wahrsagen|tell fortunes|
 wetten|bet|
@@ -3104,7 +2722,6 @@ wunderst|wonder|
 anzunehmen|to accept|
 aufgebot|banns|
 ausgewählt|selected|
-bedell|bedell|
 belastens|straining|
 brot|bread|
 Bundesrat|Federal Council|
@@ -3129,8 +2746,6 @@ käm|FIGHTING!|
 kürze|brevity|
 lokale|local|
 lustig|funny|
-material|material|
-möglicherem|möglicherem|
 offizier|officer|
 philosophin|Philosopher|
 pott|pot|
@@ -3141,7 +2756,6 @@ silber|silver|
 theologe|theologian|
 töchter|daughters|
 versailler|versailles|
-versöhnst|versöhnst|
 vorderem|front|
 vorschrift|regulation|
 widmest|dedicate|
@@ -3165,26 +2779,17 @@ falsch|wrong|
 festgestellt|found|
 gesichert|secured|
 gesunken|decreased|
-guns|Guns|
-handle|handle|
 hohes|high|
 nationen|nations|
 netz|network|
-opposition|opposition|
-regime|regime|
-robe|robe|
-roland|roland|
 schild|sign|
 seuche|epidemic|
 vermied|avoided|
 vorgetragen|presented|
-woh|woh|
 zeitpunkt|time|
 zugunsten|in favor of|
 zumeist|mostly|
-abstimme|abstimme|
 atmosphäre|atmosphere|
-auffordere|auffordere|
 aufgeregt|excited|
 bestärke|decisively support|
 betonst|laying stress|
@@ -3192,22 +2797,18 @@ bezirk|district|
 brennendem|burning|
 einberufe|convoke|
 entledige|discards|
-entschulde|entschulde|
 fortschritt|progress|
 geleimt|glued|
 gesims|cornice|
-intellektue|intellektue|
 konstruktiv|constructive|
 lebhaft|lively|
 lichten|clear|
 pferden|horses|
 pflege|care|
-schlafes|schlafes|
 unbedeutend|insignificant|
 unerfahren|inexperienced|
 vernünftig|reasonable|
 verschleppe|was delaying|
-vorrechne|vorrechne|
 gesichts|facial|
 verwöhne|spoil|
 ängstlich|anxious|
@@ -3217,22 +2818,17 @@ abgeschnitten|cut off|
 abschließe|concluding|
 abwesend|absent|
 aufgetan|opened|
-aufkomme|aufkomme|
-auswirkst|auswirkst|
 barbar|barbarian|
 bauer|farmer|
 beachtest|will notice|
 bekäme|would get|
-belebst|belebst|
 bindung|binding|
 brannte|burned|
 doppelt|twice|
-dreimai|dreimai|
 einigermaßen|somewhat|
 einverstanden|agreed|
 einziehe|Feeding|
 ernährst|nourish|
-faszinierst|faszinierst|
 festzustellen|determine|
 frankreichs|france|
 garantierst|warrant|
@@ -3256,7 +2852,6 @@ phantasie|imagination|
 platte|plate|
 prägst|forge it|
 schultern|shoulder|
-sen|sen|
 senden|send|
 spanische|Spanish|
 trinke|drink|
@@ -3265,19 +2860,14 @@ verbirg|hide|
 voneinander|of each other|
 vorfahr|ancestor|
 wehrt|wards|
-westlb|westlb|
 wink|hint|
 witzig|funny|
 künstlers|artist|
 wohlwollen|goodwill|
-anzeigst|anzeigst|
-arthur|arthur|
-barbarin|Barbarin|
 beugen|bend|
 bezeugst|testify|
 danke|Thank you|
 dichtern|compressors|
-dumbledore|dumbledore|
 einmischen|interfere|
 erdrücke|smother|
 erschrecket|troubled|
@@ -3315,12 +2905,9 @@ aufbaue|builds up|
 ausgeschlossen|impossible|
 ausweg|way out|
 bewohner|resident|
-blind|blind|
-chaos|chaos|
 eingeschlagen|taken|
 erlosch|went out|
 feindschaft|hostility|
-hall|hall|
 mittelalterliche|medieval|
 nebeneinander|side by side|
 nikolaus|Nicholas|
@@ -3329,14 +2916,11 @@ polizei|police|
 schnee|snow|
 vielzahl|multiplicity|
 wen|who|
-wohlst|wohlst|
 zufolge|according to|
 abgesagt|off|
 ach|oh|
 alleinig|solely|
-anregst|anregst|
 aufrichte|straighten up|
-bedingst|bedingst|
 breit|wide|
 brenne|burn|
 dame|lady|
@@ -3345,32 +2929,25 @@ deckst|banquet for|
 dreißig|thirty|
 dringen|penetrate|
 durchsicht|inspection|
-einweihe|einweihe|
 empfohlen|recommended|
 ethnien|ethnics|
 gedächtnis|memory|
 gekrönt|crowned|
 gelinge|successful|
-gelingst|gelingst|
 gestört|disturbed|
 halte|think|
 harmonisch|harmoniously|
 heftiges|violent|
 helle|bright|
-hinata|hinata|
-hinnehme|hinnehme|
 innerlich|internal|
 irgendwelche|any|
-james|james|
 konzentrat|concentrate|
 kopierst|copying|
 medizinisch|medical|
 nachte|nights|
-parallel|parallel|
 sachsen|Saxony|
 sang|singing|
 schilderst|describe to|
-sebastian|sebastian|
 sowjetunion|Soviet Union|
 spanne|span|
 stils|style|
@@ -3385,7 +2962,6 @@ unterbreche|interrupt|
 verbraucht|consumed|
 verehre|worship|
 verfiel|fell|
-verschaffst|verschaffst|
 versprach|promised|
 verstümmele|maim|
 verwehre|repudiate|
@@ -3394,33 +2970,23 @@ vorangegangen|preceding|
 vorsitzende|chairman|
 weiche|soft|
 wittere|scent|
-währst|währst|
 abbilder|images|
 anstrebe|striving|
-arrogant|arrogant|
 aufteile|also broken|
 aufzunehmen|record|
 beibehalte|keeping up|
-bekriege|bekriege|
 brauchbare|useful|
-chinese|chinese|
 denkbar|conceivable|
 durcheile|by rush|
-enthüllst|enthüllst|
 entschuldigst|excuse|
 fernsehe|watch TV|
 fluch|curse|
 gemessen|measured|
 gemäßigt|moderate|
 glücklichem|happy|
-hinrichte|hinrichte|
-hold|hold|
 hölzer|woods|
 isoliert|isolated|
 kostbar|precious|
-londo|londo|
-mitwirke|mitwirke|
-munde|munde|
 nachgehe|ENGAGED|
 Ostsee|Baltic Sea|
 planmäßig|scheduled|
@@ -3436,7 +3002,6 @@ verzierst|decorate|
 vorhabe|intend|
 waffenstillstand|truce|
 wirkungsvoll|effectively|
-anfiel|anfiel|
 glied|link|
 heit|safety|
 lausen|delouse|
@@ -3444,7 +3009,6 @@ mazedonien|Macedonia|
 nüchtern|sober|
 vergänglich|transient|
 wimmele|teeming|
-venus|Venus|
 anerkenne|acknowledge|
 angefangen|started|
 ausgeglichen|balanced|
@@ -3453,10 +3017,8 @@ bedienen|operate|
 beispiele|Examples|
 bemerkbar|noticeable|
 bereitwillig|readily|
-bill|bill|
 effektiv|effectively|
 eindrucksvoll|impressive|
-einschätze|einschätze|
 einstellte|stopped|
 energisch|energetic|
 entfessele|unleash|
@@ -3464,14 +3026,12 @@ fern|remote|
 flache|flat|
 formale|formal|
 gebrannt|burned|
-gelula|Gelula|
 gewußt|known|
 glänze|shine|
 gläser|glasses|
 graue|gray|
 graupe|pearl barley|
 ideale|ideal|
-kaiserreich|kaiserreich|
 kandidat|candidate|
 laune|mood|
 leistungsfähig|powerful|
@@ -3480,7 +3040,6 @@ posen|pose|
 rumäne|Romanian|
 sinnvoll|useful|
 sowjetisch|Soviet|
-staros|Staros|
 stillens|breastfeeding|
 traust|Dare|
 träumst|dream|
@@ -3505,22 +3064,18 @@ sinnlich|sensual|
 strahlend|bright|
 unerträglich|intolerable|
 vergnügst|amuse|
-abwegs|abwegs|
 alpen|Alps|
 anhänger|trailer|
 anzuerkennen|recognize|
-ausübst|ausübst|
 bekannter|known|
 beratene|advised|
 bestandteil|component|
 bote|messenger|
-christoph|christoph|
 derzeitigem|to current|
 ecke|corner|
 englisch|English|
 entsetzt|appalled|
 fahren|go|
-ferdinand|ferdinand|
 ferien|holiday|
 fliegend|flying|
 flug|flight|
@@ -3532,7 +3087,6 @@ gärte|fermented|
 Hauptartikel|Main article|
 heft|issue|
 helfend|helping|
-hitler|Hitler|
 kiel|keel|
 komödie|comedy|
 konkret|concrete|
@@ -3554,16 +3108,13 @@ rache|revenge|
 schlag|shock|
 seelen|souls|
 stab|staff|
-strike|strike|
 summe|sum|
 verdacht|suspicion|
 versag|ISA|
 verwandle|transform|
-viktor|viktor|
 vorherig|previous|
 väter|fathers|
 wahrgenommen|perceived|
-wärm|wärm|
 zeitgenössisch|contemporary|
 zeitlich|temporal|
 zurückliege|lie back|
@@ -3582,10 +3133,8 @@ gegnern|opponents of|
 geschwindigkeit|speed|
 hab|have|
 konkurrent|competitor|
-nunmal|nunmal|
 paare|pairs|
 parlament|parliament|
-press|press|
 schwerpunkt|center of gravity|
 strom|current|
 versetz|Handle is|
@@ -3597,11 +3146,8 @@ engagiere|committed|
 gelehrter|learned|
 organisch|organic|
 potenziell|potentially|
-verleide|verleide|
 achse|axis|
 ahnt|suspects|
-aussuche|aussuche|
-aussöhne|aussöhne|
 diensten|services|
 einerlei|all the same|
 eingeladen|invited|
@@ -3613,7 +3159,6 @@ gedichten|poems|
 generell|general|
 gewalttat|act of violence|
 gleichstelle|assimilates|
-hamburg|Hamburg|
 hervorgebracht|produced|
 krönst|crownest|
 lehrreich|instructive|
@@ -3622,8 +3167,6 @@ liebhaber|lover|
 messen|measure|
 nötigend|urging|
 offenkundig|obvious|
-orientierst|orientierst|
-servierst|servierst|
 spaß|fun|
 tasche|pocket|
 tiefstem|bottom|
@@ -3631,16 +3174,11 @@ trügerisch|deceptive|
 unterhielt|maintained|
 unterlief|underwent|
 vorgefühl|anticipation|
-vorkomme|vorkomme|
-Weimar|Weimar|
 williges|willing|
 worin|in which|
-überschwemmst|überschwemmst|
-überwachst|überwachst|
 osmanische|Ottoman|
 gemälden|paintings|
 adel|nobility|
-aufrechne|aufrechne|
 geschwebt|floated|
 lebenslage|living situation|
 mittelmäßig|mediocre|
@@ -3655,7 +3193,6 @@ begrab|bury|
 belege|advices|
 blatt|leaf|
 briefen|Pfandbriefe|
-david|David|
 demokrat|democrat|
 durchbruch|breakthrough|
 dänisch|Danish|
@@ -3664,36 +3201,27 @@ einblick|insight|
 einbruch|burglary|
 einnehme|occupy|
 eintraf|arrived|
-erhöbe|erhöbe|
 ersann|devised|
 erschaff|the skies|
 erweise|legally|
 etliche|some|
 exil|exile|
-expansion|expansion|
 festgehalten|held|
 gefällst|like you|
 geschliffen|polished|
 handwerk|craft|
-helen|helen|
 hergestellt|produced|
 hochzeit|wedding|
 höherer|higher|
 identisch|identical|
 instrumente|instruments|
 irrt|wrong|
-john|John|
 kontakt|contact|
 königin|queen|
 locker|loosely|
-munich|munich|
-new|new|
 perspektive|perspective|
-private|private|
 produktion|production|
 regelt|regulates|
-restaurant|Restaurant|
-richard|richard|
 schnitt|section|
 senke|sink|
 singe|sing|
@@ -3702,7 +3230,6 @@ tafel|panel|
 tisch|table|
 toll|great|
 trennt|separates|
-trochu|Trochu|
 unglaube|unbelief|
 unverändert|unchanged|
 verachtung|contempt|
@@ -3712,12 +3239,10 @@ verhandle|negotiate|
 vermag|can|
 versteck|hiding place|
 verwaltung|management|
-vision|vision|
 weltmeer|sea ​​world|
 wem|who|
 widerspruch|contradiction|
 zitat|quote|
-zone|zone|
 zügen|trains|
 öffentlich|public|
 angeben|specify|
@@ -3732,7 +3257,6 @@ bunte|colorful|
 entschlief|asleep|
 erfreulich|gratifying|
 ergebene|devoted|
-erich|erich|
 erzielst|will achieve|
 feststelle|notice|
 funkten|radioed|
@@ -3743,39 +3267,30 @@ genügt|sufficient|
 handhabe|handle|
 heiratest|get married|
 hierauf|on this|
-horizon|horizon|
 hüte|hats|
 liebenswert|lovable|
 mitgeteilt|reported|
-passos|passos|
 profil|profile|
 präsentiere|presenting|
 sammelt|collects|
 schmeicheln|flatter|
 solches|such|
 ungeduld|impatience|
-verhänge|verhänge|
 verständlich|understandable|
 verwalte|manage|
 wiederkomme|come back|
 zivile|civilian|
-besiedele|besiedele|
 durchsuche|by seeking|
 entblöße|bare|
 fleischig|fleshy|
 gehobelt|planed|
-ide|ide|
 identifiziere|identified|
 mannigfach|manifold|
-mind|Mind|
-rock|rock|
 urlaub|holiday|
 vaterland|homeland|
 vergewaltige|rape|
-beck|beck|
 besetze|filled|
 entlang|along|
-gabriel|gabriel|
 gegenleistung|return|
 hinweis|reference|
 konkurrenz|competition|
@@ -3785,30 +3300,24 @@ masse|mass|
 morgens|in the morning|
 wandel|change|
 übersicht|survey|
-Glasperlenspicl|Glasperlenspicl|
 beschimpfe|insult|
 Böhme|Bohemian|
-diana|Diana|
 einstufe|classed|
 flor|pile|
 florenz|florence|
-herzogt|herzogt|
 instinkt|instinct|
 mathematik|mathematics|
 meisterin|champion|
 priesterin|priestess|
 schloß|lock|
-tonkin|tonkin|
 unwürdig|unworthy|
 verdorben|spoiled|
-violet|violet|
 argumentiere|argue|
 armeen|armies|
 ausgeprägt|pronounced|
 auszudrücken|express|
 beobachtung|observation|
 bereust|regret|
-christie|christie|
 demütiger|humble|
 deutschsprachig|German-speaking|
 duft|scent|
@@ -3817,7 +3326,6 @@ ehrenvoll|honorably|
 enthielt|contained|
 flattern|flutter|
 gekläff|yap|
-gerhard|gerhard|
 gewirkt|worked|
 knien|kneel|
 kriegsheer|devastating war|
@@ -3826,8 +3334,6 @@ operativ|operational|
 pro|per|
 schräg|oblique|
 schwede|Swede|
-soda|soda|
-SPD|SPD|
 spross|shoot|
 strukturell|structurally|
 stummeln|stumps|
@@ -3847,7 +3353,6 @@ wettbewerb|competition|
 widerwille|aversion|
 wirtschaftspolitik|economic policy|
 abgehalten|held|
-agency|agency|
 angewandt|applied|
 anmelden|log on|
 asiatischem|Asian|
@@ -3870,7 +3375,6 @@ ergäbe|would|
 erspar|It saves|
 finde|find|
 flüche|Curses|
-flüchtest|flüchtest|
 freigelassen|released|
 gefördert|promoted|
 gegenspieler|against player|
@@ -3882,12 +3386,9 @@ grüner|green|
 günstig|favorable|
 herausgegeben|published|
 industrie|industry|
-initials|initials|
 kälte|cold|
-leipzig|Leipzig|
 loch|hole|
 londoner|London|
-markum|Markum|
 maßnahme|measure|
 militär|military|
 ministerpräsident|prime minister|
@@ -3895,14 +3396,11 @@ märchen|story|
 politisch|political|
 realiter|in reality|
 rechnest|counting on|
-reichre|reichre|
 respekt|respect|
-russell|russell|
 schlägst|strike|
 sechzig|sixty|
 stammst|are descended|
 stetig|steady|
-tale|Tale|
 teich|pond|
 traue|trust|
 umgebe|surrounding|
@@ -3913,14 +3411,12 @@ vergeh|Fade|
 vernichtung|destruction|
 verständen|UNDERSTAND|
 vortrag|lecture|
-wiener|wiener|
 wies|had|
 zurückzuführen|back|
 zurückzukehren|return|
 ärger|anger|
 überfiel|invaded|
 überlebende|survivor|
-anmerkst|anmerkst|
 dramatisch|dramatic|
 empfindung|sensation|
 empfing|received|
@@ -3931,23 +3427,18 @@ mißtrauen|distrust|
 mobilisiere|mobilize|
 respektiere|respect|
 schmuggel|smuggling|
-verzauber|verzauber|
 vorzustellen|present|
 wissende|knowing|
 zweifelhaft|doubtful|
-prof|prof|
-anderson|anderson|
 anlaut|initial sound|
 aufgetragen|applied|
 aussichtslos|hopeless|
 austausch|exchange|
-begnügst|begnügst|
 betraf|concerned|
 bundesstaat|SATE|
 delegiere|delegate|
 endlose|endless|
 erfasst|recorded|
-extrema|extrema|
 falte|fold|
 freue|am|
 gastgebend|hospitable factor|
@@ -3970,7 +3461,6 @@ schiffbar|navigable|
 schluß|end|
 sterblich|mortal|
 streichen|remove|
-superman|superman|
 talente|talents|
 trank|drank|
 trauer|mourning|
@@ -3980,10 +3470,8 @@ untergehe|go under|
 veranstalte|organizing|
 vergebene|assigned|
 verriet|revealed|
-verwahrst|verwahrst|
 vorzüge|, virtues|
 wache|watch|
-wieviei|wieviei|
 zauberern|Wizards|
 zivilist|civilian|
 zugesagt|promised|
@@ -3996,7 +3484,6 @@ zögerns|hesitation|
 überwache|supervise|
 adelig|noble|
 außergewöhnlich|exceptionally|
-bewillige|bewillige|
 geendet|ended|
 gleichgültig|indifferent|
 göttern|gods of|
@@ -4011,26 +3498,19 @@ uralt|ancient|
 verstumme|fall silent|
 verwechsele|confuse|
 werben|advertise|
-zertrümmer|zertrümmer|
 abfall|waste|
 anordnung|arrangement|
 bahn|train|
 erwerb|acquisition|
 kette|chain|
 list|cunning|
-massini|Massini|
-minister|minister|
 rätsel|riddle|
 salz|salt|
 sprung|jump|
 stände|residues|
 wahlen|election|
 werkzeuge|tools|
-wild|wild|
 ablauf|expiration|
-abschere|abschere|
-alleus|alleus|
-america|america|
 anwendung|application|
 arabischem|Arabic|
 aufrechterhalten|maintain|
@@ -4046,7 +3526,6 @@ bestens|very well|
 bischen|little|
 brich|break|
 definiere|define|
-demoralisiere|demoralisiere|
 dürft|Dared|
 ebenbürtig|equal|
 eingeschlossen|included|
@@ -4070,7 +3549,6 @@ gerät|device|
 gestaltung|shaping|
 gewinkt|waved|
 güter|goods|
-henrik|henrik|
 hinziehe|ongoing for|
 industriell|industrial|
 inszeniere|staging|
@@ -4087,7 +3565,6 @@ realisiere|realize|
 rückgabe|return|
 scheue|shy|
 schlummer|slumber|
-schweigs|schweigs|
 spieles|game|
 stattdessen|instead|
 streck|stretch|
@@ -4095,22 +3572,18 @@ symbole|Symbols|
 süßigkeit|sweetness|
 taktik|tactics|
 tanze|dance|
-theater|theater|
 traditionen|traditions|
 trenne|separate|
 tät|ity|
 türe|door|
 umgewandelt|converted|
 unfehlbar|infallible|
-unterbrechet|unterbrechet|
 vertreterin|agent|
 vogel|bird|
 vorgezogen|preferred|
 weitläufig|spacious|
 welle|wave|
 welten|worlds|
-west|west|
-wundervoii|wundervoii|
 wüte|was raging|
 zehntausend|ten thousand|
 zeig|show|
@@ -4118,38 +3591,30 @@ zerfall|decay|
 zugeständnis|concession|
 zusammenbrach|collapsed|
 zusammensetzt|composed|
-zuwandere|zuwandere|
 angeregt|stimulated|
 anlass|occasion|
 anschaust|look at|
 aufstände|Revolts|
-beendigst|beendigst|
 beifall|cheers|
 beigeben|add|
 bekennst|confess|
 beschwerst|complain|
 bestreite|contest|
-betreust|betreust|
 blutes|blood|
 blühende|flowering|
 braune|brown|
 dankbares|grateful|
 denjenigen|those|
-dresden|Dresden|
 durchgehe|by going|
 dutzend|dozen|
 dörfer|villages|
 eindrücke|impressions|
 eingetreten|occurred|
 erhitzer|heater|
-ernennst|ernennst|
 erreichbar|accessible|
 felsen|rock|
-festhalle|festhalle|
 flüchtling|refugee|
-frankfurt|Frankfurt|
 gesetzlich|legally|
-gestock|gestock|
 gewühl|crowd|
 glückliches|Happy|
 gnade|grace|
@@ -4180,7 +3645,6 @@ zusehen|watch|
 heiterkeit|serenity|
 ahne|ancestor|
 anständig|decent|
-befremde|befremde|
 befähige|Empower|
 behutsam|cautious|
 bombardiere|bombarding|
@@ -4189,13 +3653,10 @@ entkräfte|invalidate|
 entziffere|decipher|
 entzücke|ravish|
 erkundige|inquire|
-ermittele|ermittele|
 evakuiere|evacuate|
 flüstern|whisper|
 freudig|joyfully|
 gänzlich|completely|
-lockre|lockre|
-plato|Plato|
 rekrutiere|recruit|
 riesele|only ripple|
 schüchtern|shy|
@@ -4209,13 +3670,8 @@ verharre|persevere|
 verschleiere|conceals|
 verstaue|stow|
 verzöger|delayed|
-zersplitter|zersplitter|
-tito|tito|
-sirius|Sirius|
 aberglaube|superstition|
 abseitig|abstruse|
-andrem|andrem|
-anstellst|anstellst|
 archiv|archives|
 aufgesucht|visited|
 aufregst|upset|
@@ -4227,13 +3683,10 @@ bedrohlich|threatening|
 beeinträchtige|affect|
 befürworte|favorable|
 begreifst|understand|
-beruhst|beruhst|
 betragt|amounts|
-beängstige|beängstige|
 ddr|GDR|
 direktor|director|
 dokumente|documents|
-eigenarten|eigenarten|
 entworfen|designed|
 erarbeite|work out|
 erblickst|behold|
@@ -4260,13 +3713,10 @@ informiere|inform|
 knochen|bone|
 krumen|crumbs|
 kräftiger|strong|
-latent|latent|
 launig|humorous|
 lud|invited|
 milliarden|billion|
-miterlebe|miterlebe|
 moskau|Moscow|
-museum|museum|
 ohnehin|anyway|
 parlamentarische|Parliamentary|
 pause|break|
@@ -4279,28 +3729,23 @@ revolutionieren|revolutionize|
 romantisch|romantic|
 rückzug|withdrawal|
 sagenhaft|fabulous|
-schiag|schiag|
 schicksale|fates|
 schluck|sip|
 schädige|harms|
 sexuell|sexually|
-spiegelst|spiegelst|
 stabilisiere|stabilize|
 stattgebe|instead of giving|
 streben|strive|
 störung|disturbance|
 sätze|rates|
 teure|expensive|
-theodor|theodor|
 tracht|costume|
 träumend|Dreaming|
 tue|do|
-umzingele|umzingele|
 unterzeichne|signing|
 verbinde|associate|
 verbring|spends a|
 vereinfache|simplify|
-verheerst|verheerst|
 verstärke|reinforcing|
 verwaltern|managers|
 verwegen|bold|
@@ -4310,9 +3755,7 @@ verzeihet|pardon|
 vorgesehen|provided|
 vorschau|preview|
 wecker|alarm clock|
-werner|werner|
 wiegst|weigh|
-willie|willie|
 willkommen|welcome|
 womöglich|possibly|
 zeuger|generators|
@@ -4325,7 +3768,6 @@ zusammenfasse|summarize|
 akademie|academy|
 aktivität|activity|
 anbiete|Offering|
-annika|annika|
 aufgebrochen|broken|
 ausgegangen|expected|
 ausgestattet|equipped|
@@ -4334,7 +3776,6 @@ behält|reserves|
 beichte|confession|
 belaste|burden|
 bietern|providers|
-bonn|Bonn|
 bruders|brother '|
 elemente|elements|
 ergib|Yield to|
@@ -4359,9 +3800,7 @@ kühe|cows|
 lenke|joints|
 müsst|need|
 nachts|at night|
-nato|nato|
 parlamente|parliaments|
-partner|partner|
 per|by|
 prüft|checks|
 rücktritt|resignation|
@@ -4382,15 +3821,12 @@ anschlag|stop|
 bewohnern|dwellers|
 decken|cover|
 eröffnung|opening|
-felipe|felipe|
 genießt|enjoys|
 kauf|purchase|
 vorabend|eve|
 änderungen|changes|
 adlig|noble|
 ahnungslos|unaware|
-baumele|baumele|
-befriedigst|befriedigst|
 bekanntgemacht|published|
 bemächtige|take possession of|
 benachteilige|disadvantage|
@@ -4424,7 +3860,6 @@ schändlich|disgraceful|
 strahler|spotlight|
 streuen|scatter|
 umarmst|embrace|
-umstelle|umstelle|
 verbuche|accounted for|
 verkürze|shortening|
 vermindere|diminish|
@@ -4436,16 +3871,13 @@ wahrhaft|truly|
 übernachte|stay overnight|
 übersetze|translate|
 überstürze|converging on|
-aufreihe|aufreihe|
 bandes|belt|
-snap|snap|
 abgebrochen|canceled|
 abwarf|threw off|
 anbietens|offering|
 angehen|tackle|
 anhand|by|
 antrieb|drive|
-archive|archive|
 atem|breath|
 auserwählt|select|
 ausgearbeitet|prepared|
@@ -4459,7 +3891,6 @@ beträchtlich|considerably|
 bezwinge|conquer|
 dehnst|stretchest|
 dialekt|dialect|
-einbezog|einbezog|
 einrichte|installs display|
 einseitig|one-sided|
 enzyklopädie|encyclopedia|
@@ -4471,8 +3902,6 @@ gatter|gate|
 gebisse|Bits|
 gefasel|drivel|
 geträumt|dreamed of|
-hiesig|hiesig|
-jack|Jack|
 jederzeit|any time|
 komisch|funny|
 komponist|composer|
@@ -4490,7 +3919,6 @@ nett|nice|
 nordsee|North Sea|
 nächstens|next time|
 privileg|privilege|
-rebellion|rebellion|
 reinigst|cleanse|
 rind|beef|
 rührt|stirred|
@@ -4498,14 +3926,12 @@ rüstung|armor|
 schoß|shot|
 schreie|shout|
 sparen|save|
-spezialisierst|spezialisierst|
 spielzeit|season|
 stattfinde|taking place|
 steil|steep|
 stiften|donate|
 streiks|strikes|
 strick|rope|
-tribuna|tribuna|
 tugend|virtue|
 unvermeidlich|inevitable|
 venedig|Venice|
@@ -4529,11 +3955,9 @@ beherberge|harboring|
 bereichernd|enriching|
 besteuere|taxing|
 bewölken|cloud over|
-bremen|Bremen|
 chaotisch|chaotic|
 degradiere|degrading|
 einwillige|would consent|
-entmachte|entmachte|
 entwische|slip away|
 erhellst|brighten|
 finsteres|dark|
@@ -4543,7 +3967,6 @@ gewohnt|usual|
 herausstelle|put out|
 hättest|would have|
 importiere|import|
-inhaftiere|inhaftiere|
 komplette|complete|
 matt|mat|
 nackte|naked|
@@ -4551,22 +3974,17 @@ Reichskanzlei|Reich Chancellery|
 sitzung|meeting|
 sparst|save|
 spärlich|sparse|
-stationiere|stationiere|
-umgestalte|umgestalte|
 unersättlich|insatiable|
 ungemein|uncommonly|
 unterordne|subordinate|
-veredele|veredele|
 verlerne|unlearn|
 verpflege|Take care of|
 vertraulich|confidential|
-verwurzele|verwurzele|
 vorhergehe|before going|
 weiterlebe|would live|
 zaubern|conjure|
 zugestehe|been standing|
 zusammengesetzt|composite|
-adle|ADLE|
 angelegenheiten|affairs|
 anklage|indictment|
 anstieg|increase|
@@ -4579,7 +3997,6 @@ belastung|load|
 berg|mountain|
 berufes|profession|
 beschränkung|restriction|
-bezaubere|bezaubere|
 bischöfe|bishops|
 dion|dione|
 dynamik|dynamics|
@@ -4589,11 +4006,8 @@ förderung|promotion|
 fünfte|fifth|
 gebärde|gesture|
 hals|neck|
-hamburger|hamburger|
-hors|hors|
 insofern|so far|
 italiener|Italian|
-jurist|jurist|
 kreatur|creature|
 kröte|toad|
 leiche|body|
@@ -4604,13 +4018,11 @@ prinzip|principle|
 rechnung|account|
 regt|stimulates|
 reiz|attractive|
-renaissance|Renaissance|
 ressource|resource|
 seinerzeit|the time|
 stillst|Stopped|
 thron|throne|
 tor|gate|
-triumph|triumph|
 umarm|Embrace|
 umfanges|scope|
 unsinn|nonsense|
@@ -4622,12 +4034,8 @@ zeitlang|long time|
 zusammenschloß|joined together|
 zwingli|Zwinglian|
 ära|era|
-olympias|Olympias|
 abgeschabt|scraped off|
-abneigen|abneigen|
 abstrakt|abstract|
-abwechsele|abwechsele|
-anspanne|anspanne|
 assimiliere|assimilate|
 aufregendem|exciting|
 beigelegen|by lying|
@@ -4638,7 +4046,6 @@ duftend|fragrant|
 düne|dune|
 einmalig|unique|
 eintönig|monotonous|
-einwirke|einwirke|
 erkämpfe|Grow in|
 festlege|lays down|
 festsetze|fixed set|
@@ -4646,8 +4053,6 @@ finster|dark|
 fotografieren|photograph|
 genährt|nourished|
 Grundgesetz|Constitution|
-haller|Haller|
-heikes|Heikes|
 hoffnungsvoll|hopefully|
 leichtfertig|lightly|
 objektiv|objectively|
@@ -4672,30 +4077,20 @@ verächtlich|contemptuously|
 Walde|Forest|
 wei|further|
 wiedererlange|restore to man|
-world|world|
 zugefügt|added|
 zweifeln|doubt|
 überflog|flew over|
 übermittele|about mittele|
-homero|homero|
-verheize|verheize|
 absank|levels decreased|
 Amtsantritt|Office|
 angekommen|Once|
 angelegene|be superior|
 anteile|shares|
 arbeitslohn|rewarding work|
-aufhalf|aufhalf|
-aufstellst|aufstellst|
-auftragt|auftragt|
 ausspreche|express|
 bequem|convenient|
 beschäftigung|employment|
 bestellen|order|
-brave|brave|
-carlo|carlo|
-dokumentierst|dokumentierst|
-dunkein|dunkein|
 durchzusetzen|enforce|
 einstelle|adjusting|
 eintreffe|incident|
@@ -4704,29 +4099,22 @@ erschuf|created|
 erwecke|raise up|
 erzwinge|enforcing|
 fassung|version|
-france|france|
-färbst|färbst|
-gallia|gallia|
 gasse|lane|
 gedrückt|depressed|
 geflüchtet|fled|
 gefordert|required|
 geltende|applicable|
 Geschichtsschreiber|Historians|
-gringo|gringo|
 herrscherin|ruler|
 hervorzubringen|produce|
 hinblick|view|
 hinterem|rear|
 hintergründe|backgrounds|
-illusion|illusion|
 jahrgang|year|
-klaus|klaus|
 koalition|coalition|
 komplex|complex|
 konventionell|conventional|
 kostenlos|free|
-krantz|krantz|
 kurs|course|
 leuchte|light|
 litt|suffered|
@@ -4736,19 +4124,14 @@ mitarbeit|cooperation|
 modelle|models|
 natürliches|natural|
 niederländisch|Dutch|
-papias|Papias|
-passe|passe|
 passiv|passive|
-ratgebens|ratgebens|
 rufe|call|
 sinke|decreasing|
 tore|gates|
 totale|total|
-traume|traume|
 treu|true|
 ungewiß|uncertain|
 unterirdisch|underground|
-verhelfe|verhelfe|
 vorgeschichte|prehistory|
 vorgeschrieben|required|
 vorschläge|proposals|
@@ -4764,22 +4147,15 @@ zweifelst|doubt|
 einzug|collection|
 fehlern|errors|
 begehrst|desire|
-entgleise|entgleise|
 leidenschaftliche|passionate|
-schnaube|schnaube|
 achtzehn|eighteen|
-ada|ada|
 allererst|First|
 aufwachse|grow up|
 ausschank|can be poured|
 bedingungslose|unconditional|
-beklemme|beklemme|
 belgische|Belgian|
-Brandenburg|Brandenburg|
 bundesregierung|Federal government|
 entfache|Ignite|
-entzückst|entzückst|
-exekutiere|exekutiere|
 feier|celebration|
 feurig|fiery|
 fortführe|continues to carry on|
@@ -4795,24 +4171,19 @@ hinüber|over|
 hochnäsig|snooty|
 kläglich|miserably|
 kompensiere|compensating|
-labiau|Labiau|
-lachenam|lachenam|
 lebenswerk|life's work|
 leerend|emptying|
 leinwand|screen|
 meiden|avoid|
 melancholie|melancholy|
-monde|monde|
 nagels|nail|
 nass|wet|
 optimistisch|optimistic|
 patriotische|patriotic|
-polana|polana|
 proklamiere|proclaim|
 rekonstruiere|reconstruct|
 revidiere|revise|
 russlands|russia|
-schliebt|schliebt|
 schmücke|ornamental|
 schnitzeln|shred|
 selbstständig|independently|
@@ -4825,18 +4196,14 @@ ungehorsam|disobedient|
 unnahbar|unapproachable|
 unscheinbar|inconspicuous|
 untauglich|unfit|
-verschanze|verschanze|
 versäumst|neglect|
 weiterbilde|Taking a further|
-wiedergutmache|wiedergutmache|
 zurückerobere|win back|
 zusammenfüge|add together|
 überfordere|on demand|
 überhöre|hear about|
-elis|elis|
 gesuch|application|
 schütten|pour|
-administration|administration|
 afghanisch|Afghan|
 angeordnet|arranged|
 angetan|done|
@@ -4849,11 +4216,9 @@ ausgerottet|eradicated|
 außenwelt|the outside world|
 befohlen|ordered|
 beginnende|beginning|
-belasse|belasse|
 beruhig|calm down|
 besucher|visitor|
 bibliotheken|libraries|
-bismarck|Bismarck|
 blühe|flourish|
 brauch|custom|
 dementsprechend|accordingly|
@@ -4866,20 +4231,16 @@ eingetauscht|exchanged|
 fach|trade|
 fein|fine|
 fernhalte|keep away|
-flotow|Flotow|
 flugzeuge|aircraft|
 formell|formally|
 fortgalt|was continued|
 fotograf|photographer|
-frankfurter|Frankfurter|
-gange|gange|
 gebäck|biscuits|
 gedruckt|printed|
 gegenden|areas|
 gegensätze|opposites|
 getrunken|drunk|
 gewandert|migrated|
-gustaf|Gustaf|
 hass|hatred|
 heilig|holy|
 heller|brighter|
@@ -4889,21 +4250,15 @@ Historikerin|Historian|
 homosexuell|homosexual|
 imstande|able|
 instabil|unstable|
-intuition|intuition|
 kapitäls|capital was|
 kristall|crystal|
-kurt|kurt|
 mager|lean|
-main|Main|
-marceau|marceau|
-medium|medium|
 milch|milk|
 mitteln|transmit|
 murmelst|mumble|
 nächte|nights|
 oberfläche|surface|
 rausch|intoxication|
-resident|resident|
 rezept|recipe|
 rhein|Rhine|
 rückgänge|declines|
@@ -4920,7 +4275,6 @@ stört|interfere|
 substanz|substance|
 tau|dew|
 türkin|Turk|
-uniform|uniform|
 unterbrich|interrupt|
 verhext|jinxed|
 vernehme|hear|
@@ -4930,7 +4284,6 @@ versprich|Promise|
 vorfall|incident|
 vormalig|former|
 wahrst|truest|
-wettin|Wettin|
 zugebe|admit|
 zugewandt|facing|
 zusammentreffe|meet together|
@@ -4948,12 +4301,10 @@ belebe|revive|
 beschere|grant us|
 beschlich|crept|
 bezüge|remuneration|
-blödele|blödele|
 brand|fire|
 brut|brood|
 datum|date|
 diktator|dictator|
-dirk|dirk|
 dumm|stupid|
 egal|no matter|
 einmarsch|invasion|
@@ -4966,30 +4317,22 @@ erkenntnisse|insights|
 erstmal|first|
 forscher|researcher|
 futter|feed|
-hera|hera|
 hierbei|this|
 hierfür|this|
 hrsg|ed|
 hunderttausend|hundred thousand|
 hügel|hill|
-jerusalem|jerusalem|
 kern|core|
 kleider|clothes|
 mannschaft|team|
-motive|motive|
 nachgebt|will yield|
 nordosten|northeast|
-oskar|oskar|
-patient|patient|
-port|port|
 rasse|race|
-reform|reform|
 ruft|calls|
 rät|advises|
 schein|bill|
 schluss|end|
 spalte|column|
-stalien|stalien|
 stütz|support|
 tabelle|table|
 tagebuch|diary|
@@ -4997,14 +4340,10 @@ texte|texts|
 verbände|Associations|
 vorherrschaft|predominance|
 vorlag|was present|
-weshaib|weshaib|
 zeitraum|period of time|
 zentralem|central|
 aufgezeichne|the recorded|
-ausnütze|ausnütze|
 ausziehe|take off|
-bedürfst|bedürfst|
-bemalst|bemalst|
 bereitstelle|, commands|
 beschaffe|Obtain|
 beschuldige|blame|
@@ -5013,7 +4352,6 @@ dezimiere|decimate the|
 ehrenhaft|honorable|
 eingehakt|hooked|
 einmarschieren|invade|
-einwende|einwende|
 entstamme|Come from|
 geerbt|inherited|
 greis|aged|
@@ -5023,11 +4361,9 @@ islamisch|Islamic|
 kinn|chin|
 konsumiere|consuming|
 krankenversichere|have health safe|
-krasny|Krasny|
 kreische|bray|
 merkwürdiges|strange|
 psychologe|psychologist|
-ron|ron|
 rucken|jerk|
 ruderin|rower|
 schlich|crept|
@@ -5038,20 +4374,15 @@ signalisiere|signaling|
 stilisieren|stylize|
 teilhabe|participation|
 trockenem|dry|
-umwandele|umwandele|
 undurchsichtig|opaque|
 unerschütterlich|unwavering|
 unhaltbar|untenable|
 universum|universe|
 unumstritten|undisputed|
-verdrehst|verdrehst|
-verlaute|verlaute|
 verordnend|prescriptive|
-verschrecke|verschrecke|
 verschweiß|weldability|
 versprenge|sprinkle|
 vorträge|lectures|
-weasley|weasley|
 weinen|cry|
 widerfahre|befall|
 widme|dedicate|
@@ -5060,29 +4391,20 @@ zauberhaft|magical|
 zurückziehe|retire|
 ärmel|sleeve|
 überschütte|pour over|
-fatima|fatima|
-meditation|meditation|
 mitfühle|sympathize|
 vergoldern|gilders|
-ausweine|ausweine|
 durchquere|by transverse|
 karawane|caravan|
-lebensweg|lebensweg|
-luna|luna|
 meditiere|meditate|
 anstelle|instead of|
-ausstehe|ausstehe|
 behilflich|helpful|
 beklagst|complain|
 betest|pray|
-brodele|brodele|
 charakteristik|characteristics|
-charli|charli|
 cäsar|Caesar|
 defekt|defective|
 eintauche|dipped|
 erforsche|explore|
-ersterbt|ersterbt|
 exklusiv|exclusive|
 freche|cheeky|
 frühern|former|
@@ -5096,7 +4418,6 @@ gestraft|punished|
 gesägt|sawn|
 gütig|kind|
 hängend|hanging|
-interview|interview|
 kamel|camel|
 kleides|apparel|
 klüger|wiser|
@@ -5112,8 +4433,6 @@ sann|mused|
 sechzehnte|sixteenth|
 seelisch|mental|
 senkrecht|perpendicular|
-septima|septima|
-simple|simple|
 solltest|should|
 spionieren|spy|
 stillschweige|implied|
@@ -5138,15 +4457,11 @@ zurücklege|put back|
 zügeln|curb|
 abgeordnet|seconded|
 ablegst|discard|
-abnehme|abnehme|
 abzuwarten|wait|
 akt|act|
-angelika|angelika|
 ansah|looked at|
-antrete|antrete|
 anzuschließen|to close|
 anzuwenden|apply|
-attaché|attaché|
 aufgefallen|noticed|
 aufgefordert|prompted|
 auflage|edition|
@@ -5159,7 +4474,6 @@ bande|gang|
 befindlich|located|
 beisammen|together|
 beitritt|accession|
-benedict|benedict|
 bereitschaft|readiness|
 bestraf|Punish|
 betreibst|are running|
@@ -5167,8 +4481,6 @@ beziehe|refer|
 blinde|blind|
 bürgerkrieg|civil war|
 bürokrat|bureaucrat|
-danzig|danzig|
-divers|divers|
 durchs|through|
 eingebaut|installed|
 einsehe|one before|
@@ -5180,7 +4492,6 @@ feierte|celebrated|
 feindin|enemy,|
 feldzug|campaign|
 festhielt|held|
-floria|Floria|
 friedhof|cemetery|
 frühst|HB|
 füge|add|
@@ -5192,28 +4503,21 @@ getreten|entered|
 gezielt|targeted|
 großmut|magnanimity|
 gäb|'d give|
-hans|Hans|
-herald|Herald|
 hilflos|helpless|
 hitlers|hitler|
 hütern|Keepers|
-iron|iron|
 kabinett|cabinet|
 kahl|bald|
 klage|action|
-konrad|konrad|
 kontinuierlich|continuous|
 kreuzzug|crusade|
 lagern|store|
-led|led|
 lob|praise|
 löcher|holes|
 mahlzeit|meal|
-martio|Martio|
 mitbrachte|brought|
 mutmaßliche|alleged|
 ost|east|
-prophet|prophet|
 rau|rough|
 rechtzeitig|in time|
 rätselhaft|puzzling|
@@ -5222,7 +4526,6 @@ schäfer|shepherd|
 speisen|feed|
 sprichwörter|proverbs|
 statthaft|permitted|
-steigre|steigre|
 streitkräfte|forces|
 stundenlang|for hours|
 sympathie|sympathy|
@@ -5243,7 +4546,6 @@ zaubere|by magic|
 zehnte|tenth|
 zeitweilig|temporary|
 zuteil|given|
-zuviei|zuviei|
 überzog|overlaid|
 habest|hast|
 innig|intimate|
@@ -5255,16 +4557,13 @@ anrief|called|
 ansonsten|otherwise|
 anzudeuten|to suggest|
 aristokratie|aristocracy|
-ausblute|ausblute|
 ausgaben|expenditure|
 austausche|exchanges|
 bahnhof|station|
 bespreche|discuss|
 biograph|biographer|
-brower|brower|
 bundeskanzler|chancellor|
 chef|chief|
-crouch|crouch|
 demnach|therefore|
 dünn|thin|
 echtere|more real|
@@ -5272,7 +4571,6 @@ eingebildet|conceited|
 eintrieb|on the input|
 engst|closest|
 entladen|discharge|
-explosion|explosion|
 fahrt|ride|
 fatale|fatal|
 fehlerhaft|faulty|
@@ -5298,7 +4596,6 @@ kommissaren|commissioners|
 kündigst|cancel it|
 leitung|line|
 lädt|invites|
-neb|neb|
 objekt|object|
 planeten|planet|
 programm|program|
@@ -5333,7 +4630,6 @@ väterlich|paternal|
 weber|weaver|
 weitaus|much|
 wertes|value|
-wolf|wolf|
 woran|what|
 zeugnisse|Certificates|
 zurückblicke|Looking back|
@@ -5344,7 +4640,6 @@ elfenbein|ivory|
 endens|dowels gently|
 geschichtet|laminated|
 Kameltreiber|Camel driver|
-lucina|lucina|
 mahnung|reminder|
 vergöttere|adore|
 verneige|bow|
@@ -5373,14 +4668,12 @@ ausgeübt|exercised|
 auswahl|selection|
 auszubilden|train|
 auszunutzen|exploit|
-bangor|bangor|
 begebe|endorser|
 beiläufig|incidental|
 beistand|assistance|
 beizubringen|teach|
 berate|advise|
 betteln|beg|
-charlene|charlene|
 dargestellt|shown|
 debatte|debate|
 definit|definite|
@@ -5388,7 +4681,6 @@ dreihundert|three hundred|
 einzusetzen|use|
 entfernung|removal|
 entschloß|decided|
-entsprichst|entsprichst|
 ergebnisse|results|
 erschlag|up Memory|
 erstem|first|
@@ -5407,9 +4699,7 @@ gleichfalls|also|
 grobem|coarse|
 grün|green|
 hegt|harbors|
-here|here|
 hie|here|
-hornby|hornby|
 jäger|hunter|
 katze|cat|
 kniet|kneels|
@@ -5419,11 +4709,9 @@ landen|land|
 letztendlich|eventually|
 magazin|magazine|
 menschenleer|deserted|
-mustafa|mustafa|
 mythen|myths|
 mörder|killer|
 objekte|objects|
-operation|operation|
 prozesse|processes|
 ruhen|rest|
 ruhigere|quieter|
@@ -5431,7 +4719,6 @@ satt|full|
 schmuck|jewelry|
 schwerste|severe|
 segen|blessing|
-seminar|seminar|
 skeptisch|skeptical|
 soeben|just|
 stuhl|chair|
@@ -5459,15 +4746,12 @@ bearbeitern|editors|
 betonen|emphasize|
 betrübst|downcast|
 bewacht|guarded|
-darbiete|darbiete|
 deines|your|
-diadem|diadem|
 durchschnittliche|average|
 eilig|hastily|
 einbeziehe|inclusive|
 erschlich|surreptitiously|
 experimente|experiments|
-fortwähre|fortwähre|
 fungiere|acting|
 fächern|fan|
 gedauert|taken|
@@ -5477,7 +4761,6 @@ hexe|witch|
 klarmache|make clear|
 konkurriere|compete|
 körnen|granulate|
-lie|lie|
 lächerliche|ridiculous|
 mitspiele|play along|
 munteres|merry|
@@ -5485,13 +4768,10 @@ nachfülle|top off|
 niederknie|kneel|
 niederlege|resigning|
 packen|pack|
-pensionierst|pensionierst|
 permanent|permanently|
-propaganda|propaganda|
 redliches|honest|
 regionale|regional|
 rektal|rectal|
-repression|repression|
 richtiges|real|
 schalten|switch|
 schießen|shoot|
@@ -5500,7 +4780,6 @@ schweifs|tail|
 selig|blessed|
 seminare|seminars|
 sparsam|economical|
-tollend|tollend|
 trauerst|mourn|
 turnier|tournament|
 täuschst|mistaken|
@@ -5514,7 +4793,6 @@ veranlasst|causes|
 verschwendern|wasters|
 verständnisse|misunderstandings|
 voraussehe|foresee|
-vordringe|vordringe|
 weiler|hamlet|
 zerbreche|will break|
 zerbrochen|broken|
@@ -5522,16 +4800,9 @@ zuckend|twitching|
 zurückweise|reject|
 zweideutig|ambiguous|
 übriggeblieben|left|
-ansteche|ansteche|
-ausreist|ausreist|
-base|base|
-entlaufe|entlaufe|
 Farne|Ferns|
-isis|isis|
 vermähle|wed|
-aufhelfe|aufhelfe|
 brüste|breasts|
-fasele|fasele|
 hinreise|Outward|
 höfliches|polite|
 muskeln|muscles|
@@ -5542,7 +4813,6 @@ weichlich|effeminate|
 angeklagt|accused|
 anhörst|listen to|
 ausblick|view|
-bedrängst|bedrängst|
 bedurft|needed|
 befolgst|obey|
 beleuchtern|illuminators|
@@ -5551,7 +4821,6 @@ brüche|fractures|
 denkende|thinking|
 einzigartig|unique|
 erforschst|explore|
-erstellst|erstellst|
 ertrinke|drowning|
 erwischst|will catch|
 erwähle|Patent Attorney|
@@ -5565,7 +4834,6 @@ Fürstentag|Princes|
 gefahrlos|safely|
 gehege|enclosure|
 gehilfe|assistant|
-gehäng|gehäng|
 geisteskraft|mentally strong|
 gekehrt|swept|
 gekrümmt|bent|
@@ -5574,10 +4842,8 @@ geweckt|aroused|
 innenpolitik|domestic policy|
 kochst|cook|
 kommunion|Communion|
-lauerem|lauerem|
 laufende|ongoing|
 leidend|suffering|
-mars|Mars|
 mitteleuropa|Central Europe|
 nachdenklich|thoughtful|
 nächtlich|nocturnal|
@@ -5589,15 +4855,12 @@ regung|movement|
 scheiden|divorce|
 scheust|shrink|
 schimpfst|scold|
-Schleswig-Holstein|Schleswig-Holstein|
 schmackhaft|palatable|
 schädlich|harmful|
 selbstlob|self-praise|
 speichern|save|
-strabe|strabe|
 stürbe|dying|
 tempels|temple|
-tragici|tragici|
 unauffällig|inconspicuous|
 unfreundlich|unfriendly|
 ungeklärt|unexplained|
@@ -5607,7 +4870,6 @@ verdaust|digest|
 vergilt|repays|
 verkünde|proclaim|
 verschloss|locked|
-verstimmst|verstimmst|
 vorgelegen|submitted to|
 wandere|wander|
 weichst|evading|
@@ -5623,29 +4885,22 @@ züchtens|breeding|
 aufzuge|Lifts|
 begründung|grounds|
 bisweilen|sometimes|
-daniei|daniei|
 daselbst|there|
-ehrerbieten|ehrerbieten|
 ehrgeizigem|ambitious|
 entfremde|alienating|
 filme|movies|
-gefolgin|gefolgin|
 geldes|disposable|
 gift|poison|
 halbinsel|peninsula|
 häusern|houses|
-information|Information|
 inklusion|inclusive|
 innerste|innermost|
 karten|Card|
 Lebensgröße|Life-size|
 links|left|
-mercer|mercer|
-motto|motto|
 mythos|myth|
 panik|panic|
 popularität|popularity|
-revision|revision|
 sees|lake|
 seinerseits|in turn|
 sender|transmitter|
@@ -5680,7 +4935,6 @@ brandenburger|brandenburg|
 brüssel|Brussels|
 daten|data|
 derart|so|
-diplomat|diplomat|
 dreien|three|
 durchgesetzt|enforced|
 edelste|noblest|
@@ -5699,54 +4953,38 @@ geräusche|noise|
 gerückt|moved|
 gesellschaften|companies|
 gewißheit|certainty|
-gru|gru|
 gäste|guest|
 hauptquartier|headquarters|
 heben|lift|
 herangezogen|used|
 hundertmal|a hundred|
 höhle|cave|
-inflation|inflation|
 insgeheim|secretly|
 irgendwann|sometime|
-jap|jap|
-jesus|Jesus|
 jäh|abruptly|
 jährlichem|annual|
 kanzler|chancellor|
 kap|cape|
-kaufman|kaufman|
-kehl|Kehl|
 klasse|great|
 kombinat|combine|
 kontinent|continent|
 kraus|frizzy|
 kreuz|cross|
 kreuze|Crosses|
-latika|Latika|
 leblos|lifeless|
 luxus|luxury|
 ländler|Landler|
-manfred|Manfred|
 mio|million|
 neid|envy|
-noches|noches|
-organ|organ|
-prominent|prominent|
 respekts|respect|
 reste|remains|
-rudolf|rudolf|
 rächst|avenge|
-sankst|sankst|
 schwiegersohn|son-in|
 schwunds|shrinkage|
-seen|seen|
 sklave|slave|
 soziale|social|
-statistics|statistics|
 stattfand|held|
 stoff|material|
-stuttgart|Stuttgart|
 stürze|bell|
 taufe|baptism|
 thronfolger|heir to the throne|
@@ -5766,13 +5004,11 @@ vorgeworfen|accused of|
 vorliegende|This|
 vormann|foreman|
 wachs|wax|
-wechsein|wechsein|
 weitergegeben|passed|
 wendung|turn|
 werks|plant|
 westeuropa|Western Europe|
 wieseln|scurry|
-york|York|
 zorn|anger|
 zulauf|inflow|
 zurückkam|back|
@@ -5780,11 +5016,9 @@ zurückkam|back|
 Österreichs|Austria|
 überbleibsel|remnant|
 übersät|littered|
-aufbewahre|aufbewahre|
 bedrücke|oppress|
 belustige|amused|
 Bundesamt|Federal Office|
-detailliere|detailliere|
 ermüdens|tiring|
 erniedrige|degrade|
 gestreng|exigent|
@@ -5805,10 +5039,8 @@ anbetens|worshiping|
 anlässe|Occasions|
 anonym|anonymous|
 aristoteles|Aristotle|
-auffalle|auffalle|
 aufhörst|cease|
 auszulöschen|extinguish|
-baron|baron|
 bedenklich|questionable|
 begründe|is founded|
 bekehrst|art converted|
@@ -5818,7 +5050,6 @@ einkommen|income|
 empfehle|recommend|
 erfinderin|inventor|
 erpresst|blackmailed|
-euro|euro|
 exakt|exactly|
 fiktion|fiction|
 forsch|research|
@@ -5828,7 +5059,6 @@ gebäuden|buildings|
 gedeutet|interpreted|
 gegessen|eaten|
 gehorchst|obey|
-Germania|Germania|
 gestreift|striped|
 gestrig|yesterday's|
 gezahlt|paid|
@@ -5837,22 +5067,18 @@ habt|have|
 hauslehrer|home teacher|
 heeren|harry|
 heile|Heal|
-hemmst|hemmst|
 hochachte|high eighth|
 Hochschulen|Universities|
 hübsches|pretty|
-josefin|josefin|
 juristin|Lawyer|
 kletterst|climb|
 literarisch|literary|
-marisa|marisa|
 mitschüler|classmate|
 nachdrücke|Reprints|
 niedrigst|lowest|
 notierst|write down|
 packte|packed|
 pfeil|arrow|
-quarks|quarks|
 reinheit|purity|
 santes|esting|
 schurz|apron|
@@ -5864,7 +5090,6 @@ smaragd|emerald|
 solls|heck|
 sprang|jumped|
 staune|marvel|
-stefan|stefan|
 tanz|dance|
 treffend|apt|
 umkreis|perimeter|
@@ -5884,9 +5109,7 @@ augenbraue|eyebrow|
 betätige|operated|
 Bundesländer|States|
 christianisieren|Christianize|
-dubois|dubois|
 entmutige|discourage|
-entrücke|entrücke|
 entzünde|kindle|
 höflich|polite|
 hüfte|hip|
@@ -5904,7 +5127,6 @@ ungehörig|improper|
 verneine|deny|
 verspäte|be late|
 wunderlich|strange|
-amtiere|amtiere|
 analyse|analysis|
 anlage|plant|
 arabern|arabs|
@@ -5914,20 +5136,13 @@ aufeinander|each other|
 aufmache|open my|
 Aufschwung|Recovery|
 aufsicht|supervision|
-ausfliege|ausfliege|
 ausübe|Performers|
 bearbeitung|processing|
 bekanntgebt|known to give|
-berger|berger|
-bernhard|bernhard|
 betreffende|concerned|
-bitter|bitter|
 bitterkeit|bitterness|
 bucht|bay|
-Bundestag|Bundestag|
 bürgern|citizens|
-demonstrari|demonstrari|
-distanzierst|distanzierst|
 drin|in it|
 eigens|specifically|
 einflüsse|influences|
@@ -5953,37 +5168,28 @@ Großmacht|Superpower|
 gärtner|gardener|
 halbes|half|
 hausmeier|home-Meier|
-helmut|helmut|
 hingen|hung|
 hund|dog|
-indira|indira|
-industrialisiere|industrialisiere|
 infiziere|infecting|
 jahrtausenden|thousands of years|
 kalender|calendar|
 kalt|cold|
 kelle|trowel|
 konsequenz|consequence|
-konstituiere|konstituiere|
 kopiere|copy|
 kreist|Circles|
 lebe|live|
 lehn|Then sit|
 leine|leash|
 missionen|emissions|
-mozart|mozart|
 nachbarschaft|neighborhood|
 nachweis|proof|
 persönlichkeiten|Personalities|
 pfad|path|
 plane|tarpaulin|
-portugal|Portugal|
-premier|premier|
-primitive|primitive|
 projekte|projects|
 rechts|right|
 reichstem|richest|
-rose|rose|
 rundlich|rounded|
 schmerzlich|painful|
 schwestern|sisters|
@@ -6005,19 +5211,14 @@ unternahmen|undertook|
 unterrichts|teaching should|
 unwissenheit|ignorance|
 usw|etc|
-van|van|
 verallgemeinere|Generalize|
 veranlaßt|causes|
 verblüffst|amaze|
-verbreitre|verbreitre|
-Verdun|Verdun|
 verehrer|admirer|
-verfälschst|verfälschst|
 verhöhne|mock|
 verjünge|rejuvenated|
 versen|verse|
 verspotte|mock|
-verstreue|verstreue|
 vertausche|swap|
 verwies|pointed|
 vettel|hag|
@@ -6027,27 +5228,18 @@ widersprich|contradict|
 zahn|tooth|
 ökonom|economist|
 überschuß|surplus|
-abs|abs|
 abtrünnig|apostate|
 achtern|aft|
-altar|altar|
-anatol|anatol|
 anreist|arrive|
 anwachse|should grow as|
-aufziehe|aufziehe|
 auskenne|versed|
 auswich|avoided|
 auszuführen|run|
-automation|automation|
-bauwelt|bauwelt|
-belauschst|belauschst|
 beschützt|protected|
 bürgermeisterin|mayoress|
 chronisch|chronic|
 dagewesen|been there|
 dichtung|seal|
-diktierst|diktierst|
-division|division|
 einbringe|transferring|
 einschlafen|fall asleep|
 einzutreten|enter|
@@ -6061,11 +5253,8 @@ erbeutest|plunder|
 erbrach|vomited|
 ergangen|issued|
 erhalter|Sustainer|
-erlief|erlief|
-erprobst|erprobst|
 errege|excite|
 erscholl|rang out|
-ersuchst|ersuchst|
 fade|bland|
 fanatisch|fanatic|
 feiere|celebrate|
@@ -6077,14 +5266,11 @@ frucht|fruit|
 gegossen|cast|
 gejagt|chased|
 gemahlin|wife|
-germain|germain|
 gewächse|plants|
 großmütig|magnanimous|
-harrys|harrys|
 hausten|lived|
 hell|light|
 hieroglyphe|hieroglyph|
-hinderns|hinderns|
 hungre|am hungry|
 inhalte|contents|
 japanisch|Japanese|
@@ -6099,14 +5285,10 @@ lausche|listen|
 löschst|delete|
 manifestierst|manifesting|
 mitzuteilen|communicate|
-mobile|mobile|
 mysteriös|mysterious|
 mündlich|orally|
 neige|tend|
-Neutralist|Neutralist|
-oval|oval|
 paläste|palaces|
-philip|philip|
 preisgab|abandoned|
 professionell|professional|
 psychologischem|psychological|
@@ -6137,7 +5319,6 @@ veranstaltern|tour operators|
 verfahrende|traversed|
 verfechte|advocating|
 verstarb|died|
-vorahnst|vorahnst|
 weises|wise|
 widerstehe|resist|
 wortlaut|wording|
@@ -6149,17 +5330,13 @@ zugetan|devoted|
 zurückgab|returned|
 zusammenkomme|get together|
 zäh|tough|
-malfoy|malfoy|
-Pallas|Pallas|
 abstamme|descended|
 alsdann|then|
-andres|andres|
 auslieferer|Vehicle Transport|
 aussetze|intermittent|
 befriede|Pacify|
 benachrichtige|notify|
 beschied|summoned|
-bestatte|bestatte|
 besänftige|appease|
 binnen|within|
 boot|boat|
@@ -6176,16 +5353,11 @@ kaltblüter|cold-blooded|
 komplett|complete|
 komponiere|compose|
 konsolidiere|consolidating|
-LUDI|LUDI|
 manipuliere|manipulative|
 mittels|through|
 nominiere|nominate|
 platziere|Place|
-porti|porti|
-post|post|
-protest|protest|
 raus|out|
-remus|remus|
 schau|show|
 schicker|chic|
 schreins|Shrine|
@@ -6193,17 +5365,12 @@ schwinden|vanish|
 umhin|help|
 undankbare|thankless|
 unfall|accident|
-verbitterns|verbitterns|
-verdeutliche|verdeutliche|
 verhaltende|behaving|
 verheimlichen|conceal|
-verriegele|verriegele|
 verschmähe|disdain|
-verstopfe|verstopfe|
 verstrickst|snared|
 vertuschen|hush up|
 verwünsche|curse|
-videos|videos|
 wiederbelebe|reviving|
 wildern|poach|
 wissenschaftlich|scientific|
@@ -6226,8 +5393,6 @@ ausbrach|broke out|
 ausfalle|sally|
 austritt|exit|
 autonom|autonomous|
-bang|bang|
-beehrst|beehrst|
 beeilst|hurry|
 befahl|ordered|
 begrub|buried|
@@ -6243,12 +5408,10 @@ drüben|over|
 einbreche|break into your|
 eingeboren|indigenous|
 eisern|iron|
-elegant|elegant|
 empfänglich|receptive|
 entnehme|taken from|
 erblich|hereditary|
 erzog|educated|
-FDP|FDP|
 fertigkeit|skill|
 fetzen|tatters|
 fuße|the foot|
@@ -6259,7 +5422,6 @@ gegraben|excavated|
 geistern|haunt|
 geladen|loaded|
 gepriesen|blessed|
-gerd|gerd|
 gesessen|sat|
 gestärkt|strengthened|
 gleichmaß|symmetry|
@@ -6269,7 +5431,6 @@ grimmig|grim|
 gönnst|grudge|
 hastig|hastily|
 heranwachse|may grow|
-horace|horace|
 interessantes|interesting|
 interesses|interest|
 kaputt|broken|
@@ -6280,19 +5441,14 @@ köchen|chefs|
 legender|deliberative|
 lehrerin|teacher|
 leibe|Physical|
-lenkst|lenkst|
-loyal|loyal|
 meisterst|mastering|
 mittelalter|Middle Ages|
 nachgebe|give in|
 naturell|disposition|
 panter|panther|
-patrice|patrice|
 peitsche|whip|
-philipps|philipps|
 phönix|Phoenix|
 probierst|try on|
-pythagoras|pythagoras|
 rast|rest|
 raucht|smokes|
 reifer|mature|
@@ -6305,10 +5461,8 @@ Schröder|Schroeder|
 schwankst|stagger|
 schärfens|sharpening|
 seltenst|rarest|
-senate|senate|
 Siegern|Winners|
 sinnlos|meaningless|
-sophia|sophia|
 standhalte|was holding|
 stratege|strategist|
 studentin|student|
@@ -6316,8 +5470,6 @@ stuhle|Chairs|
 stäbchen|rod|
 tanzende|dancing|
 tauber|Deaf|
-triumphe|triumphe|
-ulrich|ulrich|
 verletze|violated|
 vorbeiziehe|pull over|
 vorzubereiten|prepare|
@@ -6327,7 +5479,6 @@ weitergebe|give further|
 wertem|real contribution|
 würdest|would|
 zahlenmäßig|numerical|
-zar|zar|
 zurückgeblieben|retarded|
 zurückweiche|back soft|
 zusammenbringe|bring together|
@@ -6335,18 +5486,14 @@ zusammenbringe|bring together|
 übertroffen|exceeded|
 altmodisch|old-fashioned|
 beaufsichtige|supervise|
-befriste|befriste|
 befruchte|fertilize|
 begutachte|evaluating for|
 behaglich|comfortable|
 bejahrt|aged|
 belehrst|teachest|
 beschwichtige|appeasing|
-einquartiere|einquartiere|
 elastisch|elastic|
-erdichte|erdichte|
 ergründe|fathom|
-erschlaffe|erschlaffe|
 explodiere|explode|
 fauler|lazy|
 fokussiere|focusing|
@@ -6359,24 +5506,19 @@ konvertiere|convert|
 korinth|corinth|
 kultiviere|cultivate|
 motiviere|motivate|
-nachforsche|nachforsche|
-nachprüfe|nachprüfe|
 nickt|nods|
 reaktiviere|reactivate|
 schwindelig|dizzy|
 sterilisiere|Sterilize|
 sympathisch|sympathetic|
 unwillkürlich|involuntarily|
-vereidige|vereidige|
 verlangsame|slowing|
 verpfände|pledge|
 versiegen|dry up|
-vervielfältige|vervielfältige|
 widerwärtig|offensive|
 zeremonie|ceremony|
 überschätze|overestimate|
 abgang|departure|
-abgebe|abgebe|
 achte|eighth|
 achtzig|eighty|
 akzent|accent|
@@ -6386,22 +5528,16 @@ anmeldung|application|
 ansatz|approach|
 aufbringe|muster|
 aufbruch|departure|
-beethoven|beethoven|
 begebenheit|incident|
 beides|both|
-belohn|belohn|
 besitzers|owner|
 bett|bed|
 beutel|bag|
-blockade|blockade|
-bonne|bonne|
-branch|branch|
 brille|glasses|
 brüdern|brothers|
 buche|beech|
 Bürgertum|Bourgeoisie|
 chemiker|chemist|
-chemin|chemin|
 dahinten|behind|
 demjenigen|that of|
 dom|cathedral|
@@ -6427,25 +5563,17 @@ fakt|fact|
 fließt|flows|
 fluß|flow|
 fragil|fragile|
-freiburg|Freiburg|
 gebäudes|building|
 gesang|singing|
 globalisieren|globalize|
 glücks|luck|
-goethe|Goethe|
-grothe|grothe|
-gründens|gründens|
 hauptmann|captain|
 hauptteil|bulk|
 haustür|front door|
 herbe|harsh|
 hindernisse|obstacles|
-horn|horn|
-indonesia|indonesia|
 Inhaltsverzeichnis|Contents|
-ire|ire|
 italiens|italy|
-Joachim|Joachim|
 kanaan|Canaan|
 kapitulation|surrender|
 kilometern|kilometers|
@@ -6460,7 +5588,6 @@ marke|brand|
 metern|meters|
 nachbar|neighbor|
 Neuerung|Innovation|
-norbert|norbert|
 normale|normal|
 operationen|operations|
 privat|private|
@@ -6468,11 +5595,9 @@ produkte|products|
 präge|Embossed|
 präsidentin|President|
 Regelungen|Regulations|
-regent|regent|
 rhythmus|rhythm|
 schaf|sheep|
 schrei|cry|
-schubert|schubert|
 sonnst|bask|
 spateln|spatulate|
 spekulation|speculation|
@@ -6493,7 +5618,6 @@ vorsprung|lead|
 vorwiegend|mainly|
 wappen|coat of arms|
 weihnacht|Christmas|
-yorker|yorker|
 zeitgenosse|contemporary|
 zivilisation|civilization|
 zurückhaltung|restraint|
@@ -6507,29 +5631,22 @@ zürich|Zurich|
 ärzte|doctors|
 abspiele|PLA|
 aktualisiere|update|
-angewöhne|angewöhne|
 anspiele|allude|
 archiviere|keep a collection of|
-ausdünne|ausdünne|
 ausgesagt|testified|
 auslösche|extinguish|
-beratschlage|beratschlage|
 bezwecke|INTENDED|
 blamiere|disgrace|
 brillante|brilliant|
 debattiere|debating|
-dementiere|dementiere|
 durchbohre|pierce|
 durchflute|by flute|
 durchlöchere|by löchere|
-einverleibe|einverleibe|
 enteigne|expropriating|
 entleere|deflate|
 entlehne|borrow|
-enttarne|enttarne|
 ermächtige|authorize|
 erträume|dream up|
-germanin|Germanin|
 gewichtig|weighty|
 hysterisch|hysterical|
 improvisiere|improvise|
@@ -6540,12 +5657,10 @@ modernisiere|revamp|
 modifiziere|modify|
 Narziss|Narcissus|
 pedantisch|pedantic|
-popularisiere|popularisiere|
 propagiere|propagating|
 reproduziere|reproduce|
 restauriere|restaurate|
 rhythmisch|rhythmic|
-schramek|Schramek|
 suspendiere|was suspending|
 säkularisiere|secularizes|
 territoriale|Territorial|
@@ -6556,15 +5671,11 @@ unzugänglich|inaccessible|
 verdichte|condense|
 vergegenwärtige|Realize|
 verhungere|starve|
-verkrüppele|verkrüppele|
 verrechne|charge you|
 verspiele|gamble|
 verunglimpfe|denigrates|
 verunstalte|disfiguring|
-verweichliche|verweichliche|
-verwinde|verwinde|
 verärgere|annoy|
-zerdrückst|zerdrückst|
 überdache|about dache|
 überfliege|skim|
 abgefallen|fallen|
@@ -6581,10 +5692,8 @@ aufschloß|unlocked|
 ausgeschieden|excreted|
 auslöst|triggers|
 ausnehme|excludes|
-ausstellst|ausstellst|
 ausweichen|dodge|
 auszusprechen|express|
-barbie|Barbie|
 baustein|building block|
 becher|cup|
 bedauern|regret|
@@ -6592,9 +5701,7 @@ befehlshaber|commander|
 beharrst|persist|
 beschnitt|circumcised|
 bückst|stoopest|
-claudias|claudias|
 darzustellen|show|
-defensive|defensive|
 dell|model|
 dreht|turns|
 drohe|threatened|
@@ -6616,7 +5723,6 @@ festzuhalten|hold|
 fleiß|diligence|
 fünfzehnte|fifteenth|
 geehrt|honored|
-gefährt|gefährt|
 gegolten|counted|
 geh|go|
 gehäuft|heaped|
@@ -6630,13 +5736,10 @@ gesungen|sung|
 gierig|greedy|
 glich|possible|
 glut|embers|
-grunen|grunen|
 gräben|trenches|
 grüßt|greets|
 handvoll|handful of|
 hassen|hate|
-hexen|hexen|
-hinwerfe|hinwerfe|
 ideologin|ideologist|
 innenminister|Home Secretary|
 irische|Irish|
@@ -6649,9 +5752,7 @@ komplikation|complication|
 kreuzt|crosses|
 laufbahn|career|
 leiblich|bodily|
-lich|Lich|
 lichte|possible|
-maa|maa|
 majestäten|Majesties|
 methodik|methodology|
 nachfahre|descendant|
@@ -6660,7 +5761,6 @@ Nationalstaat|Nation-state|
 ordne|arrange|
 parallele|parallel|
 pfund|pound|
-pilot|pilot|
 problemlos|problems|
 provozierst|provoke|
 radikal|radically|
@@ -6687,15 +5787,12 @@ umweg|detour|
 unberührt|unaffected|
 unterste|lowest|
 unweigerlich|inevitably|
-veraltest|veraltest|
 verbleib|whereabouts|
 vergiß|forget|
 verhalf|helped|
-verona|verona|
 vollbracht|accomplished|
 Vorjahr|Previous year|
 vorsah|providing for|
-vorspreche|vorspreche|
 wandelt|converts|
 ward|was|
 warst|were|
@@ -6719,15 +5816,12 @@ abschrecke|discouraging|
 adoptiere|Adopt|
 anschaffe|household with|
 attackieren|attack|
-aufwalle|aufwalle|
-ausfrage|ausfrage|
 ausgelassen|omitted|
 ausgereift|mature|
 ausprobiere|try out|
 begabter|gifted|
 beglückwünsche|congratulate|
 beinhalte|leg hold|
-cicero|cicero|
 dirigiere|was conducting|
 einlud|invited|
 empfindsam|sensitive|
@@ -6754,7 +5848,6 @@ schläfrig|sleepy|
 schussfeld|Committee field|
 schwuler|gay|
 selbstsicher|self-assured|
-sphinx|sphinx|
 stimuliere|stimulate|
 strenges|strict|
 unbestechlich|incorruptible|
@@ -6768,7 +5861,6 @@ vergönne|Grant that|
 verlassend|Leaving|
 verlegene|embarrassed|
 verschmelze|merge|
-verspeise|verspeise|
 viereck|square|
 vorgibst|pretend|
 vortäusche|cheating with|
@@ -6778,17 +5870,11 @@ wütende|angry|
 zurückführe|lead back|
 überdauere|outlast|
 überkomme|come on|
-draco|draco|
-juno|juno|
-abrechne|abrechne|
-alarmiere|alarmiere|
-anfechte|anfechte|
 arbeitsstab|operating rod|
 assistiere|assistive animals|
 aufdringlich|intrusive|
 auffrische|freshening|
 aufgerichtet|erected|
-aufopfere|aufopfere|
 ausfülle|fill out|
 ausrotte|root out|
 ausspioniere|spying|
@@ -6797,7 +5883,6 @@ beachtlich|considerable|
 beschmutze|defile|
 bespritze|sprinkled|
 betriebsam|busy|
-black|black|
 blutrünstig|bloodthirsty|
 brummen|hum|
 bäder|Baths|
@@ -6811,13 +5896,10 @@ eifer|zeal|
 eindringlichem|haunting|
 einfaches|simple|
 eingeklebt|glued|
-eingliedere|eingliedere|
 einreihe|classifies|
 emotionell|emotional|
 entbehre|devoid of|
-entbehrst|entbehrst|
 erbend|inheriting|
-erbleiche|erbleiche|
 erlöst|redeemed|
 erweiche|soften|
 erzittere|shiver|
@@ -6828,7 +5910,6 @@ fächele|fanning|
 gesünder|healthier|
 gewissenhaft|conscientious|
 heimsuche|home search|
-hinführe|hinführe|
 hingegeben|devoted to|
 hässlich|ugly|
 höhnisch|scornfully|
@@ -6838,21 +5919,17 @@ kreuzige|Crucify|
 kunstvoll|artistically|
 lautlos|silently|
 leichtgläubig|gullible|
-Magistern|Magistern|
 minderwertig|inferior|
 montiere|mount|
-nachwirke|nachwirke|
 neutralisiere|neutralizing|
 oberflächlich|superficial|
 pessimistisch|pessimistic|
 rammen|ram|
-reformiere|reformiere|
 respektabel|respectable|
 sattem|rich|
 schleunig|speedy|
 schlüssen|conclusions|
 schotter|gravel|
-stichele|Stichele|
 talentierte|Talented|
 trächtig|pregnant|
 tückisch|treacherous|
@@ -6870,8 +5947,6 @@ unterbreite|under broad|
 untrennbar|inseparable|
 unverzeihlich|unforgivable|
 unwirklich|unreal|
-verdächtigst|verdächtigst|
-verfinstere|verfinstere|
 verführerisch|seductive|
 vergesslich|forgetful|
 verhängnisvoll|fatal|
@@ -6879,9 +5954,6 @@ verlässlich|reliable|
 vorteilhaft|advantageous|
 wechselvollem|changeful|
 wissentlich|knowingly|
-ziseliere|ziseliere|
-zurichte|zurichte|
-zurückdränge|zurückdränge|
 zuspitze|Zugspitze|
 überdurchschnittlich|above average|
 überempfindlich|hypersensitive|
@@ -6889,16 +5961,13 @@ zuspitze|Zugspitze|
 überstehe|on stand|
 absätze|heels|
 afrikanisch|African|
-alphabet|alphabet|
 angefertigt|made|
 angelangt|reached|
 anhieb|first go|
 anziehe|don|
 anzupassen|adapt|
 anzuschauen|watch|
-ariana|ariana|
 artillerie|artillery|
-atlant|atlant|
 auffiel|noticed|
 aufgestanden|stood up|
 auftakt|prelude|
@@ -6915,8 +5984,6 @@ bestie|beast|
 beten|pray|
 Bildungsweg|Education|
 blende|aperture|
-bright|bright|
-bursac|Bursac|
 Deutung|Interpretation|
 distanz|distance|
 durchlauf|continuous|
@@ -6945,7 +6012,6 @@ gehüllt|wrapped|
 gekocht|cooked|
 gekreuzt|crossed|
 gelähmt|paralyzed|
-genauestem|genauestem|
 geometer|surveyor|
 gepflanzt|planted|
 geschwollen|swollen|
@@ -6959,7 +6025,6 @@ grell|glaring|
 grenzt|borders|
 grundstein|cornerstone|
 hege|cherish|
-helga|helga|
 hervortat|excelled|
 hierüber|here over|
 Hochgebirg|High mountains|
@@ -6983,7 +6048,6 @@ marschierst|march|
 mathematiker|mathematician|
 meile|mile|
 mische|mix|
-music|music|
 müdigkeit|fatigue|
 nachhall|reverberation|
 narbe|scar|
@@ -6992,23 +6056,13 @@ obgleich|although|
 olymp|Olympus|
 orientalen|Oriental|
 pflanzt|planted|
-plus|plus|
-probie|probie|
-protestant|Protestant|
 rassistisch|racist|
-relevant|relevant|
-Saarland|Saarland|
 saft|juice|
-samuei|samuei|
-scherst|scherst|
 schläfe|temple|
 schmerzhaft|painful|
-schmid|schmid|
 segnest|bless|
 sensibel|sensitive|
-shelby|shelby|
 sozialdemokrat|Social|
-speirs|speirs|
 spielplan|game plan|
 springe|jump|
 spröd|brittle|
@@ -7022,7 +6076,6 @@ stumpf|blunt|
 sucher|viewfinder|
 tanzt|Dances|
 tapfern|brave|
-temperament|temperament|
 tragende|supporting|
 töchtern|daughters|
 unberechenbar|unpredictable|
@@ -7036,14 +6089,12 @@ unversehrt|intact|
 verdarb|spoiled|
 verdächtig|suspicious|
 verlässt|leaves|
-verschaff|verschaff|
 verschwieg|concealed|
 vorderste|front|
 vorgekommen|occurred|
 völkerrechtliche|international law|
 waldes|Forest|
 weges|Way|
-weibern|weibern|
 wöchentlich|weekly|
 zufälligere|more random|
 zusammengefasst|summarized|
@@ -7051,9 +6102,7 @@ zustehen|entitled|
 überdies|moreover|
 überkam|was overcome|
 abnahm|decreased|
-adolf|adolf|
 affäre|affair|
-alfred|alfred|
 amerikaner|American|
 Ansätze|Approaches|
 ausflug|trip|
@@ -7061,37 +6110,26 @@ bann|ban|
 beherrschung|control|
 bestes|best|
 bezug|reference|
-bislama|bislama|
 bläst|blows|
-boris|boris|
-chan|chan|
-date|Date|
 dazwischen|between|
-drinne|drinne|
 dunkelheit|darkness|
 durchmessen|by measuring|
-elisabet|elisabet|
 Eliten|Elites|
 engagement|commitment|
 engeln|with Angels|
 familienleben|family life|
 faust|fist|
-film|film|
 fußbad|footbath|
 fürs|for|
 gelübde|vow|
 geschrei|shouts|
-golf|golf|
 grube|mine|
 gymnasien|senior secondary schools|
 hauch|hint|
 Hegemonie|Hegemony|
-horde|horde|
 hölle|hell|
 ideologe|ideologist|
-impulse|impulse|
 jahresende|year-end|
-job|job|
 jürgen|jurgen|
 kanake|dago|
 karriere|career|
@@ -7102,18 +6140,13 @@ kongress|congress|
 Kontrahent|Opponent|
 kooperation|cooperation|
 korrektur|correction|
-laste|laste|
 lebensgeschichte|living history|
 lebensjahr|years|
 loyalität|loyalty|
-madras|madras|
 meinungsverschiedenheit|disagreement|
 mitgliedern|members|
 modell|model|
-mohacs|Mohacs|
 mängel|shortcomings|
-norme|norme|
-orient|Orient|
 partnern|partners|
 passagiere|passengers|
 pfleger|keeper|
@@ -7129,40 +6162,25 @@ schriftsteller|writer|
 schuster|shoemaker|
 schwan|swan|
 singt|sings|
-sir|sir|
 sofern|provided|
 stiftung|foundation|
-tell|tell|
-tiger|tiger|
-type|type|
 türken|turks|
 verein|association|
-vorkommst|vorkommst|
 warte|wait|
 weide|pasture|
 weiterentwickle|further develop|
-williams|williams|
 Zuordnung|Assignment|
 zähne|Teeth|
 abdrücke|footprints|
-abkassiere|abkassiere|
-abschlachte|abschlachte|
 abschöpfe|skim off|
-abtrenne|abtrenne|
 abzweige|Feeders|
 albere|fooling|
 altertümer|antiquities|
 anbelange|As to|
 andauere|was continuing|
-anfertige|anfertige|
-anführst|anführst|
 anrechne|or offsetting|
-attica|attica|
-aufarbeite|aufarbeite|
-aufstrebe|aufstrebe|
 aufzähle|enumerate|
 ausführlichem|detailed|
-aushändige|aushändige|
 ausschalte|turn off|
 ausschlaggebend|crucial|
 austeile|hand out|
@@ -7170,16 +6188,13 @@ belästigst|Harass|
 berüchtigt|notorious|
 bezichtige|accuse|
 blinzele|blink|
-chanel|chanel|
 diskreditiere|discrediting|
 durchbrach|broke|
 durchmache|by doing|
-einkreise|einkreise|
 emotionalem|emotional|
 entlocke|elicit|
 etwaige|any|
 expansiv|expansive|
-Faun|Faun|
 fertigstelle|ready to put|
 folgenschwer|momentous|
 fortschrittliche|advanced|
@@ -7190,7 +6205,6 @@ grübele|pondering|
 herausbilde|Taking out|
 herumkommandiere|around comma diere|
 hockst|crouch|
-imponiere|imponiere|
 instruiere|instruct|
 inständig|fervently|
 kostbares|precious|
@@ -7198,13 +6212,9 @@ kostspielig|costly|
 lukrativ|lucrative|
 lustvoll|relish|
 mathematisch|mathematically|
-may|may|
 mieser|lousy|
-militarisiere|militarisiere|
-murray|murray|
 neidisch|jealous|
 ostfront|Eastern Front|
-parfümiere|parfümiere|
 pathetisch|emotional|
 plaudere|chat|
 polarisiere|polarize|
@@ -7214,7 +6224,6 @@ schlagartig|abruptly|
 schlendere|stroll|
 schlüpfer|panties|
 schmolle|pout|
-sehnlichem|sehnlichem|
 spielbar|playable|
 säubern|clean|
 tadellos|perfect|
@@ -7244,9 +6253,6 @@ verführe|seduce|
 vergrabe|bury|
 verkompliziere|complicate|
 verschiedenartig|varied|
-verschmerze|verschmerze|
-verschnüre|verschnüre|
-vertrockne|vertrockne|
 verwunderlich|surprising|
 vorbeuge|preventing their|
 vorenthalte|withholding|
@@ -7256,54 +6262,36 @@ weitermache|keep going|
 wohlanständig|respectable|
 zartere|delicate|
 zerrüttend|disruptive|
-zuckerst|zuckerst|
 zusammenstelle|together at the|
 zwangsläufig|inevitably|
 ähnele|resemble|
 überdecke|bedspread|
 überdrüssig|weary|
-überfüttere|überfüttere|
 überheblichem|haughty|
 übermäßig|excessively|
-verfilme|verfilme|
-achilles|Achilles|
 addieren|add|
-alexandra|alexandra|
-anschaulichem|anschaulichem|
 anstarre|stare at|
 atmest|breathe|
-aufdränge|aufdränge|
-auspeitsche|auspeitsche|
 autorisiere|authorize|
 bedeutungslos|meaningless|
 befehlige|Take command|
 betäubst|numb|
-cousin|cousin|
 dringlich|urgent|
-einfallt|einfallt|
 einfügen|insert|
 erfriere|freeze to death|
 erhaltende|sustaining|
 ernstere|serious|
-errettens|errettens|
 exotischem|exotic|
-fab|fab|
 fortdauer|continued life|
 galizien|Galicia|
 gesittet|civilized|
 heißer|hot|
 indiskretem|indiscreet|
-kandidiere|kandidiere|
 kommuniziere|communicating|
 kotzen|puke|
 Kriegsbeginn|Beginning of the war|
-mitwisse|mitwisse|
-nero|nero|
 neugierigem|curious|
-nötigst|nötigst|
-PDF|PDF|
 petrus|Peter|
-poppen|poppen|
 regungslos|motionless|
 scheu|shy|
 schmucke|pretty|
@@ -7313,7 +6301,6 @@ traurigkeit|sadness|
 unvollkommen|imperfect|
 verantwortungslos|irresponsible|
 verflixt|darn|
-verjagst|verjagst|
 verkehrt|wrong|
 vielmals|very much|
 vollziehe|full draw|
@@ -7322,27 +6309,22 @@ vorstehe|above|
 vulgäre|vulgar|
 wanken|waver|
 waschbar|washable|
-wiehere|wiehere|
-zerknitter|zerknitter|
 ziegelei|brickworks|
 zusammengelebt|lived|
 überfahre|on going|
 Kastalien|Castalia|
 abergläubisch|superstitious|
-abfinde|abfinde|
 abgefunden|resigned|
 abgeschoben|deported|
 abgestimmt|matched|
 abgewehrt|blocked|
 abzulenken|distract|
 abzusehen|refrain|
-adria|adria|
 affen|ape|
 alpin|Alpine|
 andeute|suggestive|
 ankomme|incoming|
 anlegst|mess|
-Annexe|Annexe|
 anpasst|adapts|
 anzulegen|to create|
 anzustellen|to make|
@@ -7355,14 +6337,11 @@ aufgeschrieben|written|
 aufgestiegen|risen|
 aufgewachsen|grew up|
 aufkam|came up|
-aufständischem|aufständischem|
 aufträge|orders|
 aufzubringen|raise|
 ausbauen|develop|
 ausgetragen|held|
 ausländerin|foreigner|
-aussehendem|aussehendem|
-australian|Australian|
 auszuarbeiten|develop|
 auszuliefern|deliver|
 auszuschalten|off|
@@ -7371,10 +6350,8 @@ auszutauschen|exchange|
 bad|bathroom|
 bayerin|Bavarian|
 beamter|civil servant|
-bedenkst|bedenkst|
 bedürfnisse|needs|
 begehst|commit|
-begin|begin|
 belade|laden|
 beneide|envy|
 beschlug|shoed|
@@ -7383,20 +6360,15 @@ bildende|Fine|
 billiger|cheaper|
 billigt|approves|
 blies|blew|
-bombay|Bombay|
 braue|brow|
 burgen|castles|
-butt|butt|
 Bündnisse|Alliances|
-childs|childs|
-chrissy|chrissy|
 denkwürdig|memorable|
 dominierend|dominant|
 duckst|crouch|
 dunkeln|dark|
 dunkelst|darkest|
 durchzuführen|perform|
-einbug|einbug|
 eingebüßt|lost|
 eingedrungen|penetrated|
 eingereicht|submitted|
@@ -7411,12 +6383,10 @@ ellenbogen|elbow|
 entging|escaped|
 entkam|escaped|
 entnommen|taken from|
-ereignest|ereignest|
 ermüde|get tired|
 erobere|conquer|
 externe|external|
 fechte|fencing|
-fed|fed|
 flexibel|flexible|
 formte|formed|
 fortgegangen|gone|
@@ -7438,8 +6408,6 @@ gleichwertig|equivalent|
 globalem|global|
 gruß|greeting|
 gönn|grudge|
-günter|günter|
-hallelu|hallelu|
 hauptsitz|headquarters|
 heerführer|general|
 heiler|healer|
@@ -7452,11 +6420,8 @@ hingesetzt|sat down|
 hinkst|limp|
 höfe|tribunals|
 hörner|horns|
-inn|inn|
 institutionell|institutional|
 irrend|erring|
-johns|johns|
-jordan|Jordan|
 kampflos|peacefully|
 kleid|dress|
 kleinigkeit|trifle|
@@ -7465,9 +6430,6 @@ kopfes|head|
 kurve|curve|
 kurzfristig|short-term|
 kurzzeitig|short-term|
-leh|leh|
-leiber|leiber|
-lily|lily|
 logistik|logistics|
 lässig|casual|
 magd|maid|
@@ -7482,51 +6444,35 @@ mürrisch|grumpy|
 nachsicht|forbearance|
 nachzusehen|look up|
 nachzuweisen|prove|
-napoleon|Napoleon|
 nationalität|nationality|
 Nationalversammlung|National Assembly|
 neuste|latest|
 nichtig|void|
 offenheit|openness|
-oliver|oliver|
 panisch|panic-stricken|
-patroa|patroa|
-perl|perl|
-petersburg|petersburg|
 phantastik|Fantastic|
-physis|physis|
 plakat|poster|
 plante|planned|
 Plinius|Pliny|
-Potsdam|Potsdam|
 prozession|procession|
 prähistorisch|prehistoric|
-raine|raine|
 rasende|furious|
-rebeca|rebeca|
 regisseur|director|
 riss|crack|
-robust|robust|
 röhre|tube|
 schauspielerin|actress|
 scherze|joke|
 schief|awry|
 schielst|squint|
 schilt|scolds|
-schleicher|schleicher|
 schnüre|cords|
-sensation|sensation|
 sicheres|safe|
 speist|feeds|
 sphäre|sphere|
-spukst|spukst|
 standpunkt|point of view|
-strauss|strauss|
 streber|swot|
 streiche|underline|
 streichs|prank|
-subject|subject|
-sultan|sultan|
 torheit|folly|
 umgebracht|killed|
 umzubringen|to kill|
@@ -7540,12 +6486,10 @@ unvorstellbar|unimaginable|
 versehentlich|inadvertently|
 versprecht|promise|
 Verteidigern|Defenders|
-vollmer|vollmer|
 vorwort|foreword|
 vorzufinden|It also reflects|
 vorzuziehen|preferable|
 wahrzunehmen|perceive|
-wang|wang|
 warze|wart|
 weiden|graze|
 weites|wide|
@@ -7557,7 +6501,6 @@ windstoß|blast|
 wirbel|vortex|
 wüßte|know|
 ziege|goat|
-zischle|zischle|
 zugegeben|added|
 zugeschrieben|attributed|
 zugestimmt|agreed|
@@ -7573,9 +6516,6 @@ zwilling|twin|
 überaus|extremely|
 übertreib|exaggerate|
 üppig|lush|
-hagrid|hagrid|
-riddle|riddle|
-abzeichne|abzeichne|
 anrichte|sideboard|
 anschicke|was preparing|
 anstimme|tune a|
@@ -7583,9 +6523,7 @@ anstrenge|an effort|
 arkadi|Arcadian|
 auferstehe|resurrect|
 aufgelegen|put up|
-aufkreuze|aufkreuze|
 aufschaue|look up|
-ausraube|ausraube|
 auswähle|SELECTING|
 baldig|speedy|
 beschoss|shelled|
@@ -7598,7 +6536,6 @@ einflöße|inspire in|
 einreist|enters|
 einschüchternd|intimidating|
 einstehe|once before|
-entgegenkam|entgegenkam|
 erbost|infuriated|
 erotischem|erotic|
 falter|butterfly|
@@ -7606,15 +6543,12 @@ first|ridge|
 formeln|formulas|
 fortgehe|go away|
 funkelnd|sparkling|
-fädele|fädele|
 geformt|shaped|
 geistreiche|Witty|
 genial|ingenious|
 genoß|enjoyed|
 grauenhaft|terrible|
 grünst|greenest|
-gönnend|gönnend|
-hangele|hangele|
 heitern|cheerful|
 hineingerate|into appliances|
 hochmut|pride|
@@ -7624,16 +6558,9 @@ kobolde|goblins|
 kopflos|headless|
 krankhaft|pathological|
 lehrling|apprentice|
-losmache|losmache|
 maschinengewehr|machine gun|
-meuterin|meuterin|
-michelangelo|michelangelo|
-minerva|minerva|
 mütze|cap|
-nachstelle|nachstelle|
 nutzlos|useless|
-närrischem|närrischem|
-offline|offline|
 ohrfeige|box on the ears|
 relikt|relic|
 runder|round|
@@ -7651,10 +6578,8 @@ sprudeln|bubble|
 unentwegt|constant|
 unerbittlich|inexorably|
 unzweifelhaft|undoubted|
-verbeugst|verbeugst|
 vergewissere|make sure|
 verkommende|degenerate|
-verschlaft|verschlaft|
 vollbringe|fully bring|
 wehmütigem|wistful|
 weiterreise|more travel|
@@ -7666,7 +6591,6 @@ zurückschicke|send back|
 zusammenwirke|WOULD together|
 überzeugendem|convincing|
 abgeordneter|Seconded|
-ann|ann|
 annahmen|assumptions|
 arbeitern|employees|
 Arbeitsmarkt|Labor market|
@@ -7680,7 +6604,6 @@ energie|energy|
 entwürfe|designs|
 erstelle|create|
 erzähler|narrator|
-fan|fan|
 fenstern|windows|
 flecke|stains|
 frist|period|
@@ -7689,14 +6612,9 @@ gelacht|laugh|
 gewinnt|winning|
 grafik|graphic|
 halbwegs|halfway|
-heiden|heiden|
 heil|safely|
 herüber|over|
-holla|holla|
-holocaust|holocaust|
-humor|humor|
 hunde|dogs|
-integration|integration|
 jesuiten|Jesuit|
 kaiserin|empress|
 keinesfalls|under no circumstances|
@@ -7705,8 +6623,6 @@ klarheit|clarity|
 kurie|curia|
 lehrbuch|textbook|
 lesung|reading|
-machs|machs|
-materials|materials|
 messe|fair|
 mittags|at midday|
 mitternacht|midnight|
@@ -7714,36 +6630,28 @@ mitunter|sometimes|
 münchner|munich|
 nachhinein|retrospect|
 nah|close|
-normal|normal|
 note|grade|
 onkel|uncle|
 onkeln|uncles|
 opfers|victim|
-park|park|
-Pathos|Pathos|
 peinlich|embarrassing|
 pest|plague|
 plattform|platform|
 poesie|poetry|
 porträt|portrait|
 quasi|virtually|
-radio|radio|
 rettung|rescue|
 rosa|pink|
 schande|shame|
 schiedsrichter|referee|
 Schwabe|Swabian|
 schwefel|sulfur|
-siegfried|siegfried|
 stehengeblieben|stopped|
 strophe|verse|
 sturm|storm|
 süd|south|
-terror|terror|
 toter|dead|
-tricia|tricia|
 tötung|killing|
-udo|udo|
 umfeld|surroundings|
 umsonst|free|
 unterzeichnung|signing|
@@ -7754,7 +6662,6 @@ währenddessen|meanwhile|
 zugute|benefit|
 zwischenfall|incident|
 übers|over|
-Waldzell|Waldzell|
 Alchimist|Alchemist|
 abenteurer|adventurer|
 abgekommen|strayed|
@@ -7764,21 +6671,16 @@ abgesetzt|discontinued|
 abgesondert|isolated|
 abgewandt|away|
 abgrundtief|abysmal|
-abholst|abholst|
-abrupt|abrupt|
-abschüttele|abschüttele|
 abstatte|pay her|
 abweise|dismisses|
 akte|file|
 alledem|all this|
 allgegenwärtig|ubiquitous|
-amazon|amazon|
 andalusien|andalucia|
 angebunden|tethered|
 angemeldet|logged|
 angetroffen|found|
 anmaßt|arrogates|
-anmerke|anmerke|
 ansiehst|look at|
 antwerpen|Antwerp|
 anziehst|put on|
@@ -7796,13 +6698,11 @@ aufhorche|shall hear,|
 aufhält|resident|
 aufräume|clean up|
 aufwecke|awaken|
-aufzeige|aufzeige|
 ausgebrochen|broken|
 ausgelöscht|extinguished|
 ausgestellt|displayed|
 ausgetauscht|replaced|
 ausgezahlt|paid|
-auskoste|auskoste|
 auslache|laugh at|
 ausmass|extent|
 ausruf|exclamation|
@@ -7817,24 +6717,19 @@ belange|concerns|
 belehre|teach|
 bengel|kid|
 benimm|behave|
-berauschst|berauschst|
 bereitgestellt|provided|
 beruflichem|professional|
 beruhe|is based|
-beschütz|beschütz|
 besserwissens|better knowledge|
 betrüge|fraudulent|
-bewirf|bewirf|
 billion|trillion|
 bisse|bites|
 bißchen|little|
-blanco|blanco|
 blickend|Looking|
 blutrot|blood-red|
 Bodensee|Lake Constance|
 brasilianisch|Brazilian|
 bösewicht|villain|
-center|center|
 charme|charm|
 dekadenz|decadence|
 distanzen|distances|
@@ -7842,7 +6737,6 @@ dreizehnjährig|thirteen|
 durchbrochen|open|
 durchstoße|pierce|
 edelstem|the finest|
-edition|edition|
 effizient|efficient|
 ehefrau|wife|
 eigentum|property|
@@ -7855,17 +6749,12 @@ einleuchten|be clear|
 einräume|grants|
 einwände|objection|
 elfen|elf|
-elsa|elsa|
 elternhaus|parents' house|
 entgegenstehe|precludes|
 entscheidendere|more decisive|
-entwirf|entwirf|
 erklimme|climb up|
-erlittenem|erlittenem|
 erwachsener|adult|
-erwärmst|erwärmst|
 erzeuge|create|
-exerziere|exerziere|
 favorit|favorite|
 fertiggestellt|completed|
 fessel|ankle|
@@ -7878,11 +6767,9 @@ freimache|free do|
 fremdartig|strange|
 früchten|fruits|
 fällig|due|
-gackere|gackere|
 gallig|bilious|
 gedemütigt|humiliated|
 gedenkt|commemorates|
-geduldest|geduldest|
 gefertigt|made|
 geflogen|flown|
 gefreut|happy|
@@ -7905,7 +6792,6 @@ gezögert|delayed|
 gleichwohl|nevertheless|
 gleite|slip|
 glühende|glowing|
-got|Got|
 Großmächte|Great Powers|
 grundgesetzes|basic Act|
 gutachten|report|
@@ -7921,21 +6807,17 @@ heraufbeschwor|conjured up|
 herausfinde|find out|
 hergebracht|brought|
 hilfreich|helpful|
-hinauszögere|hinauszögere|
 hineingezogen|drawn|
 hineinstecke|put into|
 hingewiesen|pointed|
 hintergehe|go back|
 hinzufüge|add|
 inoffiziell|unofficially|
-interviews|interviews|
 jahrhundertelang|for centuries|
 jahrzehntelang|decades|
 kampfes|combative|
-Karlsruhe|Karlsruhe|
 kerze|candle|
 kitzeln|tickle|
-klapperig|klapperig|
 kleide|Dress|
 kläre|clarify|
 kontinentale|continental|
@@ -7943,9 +6825,6 @@ kontinente|continents|
 kontrollen|controls|
 konvent|convention|
 korrekturen|corrections|
-krauss|krauss|
-kriseln|kriseln|
-kränkst|kränkst|
 kästchen|box|
 körpern|bodies|
 laboratorien|laboratories|
@@ -7960,52 +6839,37 @@ lobende|Honorable|
 lodere|Blaze|
 lung|development|
 makellos|flawless|
-marian|marian|
-mathias|mathias|
 medaillon|medallion|
-media|media|
 medikament|drug|
 mehrjährig|perennial|
 meistere|mastering|
 merklich|noticeably|
 messias|Messiah|
 mitbringe|bring with|
-mohr|mohr|
 momente|moments|
 monatelang|for months|
 morgige|Tomorrow|
 muttersprache|mother tongue|
 nachgeahmt|imitated|
-nachzeichne|nachzeichne|
 namhaft|designated|
 Nationalsozialismus|National Socialism|
-negro|negro|
 neptun|Neptune|
 neulich|recently|
 niederschlag|precipitation|
 niederträchtig|mean|
 nimm|take|
-norman|Norman|
 norwegisch|Norwegian|
 Nürnberg|Nuremberg|
 nütze|profitable|
-opponiere|opponiere|
 ostpreuße|East Prussian|
 partie|game|
-parton|parton|
-passion|passion|
 pforte|gate|
-philosophierst|philosophierst|
-pins|pins|
 plastik|plastic|
 platt|flat|
-pole|Pole|
 promis|celebrities|
 Protektor|Protector|
 putz|plaster|
 quäler|tormentor|
-raffst|raffst|
-rase|rase|
 ratte|rat|
 reinige|clean|
 reit|riding|
@@ -8013,12 +6877,9 @@ reserven|reserves|
 respektlos|disrespectful|
 rivale|rival|
 rohr|pipe|
-route|route|
-ruin|ruin|
 ränder|edges|
 rückfall|relapse|
 sacht|gently|
-salier|Salier|
 salzig|salty|
 schachspiel|chess game|
 schamhaar|pubic hair|
@@ -8027,20 +6888,15 @@ schiffern|mariners|
 schlachtfeld|battlefield|
 schleift|grinds|
 schoss|shot|
-schwirrst|schwirrst|
 schwoll|swelled|
 schwur|oath|
 schätzungen|estimates|
 schöpferin|creator|
 sehn|see|
 seicht|shallow|
-server|server|
 sichergestellt|ensure|
 Slowene|Slovene|
-smaria|smaria|
-social|social|
 spanisch|Spanish|
-spit|spit|
 spitzname|nickname|
 sportart|sport|
 spot|commercial|
@@ -8058,13 +6914,10 @@ teilgenommen|participated|
 tempo|pace|
 teuer|expensive|
 theatralisch|theatrical|
-tiberias|tiberias|
 tische|tables|
 titan|titanium|
 tobt|rages|
-tropez|tropez|
 tröstens|comforting|
-trübst|trübst|
 umgekommen|killed|
 umschlag|envelope|
 unabsichtlich|unintentionally|
@@ -8080,23 +6933,17 @@ unterlaß|ceasing|
 unterschreib|be signed|
 unterstreiche|underline|
 untertauche|submerging|
-urban|urban|
 variante|variant|
 verachtest|despise|
 verbiet|forbid|
 verbrenn|burn|
 vergleichst|compare|
-verkündigst|verkündigst|
 verschlüsselns|encrypting|
-verselbstständige|verselbstständige|
 versinke|sinking|
 verstrich|passed|
 versäume|neglect|
-vertretet|vertretet|
 verzeih|Forgive|
-verzerrst|verzerrst|
 verzog|a wry|
-verzückst|verzückst|
 viertelstunde|quarter of an hour|
 vorangehe|go ahead|
 vorführe|bring before|
@@ -8117,13 +6964,10 @@ wissenschaftlerin|scientist|
 wohlfühle|feel comfortable|
 wohnort|place of residence|
 wortlos|silent|
-wölbst|wölbst|
 zaubert|conjures up|
 zerfetzt|lacerated|
 zerfiel|disintegrated|
-zerfresse|zerfresse|
 zerknirscht|contrite|
-ziemlichem|ziemlichem|
 zuckst|twitch|
 zueinander|to each other|
 Zugehörigkeit|Affiliation|
@@ -8141,13 +6985,9 @@ zurückgeworfen|thrown back|
 zurückstehe|stand back|
 zusage|commitment|
 zusammengetreten|met|
-zuschicke|zuschicke|
 zweitgrößte|second largest|
 zweiundzwanzig|twenty-two|
 überlauf|overflow|
-abwandele|abwandele|
-ginny|ginny|
-neville|neville|
 Unterkleid|Petticoat|
 vereinsamen|become lonely|
 achseln|shoulders|
@@ -8167,9 +7007,6 @@ begnadet|blessed|
 beispiellos|unprecedented|
 bemitleidenswert|pitiful|
 beschneide|prune|
-bewirtens|bewirtens|
-blätterst|blätterst|
-Bundeswehr|Bundeswehr|
 derb|coarse|
 dreiecke|Triangles|
 duellieren|duel|
@@ -8177,11 +7014,9 @@ dürrer|skinny|
 entspringe|springs from|
 erbeben|shake|
 erhabenes|sublime|
-erlegst|erlegst|
 ersehnst|crave|
 farbig|colored|
 fassungslos|stunned|
-faulst|faulst|
 fesselns|bondage|
 gebeichtet|confession|
 gefälle|gradient|
@@ -8192,9 +7027,7 @@ graust|shudder|
 herausgehe|go out|
 hilfsbereit|helpful|
 hineinsehe|look into it|
-illustrierst|illustrierst|
 intrigant|scheming|
-karras|karras|
 kompetent|competently|
 konföderal|confederal|
 krempe|brim|
@@ -8204,7 +7037,6 @@ mancherlei|many|
 mekka|Mecca|
 mitgefühl|compassion|
 mitnehme|take with|
-nachsehe|nachsehe|
 Niedersachsen|Lower Saxony|
 penetrant|penetrating|
 prominenter|prominent|
@@ -8223,7 +7055,6 @@ stemmen|lift|
 sächsische|Saxon|
 sähe|would look|
 teilhabt|some have|
-ultimatum|ultimatum|
 umbringe|kill|
 unangebracht|inappropriate|
 unbedacht|thoughtless|
@@ -8234,13 +7065,11 @@ ungedeckt|uncovered|
 uninteressant|uninteresting|
 unvorteilhaft|unfavorable|
 vergelte|reward|
-vergeudern|vergeudern|
 verhältnismäßig|relatively|
 verirrst|get lost|
 vermesse|TO MEASURE|
 verräterin|traitor|
 verschlafe|oversleep|
-verschoss|verschoss|
 verwahre|protest|
 vierteilen|quartered|
 volks|people|
@@ -8264,10 +7093,8 @@ zusammengefügt|together|
 lupin|lupine|
 phönizien|Phoenicia|
 scheißen|shit|
-turu|turu|
 absage|cancellation|
 abschrift|copy|
-allerwenigste|allerwenigste|
 ammoniak|ammonia|
 amulett|amulet|
 anekdote|anecdote|
@@ -8277,25 +7104,19 @@ architekt|architect|
 assyrer|Assyrian|
 aufhebe|canceling|
 aufnimmst|absorb|
-aufseht|aufseht|
 ausrüstung|equipment|
 bankrott|bankrupt|
 bedrohe|threatening|
 befasse|deal|
-belauft|belauft|
 berechtigung|entitlement|
 betrog|cheating|
 blendendem|blinding|
 brav|good|
-carl|carl|
 charaktere|characters|
 dach|roof|
-datteln|datteln|
 dienern|bow and scrape|
 dokumentes|document|
 dorfes|village|
-dos|DOS|
-due|due|
 durst|thirst|
 dürr|dry|
 effekt|effect|
@@ -8311,8 +7132,6 @@ ernähre|feeding|
 erwärme|warm it|
 fahne|flag|
 fahrzeuge|vehicles|
-faktes|faktes|
-fat|fat|
 fernsehsender|TV station|
 fließendem|running|
 flugzeit|flight time|
@@ -8332,14 +7151,11 @@ gottesdienste|church services|
 grabstein|grave stone|
 graden|degrees|
 grau|gray|
-gryffindor|gryffindor|
 güte|goodness|
 haß|hatred|
 heldin|heroine|
 henkeln|Handles|
-huber|huber|
 intern|internal|
-intervention|intervention|
 irren|be wrong|
 jahrestag|anniversary|
 Kaisertum|Empire|
@@ -8357,9 +7173,7 @@ leiterin|leader|
 lieder|songs|
 läufe|workflows|
 lösch|delete|
-mannheim|Mannheim|
 manuskript|manuscript|
-margaret|margaret|
 markt|market|
 massaker|massacre|
 mechanik|mechanics|
@@ -8372,8 +7186,6 @@ napoleonische|Napoleonic|
 nähre|nurturing|
 orakel|oracle|
 orientier|orientable|
-pakistan|Pakistan|
-pascal|pascal|
 persien|Persia|
 pfarrei|parish|
 physischem|physical|
@@ -8381,19 +7193,14 @@ planung|planning|
 Preußens|Prussia|
 proben|rehearse|
 programme|programs|
-public|public|
 päpstliche|Papal|
 quartett|quartet|
 raume|space|
 reagier|React|
-Reformation|Reformation|
-reporte|reporte|
 ringe|rings|
 rollt|rolls|
 rüge|reprimand|
-sabich|sabich|
 salbe|ointment|
-salzburg|salzburg|
 sanden|sands|
 schaft|shank|
 schelde|Scheldt|
@@ -8410,13 +7217,11 @@ spruch|saying|
 Staatswesen|Polity|
 standorte|locations|
 stehle|steal|
-stiles|stiles|
 straff|tight|
 streitern|warriors|
 stöhne|groan|
 symptome|Symptoms|
 szenarien|scenarios|
-tad|tad|
 tatort|scene of the crime|
 tauchten|appeared|
 Teilnehmern|Participants|
@@ -8426,13 +7231,11 @@ therapie|therapy|
 tiefste|lowest|
 treffpunkt|meeting place|
 tänzen|dances|
-umgehst|umgehst|
 umging|bypassed|
 umsehe|look around|
 unterwelt|underworld|
 urheber|author|
 vertilge|will destroy|
-vii|vii|
 vorzug|preference|
 weht|blows|
 weinst|cry|
@@ -8448,8 +7251,6 @@ zusammengetan|teamed up|
 zuvorkam|forestalled|
 zweige|two|
 abgewandelt|modified|
-absterbe|absterbe|
-amüsierst|amüsierst|
 angebetet|worshiped|
 anhängig|pending|
 anklagen|accuse|
@@ -8457,17 +7258,13 @@ anzuzeigen|view|
 atme|breathe|
 aufbrach|set off|
 aufkläre|enlighten|
-aufpasse|aufpasse|
 ausgebeult|baggy|
 aussterbe|dying out|
 beeinflusst|influenced|
 begehrende|desiring|
-bekümmerst|bekümmerst|
 beschwörst|Summon|
 betraure|mourn|
 brüderlich|brotherly|
-carnby|Carnby|
-cedric|cedric|
 dazugehörig|belonging to|
 disziplinen|disciplines|
 durchschneide|by cutting|
@@ -8483,8 +7280,6 @@ episch|epic|
 erpresse|extort|
 erschaffene|created|
 erschloss|opened up|
-ertappst|ertappst|
-erwill|erwill|
 explosiv|explosive|
 fortschreite|would progress|
 freundlichkeit|friendliness|
@@ -8497,26 +7292,19 @@ gesprengt|blown up|
 giftgas|poison gas|
 grünliche|greenish|
 halblang|Semi-long|
-harrah|Harrah|
 herablasse|condescending|
 herausrage|outstanding|
 hinausgehe|go out|
-Hindenburg|Hindenburg|
-hinfahre|hinfahre|
 hinzunehme|Add to this|
-huldigst|huldigst|
 krater|crater|
 kühler|cooler|
 läuterns|lautering|
-manueii|manueii|
 mumie|mummy|
-muse|muse|
 musikant|musician|
 mäntel|Coats|
 nachbilde|afterimage|
 nachzuahmen|to imitate|
 pflaster|pavement|
-polierst|polierst|
 rauben|rob|
 realistisch|realistic|
 riskierst|risking|
@@ -8533,7 +7321,6 @@ taktisch|tactical|
 tonarm|tonearm|
 trauerspiel|tragedy|
 umgeworfen|overturned|
-umhüllst|umhüllst|
 umkreises|radius|
 unempfindlich|insensitive|
 universale|universal|
@@ -8546,7 +7333,6 @@ verlocke|entice|
 versank|sank|
 verschlinge|swallow|
 verschwöre|conspire|
-vertagst|vertagst|
 verwunde|amazement|
 vorgehabt|intended|
 vorhalten|reproach|
@@ -8567,8 +7353,6 @@ altstadt|old town|
 arbeitgeber|employer|
 börse|stock market|
 derer|of those|
-detail|detail|
-details|details|
 dokument|document|
 drucken|print|
 englands|england|
@@ -8585,19 +7369,15 @@ hebt|raises|
 heiß|hot|
 herauf|up|
 ihrerseits|in turn|
-inc|inc|
 inhaber|owner|
 inwieweit|to what extent|
-kindergarten|kindergarten|
 kontext|context|
 lebensmittel|food|
 lizenz|license|
-lothar|lothar|
 massen|masses|
 netze|networks|
 oberschicht|top layer|
 ostern|Easter|
-peru|Peru|
 plant|plans|
 prosa|prose|
 reichste|most|
@@ -8609,7 +7389,6 @@ stahl|steel|
 stiefmutter|stepmother|
 stoß|shock|
 tagsüber|during the day|
-trend|trend|
 umzusehen|to look|
 unlängst|recently|
 unstimmigkeiten|discrepancies|
@@ -8623,10 +7402,7 @@ wörter|words|
 zweieinhalb|two and a half|
 basalem|basal|
 Kastaliens|Castalia|
-rodele|rodele|
 schlichtend|arbitrating|
-verblühe|verblühe|
-verrenke|verrenke|
 aufspiele|On Game|
 einstürme|one towers|
 ernstlich|serious|
@@ -8635,18 +7411,15 @@ horkrux|Horcrux|
 abbreche|break off|
 abfallen|fall|
 abspreche|to agreement|
-allah|Allah|
 alltäglich|commonplace|
 analogem|analog|
 Anfängerin|Beginner|
 angeln|fish|
-angibst|angibst|
 anrede|salutation|
 anschluß|connection|
 ansehnliche|considerable|
 anzog|attracted|
 argons|argon|
-Argus|Argus|
 assoziation|association|
 aufweise|which has|
 aufwärts|up|
@@ -8658,19 +7431,12 @@ beleuchte|illuminating|
 bemerkenswerte|remarkable|
 bergsteige|mountaineering|
 beschaffenheit|nature|
-beschaffst|beschaffst|
 besinnst|recollect|
-beteuerst|beteuerst|
 bewähre|stands the test|
-bind|bind|
 blass|pale|
 bleich|pale|
-bummele|bummele|
 bärtig|bearded|
-datierst|datierst|
-deportiere|deportiere|
 dialektik|dialectic|
-dotierst|dotierst|
 dulde|tolerate|
 durchbreche|by breaking|
 durchkomme|get through|
@@ -8678,13 +7444,9 @@ durchsehe|look through|
 dämmert|dawns|
 egoistisch|selfish|
 eigenwille|Self-will|
-eingrabe|eingrabe|
-eintausche|eintausche|
 einwandes|objection|
 eisig|icy|
-entartens|entartens|
 enthaupte|decapitate|
-entzweist|entzweist|
 erbreche|vomit|
 erdacht|conceived|
 ergebnislos|inconclusive|
@@ -8692,9 +7454,6 @@ erklinge|sounding|
 erklärens|explaining|
 erquicke|Revive|
 erstaunliches|amazing|
-eskalierst|eskalierst|
-fittes|Fittes|
-fälschst|fälschst|
 geb|give|
 gegenangriff|counterattack|
 geglückt|successful|
@@ -8705,7 +7464,6 @@ gewacht|watched|
 gewöhnliches|ordinary|
 gutheiße|approve|
 handschuh|glove|
-hau|hau|
 helme|helmets|
 hilfloses|helpless|
 hinzugebe|to give|
@@ -8721,11 +7479,8 @@ lieferst|PROVIDING|
 Mannigfaltigkeit|Diversity|
 massierst|massaging|
 mieten|rent|
-mild|mild|
 missbrauchst|misusing|
-missionierst|missionierst|
 misslich|unfortunate|
-mitbegründe|mitbegründe|
 mitgenommen|taken|
 müßig|idle|
 nachahme|imitate|
@@ -8734,43 +7489,30 @@ originell|original|
 platzen|burst|
 protestantisch|Protestant|
 repräsentativ|representative|
-schleimer|Schleimer|
-schmarotze|schmarotze|
 schwäbische|Swabian|
-sentiment|sentiment|
 serviere|Serve|
 seufzt|sigh|
-sherif|sherif|
 softem|soft|
 sprüche|claims|
 stoppen|stop|
 stufenweise|gradually|
 telefonisch|phone|
-torso|torso|
 trauern|mourn|
 trunkene|intoxicated|
 umschrieb|paraphrased|
 ungewiss|uncertain|
-universe|universe|
-vegetation|vegetation|
 verarbeite|processing|
 verstellst|pretending|
 verstreiche|segment passing|
-virgil|virgil|
-vorführst|vorführst|
 wegbereich|ence in|
 weinbau|viniculture|
 werwolf|werewolf|
 wunderbares|wonderful|
-zerlegst|zerlegst|
 zerreiße|tear|
 zickig|silly|
-zugreife|zugreife|
-zustelle|zustelle|
 zünden|ignite|
 ärgerlich|annoying|
 askaban|Azkaban|
-barber|barber|
 durchreist|by travels|
 geblüht|flourished|
 resigniere|resigned|
@@ -8779,23 +7521,13 @@ ableben|live out|
 ablenke|distracted|
 absetze|depose|
 absolvent|graduate|
-absteche|absteche|
 abstreife|strip off|
 adresse|address|
-aid|aid|
 akteur|actor|
-albano|albano|
-albino|albino|
 altern|age|
-ambition|ambition|
 amerikanern|americans|
-amsterdam|amsterdam|
-anpacke|anpacke|
 anpasse|adaptive|
-ansammle|ansammle|
-are|are|
 arg|bad|
-arms|Arms|
 auges|eye|
 auslege|interpret|
 ausspruch|statement|
@@ -8805,7 +7537,6 @@ Basler|Basel|
 bauch|belly|
 bebt|quakes|
 belgrad|Belgrade|
-Bernd|Bernd|
 besuchern|visitors|
 bewerte|review|
 biene|bee|
@@ -8817,18 +7548,12 @@ bundesgericht|federal court|
 bändige|volume|
 Bündnispartner|Ally|
 bürge|guarantor|
-calais|calais|
-champion|champion|
 charakters|, character|
 chefredakteur|editor in chief|
 chor|choir|
 chroms|Chromium|
-collie|collie|
-comic|comic|
-devine|devine|
 Donaumonarchie|Monarchy|
 dschou|chou|
-Dürer|Dürer|
 einbrüche|dips|
 einnahmen|revenue|
 einträge|entries|
@@ -8843,34 +7568,26 @@ erfreue|rejoice|
 erkenn|recognizable|
 erkunde|explore|
 erziele|achieved|
-ese|ese|
 eule|owl|
 extrem|extreme|
-fabian|fabian|
 fachleute|specialists|
 fahrens|procedure|
 familienmitglied|family member|
 flieger|flyer|
 fluggesellschaft|airline|
 flusse|river|
-fon|fon|
-gas|gas|
 gastfreundschaft|hospitality|
 gauner|crook|
 gebietes|territory require|
 gefallenem|fallen|
-geistre|geistre|
 gerann|clotted|
 gerichtetem|directed|
 grausamkeit|cruelty|
-guido|guido|
 gästen|guests|
 halbbruder|half-brother|
 handbuch|manual|
-haufe|haufe|
 hauptgrund|main reason|
 hauptproblem|general problem|
-heidelberg|heidelberg|
 heim|home|
 heldentum|heroism|
 hülle|shell|
@@ -8878,10 +7595,6 @@ hüter|guardian|
 imperii|imperil|
 ineinander|into each other|
 instanz|authority|
-interpretation|interpretation|
-invasion|invasion|
-ira|ira|
-jacques|jacques|
 kaff|dump|
 kapuze|hood|
 kerl|guy|
@@ -8906,32 +7619,20 @@ lobt|praises|
 logik|logic|
 lärm|noise|
 löhne|Wages|
-magdalena|magdalena|
-marino|marino|
-maxim|maxim|
-maximilian|maximilian|
 maßstäbe|standards|
 meisterschaft|championship|
 mentalität|mentality|
 miene|expression|
-minus|minus|
 mode|fashion|
 modellen|models|
-monika|monika|
 muschel|shell|
-muslim|Muslim|
 musterschüler|pattern pupil|
 müller|miller|
 nachzudenken|think|
-nationalist|nationalist|
-neck|Neck|
-nestle|nestle|
 neunzehn|nineteen|
 neunzig|ninety|
 Neuwahl|Election|
-nicolai|nicolai|
 niedrigerem|lower|
-niger|Niger|
 nische|niche|
 nord|north|
 nordens|North|
@@ -8943,32 +7644,22 @@ oliv|olive|
 organisator|organizer|
 palette|range|
 pech|bad luck|
-picard|picard|
 pilger|pilgrim|
-pistoie|pistoie|
-potential|potential|
 probe|sample|
 produzent|producer|
-profile|profile|
 quecksilber|mercury|
 raste|notch|
 rathaus|town hall|
-Regensburg|Regensburg|
 reinstem|purest|
 reiße|rip|
 renne|run|
-report|report|
 Rheinland|Rhineland|
 riet|advised|
-rostock|Rostock|
 sakramente|sacraments|
-sarajevo|sarajevo|
 satellit|satellite|
-satins|satins|
 scheide|vagina|
 scheinwelt|transparent world|
 schmolz|melted|
-schneck|schneck|
 schweif|tail|
 schwörst|swear|
 sektor|sector|
@@ -8981,16 +7672,12 @@ spräche|speaking|
 spätestens|at the latest|
 staatsmann|statesman|
 statut|statute|
-stephan|stephan|
 sticht|stands|
 stundenplan|schedule|
 stätte|site|
 tänzerinnen|dancers|
 töpfe|pots|
 unternehmt|under take|
-utopia|Utopia|
-verfehl|verfehl|
-verliehenem|verliehenem|
 verlobe|betroth|
 vokabel|word|
 volkswirtschaft|economics|
@@ -9000,56 +7687,39 @@ wehre|fend|
 werbung|advertising|
 wettstreit|contest|
 widrig|unconstitutional|
-willi|willi|
 wog|weighed|
 wunsche|Desiring|
 wölfen|wolves|
 würdenträger|dignitary|
-xvi|xvi|
 zentren|centers|
-zukomme|zukomme|
 zutritt|access|
 zwangsarbeit|forced labor|
 zweifle|doubt|
-übersteigre|übersteigre|
-Plinio|Plinio|
-kastalisch|kastalisch|
 abbiegen|turn|
 ablenkst|distract|
-absenke|absenke|
-abspringe|abspringe|
 abzulegen|store|
-alice|alice|
 allmächtig|omnipotent|
 andeutens|hinting|
 anfälle|seizures|
-anschiebe|anschiebe|
 anschwelle|swells|
 ansprach|addressed|
-anspringe|anspringe|
 ansteige|was rising|
 anzuziehen|to attract|
 arbeitstag|working day|
-arrangierst|arrangierst|
 atlantiks|East Atlantic|
 aufrege|upset|
 aufrichtiges|sincere|
 aufwerfe|raises|
 aufzufinden|find|
-aufzwinge|aufzwinge|
 ausdenke|think out|
-ausfechte|ausfechte|
 ausgemalt|painted|
-ausgreife|ausgreife|
 aussah|looked|
-ausstelle|ausstelle|
 badend|Bathing|
 baumeister|builder|
 baumwolle|cotton|
 behütest|brood|
 beichtvater|confessor|
 beizuwohnen|attend|
-bekundens|bekundens|
 benützt|used|
 besann|remembered|
 beschreite|bestride|
@@ -9063,22 +7733,16 @@ bolschewik|Bolshevik|
 bremsen|slow down|
 diktiere|dictate|
 duldest|tolerate|
-durchschaure|durchschaure|
 eifriges|avid|
 eingegraben|buried|
-eingieße|eingieße|
-eingravierst|eingravierst|
 einschneide|incising|
-einschreite|einschreite|
 einsiedler|hermit|
-einspringe|einspringe|
 einzuladen|invite|
 eiskalt|ice-cold|
 engl|English|
 entgegenbringe|bring against|
 entmilitarisieren|demilitarize|
 entschwinde|vanish|
-erhängst|erhängst|
 erstach|stabbed|
 ertrug|endured|
 Exporte|Exports|
@@ -9091,8 +7755,6 @@ geahnt|suspected|
 gebückt|stooping|
 gegenüberstellst|against stellst|
 gemurmel|hum|
-genies|genies|
-Genius|Genius|
 gequält|tortured|
 geschmolzen|molten|
 geschmückt|decorated|
@@ -9102,15 +7764,12 @@ gigantisch|gigantic|
 gottlob|thank goodness|
 grausig|gruesome|
 gästehaus|guesthouse|
-hanna|hanna|
 herausbringe|bring out|
 hereinkam|came in|
-hinbringe|hinbringe|
 hinfalle|fall down|
 hinhalte|sustained|
 hinzukomme|to get|
 idealisch|idealistically|
-kapierst|kapierst|
 kinne|chins|
 lastern|vices|
 lau|lukewarm|
@@ -9118,40 +7777,30 @@ leckere|delicious|
 leichtsinn|carelessness|
 leitende|senior|
 liebreich|loving|
-linderns|linderns|
-littie|littie|
 loskomme|get away|
-maximum|maximum|
 meuterei|mutiny|
 mitgegeben|given|
 mitschuld|complicity|
-moderate|moderate|
-monte|monte|
 nachgemacht|imitated|
 nachlese|pickings|
-nachsitze|nachsitze|
 nationalistisch|nationalist|
 niedergehe|go down|
 niederreiße|tear down|
 oberteil|top|
-palm|palm|
 pathologe|pathologist|
 patzer|slip|
 peripher|peripheral|
 Pommern|Pomerania|
-potters|potters|
 primat|primacy|
 programmieren|program|
 prädestinieren|predestine|
 psychiatrie|psychiatry|
-purple|purple|
 registriere|register|
 reiben|rub|
 reizende|lovely|
 schalom|shalom|
 schema|scheme|
 schieben|push|
-schikanierst|schikanierst|
 schleuderst|hurl|
 schnitzt|Carving|
 schwermut|melancholy|
@@ -9159,12 +7808,8 @@ SCHÜLERS|STUDENT|
 seelenruhe|calmness|
 segelst|sail|
 selbstgefällig|complacent|
-slytherin|slytherin|
-soo|soo|
 sozialpolitik|social policy|
-spähst|spähst|
 süddeutsch|South German|
-thorne|thorne|
 umherziehe|, moving around|
 unantastbar|untouchable|
 unfreies|unfree|
@@ -9174,19 +7819,16 @@ unterwarf|submitted|
 unwiderstehlich|irresistible|
 unwille|unwillingness|
 US-Amerikaner|Americans|
-vase|vase|
 verblüffe|astound|
 vergass|forgot|
 verhärmt|haggard|
 verleitens|enticing|
-vermachst|vermachst|
 vermerks|note|
 verminen|mine|
 verpasst|missed|
 verwest|decayed|
 vorlauf|leading|
 vorlesungen|lectures|
-vorweise|vorweise|
 waschen|wash|
 weltall|space|
 wirksames|effective|
@@ -9197,25 +7839,16 @@ zugehörst|been listening|
 zurückgreife|falling back|
 zusammengenommen|taken together|
 zuschreibe|attributing|
-zutreffe|zutreffe|
 österreichisch-ungarische|Austro-Hungarian|
 überbiete|on offer|
 übermale|on male|
 überspringe|skip|
-bacchus|Bacchus|
 exponiere|exposing|
 kolossalem|Colossal|
-vatikanisch|vatikanisch|
-verängstige|verängstige|
 zivilisiere|Civilize|
-überlieferst|überlieferst|
-ausklinge|ausklinge|
 beschönige|whitewash|
-Bolero|Bolero|
-einrenke|einrenke|
 tätowiere|tattoo|
 unförmig|bulky|
-verfärbe|verfärbe|
 virtuoser|virtuoso|
 zusammenreime|rhymes together|
 abgehen|leave|
@@ -9223,11 +7856,7 @@ abgeschieden|secluded|
 abriet|discouraged|
 abwasche|wash up|
 akkorde|chords|
-alabama|Alabama|
 albanische|Albanian|
-android|android|
-angina|angina|
-angrenze|angrenze|
 anmutig|gracefully|
 artig|like|
 Aufgang|Rising|
@@ -9236,28 +7865,18 @@ ausgehalten|endured|
 ausgeplündert|plundered|
 auszudenken|devise|
 befasst|deals|
-begreiflichem|begreiflichem|
 behaart|hairy|
 bemitleide|pity|
-benütze|benütze|
 bereue|regret|
 bergig|mountainous|
 beriet|advised|
-besiegelst|besiegelst|
 bewegend|moving|
 bezwungen|defeated|
 biologisch|biological|
-borgia|borgia|
-brandt|brandt|
-bulldog|Bulldog|
 Bundespräsident|Federal President|
 bundesweit|nationwide|
 bünden|Graubünden|
-castle|Castle|
-chr|chr|
-cornelia|cornelia|
 davonlaufe|run away|
-deponierst|deponierst|
 drehbank|lathe|
 durchreise|transit|
 durchstreife|roam|
@@ -9268,7 +7887,6 @@ eingelassen|admitted|
 einkaufe|purchases|
 einzuleiten|initiate|
 einzusehen|view|
-eminent|eminent|
 entgegennehme|By accepting|
 entscheidens|decision-making|
 enttäusch|disappoint|
@@ -9276,7 +7894,6 @@ erdreich|soil|
 erhörst|hearest|
 errötest|blush|
 ersinner|instigate|
-ertönst|ertönst|
 extremistin|extremist|
 faschistin|Fascist|
 faulend|rotting|
@@ -9296,7 +7913,6 @@ gehauen|cut|
 gemächer|Chambers|
 Genuß|Enjoyment|
 geordnetem|orderly|
-germany|germany|
 geschult|trained|
 geschwind|fast|
 geschütz|gun|
@@ -9317,28 +7933,20 @@ hochfahre|go up|
 innegehabt|occupied|
 interaktion|interaction|
 irakisch|Iraqi|
-jawohi|jawohi|
 jungfräulich|virgin|
-kanzle|kanzle|
 kassierst|rake in|
-knauer|Knauer|
 knospe|bud|
 knöpf|Unbutton|
 kosake|Cossack|
 Kriegsausbruch|Outbreak of war|
-krümmst|krümmst|
 langsames|slow|
 Lehrauftrag|Lectureship|
 lineale|Rulers|
-linkend|linkend|
 losgelöst|detached|
-losschlage|losschlage|
 managen|manage|
-mantho|mantho|
 manövriere|maneuver|
 maßgeblich|significantly|
 missverstand|misunderstood|
-mithalte|mithalte|
 mithelfe|was helping to|
 mongolin|Mongolian|
 monoton|monotonous|
@@ -9354,8 +7962,6 @@ originale|original|
 periodisch|periodically|
 potentiell|potentially|
 prozentig|percent|
-publike|publike|
-pure|pure|
 Quirls|Whorl|
 reibst|rub|
 rundum|all around|
@@ -9368,7 +7974,6 @@ schmiedet|forges|
 schone|beautiful|
 schonst|sparest|
 schroff|abrupt|
-schrumpfst|schrumpfst|
 schwänzen|skip|
 schäbig|shabby|
 sehnend|longing|
@@ -9378,7 +7983,6 @@ selbstbewusst|self-confident|
 senderin|sender of|
 sibirien|Siberia|
 siegeln|seal|
-singular|singular|
 sittlich|moral|
 sommersprosse|freckle|
 sonnig|sunny|
@@ -9399,8 +8003,6 @@ tierisch|animal|
 touristin|tourist|
 trojanisch|trojan|
 trommeln|drum|
-turban|turban|
-turbulent|turbulent|
 tödliches|deadly|
 töpfern|do pottery|
 umgab|surrounded|
@@ -9412,14 +8014,11 @@ unterstrich|underlined|
 unzulänglich|inadequate|
 vergib|Forgive|
 Vergoldung|Gilding|
-verheere|verheere|
 verrucht|heinous|
 verschlief|overslept|
 verschmolz|merged|
 verstelle|disguise|
 verwerft|condemn|
-verzagst|verzagst|
-victor|victor|
 vieljährig|much year round|
 vierjährig|four-year|
 vitalem|vital|
@@ -9442,7 +8041,6 @@ wiedergutzumachen|amends|
 wärmer|warmer|
 zahllos|countless|
 zentraler|central|
-zubringe|zubringe|
 zugewiesen|assigned|
 zurücklag|lagged|
 zurücktrete|resign|
@@ -9450,43 +8048,29 @@ zurückzulegen|to cover|
 zuschlug|struck|
 zwanzigste|twentieth|
 zweifach|twice|
-zwiespälte|zwiespälte|
 übermorgen|day after tomorrow|
 übernatürlich|supernatural|
 überregional|nationwide|
 überschattest|via chat|
-Aachen|Aachen|
 abgab|gave|
-absolution|absolution|
 absturz|crash|
 abzureisen|leave|
 alltages|everyday|
 alternativ|alternative|
 ameise|ant|
 anbot|offered|
-anka|anka|
-antioch|antioch|
 appell|appeal|
-apple|apple|
 Arbeitsgemeinschaft|Association|
 aren|arene|
 athlet|athlete|
-audi|audi|
 aufschub|delay|
 aufwand|expenditure|
 augenzeuge|eyewitness|
-aurelius|aurelius|
 ausfindig|identify|
 ausgoß|poured|
 auskünfte|Information|
 autobahnen|highways|
-autorin|autorin|
-ball|ball|
-bbc|bbc|
 befreier|liberator|
-bekom|bekom|
-beläufst|beläufst|
-benz|benz|
 bequemlichkeit|convenience|
 berichterstattung|reporting|
 beschenke|Bestow|
@@ -9496,36 +8080,23 @@ bewusstsein|awareness|
 birgst|hidest|
 blitze|flashes|
 blöcke|blocks|
-boom|boom|
 boxe|boxing|
 brennt|burns|
 Brunnens|Fountain|
 bug|bow|
 busch|bush|
-celsius|Celsius|
-cod|cod|
-crease|crease|
-delegation|delegation|
 dermaßen|so|
-design|design|
 diktatur|dictatorship|
 dirigent|conductor|
 doktorarbeit|thesis|
 dominiks|Dominik|
-E-Book|E-Book|
 edel|noble|
-edmund|edmund|
 eduard|EDWARD|
-eingefugt|eingefugt|
 ekelig|disgusting|
 empor|up|
 enthusiasmus|enthusiasm|
-erik|erik|
 erntest|reap|
-ersche|ersche|
-erzherz|erzherz|
 feen|fairies|
-fortuna|fortuna|
 freigebt|freely give|
 freiwilliger|voluntary|
 Friedensschluss|Peace treaty|
@@ -9534,7 +8105,6 @@ Führungsschicht|Elite|
 fünfzehn|fifteen|
 gedenkst|mindful|
 gehirne|brains|
-genus|genus|
 geschicklichkeit|skill|
 gespenst|ghost|
 gesten|gestures|
@@ -9545,10 +8115,8 @@ halt|just|
 harfe|harp|
 hauptbahnhof|central station|
 hauptfigur|protagonist|
-hedwig|hedwig|
 heldentat|exploit|
 hiermit|hereby|
-holger|holger|
 honig|honey|
 hunden|dogs|
 hymne|anthem|
@@ -9559,16 +8127,13 @@ insekt|insect|
 insoweit|the extent|
 integrität|integrity|
 intensität|intensity|
-iran|Iran|
 irland|Ireland|
 jagen|chase|
 jeher|always|
-jus|jus|
 kammern|Chambers|
 kampfgeist|fighting spirit|
 kaserne|barracks|
 katalysator|catalyst|
-katharina|katharina|
 ketzer|heretic|
 klassenziel|target class|
 kombinationen|combinations|
@@ -9582,12 +8147,9 @@ kuß|kiss|
 kürzung|reduction|
 landsleute|country people|
 lebensfreude|zest for life|
-legion|legion|
 lehrmeister|educational master|
-leopold|leopold|
 lerne|learn|
 linde|linden|
-louiee|Louiee|
 luftangriff|air-raid|
 länglich|elongated|
 Machtübernahme|Takeover|
@@ -9595,37 +8157,23 @@ malten|painted|
 maßstab|scale|
 medaille|medal|
 meins|mine|
-mel|mel|
 mexiko|Mexico|
-millimeter|millimeter|
-mittelmaß|mittelmaß|
 mose|Moses|
-mute|mute|
 nachteilen|disadvantages|
 nebenbei|incidentally|
 netzen|networks|
-nietzsche|nietzsche|
 nonne|nun|
 norddeutsch|North German|
 noten|music|
 nummer|number|
 närrin|fool|
-olg|olg|
-otter|otter|
 papste|Pope|
-paragraph|paragraph|
 partnerschaft|partnership|
-passage|passage|
-perfect|Perfect|
-Pius|Pius|
-portal|portal|
 porträts|portraits|
 pressemitteilung|press release|
 prinzessin|princess|
 priorität|priority|
 privatleben|privacy|
-project|project|
-Protagonist|Protagonist|
 prozess|process|
 rad|wheel|
 rechtsprechung|case law|
@@ -9637,26 +8185,18 @@ rohstoffe|mining|
 roms|rom|
 rüste|equip|
 sag|say|
-san|san|
 sandale|sandal|
 saug|suction|
 scheidung|divorce|
 schilling|shilling|
 schleier|veil|
 schock|shock|
-schumacher|schumacher|
-schwager|Schwager|
-sed|sed|
 Selbstbestimmung|Self-determination|
 selbstmord|suicide|
 selbstvertrauen|self-confidence|
-senior|senior|
 Senioren|Seniors|
 siebzehn|seventeen|
-siedele|siedele|
 silbe|syllable|
-simon|simon|
-skandai|skandai|
 sklaverei|slavery|
 sonnenstrahl|sunbeam|
 spezialeinheit|special unit|
@@ -9673,7 +8213,6 @@ straft|punishes|
 straßenbahn|tram|
 streitigkeiten|disputes|
 sublimieren|sublimate|
-sven|sven|
 tagt|meets|
 tarnung|camouflage|
 tataren|Tatars|
@@ -9681,7 +8220,6 @@ techniker|engineer|
 technologe|technologist|
 todesangst|agony|
 topf|pot|
-transport|transport|
 traumatisch|traumatic|
 triade|triad|
 trockene|dry|
@@ -9699,18 +8237,12 @@ unterwerft|subdue|
 vaterunser|Lord's prayer|
 Verdruss|Annoyance|
 verfaule|rot|
-vermassel|vermassel|
 versager|failure|
 verschwendung|waste|
-verseuche|verseuche|
 vervollkommne|perfects|
-video|video|
 vorväter|forefathers|
 waage|Libra|
-walther|walther|
-washington|Washington|
 Weblinks|Web Links|
-wehrmacht|wehrmacht|
 weine|cry|
 wiederzusehen|see again|
 wirble|whirl|
@@ -9727,27 +8259,16 @@ zuschauern|viewers|
 akzentuiere|, accents|
 armselig|pathetic|
 bewässere|irrigate|
-dementor|dementor|
-einfasse|einfasse|
-entwässere|entwässere|
-Escher|Escher|
-fleur|fleur|
 Herodes|Herod|
 kollegialem|collegial|
-kribbele|kribbele|
 relativiere|relativizing|
 ruiniere|ruin|
 stottere|stutter|
 ticken|tick|
 toleriere|tolerate|
 vergeistige|spiritualize|
-verkohle|verkohle|
-verpflanze|verpflanze|
-versalze|versalze|
 verschmutze|soiled|
 verschönere|beautify|
-zerzause|zerzause|
-zischele|zischele|
 Ägyptern|Egyptians|
 abdruck|impression|
 abendlich|evening|
@@ -9755,12 +8276,9 @@ abfälle|waste|
 abgeblasen|blown off|
 abgekartet|collusive|
 absetzt|deposits|
-absurd|absurd|
 abzulehnen|reject|
 abzuliefern|deliver|
 abzuwenden|to avert|
-ahm|ahm|
-anal|anal|
 angeboren|congenital|
 angebrochen|opened|
 angestrichen|painted|
@@ -9785,22 +8303,18 @@ bakterie|bacterium|
 baumstamm|tree trunk|
 beeinflussung|influence|
 begehr|sought|
-begreifliches|begreifliches|
 beichtens|confessional|
 bemannen|manning|
 benetzt|wetted|
 betagt|aged|
 bewundernswert|admirable|
 bietend|bidder|
-bizaad|bizaad|
 blendens|fading|
-blähst|blähst|
 bosnische|Bosnian|
 buchen|book|
 bücherei|library|
 Canons|Canon|
 degen|epee|
-delors|Delors|
 dumme|stupid|
 durchgemacht|made by|
 durchhalten|hold out|
@@ -9824,9 +8338,7 @@ fackel|torch|
 fallende|falling|
 feierlichkeit|ceremony|
 Ferienkurs|Vacation course|
-fletch|fletch|
 freundlichere|friendly|
-gatt|gatt|
 gebeugt|bent|
 geblasen|blown|
 gebraten|fried|
@@ -9862,7 +8374,6 @@ gnadenlos|merciless|
 großfürst|great prince|
 großräume|large spaces|
 grundlohn|basic wage|
-gutmache|gutmache|
 haftbar|liable|
 handbreit|handbreadth|
 haushalt|household|
@@ -9875,7 +8386,6 @@ hiervon|from this|
 hingeschrieben|written down|
 hochverehrt|highly revered|
 huldige|homage|
-hybrid|hybrid|
 häupter|heads design|
 häßlich|ugly|
 inkompetent|incompetent|
@@ -9888,9 +8398,7 @@ keltisch|Celtic|
 kennzeichnern|identify signatories|
 klappt|works|
 klimatisch|climatic|
-klärst|klärst|
 knolle|tuber|
-knüpfst|knüpfst|
 komm|Come|
 konstellation|constellation|
 korb|basket|
@@ -9900,16 +8408,11 @@ kriegsschiff|warship|
 kundig|knowledgeable|
 kurdisch|Kurdish|
 lebhaftes|lively|
-leonid|leonid|
 lüstern|lustful|
 machtpolitisch|power politics|
-madam|madam|
-malaysia|Malaysia|
 Mantels|Mantle|
 massig|massive|
 menschenleben|people living|
-mentor|mentor|
-militant|militant|
 mitarbeiters|co worker|
 mittlerin|mediatrix|
 mitzunehmen|take|
@@ -9921,39 +8424,27 @@ nachrichtendienst|intelligence|
 nebensächlich|incidental|
 niedergelassen|settled|
 notlage|emergency|
-och|och|
-optimal|optimal|
 orgel|organ|
-origins|Origins|
-orthodox|orthodox|
 paß|pass|
-plätschere|plätschere|
-pochst|pochst|
 pompeja|Pompeian|
 proportionen|proportions|
 protegé|protégé|
 präzis|accurate|
 pubertär|adolescent|
 pöbel|mob|
-quince|quince|
 rastest|Takest|
 rastlos|restless|
 rauschende|rushing|
 rechtschaffen|righteous|
-reg|reg|
 regale|shelves|
 rheinisch|Rhine|
-robbie|robbie|
 Ruhrgebiet|Ruhr|
-rutschs|rutschs|
 rätseln|puzzle|
 rückläufe|back workflows|
 rühmst|boast|
 schaufelt|Shoveling|
 schienbein|shin|
 schlachtern|butchers|
-schwierigst|schwierigst|
-schürst|schürst|
 selbstsüchtig|selfish|
 seltsamere|stranger|
 separat|separately|
@@ -9964,18 +8455,15 @@ spritzt|injected|
 Steins|Stein|
 Straßenverkehr|Road|
 strippen|strip|
-sträubst|sträubst|
 ströme|currents|
 strümpfe|stockings|
 sünde|sin|
 taugst|'re no|
-ted|ted|
 testen|test|
 topografie|topography|
 totschlag|homicide|
 traumhaft|fantastic|
 tschetschene|Chechen|
-umwerbt|umwerbt|
 unachtsam|careless|
 unangemeldet|unannounced|
 unbewaffnet|unarmed|
@@ -9983,12 +8471,10 @@ undenkbar|unthinkable|
 ungenügen|of inadequate|
 ungut|offense|
 unheil|disaster|
-unsrig|unsrig|
 unterzog|underwent|
 unwiederbringlich|irretrievably|
 verderbt|corrupt|
 verfassungsändernd|changing constitutional|
-vernunftig|vernunftig|
 vernünftiges|reasonable|
 vertrauensvoll|trusting|
 verworren|confused|
