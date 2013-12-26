@@ -21,13 +21,12 @@ import scala.collection.immutable._
 import scala.language.postfixOps
 import scala.math.BigDecimal.double2bigDecimal
 import com.oranda.libanius.dependencies._
-import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.quizitem.{TextValue, QuizItem, QuizItemViewWithChoices}
 import com.oranda.libanius.model.wordmapping.Dictionary
 
 import scalaz._
 import scalaz.std.set
 import Scalaz._, PLens._
-import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup}
 
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
@@ -82,6 +81,12 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
       case (header, quizGroup) => Dictionary.convertToSearchResults(
         quizGroup.dictionary.mappingsForKeysContaining(input), header)
     }.toList
+
+  def isCorrect(quizGroupHeader: QuizGroupHeader, prompt: String, userResponse: String):
+      Boolean = {
+    val responses = findResponsesFor(prompt, quizGroupHeader)
+    responses.exists(TextValue(_).looselyMatches(userResponse))
+  }
 
   /*
    * Do not call in a loop: not fast.
@@ -184,9 +189,9 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
         val userAnswer = new UserResponse(qgPromptNumber)
 
         Quiz.quizGroupsLens.set(this,
-          mapVPLens(quizGroupHeader) mod ((_: QuizGroup).updatedWithUserResponse(
-            quizItem.prompt, quizItem.correctResponse, isCorrect,
-            quizItem.userResponses, userAnswer), quizGroups)
+            mapVPLens(quizGroupHeader) mod ((_: QuizGroup).updatedWithUserResponse(
+                quizItem.prompt, quizItem.correctResponse, isCorrect,
+                quizItem.userResponses, userAnswer), quizGroups)
         )
       case _ => this
     }
@@ -226,7 +231,7 @@ object Quiz extends AppDependencyAccess {
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
     val qgsWithHeader: Iterable[QuizGroupWithHeader] =
-      quizGroupsData.map(QuizGroupWithHeader.fromCustomFormat(_) )
+        quizGroupsData.map(QuizGroupWithHeader.fromCustomFormat(_) )
     Quiz(qgsWithHeader.map(
         qgWithHeader => Pair(qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }

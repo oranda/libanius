@@ -30,7 +30,7 @@ case class QuizItemViewWithChoices(
     val qgCurrentPromptNumber: Int,
     val quizGroupHeader: QuizGroupHeader,
     val falseAnswers: Set[String],
-    val numCorrectAnswersInARow: Int) extends AppDependencyAccess {
+    val numCorrectAnswersInARow: Int) {
 
   lazy val prompt = quizItem.prompt
   lazy val correctResponse = quizItem.correctResponse
@@ -48,5 +48,10 @@ case class QuizItemViewWithChoices(
    * A quiz item might be presented initially in multiple-choice format,
    * then later wihout any such assistance.
    */
-  def useMultipleChoice = numCorrectAnswersInARow < conf.useMultipleChoiceUntil
+  def useMultipleChoice = QuizItemViewWithChoices.useMultipleChoice(numCorrectAnswersInARow)
+}
+
+object QuizItemViewWithChoices extends AppDependencyAccess {
+  def useMultipleChoice(numCorrectAnswersInARow: Int) =
+    numCorrectAnswersInARow < conf.useMultipleChoiceUntil
 }

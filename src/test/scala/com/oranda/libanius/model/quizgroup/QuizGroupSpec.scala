@@ -16,7 +16,7 @@
 package com.oranda.libanius.model.quizgroup
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.dependencies.{Conf, AppDependencyAccess}
 import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices}
 
 import com.oranda.libanius.model.{UserResponse, UserResponses}
@@ -93,7 +93,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       qgWithHeaderLocal.promptType mustEqual "English word"
       qgWithHeaderLocal.responseType mustEqual "German word"
 
-      qgWithHeaderLocal.partitions.size mustEqual 5
+      qgWithHeaderLocal.partitions.size mustEqual conf.numCorrectAnswersRequired + 1
       qgWithHeaderLocal.partitions(0).size mustEqual 8
       qgWithHeaderLocal.partitions(1).size mustEqual 2
       qgWithHeaderLocal.partitions(2).size mustEqual 2

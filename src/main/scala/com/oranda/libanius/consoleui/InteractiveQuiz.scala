@@ -114,11 +114,12 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
     (userResponse, updatedQuiz)
   }
 
-  def processUserAnswer(quiz: Quiz, userAnswerTxt: String,
+  def processUserAnswer(quiz: Quiz, userResponse: String,
       quizItem: QuizItemViewWithChoices): Quiz = {
-    val correctAnswer = quizItem.correctResponse
-    val isCorrect = correctAnswer.looselyMatches(userAnswerTxt)
-    if (isCorrect) output("\nCorrect!\n") else output("\nWrong! It's " + correctAnswer + "\n")
+
+    val isCorrect = quiz.isCorrect(quizItem.quizGroupHeader, quizItem.prompt.value, userResponse)
+    if (isCorrect) output("\nCorrect!\n") else output("\nWrong! It's " +
+        quizItem.correctResponse + "\n")
 
     Util.stopwatch(quiz.updateWithUserResponse(isCorrect, quizItem.quizGroupHeader,
         quizItem.quizItem), "updateQuiz")

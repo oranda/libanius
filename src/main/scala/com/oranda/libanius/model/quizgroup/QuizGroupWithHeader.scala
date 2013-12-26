@@ -38,8 +38,12 @@ case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup) ex
   protected[model] def quizItemWithChoices(quizItem: QuizItem):
       QuizItemViewWithChoices = {
     val numCorrectAnswers = quizItem.userResponses.numCorrectResponsesInARow
-    val falseAnswers = Util.stopwatch(quizGroup.constructWrongChoices(quizItem, numCorrectAnswers),
-        "constructWrongChoices")
+    val useMultipleChoice = QuizItemViewWithChoices.useMultipleChoice(numCorrectAnswers)
+    val falseAnswers =
+      if (useMultipleChoice)
+        Util.stopwatch(quizGroup.constructWrongChoices(quizItem, numCorrectAnswers),
+            "constructWrongChoices")
+      else Set[String]()
     new QuizItemViewWithChoices(quizItem, quizGroup.currentPromptNumber,
         header, falseAnswers, numCorrectAnswers)
   }
