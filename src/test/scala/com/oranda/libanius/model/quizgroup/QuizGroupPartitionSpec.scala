@@ -1,16 +1,19 @@
-/* Copyright 2012-2013 James McCabe <james@oranda.com>
+/*
+ * Libanius
+ * Copyright (C) 2012-2014 James McCabe <james@oranda.com>
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain
- * a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.oranda.libanius.model.quizgroup
@@ -66,17 +69,15 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
     }
 
     "accept the addition of a new word-mapping" in {
-      val qgpLocal = makeQgPartition
-      qgpLocal.contains("good") mustEqual false
-      val qgUpdated = qgpLocal.addNewQuizItem("good", "gut")
+      qgPartition.contains("good") mustEqual false
+      val qgUpdated = qgPartition.addNewQuizItem("good", "gut")
       qgUpdated.contains("good") mustEqual true
     }
 
     "accept new values for an existing word-mapping" in {
-      val qgpLocal = makeQgPartition
-      val valuesForAgainst = qgpLocal.findResponsesFor("against")
+      val valuesForAgainst = qgPartition.findResponsesFor("against")
       valuesForAgainst.size mustEqual 1
-      val qgUpdated = qgpLocal.addQuizItem(TextValue("against"), TextValue("gegen"))
+      val qgUpdated = qgPartition.addQuizItem(TextValue("against"), TextValue("gegen"))
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
@@ -107,39 +108,34 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
     }
 
     "remove a quiz pair" in {
-      val qgpLocal = makeQgPartition
       val itemToRemove = QuizItem("against", "wider")
-      val qgUpdated = qgpLocal.removeQuizItem(itemToRemove)
+      val qgUpdated = qgPartition.removeQuizItem(itemToRemove)
       qgUpdated.contains("against") mustEqual false
     }
 
     "add a new quiz item to the front of its queue" in {
-      val qgpLocal = makeQgPartition
-      val qgUpdated = qgpLocal.addNewQuizItem("to exchange", "tauschen")
+      val qgUpdated = qgPartition.addNewQuizItem("to exchange", "tauschen")
       pullQuizItem(qgUpdated, 0)._2 mustEqual ("to exchange", "tauschen")
     }
 
     "move an existing quiz pair to the front of its queue" in {
-      val qgpLocal = makeQgPartition
-      val numPromptsBefore = qgpLocal.numPrompts
-      val qgUpdated = qgpLocal.addQuizItemToFront(QuizItem("sweeps", "streicht"))
+      val numPromptsBefore = qgPartition.numPrompts
+      val qgUpdated = qgPartition.addQuizItemToFront(QuizItem("sweeps", "streicht"))
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
       pullQuizItem(qgUpdated, 0)._2 mustEqual ("sweeps", "streicht")
     }
 
     "move a quiz pair to the front of its queue where only the prompt already exists" in {
-      val qgpLocal = makeQgPartition
-      val sizeBefore = qgpLocal.size
-      val qgUpdated = qgpLocal.addQuizItemToFront(QuizItem("entertain", "bewirten"))
+      val sizeBefore = qgPartition.size
+      val qgUpdated = qgPartition.addQuizItemToFront(QuizItem("entertain", "bewirten"))
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
       pullQuizItem(qgUpdated, 0)._2 mustEqual ("entertain", "bewirten")
     }
 
     "add more than one new quiz pair to the front of its queue" in {
-      val qgpLocal = makeQgPartition
-      val qgUpdated1 = qgpLocal.addQuizItemToFront(QuizItem("to exchange", "tauschen"))
+      val qgUpdated1 = qgPartition.addQuizItemToFront(QuizItem("to exchange", "tauschen"))
       val qgUpdated2 = qgUpdated1.addQuizItemToFront(QuizItem("whole", "ganz"))
       val (qgUnrolled, (keyWord, value)) = pullQuizItem(qgUpdated2, 0)
       (keyWord, value) mustEqual ("whole", "ganz")

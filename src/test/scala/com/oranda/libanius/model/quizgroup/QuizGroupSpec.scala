@@ -1,22 +1,25 @@
-/* Copyright 2012-2013 James McCabe <james@oranda.com>
+/*
+ * Libanius
+ * Copyright (C) 2012-2014 James McCabe <james@oranda.com>
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain
- * a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.oranda.libanius.model.quizgroup
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.dependencies.{Conf, AppDependencyAccess}
+import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices}
 
 import com.oranda.libanius.model.{UserResponse, UserResponses}
@@ -61,16 +64,23 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     def makeQuizGroup = QuizGroup(
         List(makeQgPartition0, makeQgPartition1, makeQgPartition2), QuizGroupUserData(true, 10))
+    val quizGroup = makeQuizGroup
 
     def makeSimpleQuizGroup = QuizGroup(List(makeQgPartition0), QuizGroupUserData(true, 0))
+    val quizGroupSimple = makeSimpleQuizGroup
 
-    def makeQgWithHeader: QuizGroupWithHeader = makeQgwh(makeQuizGroup)
-    def makeSimpleQgWithHeader: QuizGroupWithHeader = makeQgwh(makeSimpleQuizGroup)
+
 
     def makeQgwh(quizGroup: QuizGroup): QuizGroupWithHeader = {
       val header = QuizGroupHeader(WordMapping, "English word", "German word", "|")
       QuizGroupWithHeader(header, quizGroup)
     }
+    val qgwh: QuizGroupWithHeader = makeQgwh(quizGroup)
+
+    def makeQgWithHeader: QuizGroupWithHeader = makeQgwh(makeQuizGroup)
+    def makeSimpleQgWithHeader: QuizGroupWithHeader = makeQgwh(makeSimpleQuizGroup)
+
+    val qgwhSimple: QuizGroupWithHeader = makeSimpleQgWithHeader
 
     // defaults for read-only
     val qgWithHeader = makeQgWithHeader
@@ -88,15 +98,14 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     "be parseable from custom format" in {
-      val qgWithHeaderLocal = QuizGroupWithHeader.fromCustomFormat(qgCustomFormat)
-      qgWithHeaderLocal.currentPromptNumber mustEqual 10
-      qgWithHeaderLocal.promptType mustEqual "English word"
-      qgWithHeaderLocal.responseType mustEqual "German word"
+      qgWithHeader.currentPromptNumber mustEqual 10
+      qgWithHeader.promptType mustEqual "English word"
+      qgWithHeader.responseType mustEqual "German word"
 
-      qgWithHeaderLocal.partitions.size mustEqual conf.numCorrectAnswersRequired + 1
-      qgWithHeaderLocal.partitions(0).size mustEqual 8
-      qgWithHeaderLocal.partitions(1).size mustEqual 2
-      qgWithHeaderLocal.partitions(2).size mustEqual 2
+      qgWithHeader.partitions.size mustEqual conf.numCorrectAnswersRequired + 1
+      qgWithHeader.partitions(0).size mustEqual 8
+      qgWithHeader.partitions(1).size mustEqual 2
+      qgWithHeader.partitions(2).size mustEqual 2
     }
 
     "be serializable to custom format" in {
@@ -124,25 +133,22 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     "accept an updated prompt number" in {
-      val quizGroupLocal = makeQuizGroup
-      val qgUpdated = quizGroupLocal.updatedPromptNumber
+      val qgUpdated = quizGroup.updatedPromptNumber
       qgUpdated.currentPromptNumber mustEqual 11
     }
 
     "accept the addition of a new word-mapping" in {
-      val quizGroupLocal = makeQuizGroup
-      quizGroupLocal.contains("good") mustEqual false
-      val qgUpdated = quizGroupLocal.addNewQuizItem("good", "gut")
+      quizGroup.contains("good") mustEqual false
+      val qgUpdated = quizGroup.addNewQuizItem("good", "gut")
       qgUpdated.contains("good") mustEqual true
     }
 
     "update partitions on a user response" in {
-      val qgwhLocal = makeSimpleQgWithHeader
-      qgwhLocal.quizGroup.partitions(1).size mustEqual 0
-      val quizItem = qgwhLocal.quizGroup.findPresentableQuizItem
-      val qgUpdated = qgwhLocal.quizGroup.updatedWithUserResponse(quizItem.get.prompt,
+      qgwhSimple.quizGroup.partitions(1).size mustEqual 0
+      val quizItem = qgwhSimple.quizGroup.findPresentableQuizItem
+      val qgUpdated = qgwhSimple.quizGroup.updatedWithUserResponse(quizItem.get.prompt,
           quizItem.get.correctResponse, true, UserResponses(),
-          new UserResponse(qgwhLocal.currentPromptNumber))
+          new UserResponse(qgwhSimple.currentPromptNumber))
       qgUpdated.partitions(1).size mustEqual 1
     }
 
@@ -165,10 +171,9 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     "accept new values for an existing word-mapping" in {
-      val qgLocal = makeQuizGroup
-      val valuesForAgainst = qgLocal.findResponsesFor("against")
+      val valuesForAgainst = quizGroup.findResponsesFor("against")
       valuesForAgainst.size mustEqual 1
-      val qgUpdated = qgLocal.addNewQuizItem("against", "gegen")
+      val qgUpdated = quizGroup.addNewQuizItem("against", "gegen")
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
@@ -186,49 +191,45 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     "remove a quiz pair" in {
-      val qgLocal = makeQuizGroup
       val itemToRemove = QuizItem("against", "wider")
-      val qgUpdated = qgLocal.removeQuizItem(itemToRemove)
+      val qgUpdated = quizGroup.removeQuizItem(itemToRemove)
       qgUpdated.contains("against") mustEqual false
     }
 
     "add a new quiz item to the front of its queue" in {
-      val qgLocal = makeSimpleQuizGroup
-      val qgUpdated = qgLocal.addNewQuizItem("to exchange", "tauschen")
+      val qgUpdated = quizGroupSimple.addNewQuizItem("to exchange", "tauschen")
       qgUpdated.findPresentableQuizItem mustEqual Some(QuizItem("to exchange", "tauschen"))
     }
 
     "move an existing quiz pair to the front of its queue" in {
-      val qgwhLocal = makeQgWithHeader
-      val numPromptsBefore = qgwhLocal.numPrompts
-      val qgUpdated = qgwhLocal.addNewQuizItem("sweeps", "streicht")
+      val numPromptsBefore = qgwh.numPrompts
+      val qgUpdated = qgwh.addNewQuizItem("sweeps", "streicht")
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
-      val qgwhUpdated = QuizGroupWithHeader(qgwhLocal.header, qgUpdated)
+      val qgwhUpdated = QuizGroupWithHeader(qgwh.header, qgUpdated)
       qgwhUpdated.quizGroup.partitions(0).findPresentableQuizItem(
           qgwhUpdated.currentPromptNumber) mustEqual Some(QuizItem("sweeps", "streicht"))
     }
 
     "add a quiz pair where only the prompt already exists" in {
-      val qgwhLocal = makeQgWithHeader
-      val sizeBefore = qgwhLocal.size
-      val qgUpdated = qgwhLocal.addNewQuizItem("on", "zu")
+      val sizeBefore = qgwh.size
+      val qgUpdated = qgwh.addNewQuizItem("on", "zu")
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
-      val qgwhUpdated = QuizGroupWithHeader(qgwhLocal.header, qgUpdated)
+      val qgwhUpdated = QuizGroupWithHeader(qgwh.header, qgUpdated)
       qgwhUpdated.quizGroup.partitions(0).findPresentableQuizItem(
           qgwhUpdated.currentPromptNumber) mustEqual Some(QuizItem("on", "zu"))
     }
 
 
     "add more than one new quiz pair" in {
-      val qgwhLocal = makeSimpleQgWithHeader
-      val qgUpdated1 = qgwhLocal.addNewQuizItem("to exchange", "tauschen")
+      val qgwhSimple = makeSimpleQgWithHeader
+      val qgUpdated1 = qgwhSimple.addNewQuizItem("to exchange", "tauschen")
       val qgUpdated2 = qgUpdated1.addNewQuizItem("whole", "ganz")
-      val qgwhUpdated2 = QuizGroupWithHeader(qgwhLocal.header, qgUpdated2)
+      val qgwhUpdated2 = QuizGroupWithHeader(qgwhSimple.header, qgUpdated2)
       val (qgUnrolled, (keyWord, value)) = pullQuizItem(qgwhUpdated2)
       (keyWord, value) mustEqual ("whole", "ganz")
-      val qgwhUnrolled = QuizGroupWithHeader(qgwhLocal.header, qgUnrolled)
+      val qgwhUnrolled = QuizGroupWithHeader(qgwhSimple.header, qgUnrolled)
       pullQuizItem(qgwhUnrolled)._2 mustEqual ("to exchange", "tauschen")
     }
   }
