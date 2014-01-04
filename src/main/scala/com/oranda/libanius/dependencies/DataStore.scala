@@ -109,15 +109,19 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
   }
 
   def findAvailableQuizGroups: Set[QuizGroupHeader] =
-    findAvailableResQuizGroups ++ findAvailableFileNameQuizGroups
+    findAvailableResQuizGroups ++ findAvailableFileQuizGroups
 
+  def loadAllQuizGroupsFromFilesDir: Map[QuizGroupHeader, QuizGroup] = {
+    val qgHeaders: Set[QuizGroupHeader] = findAvailableFileQuizGroups
+    qgHeaders.map(qgh => Pair(qgh, loadQuizGroupCore(qgh))).toMap
+  }
 
   private def findAvailableResQuizGroups: Set[QuizGroupHeader] = {
     val qgResNames = io.findQgFileNamesFromResources
     qgResNames.flatMap(io.readQgMetadataFromResource(_)).toSet
   }
 
-  private def findAvailableFileNameQuizGroups: Set[QuizGroupHeader] = {
+  private def findAvailableFileQuizGroups: Set[QuizGroupHeader] = {
     val qgFileNames = io.findQgFileNamesFromFilesDir
     qgFileNames.flatMap(io.readQgMetadataFromFile(_)).toSet
   }
