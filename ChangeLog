@@ -1,3 +1,7 @@
+== 0.93 January 18 2014
+
+  * Little incremental improvements supporting the Android and Play views.
+
 == 0.92 December 18 2013
 
   * Made constructWrongChoicesRandom() at least ten times more efficient.
