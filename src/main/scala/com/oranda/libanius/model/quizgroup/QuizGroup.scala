@@ -139,13 +139,11 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
       numCorrectResponsesSoFar: Int, numWrongChoicesRequired: Int = 2): Set[String] = {
 
     val correctResponses = Util.stopwatch(findResponsesFor(itemCorrect.prompt.value), "findResponsesFor")
-
     val falseResponses: Stream[String] =
         constructWrongChoicesSimilar(numCorrectResponsesSoFar,
             itemCorrect, numWrongChoicesRequired, correctResponses) ++
         constructWrongChoicesRandom(correctResponses, numWrongChoicesRequired, itemCorrect) ++
         constructWrongChoicesDummy(numWrongChoicesRequired)
-
     falseResponses.take(numWrongChoicesRequired).toSet
   }
 
@@ -154,8 +152,7 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
    * find responses that look similar to the correct one.
    */
   def constructWrongChoicesSimilar(numCorrectResponsesSoFar: Long, itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int, correctResponses: List[String]): Stream[String] = {
-
+      numWrongChoicesRequired: Int, correctResponses: List[String]): Stream[String] =
     if (numCorrectResponsesSoFar == 0)
       Stream.empty
     else {
@@ -167,7 +164,6 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
       partitions.toStream.flatMap( _.constructWrongChoicesSimilar(correctResponses,
           numWrongChoicesRequired, correctValuePresented, similarityPredicate))
     }
-  }
 
   protected[quizgroup] def constructWrongChoicesRandom(correctResponses: List[String],
       numWrongChoicesRequired: Int, itemCorrect: QuizItem): Stream[String] =
