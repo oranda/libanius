@@ -255,4 +255,5 @@ object Quiz extends AppDependencyAccess {
     "wider|against\n" +
     "unterhalten|entertain"
   )
+
 }
