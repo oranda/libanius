@@ -29,10 +29,8 @@ import com.oranda.libanius.util.Util
 case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup) extends AppDependencyAccess {
   def toPair = Pair(header, quizGroup)
 
-  def findPresentableQuizItem: Option[QuizItemViewWithChoices] = {
-    l.log("QuizGroupWithHeader findPresentableQuizItem")
+  def findPresentableQuizItem: Option[QuizItemViewWithChoices] =
     quizGroup.findPresentableQuizItem.map(quizItemWithChoices(_))
-  }
 
   def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] =
     quizGroup.findAnyUnfinishedQuizItem.map(quizItemWithChoices(_))
