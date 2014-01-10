@@ -78,7 +78,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
           case Some(qgResName) =>
             val qgText = Util.stopwatch(io.readResource(qgResName).get,
                 "reading quiz group resource " + qgResName)
-            header.createQuizGroup(qgText)
+            Util.stopwatch(header.createQuizGroup(qgText), "creating quiz group by parsing text")
           case _ =>
             l.logError("failed to load quiz group " + header)
             QuizGroup()

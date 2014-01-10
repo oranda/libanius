@@ -30,7 +30,8 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
   "a quiz group" should {
 
     val qgCustomFormat =
-      "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" currentPromptNumber=\"10\" isActive=\"true\"\n" +
+      "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" currentPromptNumber=\"10\" isActive=\"true\"\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"0\"\n" +
         "en route|unterwegs|\n" +
         "full|satt|\n" +
         "full|voll|\n" +
@@ -39,8 +40,10 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
         "rides|reitet|\n" +
         "on|auf|\n" +
         "sweeps|streicht|\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"1\"\n" +
         "entertain|unterhalten|8;2\n" +
         "winner|Siegerin|5;0\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"2\"\n" +
         "against|wider|9,7;6\n" +
         "teach|unterrichten|4,3;1\n"
 
@@ -93,7 +96,6 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     def pullQuizItemAndAnswerCorrectly(qgwh: QuizGroupWithHeader): QuizGroupWithHeader = {
       val quizItem = qgwh.findPresentableQuizItem.get
-      println("quizItem: " + quizItem)
       QuizGroupWithHeader(qgwh.header, updateWithUserAnswer(qgwh.quizGroup, quizItem))
     }
 

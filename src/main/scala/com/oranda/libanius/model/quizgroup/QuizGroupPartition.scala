@@ -20,7 +20,7 @@ package com.oranda.libanius.model.quizgroup
 
 import scala.collection.immutable._
 import scala.language.postfixOps
-import scala.util.{Random}
+import scala.util.{Try, Random}
 
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 import com.oranda.libanius.dependencies.AppDependencyAccess
@@ -35,6 +35,7 @@ import scala.collection.immutable.Stream
 import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
 import java.lang.StringBuilder
+import com.oranda.libanius.util.StringSplitter
 
 /*
  * A subgroup of a QuizGroup, containing quiz items which have all been answered
@@ -48,8 +49,9 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
   protected[quizgroup] def updatedQuizItems(newQuizItems: Stream[QuizItem]): QuizGroupPartition =
     QuizGroupPartition.itemsLens.set(this, newQuizItems)
 
-  protected[quizgroup] def updatedWithUserAnswer(prompt: TextValue, response: TextValue, wasCorrect: Boolean,
-      userResponses: UserResponses, userAnswer: UserResponse): QuizGroupPartition = {
+  protected[quizgroup] def updatedWithUserAnswer(prompt: TextValue, response: TextValue,
+      wasCorrect: Boolean, userResponses: UserResponses, userAnswer: UserResponse):
+      QuizGroupPartition = {
     val userResponseUpdated = userResponses.add(userAnswer, wasCorrect)
     addQuizItem(prompt, response, userResponseUpdated)
   }
@@ -122,7 +124,6 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
   protected[quizgroup] def findQuizItem(prompt: String, response: String): Option[QuizItem] =
     quizItems.find(_.samePromptAndResponse(QuizItem(prompt, response)))
 
-
   protected[quizgroup] def findAnyUnfinishedQuizItem: Option[QuizItem] =
     (for {
       quizItem <- quizItems.toStream
@@ -155,8 +156,6 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
     similarWords.toStream
   }
 
-
-
   protected[quizgroup] def randomValues(sliceSize: Int): List[TextValue] =
     randomSliceOfQuizItems(sliceSize).map(_.correctResponse).toList
 
@@ -183,7 +182,9 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
       quizItems.slice(randomStart, randomStart + sliceSize)
     }
 
-  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String) = {
+  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String, index: Int) = {
+    if (!quizItems.isEmpty)
+      strBuilder.append("#quizGroupPartition numCorrectResponsesInARow=\"" + index + "\"" + '\n')
     for (quizItem <- quizItems.toStream) {
       quizItem.toCustomFormat(strBuilder, mainSeparator)
       strBuilder.append('\n')
@@ -199,7 +200,38 @@ object QuizGroupPartition extends AppDependencyAccess {
       set = (qgp: QuizGroupPartition,
            qItems: Stream[QuizItem]) => qgp.copy(quizItems = qItems))
 
-  protected[quizgroup] def remove(quizItems: Stream[QuizItem], quizItem: QuizItem): Stream[QuizItem] =
+  protected[quizgroup] def remove(quizItems: Stream[QuizItem], quizItem: QuizItem):
+      Stream[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
 
+
+  /*
+   * Text does not include header line
+   */
+  def fromCustomFormat(text: String, mainSeparator: String): QuizGroupPartition = {
+
+    def parseQuizItem(strPromptResponse: String): Option[QuizItem] = {
+      Try(Some(QuizItem.fromCustomFormat(strPromptResponse, mainSeparator))).recover {
+        case e: Exception => l.logError("could not parse quiz item with text " +
+            strPromptResponse + " using separator " + mainSeparator)
+            None
+      }.get
+    }
+
+    def parseQuizItems(lineSplitter: StringSplitter): Stream[QuizItem] = {
+      if (lineSplitter.hasNext)
+        parseQuizItem(lineSplitter.next) match {
+          case Some(line) => Stream.cons(line, parseQuizItems(lineSplitter))
+          case _ => parseQuizItems(lineSplitter)
+        }
+      else
+        Stream.empty
+    }
+
+    val lineSplitter = stringSplitterFactory.getSplitter('\n')
+    lineSplitter.setString(text)
+    val quizItems = parseQuizItems(lineSplitter)
+
+    QuizGroupPartition(quizItems)
+  }
 }

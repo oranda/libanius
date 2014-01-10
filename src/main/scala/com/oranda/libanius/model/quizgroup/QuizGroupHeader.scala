@@ -33,7 +33,7 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
   override def toString = quizGroupType + ": " + promptType + "-" + responseType
 
   def toCustomFormat(strBuilder: StringBuilder) =
-    strBuilder.append("quizGroup type=\"").append(quizGroupType).append("\" promptType=\"").
+    strBuilder.append("#quizGroup type=\"").append(quizGroupType).append("\" promptType=\"").
         append(promptType).append("\" responseType=\"").append(responseType).
         append("\" mainSeparator=\"").append(mainSeparator).append("\"")
 
@@ -66,8 +66,10 @@ object QuizGroupHeader extends AppDependencyAccess {
                 QuestionAndAnswer
     }
 
-  def parsePromptType(str: String): String = StringUtil.parseValue(str, "promptType=\"", "\"").getOrElse("")
-  def parseResponseType(str: String): String = StringUtil.parseValue(str, "responseType=\"", "\"").getOrElse("")
+  def parsePromptType(str: String): String =
+    StringUtil.parseValue(str, "promptType=\"", "\"").getOrElse("")
+  def parseResponseType(str: String): String =
+    StringUtil.parseValue(str, "responseType=\"", "\"").getOrElse("")
   def parseMainSeparator(str: String): String =
     StringUtil.parseValue(str, "mainSeparator=\"", "\"").getOrElse("|")
 

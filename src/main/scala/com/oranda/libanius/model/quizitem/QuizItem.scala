@@ -65,7 +65,7 @@ object QuizItem {
       new UserResponses(correctResponses.map(UserResponse(_)),
           incorrectResponses.map(UserResponse(_))))
 
-  def fromCustomFormat(strPromptResponse: String, mainSeparator: String = "|") = {
+  def fromCustomFormat(strPromptResponse: String, mainSeparator: String = "|"): QuizItem = {
     val i = strPromptResponse.indexOf(mainSeparator)
     val strPrompt = strPromptResponse.substring(0, i).trim
     val strResponseAndUserInfo = strPromptResponse.substring(i + mainSeparator.length)

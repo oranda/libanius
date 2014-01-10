@@ -1,4 +1,5 @@
-quizGroup type="WordMapping" promptType="English word" responseType="German word" mainSeparator="|" currentPromptNumber="0" isActive="true"
+#quizGroup type="WordMapping" promptType="English word" responseType="German word" mainSeparator="|" currentPromptNumber="0" isActive="true"
+#quizGroupPartition numCorrectResponsesInARow="0"
 on|auf|
 as|als|
 agreed|einig|

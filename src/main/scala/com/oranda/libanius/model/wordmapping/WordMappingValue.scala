@@ -81,7 +81,7 @@ object WordMappingValue extends AppDependencyAccess {
         quizItem.userResponses.correctResponsesInARow,
         quizItem.userResponses.incorrectResponses)
 
-  // Example: str = "nachlösen|1,7,9;6"
+  // Example: text = "nachlösen|1,7,9;6"
   def fromCustomFormat(str: String, mainSeparator: String): WordMappingValue = {
 
     import com.oranda.libanius.util.StringUtil.RichString

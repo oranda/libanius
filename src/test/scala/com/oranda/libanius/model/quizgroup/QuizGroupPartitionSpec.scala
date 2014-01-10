@@ -29,8 +29,8 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
 
   "a quiz group partition" should {
     /*
-    Construct a quiz group partition.
-    */
+     * Construct a quiz group partition.
+     */
     def makeQgPartition: QuizGroupPartition = QuizGroupPartition(List(
         QuizItem("against", "wider"),
         QuizItem("entertain", "unterhalten"),
@@ -59,9 +59,16 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
         "entertain|unterhalten|\n"
 
 
+    "be parseable from custom format" in {
+      val qgp = QuizGroupPartition.fromCustomFormat(
+          qgPartitionSimpleCustomFormat, "|")
+      qgp.numQuizItems mustEqual 2
+    }
+
     "be serializable to custom format" in {
-      val customFormat = qgPartitionSimple.toCustomFormat(new StringBuilder(), "|")
-      customFormat.toString mustEqual qgPartitionSimpleCustomFormat
+      val customFormat = qgPartitionSimple.toCustomFormat(new StringBuilder(), "|", 0)
+      customFormat.toString mustEqual
+          "#quizGroupPartition numCorrectResponsesInARow=\"0\"\n" + qgPartitionSimpleCustomFormat
     }
 
     "find values for a prompt" in {
@@ -169,6 +176,4 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
     }
 
   }
-
-
 }

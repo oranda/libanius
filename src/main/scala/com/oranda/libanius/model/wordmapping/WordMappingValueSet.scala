@@ -98,7 +98,7 @@ object WordMappingValueSet extends AppDependencyAccess {
       }
     }
     Try(parseFromCustomFormat) recover {
-      case e: Exception => l.logError("WordMappingValueSet: Could not parse str " + str, e)
+      case e: Exception => l.logError("WordMappingValueSet: Could not parse text " + str, e)
     }
     WordMappingValueSet(values.toList)
   }

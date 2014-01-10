@@ -25,17 +25,14 @@ import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import scalaz._
-import com.oranda.libanius.model.{UserResponses, ModelComponent}
+import com.oranda.libanius.model.{UserResponses, ModelComponent, UserResponse}
 import java.lang.StringBuilder
 import scalaz.PLens._
 import scala.collection.immutable.Stream
 import scala.collection.immutable.List
-import scala.collection.mutable.ListBuffer
-import scala.util.Try
 import scala.Predef._
 import scala.collection.immutable.Set
-import com.oranda.libanius.model.UserResponse
-import com.oranda.libanius.util.Util
+import com.oranda.libanius.util.{StringUtil, Util}
 
 /*
  * Contains quiz items for a topic.
@@ -138,7 +135,8 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
   protected[model] def constructWrongChoices(itemCorrect: QuizItem,
       numCorrectResponsesSoFar: Int, numWrongChoicesRequired: Int = 2): Set[String] = {
 
-    val correctResponses = Util.stopwatch(findResponsesFor(itemCorrect.prompt.value), "findResponsesFor")
+    val correctResponses = Util.stopwatch(findResponsesFor(itemCorrect.prompt.value),
+        "findResponsesFor")
     val falseResponses: Stream[String] =
         constructWrongChoicesSimilar(numCorrectResponsesSoFar,
             itemCorrect, numWrongChoicesRequired, correctResponses) ++
@@ -210,8 +208,8 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
   def toCustomFormat(strBuilder: StringBuilder, header: QuizGroupHeader) = {
     userData.toCustomFormat(header.toCustomFormat(strBuilder))
     strBuilder.append('\n')
-    for (partition <- partitions.toStream)
-      partition.toCustomFormat(strBuilder, header.mainSeparator)
+    for (partition <- partitions.zipWithIndex.toStream)
+      partition._1.toCustomFormat(strBuilder, header.mainSeparator, partition._2)
 
     strBuilder
   }
@@ -235,14 +233,21 @@ object QuizGroup extends AppDependencyAccess {
     QuizGroup(partitions.toList, userData, dictionary)
   }
 
+  def createFromPartitions(partitionMap: Map[Int, QuizGroupPartition],
+      userData: QuizGroupUserData): QuizGroup =
+    QuizGroup(toPartitionArray(partitionMap), userData, new Dictionary())
+
   /*
    * Form a QuizGroup from quiz items with user responses.
    */
   def createFromQuizItems(quizItems: Stream[QuizItem], userData: QuizGroupUserData,
       header: String): QuizGroup = {
 
-    val quizItemsGrouped: scala.collection.immutable.Map[Int, Stream[QuizItem]] =
-      quizItems.groupBy(_.numCorrectAnswersInARow)
+    val quizItemsGrouped: scala.collection.immutable.Map[Int, QuizGroupPartition] =
+        quizItems.groupBy(_.numCorrectAnswersInARow).map {
+          case (numCorrectAnswers: Int, quizItems: Stream[QuizItem]) =>
+            (numCorrectAnswers, QuizGroupPartition(quizItems))
+        }
 
     if (quizItemsGrouped.size > conf.numCorrectAnswersRequired + 1) {
       l.logError("Corrupt data for " + header +
@@ -251,13 +256,7 @@ object QuizGroup extends AppDependencyAccess {
       QuizGroup()
 
     } else {
-      val partitions = Array.fill(conf.numCorrectAnswersRequired + 1)(QuizGroupPartition())
-
-      quizItemsGrouped.foreach {
-        case (numCorrectAnswers: Int, quizItems) =>
-          partitions(numCorrectAnswers) = QuizGroupPartition(quizItems)
-      }
-
+      val partitions = toPartitionArray(quizItemsGrouped)
       val dictionary = Dictionary.fromQuizItems(quizItems)
       QuizGroup(partitions, userData, dictionary)
     }
@@ -268,18 +267,27 @@ object QuizGroup extends AppDependencyAccess {
     QuizGroup(partitions.toList, userData, dictionary)
 
   def apply(partitions: List[QuizGroupPartition], userData: QuizGroupUserData): QuizGroup =
-    QuizGroup(fillPartitions(partitions), userData, new Dictionary())
+    QuizGroup(toPartitionArray(partitions), userData, new Dictionary())
 
   def apply(userData: QuizGroupUserData): QuizGroup =
     QuizGroup(List(), userData)
 
   def apply(partitions: List[QuizGroupPartition], dictionary: Dictionary): QuizGroup =
-    QuizGroup(fillPartitions(partitions), QuizGroupUserData(), dictionary)
+    QuizGroup(toPartitionArray(partitions), QuizGroupUserData(), dictionary)
 
-  def fillPartitions(partitions: List[QuizGroupPartition]): Array[QuizGroupPartition] = {
-    val arrayPartitions = Array.fill(conf.numCorrectAnswersRequired + 1)(QuizGroupPartition())
-    partitions.toArray.copyToArray(arrayPartitions)
-    arrayPartitions
+  def toPartitionArray(partitions: List[QuizGroupPartition]): Array[QuizGroupPartition] = {
+    val partitionArray = Array.fill(conf.numCorrectAnswersRequired + 1)(QuizGroupPartition())
+    partitions.toArray.copyToArray(partitionArray)
+    partitionArray
+  }
+
+  def toPartitionArray(partitionMap: Map[Int, QuizGroupPartition]): Array[QuizGroupPartition] = {
+    val partitionArray = Array.fill(conf.numCorrectAnswersRequired + 1)(QuizGroupPartition())
+    partitionMap.foreach {
+      case (numCorrectAnswers: Int, partition: QuizGroupPartition) =>
+        partitionArray(numCorrectAnswers) = partition
+    }
+    partitionArray
   }
 
 
@@ -309,36 +317,33 @@ object QuizGroup extends AppDependencyAccess {
   def remove(quizItems: Stream[QuizItem], quizItem: QuizItem): Stream[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
 
+
+  /*
+   * Text includes header line
+   */
   def fromCustomFormat(text: String, mainSeparator: String, headerLine: String): QuizGroup = {
 
-    val splitterLineBreak = stringSplitterFactory.getSplitter('\n')
+    val quizGroupParts = text.split("#quizGroupPartition ")
+    val headerLine = quizGroupParts.head
+    val quizGroupPartitions = quizGroupParts.tail
 
-    val quizItemsMutable = new ListBuffer[QuizItem]()
-
-    def parseQuizGroup() {
-      splitterLineBreak.setString(text)
-      splitterLineBreak.next // skip the first line, which has already been parsed
-
-      while (splitterLineBreak.hasNext) {
-        val strPromptResponse = splitterLineBreak.next
-
-        def addQuizItem {
-          quizItemsMutable += QuizItem.fromCustomFormat(strPromptResponse, mainSeparator)
-        }
-        Try(addQuizItem) recover {
-          case e: Exception => l.logError("could not parse quiz item with str " +
-              strPromptResponse + " using separator " + mainSeparator)
-        }
-      }
-    }
-    Try(parseQuizGroup) recover {
-      case e: Exception => l.logError("could not parse qg with str " +
-          text.take(100) + "..." + text.takeRight(100))
+    def parsePartitionText(partitionText: String): Pair[Int, QuizGroupPartition] = {
+      val headerLine = partitionText.takeWhile(_ != '\n')
+      val mainPartitionText = partitionText.dropWhile(_ != '\n').tail
+      val partition = QuizGroupPartition.fromCustomFormat(mainPartitionText, mainSeparator)
+      val index = StringUtil.parseValue(headerLine,
+          "numCorrectResponsesInARow=\"", "\"").getOrElse("0").toInt
+      Pair(index, partition)
     }
 
-    val userData = QuizGroupUserData(headerLine)
-    QuizGroup.createFromQuizItems(quizItemsMutable.toStream, userData, headerLine)
+    val partitionMap = quizGroupPartitions.map(parsePartitionText(_)).toMap
+    val userData: QuizGroupUserData = QuizGroupUserData(headerLine)
+
+    val quizGroup = QuizGroup.createFromPartitions(partitionMap, userData)
+    quizGroup
   }
+
+
 }
 
 

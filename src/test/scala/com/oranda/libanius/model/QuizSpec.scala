@@ -20,7 +20,7 @@ package com.oranda.libanius.model
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{AppDependencyAccess}
-import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, WordMapping, QuizGroupHeader, QuizGroup}
 
 class QuizSpec extends Specification with AppDependencyAccess {
@@ -29,7 +29,8 @@ class QuizSpec extends Specification with AppDependencyAccess {
     
     val quizData = List(
 
-        "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
+        "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"0\"\n" +
         "against|wider\n" +
         "entertain|unterhalten\n" +
         "teach|unterrichten\n" +
@@ -41,17 +42,26 @@ class QuizSpec extends Specification with AppDependencyAccess {
         "contract|Vertrag\n" +
         "rides|reitet\n" +
         "on|auf\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"3\"\n" +
         "sweeps|streicht|100,200,300;405\n",
 
-        "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
+        "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"0\"\n" +
         "unterwegs|en route\n" +
-        "Vertrag|contract|697,696;698\n" +
-        "Vertrag|treaty|796;798\n")
+        "#quizGroupPartition numCorrectResponsesInARow=\"1\"\n" +
+        "Vertrag|treaty|796;798\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"2\"\n" +
+        "Vertrag|contract|697,696;698\n"
+    )
 
     val quiz = Quiz.demoQuiz(quizData)
 
-    "find values for a prompt" in {
+    "be parseable from custom format" in {
+      quiz.numActiveGroups mustEqual 2
       quiz.numQuizItems mustEqual 15
+    }
+
+    "find values for a prompt" in {
 
       val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word", "|")
       quiz.findResponsesFor("on", qgHeader) mustEqual List("auf")
@@ -118,6 +128,11 @@ class QuizSpec extends Specification with AppDependencyAccess {
       val quizItem = QuizItem("against", "wider")
       val quizUpdated = quiz.updateWithUserResponse(true, qgHeader, quizItem)
       quizUpdated.numCorrectAnswers mustEqual 7
+    }
+
+    "find a presentable quiz item" in {
+      val (quizItemViewWithChoices, _) = quiz.findPresentableQuizItem.get
+      quizItemViewWithChoices.prompt mustEqual TextValue("against")
     }
   }
 }

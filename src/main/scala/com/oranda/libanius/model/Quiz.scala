@@ -55,7 +55,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
    */
   def findPresentableQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] =
     (for {
-      (header, quizGroup) <- activeQuizGroups
+      (header, quizGroup) <- activeQuizGroups.toStream
       quizItem <- QuizGroupWithHeader(header, quizGroup).findPresentableQuizItem.toStream
     } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption.orElse(
         findAnyUnfinishedQuizItem)
@@ -223,13 +223,6 @@ object Quiz extends AppDependencyAccess {
     quizGroupHeadings.map(QuizGroupHeader(_)).toSet
   }
 
-  def fromCustomFormat(str: String): Quiz = {
-    val quizGroupHeadings = str.split("quizGroup").tail
-    val quizGroups = quizGroupHeadings.map(
-        headerText => QuizGroupHeader(headerText) -> QuizGroup()).toMap
-    Quiz(quizGroups)
-  }
-
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
     val qgsWithHeader: Iterable[QuizGroupWithHeader] =
@@ -241,14 +234,16 @@ object Quiz extends AppDependencyAccess {
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
 
-    "quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
+    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
+    "#quizGroupPartition numCorrectResponsesInARow=\"0\"\n" +
     "en route|unterwegs\n" +
     "contract|Vertrag\n" +
     "treaty|Vertrag\n" +
     "against|wider\n" +
     "entertain|unterhalten\n",
 
-    "quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
+    "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
+    "#quizGroupPartition numCorrectResponsesInARow=\"0\"\n" +
     "unterwegs|en route\n" +
     "Vertrag|contract\n" +
     "Vertrag|treaty\n" +

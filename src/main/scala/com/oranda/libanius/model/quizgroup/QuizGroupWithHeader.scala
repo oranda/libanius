@@ -59,7 +59,8 @@ object QuizGroupWithHeader extends AppDependencyAccess {
   def fromCustomFormat(text: String, mainSeparator: String = "|"): QuizGroupWithHeader = {
     val headerLine = text.takeWhile(_ != '\n')
     val qgHeader = QuizGroupHeader(headerLine)
-    val qg = QuizGroup.fromCustomFormat(text, mainSeparator, headerLine)
+    val qg = Util.stopwatch(QuizGroup.fromCustomFormat(text, mainSeparator, headerLine),
+        "QuizGroup.fromCustomFormat")
     QuizGroupWithHeader(qgHeader, qg)
   }
 }

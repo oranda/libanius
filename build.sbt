@@ -7,12 +7,15 @@ scalaVersion := "2.10.2"
 scalacOptions += "-deprecation"
 
 resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-          "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-		  "releases"  at "http://oss.sonatype.org/content/repositories/releases")
+                  "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
+                  "releases"  at "http://oss.sonatype.org/content/repositories/releases"
+                 )
 
 libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
                             "org.specs2" %% "specs2" % "2.1",
                             "org.scalaz" %% "scalaz-core" % "7.0.3")
+
+seq(ScctPlugin.instrumentSettings : _*)
     
 unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "config") }
 
@@ -21,7 +24,7 @@ unmanagedClasspath in Test <+= (baseDirectory) map { bd => Attributed.blank(bd /
 parallelExecution in Test := true
 
 artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
-  artifact.name + "-0.93." + artifact.extension
+  artifact.name + "-0.94." + artifact.extension
 }
 
 scalacOptions += "-feature"

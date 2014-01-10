@@ -106,7 +106,7 @@ object WordMappingGroup extends AppDependencyAccess {
       }
     }
     Try(parseQuizGroup) recover {
-      case e: Exception => l.logError("could not parse wmg with str " + str.take(100) + "..." +
+      case e: Exception => l.logError("could not parse wmg with text " + str.take(100) + "..." +
           str.takeRight(100))
     }
 
