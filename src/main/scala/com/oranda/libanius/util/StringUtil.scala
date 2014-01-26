@@ -55,15 +55,20 @@ object StringUtil {
   }
 
   implicit class RichString(s: String) {
+
     def removeAll(substr: String): String = s.replaceAll(substr, "")
+
+    def removeFirstLetters(substr: String): String =
+      if (s.startsWith(substr)) s.replaceFirst(substr, "") else s
+
     def optionalIndex(substr: String): Option[Int] = {
       val index = s.indexOf(substr)
       if (index == -1) None else Some(index)
     }
+
     def optionalIndex(substr: String, from: Int): Option[Int] = {
       val index = s.indexOf(substr, from)
       if (index == -1) None else Some(index)
     }
-
   }
 }

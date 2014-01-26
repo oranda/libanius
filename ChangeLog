@@ -1,3 +1,10 @@
+== 0.95 January 26 2014
+
+  * Added remote dictionary search, i.e. REST querying of mymemory.translated.net.
+
+  * Added RunDictionary script and fixed dictionary bugs.
+
+
 == 0.94 January 10 2014
 
   * The internal partitioning of QuizGroup's is now reflected in the file format.

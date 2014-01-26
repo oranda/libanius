@@ -62,8 +62,8 @@ object QuizItem {
   def apply(prompt: String, response: String, correctResponses: List[Int],
       incorrectResponses: List[Int]): QuizItem =
     QuizItem(TextValue(prompt), TextValue(response),
-      new UserResponses(correctResponses.map(UserResponse(_)),
-          incorrectResponses.map(UserResponse(_))))
+        new UserResponses(correctResponses.map(UserResponse(_)),
+        incorrectResponses.map(UserResponse(_))))
 
   def fromCustomFormat(strPromptResponse: String, mainSeparator: String = "|"): QuizItem = {
     val i = strPromptResponse.indexOf(mainSeparator)

@@ -174,6 +174,5 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
       val quizItem5 = qgpLocal.findPresentableQuizItem(5)
       quizItem5.get.prompt.value mustEqual "against"
     }
-
   }
 }

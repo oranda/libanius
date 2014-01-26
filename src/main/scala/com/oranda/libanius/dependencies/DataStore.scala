@@ -47,23 +47,12 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     Util.stopwatch(loadDictionary(header, quizGroup), "preparing dictionary for " + header)
   }
 
-  def saveQuiz(quiz: Quiz, path: String = "") {
-
-    def saveToFile(header: QuizGroupHeader, quizGroup: QuizGroup) = {
-      val fileName = header.makeQgFileName
-      val serialized = quizGroup.toCustomFormat(new StringBuilder, header)
-      l.log("Saving quiz group " + header.promptType + ", quiz group has promptNumber " +
-          quizGroup.currentPromptNumber + " to " + fileName)
-      io.writeToFile(path + fileName, serialized.toString)
-    }
-    quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg) }
-  }
-
   private def loadDictionary(header: QuizGroupHeader, qg: QuizGroup): QuizGroup = {
     val dictFileName = header.makeDictFileName
-    readDictionary(dictFileName) match {
+    readDictionary(conf.filesDir + dictFileName) match {
       case Some(dictionary) => qg.updatedDictionary(dictionary)
-      case _ => qg
+      case _ => l.logError("Failed to load dictionary")
+                qg
     }
   }
 
@@ -87,6 +76,18 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
     if (quizGroup.isEmpty) l.logError("No quiz items loaded for " + header)
     quizGroup
+  }
+
+  def saveQuiz(quiz: Quiz, path: String = "") {
+
+    def saveToFile(header: QuizGroupHeader, quizGroup: QuizGroup) = {
+      val fileName = header.makeQgFileName
+      val serialized = quizGroup.toCustomFormat(new StringBuilder, header)
+      l.log("Saving quiz group " + header.promptType + ", quiz group has promptNumber " +
+        quizGroup.currentPromptNumber + " to " + fileName)
+      io.writeToFile(path + fileName, serialized.toString)
+    }
+    quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg) }
   }
 
   private def readQuizGroupFromFilesDir(qgFileName: String):

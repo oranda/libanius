@@ -19,8 +19,9 @@
 package com.oranda.libanius.consoleui
 
 import scala.util.Try
-import com.oranda.libanius.util.{StringUtil, Util}
+import com.oranda.libanius.util.{Util, StringUtil}
 import Output._
+import ConsoleUtil._
 import com.oranda.libanius.model._
 import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
@@ -134,17 +135,5 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
       case input: String => TextAnswer(input)
     }
 
-  /*
-   * Predef readLine does not allow backspacing. This is a hack until libanius SBT is
-   * upgraded to a version that is not incompatible with jline 2.11.
-   */
-  def readLineUntilNoBackspaces: String = {
-    val s = readLine
-    val extendedCode: (Char) => Boolean = (c:Char) => (c == 127)
-    if (!s.exists(extendedCode)) s else {
-      println("backspace detected: try again")
-      readLineUntilNoBackspaces
-    }
-  }
 }
 

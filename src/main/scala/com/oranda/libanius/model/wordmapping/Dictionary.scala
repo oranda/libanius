@@ -22,7 +22,7 @@ import scala.collection.JavaConversions.mapAsScalaMap
 
 import scala.collection.immutable.Stream
 import scala.util.Try
-import com.oranda.libanius.model.{ModelComponent, SearchResult}
+import com.oranda.libanius.model.{SearchResultPair, ModelComponent, SearchResult}
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 import com.oranda.libanius.model.quizitem.QuizItem
 
@@ -71,8 +71,6 @@ object Dictionary {
     }
   }
 
-
-
   /*
    * Example:
    *
@@ -100,7 +98,7 @@ object Dictionary {
             if (splitterKeyValue.hasNext) {
               val strValues = splitterKeyValue.next
               // for efficiency, avoid an extra method call into Dictionary here
-              wordMappings.put(strKey, WordMappingValueSetLazyProxy("|", strValues))
+              wordMappings.put(strKey, WordMappingValueSetLazyProxy(strValues, "|"))
             }
           }
         }
@@ -115,7 +113,7 @@ object Dictionary {
   // Useful functions for search:
 
   def convertToSearchResults(pairs: List[(String, WordMappingValueSet)], header: QuizGroupHeader) =
-    pairs.map(pair => SearchResult(header, WordMappingPair(pair._1, pair._2)))
+    pairs.map(pair => SearchResult(header, SearchResultPair(pair._1, pair._2.toValueSet)))
 
   def searchFunction(param: => List[SearchResult]) = () => param
 

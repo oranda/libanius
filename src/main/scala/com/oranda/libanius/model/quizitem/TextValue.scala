@@ -61,15 +61,19 @@ case class DesiredResponse(value: String) {
   import DesiredResponse._
 
   def matches(userResponse: String) =
-    userResponse.removeAll(" ") == value.removeAll(" ")
+    standardized1(userResponse) == standardized1(value)
 
-  //userResponse == value ||
-  //containsPartsIn(standardized(userResponse), standardized(value).takeWhile(c => c != '/'))
+  def matchesParts(userResponse: String) =
+    userResponse == value ||
+        containsPartsIn(standardized2(userResponse), standardized2(value).takeWhile(c => c != '/'))
 }
 
 object DesiredResponse extends AppDependencyAccess {
 
-  def standardized(response: String) =
+  def standardized1(response: String) =
+    response.toLowerCase.removeFirstLetters("to ").removeAll(" ").removeAll("-")
+
+  def standardized2(response: String) =
     response.removeAll(",").removeAll("\\.").removeAll("!").trim.toLowerCase
 
   def containsPartsIn(userResponse: String, desiredResponse: String): Boolean = {

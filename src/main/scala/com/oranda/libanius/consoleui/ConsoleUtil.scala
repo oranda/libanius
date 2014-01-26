@@ -16,17 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.util
+package com.oranda.libanius.consoleui
 
-import org.specs2.mutable.Specification
+object ConsoleUtil {
 
-class StringUtilSpec extends Specification {
-
-  "a string should " should {
-    "allow a substring to be extracted based on enclosing substrings specified" in {
-      val str = "promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" currentPromptNumber=\"10\" isActive=\"true\""
-      val substr = StringUtil.parseValue(str, "isActive=\"", "\"")
-      substr mustEqual Some("true")
+  /*
+   * Predef readLine does not allow backspacing. This is a hack until libanius SBT is
+   * upgraded to a version (0.13 or greater) that is not incompatible with jline 2.11.
+   */
+  def readLineUntilNoBackspaces: String = {
+    val s = readLine
+    val extendedCode: (Char) => Boolean = (c:Char) => (c == 127)
+    if (!s.exists(extendedCode)) s else {
+      println("backspace detected: try again")
+      readLineUntilNoBackspaces
     }
   }
 }

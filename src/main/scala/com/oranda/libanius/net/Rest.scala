@@ -16,17 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.util
+package com.oranda.libanius.net
 
-import org.specs2.mutable.Specification
+import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.client.methods.HttpGet
 
-class StringUtilSpec extends Specification {
+object Rest {
 
-  "a string should " should {
-    "allow a substring to be extracted based on enclosing substrings specified" in {
-      val str = "promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" currentPromptNumber=\"10\" isActive=\"true\""
-      val substr = StringUtil.parseValue(str, "isActive=\"", "\"")
-      substr mustEqual Some("true")
+  protected[net] def query(url: String): String = {
+    val httpClient = new DefaultHttpClient()
+    val httpResponse = httpClient.execute(new HttpGet(url))
+    val entity = httpResponse.getEntity()
+    var content = ""
+    if (entity != null) {
+      val inputStream = entity.getContent()
+      content = io.Source.fromInputStream(inputStream).getLines.mkString
+      inputStream.close
     }
+    httpClient.getConnectionManager().shutdown()
+    return content
   }
 }

@@ -120,8 +120,8 @@ object Criteria {
   val criteriaSets = Seq[Criteria](
     Criteria(numCorrectResponsesInARowDesired = 1, diffInPromptNumMinimum = 5),
     Criteria(numCorrectResponsesInARowDesired = 2, diffInPromptNumMinimum = 15),
-    Criteria(numCorrectResponsesInARowDesired = 3, diffInPromptNumMinimum = 25),
-    Criteria(numCorrectResponsesInARowDesired = 4, diffInPromptNumMinimum = 100)
+    Criteria(numCorrectResponsesInARowDesired = 3, diffInPromptNumMinimum = 40),
+    Criteria(numCorrectResponsesInARowDesired = 4, diffInPromptNumMinimum = 200)
   )
 
   def maxDiffInPromptNumMinimum = criteriaSets.map(_.diffInPromptNumMinimum).max

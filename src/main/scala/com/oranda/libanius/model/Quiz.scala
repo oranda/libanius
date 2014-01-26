@@ -30,6 +30,11 @@ import scalaz._
 import scalaz.std.set
 import Scalaz._, PLens._
 import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup}
+import scala._
+import scala.collection.immutable.Nil
+import scala.collection.immutable.List
+import scala.collection.immutable.Iterable
+import com.oranda.libanius.net.providers.MyMemoryTranslate
 
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
     extends ModelComponent {
@@ -75,7 +80,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def resultsBeginningWith(input: String): List[SearchResult] =
     activeQuizGroups.flatMap {
       case (header, quizGroup) => Dictionary.convertToSearchResults(
-        quizGroup.dictionary.mappingsForKeysBeginningWith(input), header)
+          quizGroup.dictionary.mappingsForKeysBeginningWith(input), header)
     }.toList
 
   def resultsContaining(input: String): List[SearchResult] =
@@ -201,6 +206,24 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
   def nearTheEnd = quizGroups.exists(qgwh =>
       (qgwh._2.numPrompts - qgwh._2.currentPromptNumber) < Criteria.maxDiffInPromptNumMinimum)
+
+  def searchLocalDictionary(searchInput: String): List[SearchResult] = {
+    import Dictionary._  // make special search utilities available
+
+    val firstWord = searchInput.takeWhile(_ != ' ')
+
+    // Keep trying different ways of searching the dictionary until one finds something.
+    if (firstWord.length <= 2) Nil
+    else tryUntilResults(List(
+      searchFunction { resultsBeginningWith(firstWord) },
+      searchFunction { resultsBeginningWith(firstWord.dropRight(1)) },
+      searchFunction { resultsBeginningWith(firstWord.dropRight(2)) },
+      searchFunction { if (firstWord.length > 3) resultsContaining(firstWord) else Nil }
+    ))
+  }
+
+  def searchRemoteDictionary(searchInput: String): List[SearchResult] =
+    MyMemoryTranslate.translate(searchInput, this)
 }
 
 object Quiz extends AppDependencyAccess {

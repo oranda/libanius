@@ -13,7 +13,10 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
 
 libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
                             "org.specs2" %% "specs2" % "2.1",
-                            "org.scalaz" %% "scalaz-core" % "7.0.3")
+                            "org.scalaz" %% "scalaz-core" % "7.0.3",
+                            "org.apache.httpcomponents" % "httpclient" % "4.1.2",
+                            "com.typesafe.play" %% "play-json" % "2.2.0-RC1"
+                           )
 
 seq(ScctPlugin.instrumentSettings : _*)
     
@@ -24,7 +27,7 @@ unmanagedClasspath in Test <+= (baseDirectory) map { bd => Attributed.blank(bd /
 parallelExecution in Test := true
 
 artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
-  artifact.name + "-0.94." + artifact.extension
+  artifact.name + "-0.95." + artifact.extension
 }
 
 scalacOptions += "-feature"

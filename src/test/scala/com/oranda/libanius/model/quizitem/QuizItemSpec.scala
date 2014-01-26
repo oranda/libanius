@@ -86,5 +86,10 @@ class QuizItemSpec extends Specification with AppDependencyAccess {
     "know the number of times in a row it was answered correctly by the user" in {
       quizItem.numCorrectAnswersInARow must be equalTo 2
     }
+
+    "be matchable even if there is a 'to ' at the front" in {
+      val quizItem = QuizItem(TextValue("leiden"), TextValue("to suffer"))
+      quizItem.looselyMatches("suffer") mustEqual true
+    }
   }
 }

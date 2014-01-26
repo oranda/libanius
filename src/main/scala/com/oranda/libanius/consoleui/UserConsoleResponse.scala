@@ -19,9 +19,11 @@
 package com.oranda.libanius.consoleui
 
 abstract class UserConsoleResponse
-abstract class Answer extends UserConsoleResponse {
+abstract class TextInput extends UserConsoleResponse {
   def text: String
 }
+case class WordQuery(text: String) extends TextInput
+abstract class Answer extends TextInput
 case class TextAnswer(text: String) extends Answer
 case class ChosenOptions(chosenOptions: List[_]) extends Answer {
   override def text = chosenOptions.iterator.next.toString

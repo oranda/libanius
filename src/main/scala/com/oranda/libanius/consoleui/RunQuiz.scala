@@ -40,6 +40,5 @@ object RunQuiz extends InteractiveQuiz {
     output("OK, the quiz begins! To quit, type q at any time.\n")
     testUserWithQuizItem(quiz)
   }
-
 }
 

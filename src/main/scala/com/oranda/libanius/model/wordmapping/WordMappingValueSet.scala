@@ -23,7 +23,7 @@ import scala.collection.mutable.ListBuffer
 
 import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.model.quizitem.QuizItem
-import com.oranda.libanius.model.ModelComponent
+import com.oranda.libanius.model.{ValueSet, ModelComponent}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import java.lang.StringBuilder
@@ -47,7 +47,7 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil)
 
   def removeValue(value: String) = filterOut(value)
 
-  override def toString = values.toString
+  override def toString = values.map(_.value).mkString(", ")
 
   // Example: contract:696,697;698/treaty:796;798
   def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String) = {
@@ -57,8 +57,6 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil)
 
     StringUtil.mkString(strBuilder, values, wmvToCustomFormat, '/')
   }
-
-
 
   def strings: Iterable[String] = values.map(_.value)
 
@@ -70,6 +68,7 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil)
 
   def valueBeginningWith(valueStart: String) = values.find(_.value.startsWith(valueStart))
 
+  def toValueSet = ValueSet(strings.toList)
 }
 
 object WordMappingValueSet extends AppDependencyAccess {

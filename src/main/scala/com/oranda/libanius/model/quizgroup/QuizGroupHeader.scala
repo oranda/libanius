@@ -20,7 +20,6 @@ package com.oranda.libanius.model.quizgroup
 
 import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.wordmapping.WordMappingGroup
 
 import java.lang.StringBuilder
 import com.oranda.libanius.model.ModelComponent

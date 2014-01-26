@@ -34,5 +34,4 @@ object Util extends AppDependencyAccess {
     val timeTaken = System.currentTimeMillis() - start
     (result, timeTaken)
   }
-
 }

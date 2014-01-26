@@ -16,17 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.util
+package com.oranda.libanius.model
 
-import org.specs2.mutable.Specification
+/*
+ * Used for search results.
+ */
+case class ValueSet(values: List[String] = Nil)
+  extends ModelComponent {
 
-class StringUtilSpec extends Specification {
+  def addValueToEnd(value: String) =
+    copy(if (!values.contains(value)) values :+ value else values)
 
-  "a string should " should {
-    "allow a substring to be extracted based on enclosing substrings specified" in {
-      val str = "promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" currentPromptNumber=\"10\" isActive=\"true\""
-      val substr = StringUtil.parseValue(str, "isActive=\"", "\"")
-      substr mustEqual Some("true")
-    }
-  }
+  override def toString = values.mkString(", ")
+
+  def strings: Iterable[String] = values
+
+  def size = values.size
+
+  def containsValue(value: String): Boolean = values.contains(value)
+
+  def valueBeginningWith(valueStart: String) = values.find(_.startsWith(valueStart))
 }
+
