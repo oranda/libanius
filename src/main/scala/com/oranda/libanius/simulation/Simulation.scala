@@ -47,7 +47,6 @@ trait Simulation {
   private def testWithQuizItems(quiz: Quiz,
       lastQuizItem: Option[QuizItemViewWithChoices] = None) (implicit maxResponses: Long) {
 
-
     if (responsesProcessed < maxResponses) {
 
       val (presentableQuizItem, timeTakenToFindItem) = Util.stopwatch(quiz.findPresentableQuizItem)
