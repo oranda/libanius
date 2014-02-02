@@ -1,3 +1,10 @@
+== 0.951 February 2 2014
+
+  * Fine-tuned the use of Streams to avoid OutOfMemoryErrors.
+
+  * Made the simulation tail-recursive to avoid StackOverflowErrors.
+
+
 == 0.95 January 26 2014
 
   * Added remote dictionary search, i.e. REST querying of mymemory.translated.net.
