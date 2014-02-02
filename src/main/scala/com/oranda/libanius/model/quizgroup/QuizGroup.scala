@@ -290,7 +290,6 @@ object QuizGroup extends AppDependencyAccess {
     partitionArray
   }
 
-
   val partitionsLens: Lens[QuizGroup, List[QuizGroupPartition]] = Lens.lensu(
     get = (_: QuizGroup).partitions,
     set = (qGroup: QuizGroup,
@@ -342,8 +341,6 @@ object QuizGroup extends AppDependencyAccess {
     val quizGroup = QuizGroup.createFromPartitions(partitionMap, userData)
     quizGroup
   }
-
-
 }
 
 
