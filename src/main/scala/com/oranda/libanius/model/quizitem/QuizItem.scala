@@ -20,6 +20,7 @@ package com.oranda.libanius.model.quizitem
 
 import com.oranda.libanius.model.{UserResponse, UserResponses}
 import com.oranda.libanius.model.wordmapping.WordMappingValue
+import com.oranda.libanius.dependencies.AppDependencyAccess
 
 /*
  * A connection between two things, and user information associated with the connection.
@@ -33,15 +34,17 @@ import com.oranda.libanius.model.wordmapping.WordMappingValue
  *  - a word and a translation
  */
 case class QuizItem(prompt: TextValue, correctResponse: TextValue,
-    userResponses: UserResponses = new UserResponses()) {
+    userResponses: UserResponses = new UserResponses()) extends AppDependencyAccess {
+
+  def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
+  def numCorrectAnswersInARow = userResponses.numCorrectResponsesInARow
+
+  def isComplete = numCorrectAnswersInARow >= conf.numCorrectAnswersRequired
 
   def samePromptAndResponse(other: QuizItem) =
     other.prompt == prompt && other.correctResponse == correctResponse
   def isPresentable(currentPromptNumber: Int) =
     userResponses.isPresentable(currentPromptNumber)
-
-  def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
-  def numCorrectAnswersInARow = userResponses.numCorrectResponsesInARow
 
   def looselyMatches(userResponse: String): Boolean =
     correctResponse.looselyMatches(userResponse)
