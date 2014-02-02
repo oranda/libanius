@@ -137,7 +137,7 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
 
     val correctResponses = Util.stopwatch(findResponsesFor(itemCorrect.prompt.value),
         "findResponsesFor")
-    val falseResponses: Stream[String] =
+    val falseResponses: List[String] =
         constructWrongChoicesSimilar(numCorrectResponsesSoFar,
             itemCorrect, numWrongChoicesRequired, correctResponses) ++
         constructWrongChoicesRandom(correctResponses, numWrongChoicesRequired, itemCorrect) ++
@@ -150,32 +150,32 @@ case class QuizGroup private(partitions: List[QuizGroupPartition] = List(),
    * find responses that look similar to the correct one.
    */
   def constructWrongChoicesSimilar(numCorrectResponsesSoFar: Long, itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int, correctResponses: List[String]): Stream[String] =
+      numWrongChoicesRequired: Int, correctResponses: List[String]): List[String] =
     if (numCorrectResponsesSoFar == 0)
-      Stream.empty
+      Nil
     else {
       val correctValuePresented = itemCorrect.correctResponse.value
 
       def hasSameStart = (value1: TextValue, value2: String) => value1.hasSameStart(value2)
       def hasSameEnd = (value1: TextValue, value2: String) => value1.hasSameEnd(value2)
       val similarityPredicate = if (numCorrectResponsesSoFar % 2 == 1) hasSameStart else hasSameEnd
-      partitions.toStream.flatMap( _.constructWrongChoicesSimilar(correctResponses,
+      partitions.flatMap( _.constructWrongChoicesSimilar(correctResponses,
           numWrongChoicesRequired, correctValuePresented, similarityPredicate))
     }
 
   protected[quizgroup] def constructWrongChoicesRandom(correctResponses: List[String],
-      numWrongChoicesRequired: Int, itemCorrect: QuizItem): Stream[String] =
-    partitions.toStream.filterNot(_.isEmpty).flatMap(_.constructWrongChoicesRandom(
+      numWrongChoicesRequired: Int, itemCorrect: QuizItem): List[String] =
+    partitions.filterNot(_.isEmpty).flatMap(_.constructWrongChoicesRandom(
         correctResponses, numWrongChoicesRequired, itemCorrect))
 
   protected[quizgroup] def constructWrongChoicesDummy(numWrongChoicesRequired: Int):
-      Stream[String] = {
+      List[String] = {
     val characters = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray
     if (numWrongChoicesRequired > characters.length) {
       l.logError("Too many dummy answers requested.")
-      Stream.empty
+      Nil
     } else
-      characters.map(_.toString).take(numWrongChoicesRequired).toStream
+      characters.map(_.toString).take(numWrongChoicesRequired).toList
   }
 
   protected[model] def findAnyUnfinishedQuizItem: Option[QuizItem] =

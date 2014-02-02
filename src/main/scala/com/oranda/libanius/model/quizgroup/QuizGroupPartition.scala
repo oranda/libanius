@@ -43,10 +43,22 @@ import com.oranda.libanius.util.StringSplitter
  * (A ListMap was formerly used to store quiz items but this was found to be too
  * slow for bulk insert. Currently a Stream is used.)
  */
-case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
-    extends ModelComponent {
+case class QuizGroupPartition(quizItemStream: Stream[QuizItem] = Stream.empty) extends ModelComponent {
 
-  protected[quizgroup] def updatedQuizItems(newQuizItems: Stream[QuizItem]): QuizGroupPartition =
+  lazy val quizItems = quizItemStream.toList
+
+  protected[quizgroup] def contains(quizItem: QuizItem): Boolean =
+    quizItems.exists(_.samePromptAndResponse(quizItem))
+  protected[quizgroup] def contains(prompt: TextValue): Boolean =
+    quizItems.exists(_.prompt == prompt)
+  protected[quizgroup] def contains(prompt: String): Boolean = contains(TextValue(prompt))
+  protected[quizgroup] def numQuizItems = quizItems.size
+  protected[quizgroup] def size = numQuizItems
+  protected[quizgroup] def isEmpty = quizItems.isEmpty
+  protected[quizgroup] def numPrompts = size
+  protected[quizgroup] def numResponses = size
+
+  protected[quizgroup] def updatedQuizItems(newQuizItems: List[QuizItem]): QuizGroupPartition =
     QuizGroupPartition.itemsLens.set(this, newQuizItems)
 
   protected[quizgroup] def updatedWithUserAnswer(prompt: TextValue, response: TextValue,
@@ -69,21 +81,21 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
   protected[quizgroup] def addQuizItemToFront(quizItem: QuizItem): QuizGroupPartition =
     addQuizItemToFront(quizItems, quizItem)
 
-  protected[quizgroup] def addQuizItemToFront(quizItems: Stream[QuizItem],
+  protected[quizgroup] def addQuizItemToFront(quizItems: List[QuizItem],
       quizItem: QuizItem): QuizGroupPartition =
     QuizGroupPartition.itemsLens.set(this, quizItem +: remove(quizItem))
 
   protected[quizgroup] def addQuizItemToEnd(quizItem: QuizItem): QuizGroupPartition =
     addQuizItemToEnd(quizItems, quizItem)
 
-  protected[quizgroup] def addQuizItemToEnd(quizItems: Stream[QuizItem], quizItem: QuizItem):
+  protected[quizgroup] def addQuizItemToEnd(quizItems: List[QuizItem], quizItem: QuizItem):
       QuizGroupPartition =
     updatedQuizItems(remove(quizItem) :+ quizItem)
 
   protected[quizgroup] def removeQuizItem(quizItem: QuizItem): QuizGroupPartition =
     QuizGroupPartition.itemsLens.set(this, remove(quizItem))
 
-  protected[quizgroup] def remove(quizItem: QuizItem): Stream[QuizItem] =
+  protected[quizgroup] def remove(quizItem: QuizItem): List[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
 
   protected[quizgroup] def removeQuizItemsForPrompt(prompt: String) =
@@ -91,20 +103,8 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
   protected[quizgroup] def removeQuizItemsForResponse(response: String) =
     updatedQuizItems(quizItems.filter(_.correctResponse.value != response))
 
-  protected[quizgroup] def quizPrompts: Stream[TextValue] = quizItems.map(_.prompt)
-  protected[quizgroup] def quizResponses: Stream[TextValue] = quizItems.map(_.correctResponse)
-
-
-  protected[quizgroup] def contains(quizItem: QuizItem): Boolean =
-    quizItems.exists(_.samePromptAndResponse(quizItem))
-  protected[quizgroup] def contains(prompt: TextValue): Boolean =
-    quizItems.exists(_.prompt == prompt)
-  protected[quizgroup] def contains(prompt: String): Boolean = contains(TextValue(prompt))
-  protected[quizgroup] def numQuizItems = quizItems.size
-  protected[quizgroup] def size = numQuizItems
-  protected[quizgroup] def isEmpty = quizItems.isEmpty
-  protected[quizgroup] def numPrompts = size
-  protected[quizgroup] def numResponses = size
+  protected[quizgroup] def quizPrompts: List[TextValue] = quizItems.map(_.prompt)
+  protected[quizgroup] def quizResponses: List[TextValue] = quizItems.map(_.correctResponse)
 
   /*
    * Low usage expected. Slow because we are not using a Map for quizItems.
@@ -128,7 +128,7 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
     (for {
       quizItem <- quizItems.toStream
       if quizItem.userResponses.isUnfinished
-     } yield quizItem).headOption
+    } yield quizItem).headOption
 
   def findPresentableQuizItem(currentPromptNumber: Int): Option[QuizItem] =
     (for {
@@ -138,29 +138,29 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
 
   protected[quizgroup] def constructWrongChoicesSimilar(correctResponses: List[String],
       numWrongResponsesRequired: Int, correctValue: String,
-      similarityPredicate: (TextValue, String) => Int => Boolean): Stream[String] = {
+      similarityPredicate: (TextValue, String) => Int => Boolean): List[String] = {
 
     var similarWords = new HashSet[String]
     var numValueSetsSearched = 0
     val numSimilarLettersRequired = 2
     quizItems.iterator.takeWhile(_ => similarWords.size < numWrongResponsesRequired).
       foreach(quizItem => {
-        numValueSetsSearched = numValueSetsSearched + 1
-        // Avoid selecting values belonging to the "correct" correctResponse set
-        if (!correctResponses.contains(quizItem.correctResponse)) {
-          if (similarWords.size < numWrongResponsesRequired &&
-              similarityPredicate(quizItem.correctResponse, correctValue)(numSimilarLettersRequired))
-            similarWords += quizItem.correctResponse.value
+      numValueSetsSearched = numValueSetsSearched + 1
+      // Avoid selecting values belonging to the "correct" correctResponse set
+      if (!correctResponses.contains(quizItem.correctResponse)) {
+        if (similarWords.size < numWrongResponsesRequired &&
+          similarityPredicate(quizItem.correctResponse, correctValue)(numSimilarLettersRequired))
+          similarWords += quizItem.correctResponse.value
       }
     })
-    similarWords.toStream
+    similarWords.toList
   }
 
   protected[quizgroup] def randomValues(sliceSize: Int): List[TextValue] =
     randomSliceOfQuizItems(sliceSize).map(_.correctResponse).toList
 
   protected[quizgroup] def constructWrongChoicesRandom(correctValues: List[String],
-      numFalseAnswersRequired: Int, itemCorrect: QuizItem): Stream[String] = {
+      numFalseAnswersRequired: Int, itemCorrect: QuizItem): List[String] = {
 
     def randomFalseWordValue(sliceIndex: Int): Option[String] = {
       val sliceSize = (numQuizItems / numFalseAnswersRequired)
@@ -172,7 +172,7 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
     }
 
     (0 until numFalseAnswersRequired).map(
-        sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toSet.toStream
+      sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toList
   }
 
   protected[quizgroup] def randomSliceOfQuizItems(sliceSize: Int): Iterable[QuizItem] =
@@ -195,13 +195,13 @@ case class QuizGroupPartition(quizItems: Stream[QuizItem] = Stream.empty)
 
 object QuizGroupPartition extends AppDependencyAccess {
 
-  val itemsLens: Lens[QuizGroupPartition, Stream[QuizItem]] = Lens.lensu(
-      get = (_: QuizGroupPartition).quizItems,
-      set = (qgp: QuizGroupPartition,
-           qItems: Stream[QuizItem]) => qgp.copy(quizItems = qItems))
+  val itemsLens: Lens[QuizGroupPartition, List[QuizItem]] = Lens.lensu(
+    get = (_: QuizGroupPartition).quizItems,
+    set = (qgp: QuizGroupPartition,
+           qItems: List[QuizItem]) => qgp.copy(quizItemStream = qItems.toStream))
 
-  protected[quizgroup] def remove(quizItems: Stream[QuizItem], quizItem: QuizItem):
-      Stream[QuizItem] =
+  protected[quizgroup] def remove(quizItems: List[QuizItem], quizItem: QuizItem):
+  List[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
 
 
@@ -213,8 +213,8 @@ object QuizGroupPartition extends AppDependencyAccess {
     def parseQuizItem(strPromptResponse: String): Option[QuizItem] = {
       Try(Some(QuizItem.fromCustomFormat(strPromptResponse, mainSeparator))).recover {
         case e: Exception => l.logError("could not parse quiz item with text " +
-            strPromptResponse + " using separator " + mainSeparator)
-            None
+          strPromptResponse + " using separator " + mainSeparator)
+          None
       }.get
     }
 
