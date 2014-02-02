@@ -23,6 +23,7 @@ import com.oranda.libanius.model.Quiz
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import com.oranda.libanius.util.{StringUtil, Util}
 import com.oranda.libanius.model.quizgroup.QuizGroupWithHeader
+import scala.annotation.tailrec
 
 /*
  * Run through a whole quiz, simulating the part of the user and checking
@@ -37,15 +38,15 @@ trait Simulation {
 
   protected def testAllQuizItems(quiz: Quiz,
       lastQuizItem: Option[QuizItemViewWithChoices] = None) {
-    val maxResponses = 1000
+    val maxResponses = 300000
     testWithQuizItems(quiz, lastQuizItem)(maxResponses)
     report(quiz)
   }
 
+  @tailrec
   private def testWithQuizItems(quiz: Quiz,
       lastQuizItem: Option[QuizItemViewWithChoices] = None) (implicit maxResponses: Long) {
 
-    doGarbageCollection()
 
     if (responsesProcessed < maxResponses) {
 
@@ -55,8 +56,18 @@ trait Simulation {
 
       presentableQuizItem match {
         case (Some((quizItem, qgWithHeader))) =>
-          // This will recursively call testWithQuizItems
-          processQuizItem(timeTakenToFindItem, quizItem, lastQuizItem, quiz, qgWithHeader)
+          output("Prompt: " + quizItem.prompt + "\tChoices: " + quizItem.allChoices.mkString(", "))
+          val problem = findProblem(timeTakenToFindItem, quizItem, lastQuizItem, quiz)
+          problem.foreach(output(_))
+          if (!problem.isDefined) {
+            val updatedQuiz = quiz.updatedPromptNumber(qgWithHeader)
+            val simulatedResponse = makeResponse(quizItem, quiz)
+            output("Simulated response: " + simulatedResponse)
+            val quizAfterResponse = processUserResponse(updatedQuiz, simulatedResponse, quizItem)
+
+            responsesProcessed += 1
+            testWithQuizItems(quizAfterResponse, Some(quizItem))
+          }
         case _ =>
           output("No more questions found! Finished!")
       }
@@ -65,41 +76,10 @@ trait Simulation {
     }
   }
 
-  /**
-   * In a fast simulation, garbage collection becomes a problem and may skew
-   * the performance statistics.
-   * (In normal user operation there are pauses so it's not a problem.)
-   */
-  private def doGarbageCollection() {
-    if (responsesProcessed % 10 == 0) {
-      output("Deliberate garbage collection pause")
-      System.gc()
-    }
-  }
-
-  private def processQuizItem(timeTakenToFindItem: Long,
-      quizItem: QuizItemViewWithChoices, lastQuizItem: Option[QuizItemViewWithChoices],
-      quiz: Quiz, qgWithHeader: QuizGroupWithHeader) (implicit maxResponses: Long) {
-
-    output("Prompt: " + quizItem.prompt + "\tChoices: " + quizItem.allChoices.mkString(", "))
-
-    val problem = findProblem(timeTakenToFindItem, quizItem, lastQuizItem, quiz)
-    problem.foreach(output(_))
-    if (!problem.isDefined) {
-      val updatedQuiz = quiz.updatedPromptNumber(qgWithHeader)
-      val simulatedResponse = makeResponse(quizItem, quiz)
-      output("Simulated response: " + simulatedResponse)
-      val quizAfterResponse = processUserResponse(updatedQuiz, simulatedResponse, quizItem)
-
-      responsesProcessed += 1
-      testWithQuizItems(quizAfterResponse, Some(quizItem))
-    }
-  }
-
   private def findProblem(timeTakenToFindItem: Long,
       quizItem: QuizItemViewWithChoices, lastQuizItem: Option[QuizItemViewWithChoices],
       quiz: Quiz): Option[String] =
-    if (timeTakenToFindItem > 100 && responsesProcessed > 3)
+    if (timeTakenToFindItem > 500 && responsesProcessed > 3)
       Some("time taken to find a presentable quiz item was too long for " + quizItem.prompt)
     else if (quizItemWasRepeated(quizItem, lastQuizItem, quiz))
       Some("quiz item was repeated")
