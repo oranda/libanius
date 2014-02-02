@@ -41,6 +41,8 @@ case class QuizItemViewWithChoices(
 
   lazy val allChoices: List[String] = choicesInRandomOrder(quizItem.userResponses, falseAnswers)
 
+  def isComplete = quizItem.isComplete
+
   def choicesInRandomOrder(quizValue: UserResponses, otherChoices: Set[String]): List[String] = {
     val allChoices = otherChoices + quizItem.correctResponse.value
     Random.shuffle(allChoices.toList)
