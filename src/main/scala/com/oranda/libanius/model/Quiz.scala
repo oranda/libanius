@@ -207,22 +207,24 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def nearTheEnd = quizGroups.exists(qgwh =>
       (qgwh._2.numPrompts - qgwh._2.currentPromptNumber) < Criteria.maxDiffInPromptNumMinimum)
 
-  def searchLocalDictionary(searchInput: String): List[SearchResult] = {
+  def searchLocalDictionary(searchInput: String): SearchResultsContainer = {
     import Dictionary._  // make special search utilities available
 
     val firstWord = searchInput.takeWhile(_ != ' ')
 
     // Keep trying different ways of searching the dictionary until one finds something.
-    if (firstWord.length <= 2) Nil
-    else tryUntilResults(List(
-      searchFunction { resultsBeginningWith(firstWord) },
-      searchFunction { resultsBeginningWith(firstWord.dropRight(1)) },
-      searchFunction { resultsBeginningWith(firstWord.dropRight(2)) },
-      searchFunction { if (firstWord.length > 3) resultsContaining(firstWord) else Nil }
-    ))
+    val results =
+      if (firstWord.length <= 2) Nil
+      else tryUntilResults(List(
+        searchFunction { resultsBeginningWith(firstWord) },
+        searchFunction { resultsBeginningWith(firstWord.dropRight(1)) },
+        searchFunction { resultsBeginningWith(firstWord.dropRight(2)) },
+        searchFunction { if (firstWord.length > 3) resultsContaining(firstWord) else Nil }
+      ))
+    SearchResultsContainer(results, None)
   }
 
-  def searchRemoteDictionary(searchInput: String): List[SearchResult] =
+  def searchRemoteDictionary(searchInput: String): SearchResultsContainer =
     MyMemoryTranslate.translate(searchInput, this)
 }
 

@@ -71,9 +71,9 @@ object RunDictionary extends App with AppDependencyAccess {
 
   private[this] def searchAndDisplayResults(text: String, quiz: Quiz) = {
     val localResults = quiz.searchLocalDictionary(text)
-    output(localResults.map(_.toString).mkString("\n"))
+    output(localResults.results.map(_.toString).mkString("\n"))
     val networkResults = quiz.searchRemoteDictionary(text)
-    output(networkResults.map(_.toString).mkString("\n"))
+    output(networkResults.results.map(_.toString).mkString("\n"))
   }
 
   private[this] def getWordQueryFromInput: UserConsoleResponse =

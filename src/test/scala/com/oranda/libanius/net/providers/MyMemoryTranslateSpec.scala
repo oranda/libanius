@@ -16,12 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.model.net.providers
+package com.oranda.libanius.net.providers
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.SearchResult
-import com.oranda.libanius.net.providers.MyMemoryTranslate
+import com.oranda.libanius.model.SearchResultsContainer
 import com.oranda.libanius.model.quizgroup.{WordMapping, QuizGroupHeader}
 
 
@@ -31,15 +30,15 @@ class MyMemoryTranslateSpec extends Specification with AppDependencyAccess {
 
     "translate a word successfully" in {
       val qgHeader = QuizGroupHeader(WordMapping, "German word", "English word", "|")
-      val matches: List[SearchResult] = MyMemoryTranslate.translate("Bett", qgHeader)
-      matches.head.valueSet.containsValue("Bed") mustEqual true
+      val container: SearchResultsContainer = MyMemoryTranslate.translate("Bett", qgHeader)
+      container.getErrorMessage mustEqual None
+      container.results.head.valueSet.containsValue("Bed") mustEqual true
     }
 
     "return an empty list if there is a problem translating a word" in {
       val qgHeader = QuizGroupHeader(WordMapping, "German word", "English word", "|")
-      val matches: List[SearchResult] = MyMemoryTranslate.translate("abcdef", qgHeader)
-      println(matches)
-      matches.isEmpty mustEqual true
+      val container: SearchResultsContainer = MyMemoryTranslate.translate("abcdef", qgHeader)
+      container.results.isEmpty mustEqual true
     }
   }
 }

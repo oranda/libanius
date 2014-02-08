@@ -20,20 +20,29 @@ package com.oranda.libanius.net
 
 import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.client.methods.HttpGet
+import com.oranda.libanius.dependencies.AppDependencyAccess
+import scala.io.Source
 
-object Rest {
+
+object Rest extends AppDependencyAccess {
 
   protected[net] def query(url: String): String = {
     val httpClient = new DefaultHttpClient()
     val httpResponse = httpClient.execute(new HttpGet(url))
-    val entity = httpResponse.getEntity()
+    val entity = httpResponse.getEntity
     var content = ""
     if (entity != null) {
-      val inputStream = entity.getContent()
-      content = io.Source.fromInputStream(inputStream).getLines.mkString
+      val inputStream = entity.getContent
+      content = Source.fromInputStream(inputStream).getLines.mkString
       inputStream.close
     }
     httpClient.getConnectionManager().shutdown()
-    return content
+
+    // Watch out for redirection
+    if (content.contains("<html") || httpResponse.getStatusLine.getStatusCode != 200)
+      throw new NoRestContentException
+    content
   }
 }
+
+class NoRestContentException extends RuntimeException

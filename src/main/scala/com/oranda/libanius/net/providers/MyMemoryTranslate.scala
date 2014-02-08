@@ -32,26 +32,28 @@ import com.oranda.libanius.util.GroupByOrderedImplicit
 import scala.language.implicitConversions
 import com.oranda.libanius.net.Rest
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.{Quiz, ValueSet, SearchResultPair, SearchResult}
+import com.oranda.libanius.model._
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 import scala.util.Try
+import com.oranda.libanius.model.ValueSet
+import com.oranda.libanius.model.SearchResultPair
+import com.oranda.libanius.model.SearchResult
 
 /*
  * Use the free online service mymemory.translated.net to translate strings.
  */
 object MyMemoryTranslate extends AppDependencyAccess {
 
-  def translate(word: String, quiz: Quiz): List[SearchResult] =
-    quiz.activeQuizGroupHeaders.flatMap(translate(word, _)).toList
+  def translate(word: String, quiz: Quiz): SearchResultsContainer =
+    SearchResultsContainer.combine(quiz.activeQuizGroupHeaders.map(translate(word, _)))
 
-  def translate(word: String, header: QuizGroupHeader): List[SearchResult] =
-    Try(groupedTranslateOrError(word, header)).recover {
-      case e: Exception => l.logError("Exception translating " + word + " was " + e.getMessage)
-        Nil
+  def translate(word: String, header: QuizGroupHeader): SearchResultsContainer =
+    Try(groupedTranslate(word, header)).recover {
+      case e: Exception => SearchResultsContainer(Nil, Some(e))
     }.get
 
-  private[this] def groupedTranslateOrError(word: String, header: QuizGroupHeader):
-      List[SearchResult] = {
+  private[this] def groupedTranslate(word: String, header: QuizGroupHeader):
+      SearchResultsContainer = {
 
     val matches: List[(String, String)] =
       mmCode(header).toList.flatMap(translateOrError(word, _))
@@ -65,7 +67,7 @@ object MyMemoryTranslate extends AppDependencyAccess {
       case (key, valueSet) => SearchResult(header,
         SearchResultPair(key, ValueSet(valueSet.map(_._2).toList)))
     }
-    groupedMatches.filterNot(_.keyWordMatchesValue).toList
+    SearchResultsContainer(groupedMatches.filterNot(_.keyWordMatchesValue).toList, None)
   }
 
   private[this] def urlEncode(str: String) = URLEncoder.encode(str, "UTF-8")
@@ -75,15 +77,13 @@ object MyMemoryTranslate extends AppDependencyAccess {
    */
   private[this] def translateOrError(word: String, mmCode: String): List[(String, String)] = {
 
-    val translationRaw = Rest.query(
-        "http://api.mymemory.translated.net/get?q=" + urlEncode(word) + "&de=" +
-        conf.email + "&langpair=" + urlEncode(mmCode))
-
+    val translationRaw = Rest.query("http://api.mymemory.translated.net/get?q=" +
+        urlEncode(word) + "&de=" + conf.email + "&langpair=" + urlEncode(mmCode))
     val matches = findMatchesInJson(translationRaw)
-
     // Filter on the quality of the match.
     matches.filter(_.matchWeight >= 0.5).map(trMatch => Pair(trMatch.segment, trMatch.translation))
   }
+
 
   case class TranslationMatch(segment: String, translation: String, matchWeight: BigDecimal)
 
