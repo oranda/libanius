@@ -61,7 +61,7 @@ case class DesiredResponse(value: String) {
   import DesiredResponse._
 
   def matches(userResponse: String) =
-    standardized1(userResponse) == standardized1(value)
+    standardized(userResponse) == standardized(value)
 
   def matchesParts(userResponse: String) =
     userResponse == value ||
@@ -69,6 +69,11 @@ case class DesiredResponse(value: String) {
 }
 
 object DesiredResponse extends AppDependencyAccess {
+
+  def standardized(response: String) =
+    response.toLowerCase.removeFirstLetters("to ").removeAll(" ").removeAll("-").
+        removeAll(",").removeAll("\\.").removeAll("!").
+        takeWhile(c => c != '/' && c != '(' && c != '[' && c != '{')
 
   def standardized1(response: String) =
     response.toLowerCase.removeFirstLetters("to ").removeAll(" ").removeAll("-")
