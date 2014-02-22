@@ -15,9 +15,14 @@ James McCabe <james@oranda.com>
 Usage
 =====
 
-Usually Libanius will be run through an interface such as https://github.com/oranda/libanius-android, but a console UI is provided in this project. From SBT, type:
+Usually Libanius will be run through an interface such as https://github.com/oranda/libanius-android, but a console UI is provided in this project.
+Get a copy of `github.com/oranda/libanius` using `git clone`,  From SBT, type:
 
-run
+    run
+
+Pick the option `com.oranda.libanius.consoleui.RunQuiz` and try out a sample quiz.
+
+This has been tested with sbt 0.12 and Scala 2.10.2.
 
 
 License
