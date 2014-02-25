@@ -145,14 +145,14 @@ case class QuizGroupPartition(quizItemStream: Stream[QuizItem] = Stream.empty) e
     val numSimilarLettersRequired = 2
     quizItems.iterator.takeWhile(_ => similarWords.size < numWrongResponsesRequired).
       foreach(quizItem => {
-      numValueSetsSearched = numValueSetsSearched + 1
-      // Avoid selecting values belonging to the "correct" correctResponse set
-      if (!correctResponses.contains(quizItem.correctResponse)) {
-        if (similarWords.size < numWrongResponsesRequired &&
-          similarityPredicate(quizItem.correctResponse, correctValue)(numSimilarLettersRequired))
-          similarWords += quizItem.correctResponse.value
-      }
-    })
+        numValueSetsSearched = numValueSetsSearched + 1
+        // Avoid selecting values belonging to the "correct" correctResponse set
+        if (!correctResponses.contains(quizItem.correctResponse)) {
+          if (similarWords.size < numWrongResponsesRequired &&
+            similarityPredicate(quizItem.correctResponse, correctValue)(numSimilarLettersRequired))
+            similarWords += quizItem.correctResponse.value
+        }
+      })
     similarWords.toList
   }
 
@@ -172,7 +172,7 @@ case class QuizGroupPartition(quizItemStream: Stream[QuizItem] = Stream.empty) e
     }
 
     (0 until numFalseAnswersRequired).map(
-      sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toList
+        sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toList
   }
 
   protected[quizgroup] def randomSliceOfQuizItems(sliceSize: Int): Iterable[QuizItem] =
@@ -201,7 +201,7 @@ object QuizGroupPartition extends AppDependencyAccess {
            qItems: List[QuizItem]) => qgp.copy(quizItemStream = qItems.toStream))
 
   protected[quizgroup] def remove(quizItems: List[QuizItem], quizItem: QuizItem):
-  List[QuizItem] =
+      List[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
 
 

@@ -19,9 +19,10 @@
 package com.oranda.libanius.consoleui
 
 import com.oranda.libanius.consoleui.Output._
-import com.oranda.libanius.model.Quiz
+import com.oranda.libanius.model.{SearchResult, Quiz}
 import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader}
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import scala.util.{Failure, Success, Try}
 
 object RunDictionary extends App with AppDependencyAccess {
 
@@ -70,11 +71,16 @@ object RunDictionary extends App with AppDependencyAccess {
   }
 
   private[this] def searchAndDisplayResults(text: String, quiz: Quiz) = {
-    val localResults = quiz.searchLocalDictionary(text)
-    output(localResults.results.map(_.toString).mkString("\n"))
-    val networkResults = quiz.searchRemoteDictionary(text)
-    output(networkResults.results.map(_.toString).mkString("\n"))
+    output(resultsToString(quiz.searchLocalDictionary(text)))
+    output(resultsToString(quiz.searchRemoteDictionary(text)))
   }
+
+  private[this] def resultsToString(results: Try[List[SearchResult]]) =
+    results match {
+      case Success(results) => results.map(_.toString).mkString("\n")
+      case Failure(ex) =>
+          s"Problem getting results: ${ex.getClass.getSimpleName}  ${ex.getMessage}"
+    }
 
   private[this] def getWordQueryFromInput: UserConsoleResponse =
     ConsoleUtil.readLineUntilNoBackspaces match {

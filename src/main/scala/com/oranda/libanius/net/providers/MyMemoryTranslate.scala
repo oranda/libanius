@@ -18,11 +18,6 @@
 
 package com.oranda.libanius.net.providers
 
-import com.oranda.libanius.net.Rest
-import java.net.URLEncoder
-import play.api.libs.json._
-import com.oranda.libanius.util.GroupByOrderedImplicit
-
 import java.net.URLEncoder
 import play.api.libs.json
 import play.api.libs.functional.syntax._
@@ -44,16 +39,18 @@ import com.oranda.libanius.model.SearchResult
  */
 object MyMemoryTranslate extends AppDependencyAccess {
 
-  def translate(word: String, quiz: Quiz): SearchResultsContainer =
-    SearchResultsContainer.combine(quiz.activeQuizGroupHeaders.map(translate(word, _)))
+  def translate(word: String, quiz: Quiz): Try[List[SearchResult]] = {
+    val tryTranslate = Try(quiz.activeQuizGroupHeaders.flatMap(translateQgh(word, _)).toList)
+    tryTranslate.recover {
+      case t: Throwable => l.logError("Unknown error in MyMemoryTranslate", t)
+    }
+    // Rethrow, so the client can decide on a custom error message.
+    tryTranslate
+  }
 
-  def translate(word: String, header: QuizGroupHeader): SearchResultsContainer =
-    Try(groupedTranslate(word, header)).recover {
-      case e: Exception => SearchResultsContainer(Nil, Some(e))
-    }.get
 
-  private[this] def groupedTranslate(word: String, header: QuizGroupHeader):
-      SearchResultsContainer = {
+  protected[providers] def translateQgh(word: String, header: QuizGroupHeader):
+      List[SearchResult] = {
 
     val matches: List[(String, String)] =
       mmCode(header).toList.flatMap(translateOrError(word, _))
@@ -67,7 +64,7 @@ object MyMemoryTranslate extends AppDependencyAccess {
       case (key, valueSet) => SearchResult(header,
         SearchResultPair(key, ValueSet(valueSet.map(_._2).toList)))
     }
-    SearchResultsContainer(groupedMatches.filterNot(_.keyWordMatchesValue).toList, None)
+    groupedMatches.filterNot(_.keyWordMatchesValue).toList
   }
 
   private[this] def urlEncode(str: String) = URLEncoder.encode(str, "UTF-8")

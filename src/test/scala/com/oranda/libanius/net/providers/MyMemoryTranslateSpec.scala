@@ -20,7 +20,7 @@ package com.oranda.libanius.net.providers
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.SearchResultsContainer
+import com.oranda.libanius.model.SearchResult
 import com.oranda.libanius.model.quizgroup.{WordMapping, QuizGroupHeader}
 
 
@@ -30,15 +30,14 @@ class MyMemoryTranslateSpec extends Specification with AppDependencyAccess {
 
     "translate a word successfully" in {
       val qgHeader = QuizGroupHeader(WordMapping, "German word", "English word", "|")
-      val container: SearchResultsContainer = MyMemoryTranslate.translate("Bett", qgHeader)
-      container.getErrorMessage mustEqual None
-      container.results.head.valueSet.containsValue("Bed") mustEqual true
+      val results: List[SearchResult] = MyMemoryTranslate.translateQgh("Bett", qgHeader)
+      results.head.valueSet.containsValue("Bed") mustEqual true
     }
 
     "return an empty list if there is a problem translating a word" in {
       val qgHeader = QuizGroupHeader(WordMapping, "German word", "English word", "|")
-      val container: SearchResultsContainer = MyMemoryTranslate.translate("abcdef", qgHeader)
-      container.results.isEmpty mustEqual true
+      val results: List[SearchResult] = MyMemoryTranslate.translateQgh("abcdef", qgHeader)
+      results.isEmpty mustEqual true
     }
   }
 }

@@ -30,19 +30,20 @@ object Rest extends AppDependencyAccess {
     val httpClient = new DefaultHttpClient()
     val httpResponse = httpClient.execute(new HttpGet(url))
     val entity = httpResponse.getEntity
-    var content = ""
+    var restContent = ""
     if (entity != null) {
-      val inputStream = entity.getContent
-      content = Source.fromInputStream(inputStream).getLines.mkString
-      inputStream.close
+      val is = entity.getContent
+      restContent = Source.fromInputStream(is).getLines.mkString
+      is.close
     }
-    httpClient.getConnectionManager().shutdown()
+    httpClient.getConnectionManager.shutdown()
 
     // Watch out for redirection
-    if (content.contains("<html") || httpResponse.getStatusLine.getStatusCode != 200)
-      throw new NoRestContentException
-    content
+    val statusCode = httpResponse.getStatusLine.getStatusCode
+    if (restContent.contains("<html") || statusCode != 200)
+      throw new RestResponseException(restContent, statusCode)
+    restContent
   }
 }
 
-class NoRestContentException extends RuntimeException
+class RestResponseException(content: String, httpStatusCode: Int) extends RuntimeException
