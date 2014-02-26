@@ -114,17 +114,20 @@ case class Criteria(numCorrectResponsesInARowDesired: Int, diffInPromptNumMinimu
 }
 
 object Criteria {
+
   /*
-   * Criteria sets that determine whether the current item is presentable or not.
+   * After an item is presented and answered correctly, there is a minimum interval before it
+   * can be presented again, depending on how many times it has already been correctly answered.
+   * These are the minimum intervals. See the concept of "spaced repetition".
    */
-  val criteriaSets = Seq[Criteria](
-    Criteria(numCorrectResponsesInARowDesired = 1, diffInPromptNumMinimum = 5),
-    Criteria(numCorrectResponsesInARowDesired = 2, diffInPromptNumMinimum = 15),
-    Criteria(numCorrectResponsesInARowDesired = 3, diffInPromptNumMinimum = 60),
-    Criteria(numCorrectResponsesInARowDesired = 4, diffInPromptNumMinimum = 600)
-  )
+  val repetitionIntervals = Vector[Int](5, 15, 60, 600)
 
-  def maxDiffInPromptNumMinimum = criteriaSets.map(_.diffInPromptNumMinimum).max
+  val criteriaSets = repetitionIntervals.zipWithIndex.map {
+    case (interval, index) =>
+      Criteria(numCorrectResponsesInARowDesired = index + 1, diffInPromptNumMinimum = interval)
+    }
 
-  def numCorrectAnswersRequired = criteriaSets.size + 1
+  def numCorrectAnswersRequired = repetitionIntervals.size + 1
+  def maxDiffInPromptNumMinimum = repetitionIntervals.max
+
 }
