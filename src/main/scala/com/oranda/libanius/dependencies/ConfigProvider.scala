@@ -32,7 +32,6 @@ class ConfigProviderDefault extends ConfigProvider {
   override def conf =
     new Conf(
       enableLogging = config.getBoolean("libanius.enableLogging"),
-      numCorrectAnswersRequired = config.getInt("libanius.numCorrectAnswersRequired"),
       useMultipleChoiceUntil = config.getInt("libanius.useMultipleChoiceUntil"),
       email = config.getString("libanius.email"),
       fileQuizRoot = config.getString("libanius.file.quizRoot"),
@@ -49,7 +48,6 @@ class ConfigProviderMock extends ConfigProvider {
   override def conf =
     new Conf(
       enableLogging = false,
-      numCorrectAnswersRequired = 4,
       useMultipleChoiceUntil = 4,
       email = "",
       fileQuizRoot = "",

@@ -25,7 +25,7 @@ import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import scalaz._
-import com.oranda.libanius.model.{UserResponses, ModelComponent, UserResponse}
+import com.oranda.libanius.model.{Criteria, UserResponses, ModelComponent, UserResponse}
 import java.lang.StringBuilder
 import scalaz.PLens._
 import scala.collection.immutable.Stream
@@ -228,7 +228,7 @@ object QuizGroup extends AppDependencyAccess {
    */
   def apply(quizItems: Stream[QuizItem], userData: QuizGroupUserData,
       dictionary: Dictionary): QuizGroup = {
-    val partitions = Array.fill(conf.numCorrectAnswersRequired + 1)(QuizGroupPartition())
+    val partitions = Array.fill(Criteria.numCorrectAnswersRequired + 1)(QuizGroupPartition())
     partitions(0) = QuizGroupPartition(quizItems)
     QuizGroup(partitions.toList, userData, dictionary)
   }
@@ -249,10 +249,10 @@ object QuizGroup extends AppDependencyAccess {
             (numCorrectAnswers, QuizGroupPartition(quizItems))
         }
 
-    if (quizItemsGrouped.size > conf.numCorrectAnswersRequired + 1) {
+    if (quizItemsGrouped.size > Criteria.numCorrectAnswersRequired + 1) {
       l.logError("Corrupt data for " + header +
           ": it looks like there is a quizItem with more than " +
-          conf.numCorrectAnswersRequired + " correct responses stored")
+          Criteria.numCorrectAnswersRequired + " correct responses stored")
       QuizGroup()
 
     } else {
@@ -276,13 +276,13 @@ object QuizGroup extends AppDependencyAccess {
     QuizGroup(toPartitionArray(partitions), QuizGroupUserData(), dictionary)
 
   def toPartitionArray(partitions: List[QuizGroupPartition]): Array[QuizGroupPartition] = {
-    val partitionArray = Array.fill(conf.numCorrectAnswersRequired + 1)(QuizGroupPartition())
+    val partitionArray = Array.fill(Criteria.numCorrectAnswersRequired + 1)(QuizGroupPartition())
     partitions.toArray.copyToArray(partitionArray)
     partitionArray
   }
 
   def toPartitionArray(partitionMap: Map[Int, QuizGroupPartition]): Array[QuizGroupPartition] = {
-    val partitionArray = Array.fill(conf.numCorrectAnswersRequired + 1)(QuizGroupPartition())
+    val partitionArray = Array.fill(Criteria.numCorrectAnswersRequired + 1)(QuizGroupPartition())
     partitionMap.foreach {
       case (numCorrectAnswers: Int, partition: QuizGroupPartition) =>
         partitionArray(numCorrectAnswers) = partition

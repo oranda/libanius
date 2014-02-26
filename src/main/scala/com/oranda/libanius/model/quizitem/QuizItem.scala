@@ -18,7 +18,7 @@
 
 package com.oranda.libanius.model.quizitem
 
-import com.oranda.libanius.model.{UserResponse, UserResponses}
+import com.oranda.libanius.model.{Criteria, UserResponse, UserResponses}
 import com.oranda.libanius.model.wordmapping.WordMappingValue
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
@@ -39,7 +39,7 @@ case class QuizItem(prompt: TextValue, correctResponse: TextValue,
   def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
   def numCorrectAnswersInARow = userResponses.numCorrectResponsesInARow
 
-  def isComplete = numCorrectAnswersInARow >= conf.numCorrectAnswersRequired
+  def isComplete = numCorrectAnswersInARow >= Criteria.numCorrectAnswersRequired
 
   def samePromptAndResponse(other: QuizItem) =
     other.prompt == prompt && other.correctResponse == correctResponse

@@ -53,7 +53,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def numQuizItems = (0 /: activeQuizGroups.values)(_ + _.size)
   def numCorrectAnswers = (0 /: activeQuizGroups.values)(_ + _.numCorrectAnswers)
   def scoreSoFar: BigDecimal =  // out of 1.0
-    numCorrectAnswers.toDouble / (numQuizItems * conf.numCorrectAnswersRequired).toDouble
+    numCorrectAnswers.toDouble / (numQuizItems * Criteria.numCorrectAnswersRequired).toDouble
 
   /*
    * Find the first available "presentable" quiz item.

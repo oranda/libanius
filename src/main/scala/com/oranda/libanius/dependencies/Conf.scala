@@ -26,7 +26,6 @@ object Conf {
     val config = ConfigFactory.load()
     new Conf(
       enableLogging = config.getBoolean("libanius.enableLogging"),
-      numCorrectAnswersRequired = config.getInt("libanius.numCorrectAnswersRequired"),
       useMultipleChoiceUntil = config.getInt("libanius.useMultipleChoiceUntil"),
       email = config.getString("libanius.email"),
       fileQuizRoot = config.getString("libanius.file.quizRoot"),
@@ -40,7 +39,6 @@ object Conf {
   def setUpForTest() = {
     new Conf(
       enableLogging = false,
-      numCorrectAnswersRequired = 4,
       useMultipleChoiceUntil = 4,
       email = "",
       fileQuizRoot = "",
@@ -54,7 +52,6 @@ object Conf {
   def setUpForParsing(fileQuizRoot: String) = {
     new Conf(
       enableLogging = true,
-      numCorrectAnswersRequired = 4,
       useMultipleChoiceUntil = 4,
       email = "",
       fileQuizRoot,
@@ -70,7 +67,6 @@ object Conf {
  */
 class Conf(
     val enableLogging: Boolean,
-    val numCorrectAnswersRequired: Int,
     val useMultipleChoiceUntil: Int,
     val email: String,
     val fileQuizRoot: String,

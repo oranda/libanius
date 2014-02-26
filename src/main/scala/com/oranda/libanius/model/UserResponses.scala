@@ -55,7 +55,7 @@ case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
     numCorrectResponsesInARow == 0 || Criteria.criteriaSets.exists(_.isPresentable(
         currentPromptNum, promptNumInMostRecentResponse, numCorrectResponsesInARow))
 
-  def isUnfinished: Boolean = numCorrectResponsesInARow < conf.numCorrectAnswersRequired
+  def isUnfinished: Boolean = numCorrectResponsesInARow < Criteria.numCorrectAnswersRequired
   
   def numCorrectResponsesInARow = correctResponsesInARow.length
   
@@ -125,4 +125,6 @@ object Criteria {
   )
 
   def maxDiffInPromptNumMinimum = criteriaSets.map(_.diffInPromptNumMinimum).max
+
+  def numCorrectAnswersRequired = criteriaSets.size + 1
 }
