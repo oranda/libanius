@@ -295,10 +295,6 @@ object QuizGroup extends AppDependencyAccess {
     set = (qGroup: QuizGroup,
            qPartitions: List[QuizGroupPartition]) => qGroup.copy(partitions = qPartitions))
 
-  val quizGroupItemsLens: Lens[QuizGroup, Stream[QuizItem]] = Lens.lensu(
-      get = (_: QuizGroup).quizItems,
-      set = (qGroup: QuizGroup, qItems: Stream[QuizItem]) => qGroup/*qGroup.copy(quizItems = qItems)*/)
-
   val dictionaryLens: Lens[QuizGroup, Dictionary] = Lens.lensu(
       get = (_: QuizGroup).dictionary,
       set = (qGroup: QuizGroup, d: Dictionary) => qGroup.copy(dictionary = d))
