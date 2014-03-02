@@ -1,4 +1,4 @@
-== 0.96 February 26 2014
+== 0.96 March 2 2014
 
   * Removed SearchResultsContainer in favour of just returning a Try.
 
