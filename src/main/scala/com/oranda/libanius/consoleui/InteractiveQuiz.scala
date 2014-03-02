@@ -134,6 +134,5 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
       case "quit" => Quit
       case input: String => TextAnswer(input)
     }
-
 }
 

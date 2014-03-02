@@ -104,7 +104,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       qgWithHeader.promptType mustEqual "English word"
       qgWithHeader.responseType mustEqual "German word"
 
-      qgWithHeader.partitions.size mustEqual Criteria.numCorrectAnswersRequired + 1
+      qgWithHeader.partitions.size mustEqual Criteria.numCorrectResponsesRequired + 1
       qgWithHeader.partitions(0).size mustEqual 8
       qgWithHeader.partitions(1).size mustEqual 2
       qgWithHeader.partitions(2).size mustEqual 2

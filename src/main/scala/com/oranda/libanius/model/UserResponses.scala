@@ -55,7 +55,7 @@ case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
     numCorrectResponsesInARow == 0 || Criteria.criteriaSets.exists(_.isPresentable(
         currentPromptNum, promptNumInMostRecentResponse, numCorrectResponsesInARow))
 
-  def isUnfinished: Boolean = numCorrectResponsesInARow < Criteria.numCorrectAnswersRequired
+  def isUnfinished: Boolean = numCorrectResponsesInARow < Criteria.numCorrectResponsesRequired
   
   def numCorrectResponsesInARow = correctResponsesInARow.length
   
@@ -120,14 +120,13 @@ object Criteria {
    * can be presented again, depending on how many times it has already been correctly answered.
    * These are the minimum intervals. See the concept of "spaced repetition".
    */
-  val repetitionIntervals = Vector[Int](5, 15, 60, 600)
+  val repetitionIntervals = Vector[Int](5, 15, 15, 60, 600)
 
   val criteriaSets = repetitionIntervals.zipWithIndex.map {
     case (interval, index) =>
       Criteria(numCorrectResponsesInARowDesired = index + 1, diffInPromptNumMinimum = interval)
     }
 
-  def numCorrectAnswersRequired = repetitionIntervals.size + 1
+  def numCorrectResponsesRequired = repetitionIntervals.size + 1
   def maxDiffInPromptNumMinimum = repetitionIntervals.max
-
 }

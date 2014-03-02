@@ -76,7 +76,10 @@ object MyMemoryTranslate extends AppDependencyAccess {
 
     val translationRaw = Rest.query("http://api.mymemory.translated.net/get?q=" +
         urlEncode(word) + "&de=" + conf.email + "&langpair=" + urlEncode(mmCode))
-    val matches = findMatchesInJson(translationRaw)
+    val matches = Try(findMatchesInJson(translationRaw)).recover {
+      case t: Throwable => l.logError("Could not parse JSON text: " + translationRaw, t)
+          List[TranslationMatch]()
+    }.get
     // Filter on the quality of the match.
     matches.filter(_.matchWeight >= 0.5).map(trMatch => Pair(trMatch.segment, trMatch.translation))
   }

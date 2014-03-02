@@ -25,7 +25,7 @@ import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, WordMapping, Quiz
 
 class QuizSpec extends Specification with AppDependencyAccess {
   
-  "a quiz of word-mappings" should {
+  "a quiz" should {
     
     val quizData = List(
 
@@ -124,10 +124,12 @@ class QuizSpec extends Specification with AppDependencyAccess {
 
     "update a quiz with a user response" in {
       quiz.numCorrectAnswers mustEqual 6
+      quiz.numCorrectResponsesInARow(0) mustEqual 0
       val qgHeader = QuizGroupHeader(WordMapping, "English word", "German word", "|")
       val quizItem = QuizItem("against", "wider")
       val quizUpdated = quiz.updateWithUserResponse(true, qgHeader, quizItem)
       quizUpdated.numCorrectAnswers mustEqual 7
+      quizUpdated.numCorrectResponsesInARow(0) mustEqual 1
     }
 
     "find a presentable quiz item" in {

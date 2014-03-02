@@ -37,7 +37,8 @@ import scala.collection.immutable.Iterable
 import com.oranda.libanius.net.providers.MyMemoryTranslate
 import scala.util.Try
 
-case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
+case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap(),
+    private val memoryLevelsStats: StatsAllMemoryLevels = StatsAllMemoryLevels())
     extends ModelComponent {
 
   def hasQuizGroup(header: QuizGroupHeader): Boolean = quizGroups.contains(header)
@@ -53,7 +54,10 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def numQuizItems = (0 /: activeQuizGroups.values)(_ + _.size)
   def numCorrectAnswers = (0 /: activeQuizGroups.values)(_ + _.numCorrectAnswers)
   def scoreSoFar: BigDecimal =  // out of 1.0
-    numCorrectAnswers.toDouble / (numQuizItems * Criteria.numCorrectAnswersRequired).toDouble
+    numCorrectAnswers.toDouble / (numQuizItems * Criteria.numCorrectResponsesRequired).toDouble
+
+  def totalResponses(level: Int) = memoryLevelsStats.totalResponses(level)
+  def numCorrectResponsesInARow(level: Int) = memoryLevelsStats.numCorrectResponsesInARow(level)
 
   /*
    * Find the first available "presentable" quiz item.
@@ -196,13 +200,22 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
       case Some(qgPromptNumber) =>
         val userAnswer = new UserResponse(qgPromptNumber)
 
-        Quiz.quizGroupsLens.set(this,
+        val updatedQuiz = Quiz.quizGroupsLens.set(this,
             mapVPLens(quizGroupHeader) mod ((_: QuizGroup).updatedWithUserResponse(
                 quizItem.prompt, quizItem.correctResponse, isCorrect,
                 quizItem.userResponses, userAnswer), quizGroups)
         )
+        reportMemoryLevelStats(quizItem.numCorrectAnswersInARow)
+
+        Quiz.statsLens.mod((_: StatsAllMemoryLevels).incrementResponses(
+            memoryLevel = quizItem.numCorrectAnswersInARow, isCorrect), updatedQuiz)
       case _ => this
     }
+  }
+
+  private def reportMemoryLevelStats(memoryLevel: Int) {
+    memoryLevelsStats.reportIfAtLimit(memoryLevel).foreach(
+        report => l.log("Memory level " + report))
   }
 
   def nearTheEnd = quizGroups.exists(qgwh =>
@@ -234,6 +247,11 @@ object Quiz extends AppDependencyAccess {
   val quizGroupsLens: Lens[Quiz, Map[QuizGroupHeader, QuizGroup]] = Lens.lensu(
       get = (_: Quiz).quizGroups,
       set = (q: Quiz, qgs: Map[QuizGroupHeader, QuizGroup]) => q.copy(quizGroups = qgs))
+
+  val statsLens: Lens[Quiz, StatsAllMemoryLevels] = Lens.lensu(
+      get = (_: Quiz).memoryLevelsStats,
+      set = (q: Quiz, stats: StatsAllMemoryLevels) => q.copy(memoryLevelsStats = stats)
+  )
 
   def quizGroupMapLens[QuizGroupHeader, QuizGroup](header: QuizGroupHeader):
       Lens[Map[QuizGroupHeader, QuizGroup], Option[QuizGroup]] =

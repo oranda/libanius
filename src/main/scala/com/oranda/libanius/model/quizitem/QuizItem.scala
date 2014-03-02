@@ -39,7 +39,7 @@ case class QuizItem(prompt: TextValue, correctResponse: TextValue,
   def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
   def numCorrectAnswersInARow = userResponses.numCorrectResponsesInARow
 
-  def isComplete = numCorrectAnswersInARow >= Criteria.numCorrectAnswersRequired
+  def isComplete = numCorrectAnswersInARow >= Criteria.numCorrectResponsesRequired
 
   def samePromptAndResponse(other: QuizItem) =
     other.prompt == prompt && other.correctResponse == correctResponse
