@@ -20,7 +20,7 @@ package com.oranda.libanius.model.quizitem
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.{Criteria, UserResponses, UserResponse}
+import com.oranda.libanius.model.{MemoryLevel, UserResponses, UserResponse}
 
 class QuizItemSpec extends Specification with AppDependencyAccess {
 
@@ -55,9 +55,9 @@ class QuizItemSpec extends Specification with AppDependencyAccess {
 
     def isPresentable(quizItem: QuizItem, numCorrectAnswersInARowDesired: Int,
         diffInPromptNumMinimum: Int, currentPromptNum: Int) = {
-      val criteria = Criteria(numCorrectAnswersInARowDesired, diffInPromptNumMinimum)
+      val criteria = MemoryLevel(numCorrectAnswersInARowDesired, diffInPromptNumMinimum)
       criteria.isPresentable(currentPromptNum, quizItem.promptNumInMostRecentAnswer,
-          quizItem.numCorrectAnswersInARow)
+          quizItem.numCorrectResponsesInARow)
     }
 
     "be presentable in the quiz, given certain criteria" in {
@@ -84,7 +84,7 @@ class QuizItemSpec extends Specification with AppDependencyAccess {
     }
 
     "know the number of times in a row it was answered correctly by the user" in {
-      quizItem.numCorrectAnswersInARow must be equalTo 2
+      quizItem.numCorrectResponsesInARow must be equalTo 2
     }
 
     "be matchable even if there is a 'to ' at the front" in {

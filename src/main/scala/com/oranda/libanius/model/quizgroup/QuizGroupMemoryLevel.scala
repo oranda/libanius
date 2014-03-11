@@ -28,9 +28,8 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import scalaz._
 import scalaz.std.set
 import scalaz.Scalaz._
-import com.oranda.libanius.model.{UserResponses, ModelComponent}
+import com.oranda.libanius.model.{MemoryLevels, UserResponses, ModelComponent, UserResponse}
 import scala._
-import com.oranda.libanius.model.UserResponse
 import scala.collection.immutable.Stream
 import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
@@ -38,12 +37,13 @@ import java.lang.StringBuilder
 import com.oranda.libanius.util.StringSplitter
 
 /*
- * A subgroup of a QuizGroup, containing quiz items which have all been answered
- * correctly a certain number of times.
+ * QuizGroupMemoryLevel: a partition of a QuizGroup, containing quiz items which have
+ * all been answered correctly a certain number of times.
  * (A ListMap was formerly used to store quiz items but this was found to be too
  * slow for bulk insert. Currently a Stream is used.)
  */
-case class QuizGroupPartition(quizItemStream: Stream[QuizItem] = Stream.empty) extends ModelComponent {
+case class QuizGroupMemoryLevel(quizItemStream: Stream[QuizItem] = Stream.empty)
+    extends ModelComponent {
 
   lazy val quizItems = quizItemStream.toList
 
@@ -58,42 +58,42 @@ case class QuizGroupPartition(quizItemStream: Stream[QuizItem] = Stream.empty) e
   protected[quizgroup] def numPrompts = size
   protected[quizgroup] def numResponses = size
 
-  protected[quizgroup] def updatedQuizItems(newQuizItems: List[QuizItem]): QuizGroupPartition =
-    QuizGroupPartition.itemsLens.set(this, newQuizItems)
+  protected[quizgroup] def updatedQuizItems(newQuizItems: List[QuizItem]): QuizGroupMemoryLevel =
+    QuizGroupMemoryLevel.itemsLens.set(this, newQuizItems)
 
   protected[quizgroup] def updatedWithUserAnswer(prompt: TextValue, response: TextValue,
       wasCorrect: Boolean, userResponses: UserResponses, userAnswer: UserResponse):
-      QuizGroupPartition = {
+      QuizGroupMemoryLevel = {
     val userResponseUpdated = userResponses.add(userAnswer, wasCorrect)
     addQuizItem(prompt, response, userResponseUpdated)
   }
 
   protected[quizgroup] def addQuizItem(prompt: TextValue, response: TextValue,
-      userResponses: UserResponses = UserResponses()): QuizGroupPartition =
+      userResponses: UserResponses = UserResponses()): QuizGroupMemoryLevel =
     addQuizItemToFront(QuizItem(prompt, response, userResponses))
 
-  protected[quizgroup] def addNewQuizItem(prompt: String, response: String): QuizGroupPartition =
+  protected[quizgroup] def addNewQuizItem(prompt: String, response: String): QuizGroupMemoryLevel =
     if (!prompt.isEmpty && !response.isEmpty && prompt.toLowerCase != response.toLowerCase)
       addQuizItemToFront(QuizItem(prompt, response))
     else
       this
 
-  protected[quizgroup] def addQuizItemToFront(quizItem: QuizItem): QuizGroupPartition =
+  protected[quizgroup] def addQuizItemToFront(quizItem: QuizItem): QuizGroupMemoryLevel =
     addQuizItemToFront(quizItems, quizItem)
 
   protected[quizgroup] def addQuizItemToFront(quizItems: List[QuizItem],
-      quizItem: QuizItem): QuizGroupPartition =
-    QuizGroupPartition.itemsLens.set(this, quizItem +: remove(quizItem))
+      quizItem: QuizItem): QuizGroupMemoryLevel =
+    QuizGroupMemoryLevel.itemsLens.set(this, quizItem +: remove(quizItem))
 
-  protected[quizgroup] def addQuizItemToEnd(quizItem: QuizItem): QuizGroupPartition =
+  protected[quizgroup] def addQuizItemToEnd(quizItem: QuizItem): QuizGroupMemoryLevel =
     addQuizItemToEnd(quizItems, quizItem)
 
   protected[quizgroup] def addQuizItemToEnd(quizItems: List[QuizItem], quizItem: QuizItem):
-      QuizGroupPartition =
+      QuizGroupMemoryLevel =
     updatedQuizItems(remove(quizItem) :+ quizItem)
 
-  protected[quizgroup] def removeQuizItem(quizItem: QuizItem): QuizGroupPartition =
-    QuizGroupPartition.itemsLens.set(this, remove(quizItem))
+  protected[quizgroup] def removeQuizItem(quizItem: QuizItem): QuizGroupMemoryLevel =
+    QuizGroupMemoryLevel.itemsLens.set(this, remove(quizItem))
 
   protected[quizgroup] def remove(quizItem: QuizItem): List[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
@@ -124,13 +124,15 @@ case class QuizGroupPartition(quizItemStream: Stream[QuizItem] = Stream.empty) e
   protected[quizgroup] def findQuizItem(prompt: String, response: String): Option[QuizItem] =
     quizItems.find(_.samePromptAndResponse(QuizItem(prompt, response)))
 
-  protected[quizgroup] def findAnyUnfinishedQuizItem: Option[QuizItem] =
+  protected[quizgroup] def findAnyUnfinishedQuizItem(numCorrectResponsesRequired: Int):
+      Option[QuizItem] =
     (for {
       quizItem <- quizItems.toStream
-      if quizItem.userResponses.isUnfinished
+      if quizItem.userResponses.isUnfinished(numCorrectResponsesRequired)
     } yield quizItem).headOption
 
-  def findPresentableQuizItem(currentPromptNumber: Int): Option[QuizItem] =
+  def findPresentableQuizItem(currentPromptNumber: Int)(implicit ml: MemoryLevels):
+      Option[QuizItem] =
     (for {
       quizItem <- quizItems.toStream
       if quizItem.isPresentable(currentPromptNumber)
@@ -193,11 +195,11 @@ case class QuizGroupPartition(quizItemStream: Stream[QuizItem] = Stream.empty) e
   }
 }
 
-object QuizGroupPartition extends AppDependencyAccess {
+object QuizGroupMemoryLevel extends AppDependencyAccess {
 
-  val itemsLens: Lens[QuizGroupPartition, List[QuizItem]] = Lens.lensu(
-    get = (_: QuizGroupPartition).quizItems,
-    set = (qgp: QuizGroupPartition,
+  val itemsLens: Lens[QuizGroupMemoryLevel, List[QuizItem]] = Lens.lensu(
+    get = (_: QuizGroupMemoryLevel).quizItems,
+    set = (qgp: QuizGroupMemoryLevel,
            qItems: List[QuizItem]) => qgp.copy(quizItemStream = qItems.toStream))
 
   protected[quizgroup] def remove(quizItems: List[QuizItem], quizItem: QuizItem):
@@ -208,7 +210,7 @@ object QuizGroupPartition extends AppDependencyAccess {
   /*
    * Text does not include header line
    */
-  def fromCustomFormat(text: String, mainSeparator: String): QuizGroupPartition = {
+  def fromCustomFormat(text: String, mainSeparator: String): QuizGroupMemoryLevel = {
 
     def parseQuizItem(strPromptResponse: String): Option[QuizItem] = {
       Try(Some(QuizItem.fromCustomFormat(strPromptResponse, mainSeparator))).recover {
@@ -232,6 +234,6 @@ object QuizGroupPartition extends AppDependencyAccess {
     lineSplitter.setString(text)
     val quizItems = parseQuizItems(lineSplitter)
 
-    QuizGroupPartition(quizItems)
+    QuizGroupMemoryLevel(quizItems)
   }
 }

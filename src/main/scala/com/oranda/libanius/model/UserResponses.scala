@@ -47,15 +47,17 @@ case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
    * See if this quiz item meets any of the defined criteria sets that would make it presentable.
    * (Intended to be called over many quiz items until one fits.)
    */
-  def isPresentable(currentPromptNum : Int): Boolean =
+  def isPresentable(currentPromptNum: Int)(implicit ml: MemoryLevels): Boolean =
     isPresentable(currentPromptNum, promptNumInMostRecentResponse, numCorrectResponsesInARow)
 
   protected[model] def isPresentable(currentPromptNum : Int,
-      promptNumInMostRecentResponse: Option[Int], numCorrectResponsesInARow: Int): Boolean =
-    numCorrectResponsesInARow == 0 || Criteria.criteriaSets.exists(_.isPresentable(
+      promptNumInMostRecentResponse: Option[Int], numCorrectResponsesInARow: Int)
+      (implicit ml: MemoryLevels): Boolean =
+    numCorrectResponsesInARow == 0 || ml.memoryLevels.exists(_.isPresentable(
         currentPromptNum, promptNumInMostRecentResponse, numCorrectResponsesInARow))
 
-  def isUnfinished: Boolean = numCorrectResponsesInARow < Criteria.numCorrectResponsesRequired
+  def isUnfinished(numCorrectResponsesRequired: Int): Boolean =
+    numCorrectResponsesInARow < numCorrectResponsesRequired
   
   def numCorrectResponsesInARow = correctResponsesInARow.length
   
@@ -92,41 +94,4 @@ object UserResponses {
   val userResponsesIncorrectResponsesLens = Lens.lensu(
       get = (_: UserResponses).incorrectResponses,
       set = (ur: UserResponses, urs: List[UserResponse]) => ur.copy(incorrectResponses = urs))
-}
-
-
-/*
- * Criteria used to check if a quiz item is "presentable".
- *
- * numCorrectResponsesInARowDesired: how many times this item should have been answered correctly
- * diffInPromptNumMinimum: how long ago it was last answered - may be None to omit this criterion
- */
-case class Criteria(numCorrectResponsesInARowDesired: Int, diffInPromptNumMinimum: Int) {
-  def isPresentable(currentPromptNum : Int, promptNumInMostRecentResponse: Option[Int],
-      numCorrectResponsesInARow: Int): Boolean = {
-    def wasNotTooRecentlyUsed = promptNumInMostRecentResponse.forall {
-      case promptNumInMostRecentResponse =>
-          val diffInPromptNum = currentPromptNum - promptNumInMostRecentResponse
-          diffInPromptNum >= diffInPromptNumMinimum
-    }
-    (numCorrectResponsesInARow == numCorrectResponsesInARowDesired) && wasNotTooRecentlyUsed
-  }
-}
-
-object Criteria {
-
-  /*
-   * After an item is presented and answered correctly, there is a minimum interval before it
-   * can be presented again, depending on how many times it has already been correctly answered.
-   * These are the minimum intervals. See the concept of "spaced repetition".
-   */
-  val repetitionIntervals = Vector[Int](5, 15, 15, 60, 600)
-
-  val criteriaSets = repetitionIntervals.zipWithIndex.map {
-    case (interval, index) =>
-      Criteria(numCorrectResponsesInARowDesired = index + 1, diffInPromptNumMinimum = interval)
-    }
-
-  def numCorrectResponsesRequired = repetitionIntervals.size + 1
-  def maxDiffInPromptNumMinimum = repetitionIntervals.max
 }

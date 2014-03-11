@@ -22,16 +22,19 @@ import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 
-import com.oranda.libanius.model.{UserResponse, UserResponses}
+import com.oranda.libanius.model.{MemoryLevels, UserResponse, UserResponses}
 import java.lang.StringBuilder
 
-class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
+class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
   "a quiz group partition" should {
+
+    implicit val ml = MemoryLevels()
+
     /*
      * Construct a quiz group partition.
      */
-    def makeQgPartition: QuizGroupPartition = QuizGroupPartition(List(
+    def makeQgPartition: QuizGroupMemoryLevel = QuizGroupMemoryLevel(List(
         QuizItem("against", "wider"),
         QuizItem("entertain", "unterhalten"),
         QuizItem("teach", "unterrichten"),
@@ -45,7 +48,7 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
         QuizItem("on", "auf"),
         QuizItem("sweeps", "streicht")).toStream)
 
-    def makeQgPartitionSimple: QuizGroupPartition = QuizGroupPartition(List(
+    def makeQgPartitionSimple: QuizGroupMemoryLevel = QuizGroupMemoryLevel(List(
         QuizItem("against", "wider"),
         QuizItem("entertain", "unterhalten")).toStream)
 
@@ -60,7 +63,7 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
 
 
     "be parseable from custom format" in {
-      val qgp = QuizGroupPartition.fromCustomFormat(
+      val qgp = QuizGroupMemoryLevel.fromCustomFormat(
           qgPartitionSimpleCustomFormat, "|")
       qgp.numQuizItems mustEqual 2
     }
@@ -100,8 +103,8 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
       falseAnswers.contains("unterrichten") mustEqual true
     }
 
-    def pullQuizItem(qgp: QuizGroupPartition, currentPromptNumber: Int):
-        (QuizGroupPartition, (String, String)) = {
+    def pullQuizItem(qgp: QuizGroupMemoryLevel, currentPromptNumber: Int):
+        (QuizGroupMemoryLevel, (String, String)) = {
       val quizItem = qgp.findPresentableQuizItem(currentPromptNumber)
       quizItem.isDefined mustEqual true
       // Each time a quiz item is pulled, a user answer must be set
@@ -149,14 +152,14 @@ class QuizGroupPartitionSpec extends Specification with AppDependencyAccess {
       pullQuizItem(qgUnrolled, 1)._2 mustEqual ("to exchange", "tauschen")
     }
 
-    def pullQuizItemAndAnswerCorrectly(qgp: QuizGroupPartition, currentPromptNumber: Int):
-        QuizGroupPartition = {
+    def pullQuizItemAndAnswerCorrectly(qgp: QuizGroupMemoryLevel, currentPromptNumber: Int):
+        QuizGroupMemoryLevel = {
       val quizItem = qgp.findPresentableQuizItem(currentPromptNumber).get
       updateWithUserAnswer(qgp, quizItem, currentPromptNumber)
     }
 
-    def updateWithUserAnswer(qgp: QuizGroupPartition, quizItem: QuizItem,
-        currentPromptNumber: Int): QuizGroupPartition = {
+    def updateWithUserAnswer(qgp: QuizGroupMemoryLevel, quizItem: QuizItem,
+        currentPromptNumber: Int): QuizGroupMemoryLevel = {
       val userAnswer = new UserResponse(currentPromptNumber)
       qgp.updatedWithUserAnswer(quizItem.prompt, quizItem.correctResponse, true,
           UserResponses(), userAnswer)

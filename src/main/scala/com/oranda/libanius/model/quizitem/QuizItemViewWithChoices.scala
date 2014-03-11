@@ -19,7 +19,7 @@
 package com.oranda.libanius.model.quizitem
 
 import scala.util.Random
-import com.oranda.libanius.model.UserResponses
+import com.oranda.libanius.model.{MemoryLevels, UserResponses}
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
@@ -41,7 +41,7 @@ case class QuizItemViewWithChoices(
 
   lazy val allChoices: List[String] = choicesInRandomOrder(quizItem.userResponses, falseAnswers)
 
-  def isComplete = quizItem.isComplete
+  def isComplete(implicit ml: MemoryLevels) = quizItem.isComplete
 
   def choicesInRandomOrder(quizValue: UserResponses, otherChoices: Set[String]): List[String] = {
     val allChoices = otherChoices + quizItem.correctResponse.value

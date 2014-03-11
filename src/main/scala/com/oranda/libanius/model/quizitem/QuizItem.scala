@@ -18,7 +18,7 @@
 
 package com.oranda.libanius.model.quizitem
 
-import com.oranda.libanius.model.{Criteria, UserResponse, UserResponses}
+import com.oranda.libanius.model.{MemoryLevels, UserResponse, UserResponses}
 import com.oranda.libanius.model.wordmapping.WordMappingValue
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
@@ -34,16 +34,18 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
  *  - a word and a translation
  */
 case class QuizItem(prompt: TextValue, correctResponse: TextValue,
-    userResponses: UserResponses = new UserResponses()) extends AppDependencyAccess {
+    userResponses: UserResponses = new UserResponses())
+  extends AppDependencyAccess {
 
   def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
-  def numCorrectAnswersInARow = userResponses.numCorrectResponsesInARow
+  def numCorrectResponsesInARow = userResponses.numCorrectResponsesInARow
 
-  def isComplete = numCorrectAnswersInARow >= Criteria.numCorrectResponsesRequired
+  def isComplete(implicit ml: MemoryLevels) = numCorrectResponsesInARow >= ml.numCorrectResponsesRequired
 
   def samePromptAndResponse(other: QuizItem) =
     other.prompt == prompt && other.correctResponse == correctResponse
-  def isPresentable(currentPromptNumber: Int) =
+
+  def isPresentable(currentPromptNumber: Int)(implicit ml: MemoryLevels) =
     userResponses.isPresentable(currentPromptNumber)
 
   def looselyMatches(userResponse: String): Boolean =
@@ -55,7 +57,6 @@ case class QuizItem(prompt: TextValue, correctResponse: TextValue,
     userResponses.toCustomFormat(strBuilder, mainSeparator)
     strBuilder
   }
-
 }
 
 object QuizItem {

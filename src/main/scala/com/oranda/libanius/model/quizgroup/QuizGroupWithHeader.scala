@@ -22,18 +22,21 @@ import scala.language.implicitConversions
 import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.util.Util
+import com.oranda.libanius.model.MemoryLevels
 
 /*
  * Convenience class for passing around a key-value pair from the Quiz.quizGroups map.
  */
-case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup) extends AppDependencyAccess {
+case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
+    extends AppDependencyAccess {
   def toPair = Pair(header, quizGroup)
 
-  def findPresentableQuizItem: Option[QuizItemViewWithChoices] =
+  def findPresentableQuizItem(implicit ml: MemoryLevels): Option[QuizItemViewWithChoices] =
     quizGroup.findPresentableQuizItem.map(quizItemWithChoices(_))
 
-  def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] =
-    quizGroup.findAnyUnfinishedQuizItem.map(quizItemWithChoices(_))
+  def findAnyUnfinishedQuizItem(numCorrectResponsesRequired: Int):
+      Option[QuizItemViewWithChoices] =
+    quizGroup.findAnyUnfinishedQuizItem(numCorrectResponsesRequired).map(quizItemWithChoices(_))
 
   protected[model] def quizItemWithChoices(quizItem: QuizItem):
       QuizItemViewWithChoices = {

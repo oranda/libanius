@@ -38,8 +38,7 @@ import com.oranda.libanius.net.providers.MyMemoryTranslate
 import scala.util.Try
 
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap(),
-    private val memoryLevelsStats: StatsAllMemoryLevels = StatsAllMemoryLevels())
-    extends ModelComponent {
+    private val memoryLevels: MemoryLevels = MemoryLevels()) extends ModelComponent {
 
   def hasQuizGroup(header: QuizGroupHeader): Boolean = quizGroups.contains(header)
   def isActive(header: QuizGroupHeader): Boolean = quizGroups.get(header).exists(_.isActive)
@@ -54,10 +53,12 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def numQuizItems = (0 /: activeQuizGroups.values)(_ + _.size)
   def numCorrectAnswers = (0 /: activeQuizGroups.values)(_ + _.numCorrectAnswers)
   def scoreSoFar: BigDecimal =  // out of 1.0
-    numCorrectAnswers.toDouble / (numQuizItems * Criteria.numCorrectResponsesRequired).toDouble
+    numCorrectAnswers.toDouble / (numQuizItems * memoryLevels.numCorrectResponsesRequired).toDouble
 
-  def totalResponses(level: Int) = memoryLevelsStats.totalResponses(level)
-  def numCorrectResponsesInARow(level: Int) = memoryLevelsStats.numCorrectResponsesInARow(level)
+  def totalResponses(level: Int) =
+    memoryLevels.memoryLevelsStats.totalResponses(level)
+  def numCorrectResponsesInARow(level: Int) =
+    memoryLevels.memoryLevelsStats.numCorrectResponsesInARow(level)
 
   /*
    * Find the first available "presentable" quiz item.
@@ -66,7 +67,8 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def findPresentableQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] =
     (for {
       (header, quizGroup) <- activeQuizGroups.toStream
-      quizItem <- QuizGroupWithHeader(header, quizGroup).findPresentableQuizItem.toStream
+      quizItem <- QuizGroupWithHeader(header, quizGroup).findPresentableQuizItem(memoryLevels).
+          toStream
     } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption.orElse(
         findAnyUnfinishedQuizItem)
 
@@ -79,7 +81,8 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] =
     (for {
       (header, quizGroup) <- activeQuizGroups
-      quizItem <- QuizGroupWithHeader(header, quizGroup).findAnyUnfinishedQuizItem.toStream
+      quizItem <- QuizGroupWithHeader(header, quizGroup).findAnyUnfinishedQuizItem(
+          memoryLevels.numCorrectResponsesRequired).toStream
     } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption
 
   def resultsBeginningWith(input: String): List[SearchResult] =
@@ -205,21 +208,21 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
                 quizItem.prompt, quizItem.correctResponse, isCorrect,
                 quizItem.userResponses, userAnswer), quizGroups)
         )
-        reportMemoryLevelStats(quizItem.numCorrectAnswersInARow)
+        reportMemoryLevelStats(quizItem.numCorrectResponsesInARow)
 
         Quiz.statsLens.mod((_: StatsAllMemoryLevels).incrementResponses(
-            memoryLevel = quizItem.numCorrectAnswersInARow, isCorrect), updatedQuiz)
+            memoryLevel = quizItem.numCorrectResponsesInARow, isCorrect), updatedQuiz)
       case _ => this
     }
   }
 
   private def reportMemoryLevelStats(memoryLevel: Int) {
-    memoryLevelsStats.reportIfAtLimit(memoryLevel).foreach(
+    memoryLevels.memoryLevelsStats.reportIfAtLimit(memoryLevel).foreach(
         report => l.log("Memory level " + report))
   }
 
   def nearTheEnd = quizGroups.exists(qgwh =>
-      (qgwh._2.numPrompts - qgwh._2.currentPromptNumber) < Criteria.maxDiffInPromptNumMinimum)
+      (qgwh._2.numPrompts - qgwh._2.currentPromptNumber) < memoryLevels.maxDiffInPromptNumMinimum)
 
   def searchLocalDictionary(searchInput: String): Try[List[SearchResult]] = {
     import Dictionary._  // make special search utilities available
@@ -248,10 +251,11 @@ object Quiz extends AppDependencyAccess {
       get = (_: Quiz).quizGroups,
       set = (q: Quiz, qgs: Map[QuizGroupHeader, QuizGroup]) => q.copy(quizGroups = qgs))
 
-  val statsLens: Lens[Quiz, StatsAllMemoryLevels] = Lens.lensu(
-      get = (_: Quiz).memoryLevelsStats,
-      set = (q: Quiz, stats: StatsAllMemoryLevels) => q.copy(memoryLevelsStats = stats)
-  )
+  val memoryLevelsLens: Lens[Quiz, MemoryLevels] = Lens.lensu(
+      get = (_: Quiz).memoryLevels,
+      set = (q: Quiz, ml: MemoryLevels) => q.copy(memoryLevels = ml))
+
+  val statsLens: Lens[Quiz, StatsAllMemoryLevels] = MemoryLevels.statsLens compose memoryLevelsLens
 
   def quizGroupMapLens[QuizGroupHeader, QuizGroup](header: QuizGroupHeader):
       Lens[Map[QuizGroupHeader, QuizGroup], Option[QuizGroup]] =

@@ -22,12 +22,14 @@ import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices}
 
-import com.oranda.libanius.model.{Criteria, UserResponse, UserResponses}
+import com.oranda.libanius.model.{MemoryLevels, UserResponse, UserResponses}
 import com.oranda.libanius.util.Util
 
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
   "a quiz group" should {
+
+    implicit val ml = MemoryLevels()
 
     val qgCustomFormat =
       "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" currentPromptNumber=\"10\" isActive=\"true\"\n" +
@@ -47,7 +49,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
         "against|wider|9,7;6\n" +
         "teach|unterrichten|4,3;1\n"
 
-    def makeQgPartition0: QuizGroupPartition = QuizGroupPartition(List(
+    def makeQgPartition0: QuizGroupMemoryLevel = QuizGroupMemoryLevel(List(
       QuizItem("en route", "unterwegs"),
       QuizItem("full", "satt"),
       QuizItem("full", "voll"),
@@ -57,11 +59,11 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       QuizItem("on", "auf"),
       QuizItem("sweeps", "streicht")).toStream)
 
-    def makeQgPartition1: QuizGroupPartition = QuizGroupPartition(List(
+    def makeQgPartition1: QuizGroupMemoryLevel = QuizGroupMemoryLevel(List(
       QuizItem("entertain", "unterhalten", List(8), List(2)),
       QuizItem("winner", "Siegerin", List(5), List(0))).toStream)
 
-    def makeQgPartition2: QuizGroupPartition = QuizGroupPartition(List(
+    def makeQgPartition2: QuizGroupMemoryLevel = QuizGroupMemoryLevel(List(
       QuizItem("against", "wider", List(9, 7), List(6)),
       QuizItem("teach", "unterrichten", List(4, 3), List(1))).toStream)
 
@@ -95,7 +97,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     def pullQuizItemAndAnswerCorrectly(qgwh: QuizGroupWithHeader): QuizGroupWithHeader = {
-      val quizItem = qgwh.findPresentableQuizItem.get
+      val quizItem = qgwh.findPresentableQuizItem(MemoryLevels()).get
       QuizGroupWithHeader(qgwh.header, updateWithUserAnswer(qgwh.quizGroup, quizItem))
     }
 
@@ -104,7 +106,6 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       qgWithHeader.promptType mustEqual "English word"
       qgWithHeader.responseType mustEqual "German word"
 
-      qgWithHeader.partitions.size mustEqual Criteria.numCorrectResponsesRequired + 1
       qgWithHeader.partitions(0).size mustEqual 8
       qgWithHeader.partitions(1).size mustEqual 2
       qgWithHeader.partitions(2).size mustEqual 2
@@ -121,7 +122,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     def pullQuizItem(qgwh: QuizGroupWithHeader): (QuizGroup, (String, String)) = {
-      val quizItem = qgwh.findPresentableQuizItem
+      val quizItem = qgwh.findPresentableQuizItem(MemoryLevels())
       quizItem.isDefined mustEqual true
       // Each time a quiz item is pulled, a user answer must be set
       val qgUpdated = qgwh.quizGroup.updatedWithUserResponse(quizItem.get.prompt,
@@ -160,7 +161,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
      */
     "present an item that has been answered before after five prompts" in {
       var qgwhLocal = makeSimpleQgWithHeader
-      val quizItem0 = qgwhLocal.findPresentableQuizItem.get
+      val quizItem0 = qgwhLocal.findPresentableQuizItem(MemoryLevels()).get
       quizItem0.prompt.value mustEqual "en route" // "against"
       qgwhLocal = QuizGroupWithHeader(qgwhLocal.header,
           updateWithUserAnswer(qgwhLocal, quizItem0))
@@ -168,7 +169,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       for (promptNum <- 1 until 5)
         qgwhLocal = pullQuizItemAndAnswerCorrectly(qgwhLocal)
 
-      val quizItem5 = qgwhLocal.findPresentableQuizItem
+      val quizItem5 = qgwhLocal.findPresentableQuizItem(MemoryLevels())
       quizItem5.get.prompt.value mustEqual "en route" // "against"
     }
 
@@ -200,7 +201,8 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "add a new quiz item to the front of its queue" in {
       val qgUpdated = quizGroupSimple.addNewQuizItem("to exchange", "tauschen")
-      qgUpdated.findPresentableQuizItem mustEqual Some(QuizItem("to exchange", "tauschen"))
+      qgUpdated.findPresentableQuizItem(MemoryLevels()) mustEqual
+          Some(QuizItem("to exchange", "tauschen"))
     }
 
     "move an existing quiz pair to the front of its queue" in {
