@@ -45,7 +45,7 @@ case class WordMappingGroup(header: QuizGroupHeader,
 
     val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems(_))
 
-    QuizGroup(quizItems, userData, new Dictionary())
+    QuizGroup.fromQuizItems(quizItems, userData)
   }
 }
 

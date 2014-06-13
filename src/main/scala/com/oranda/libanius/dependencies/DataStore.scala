@@ -51,8 +51,9 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     val dictFileName = header.makeDictFileName
     readDictionary(conf.filesDir + dictFileName) match {
       case Some(dictionary) => qg.updatedDictionary(dictionary)
-      case _ => l.logError("Failed to load dictionary")
-                qg
+      case _ => l.logError("Could not find dictionary on filesystem for " +
+              header.toString + ", so creating dictionary from the quizGroup")
+          qg.updatedDictionary(Dictionary.fromQuizGroup(qg))
     }
   }
 

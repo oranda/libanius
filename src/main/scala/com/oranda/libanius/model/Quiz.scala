@@ -37,8 +37,8 @@ import scala.collection.immutable.Iterable
 import com.oranda.libanius.net.providers.MyMemoryTranslate
 import scala.util.Try
 
-case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap(),
-    private val memoryLevels: MemoryLevels = MemoryLevels()) extends ModelComponent {
+case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
+    extends ModelComponent {
 
   def hasQuizGroup(header: QuizGroupHeader): Boolean = quizGroups.contains(header)
   def isActive(header: QuizGroupHeader): Boolean = quizGroups.get(header).exists(_.isActive)
@@ -51,14 +51,19 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def numPrompts = (0 /: activeQuizGroups.values)(_ + _.numPrompts)
   def numResponses = (0 /: activeQuizGroups.values)(_ + _.numResponses)
   def numQuizItems = (0 /: activeQuizGroups.values)(_ + _.size)
-  def numCorrectAnswers = (0 /: activeQuizGroups.values)(_ + _.numCorrectAnswers)
+  def numCorrectResponses = (0 /: activeQuizGroups.values)(_ + _.numCorrectResponses)
+  def totalCorrectResponsesRequired =
+    (0 /: activeQuizGroups.values)(_ + _.totalCorrectResponsesRequired)
   def scoreSoFar: BigDecimal =  // out of 1.0
-    numCorrectAnswers.toDouble / (numQuizItems * memoryLevels.numCorrectResponsesRequired).toDouble
+    numCorrectResponses.toDouble / totalCorrectResponsesRequired.toDouble
 
-  def totalResponses(level: Int) =
-    memoryLevels.memoryLevelsStats.totalResponses(level)
-  def numCorrectResponsesInARow(level: Int) =
-    memoryLevels.memoryLevelsStats.numCorrectResponsesInARow(level)
+  def numCorrectResponses(qgh: QuizGroupHeader, level: Int) =
+    quizGroups(qgh).numCorrectResponses(level)
+
+  def memoryLevelInterval(qgh: QuizGroupHeader, level: Int) =
+    quizGroups(qgh).memoryLevelInterval(level)
+
+  def numDictionaryKeyWords(qgh: QuizGroupHeader) = quizGroups(qgh).numDictionaryKeyWords
 
   /*
    * Find the first available "presentable" quiz item.
@@ -67,8 +72,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def findPresentableQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] =
     (for {
       (header, quizGroup) <- activeQuizGroups.toStream
-      quizItem <- QuizGroupWithHeader(header, quizGroup).findPresentableQuizItem(memoryLevels).
-          toStream
+      quizItem <- QuizGroupWithHeader(header, quizGroup).findPresentableQuizItem.toStream
     } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption.orElse(
         findAnyUnfinishedQuizItem)
 
@@ -78,12 +82,14 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
    * normal criteria, because the last correct response was recent. However, they do need
    * to be presented in order for the quiz to finish, so this method is called as a last try.
    */
-  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] =
+  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] = {
+    l.log("calling findAnyUnfinishedQuizItem")
     (for {
       (header, quizGroup) <- activeQuizGroups
-      quizItem <- QuizGroupWithHeader(header, quizGroup).findAnyUnfinishedQuizItem(
-          memoryLevels.numCorrectResponsesRequired).toStream
-    } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption
+      quizItemView: QuizItemViewWithChoices <- QuizGroupWithHeader(header, quizGroup).findAnyUnfinishedQuizItem
+    } yield (quizItemView, QuizGroupWithHeader(header, quizGroup))).headOption
+
+  }
 
   def resultsBeginningWith(input: String): List[SearchResult] =
     activeQuizGroups.flatMap {
@@ -117,10 +123,6 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
   def updatedQuizGroups(quizGroups: Map[QuizGroupHeader, QuizGroup]): Quiz =
     Quiz.quizGroupsLens.set(this, quizGroups)
-
-  def updatedPromptNumber(qgWithHeader: QuizGroupWithHeader): Quiz =
-    setQuizGroup(qgWithHeader.header,
-        QuizGroup.promptNumberLens.mod( (1+), qgWithHeader.quizGroup))
 
   def activate(header: QuizGroupHeader): Quiz =
     Quiz.quizGroupsLens.set(this, mapVPLens(header) mod ((_: QuizGroup).activate, quizGroups))
@@ -193,36 +195,31 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def qgCurrentPromptNumber(header: QuizGroupHeader): Option[Int] =
     mapVPLens(header).get(activeQuizGroups).map(_.currentPromptNumber)
 
+  def findQuizItem(header: QuizGroupHeader, prompt: String): Option[QuizItem] =
+    mapVPLens(header).get(activeQuizGroups).flatMap(_.findQuizItem(prompt))
+
   def findQuizItem(header: QuizGroupHeader, prompt: String, response: String):
       Option[QuizItem] =
     mapVPLens(header).get(activeQuizGroups).flatMap(_.findQuizItem(prompt, response))
 
   def updateWithUserResponse(isCorrect: Boolean, quizGroupHeader: QuizGroupHeader,
-      quizItem: QuizItem): Quiz = {
+      quizItem: QuizItem): Quiz =
     qgCurrentPromptNumber(quizGroupHeader) match {
       case Some(qgPromptNumber) =>
-        val userAnswer = new UserResponse(qgPromptNumber)
+        val userResponse = new UserResponse(qgPromptNumber)
 
-        val updatedQuiz = Quiz.quizGroupsLens.set(this,
-            mapVPLens(quizGroupHeader) mod ((_: QuizGroup).updatedWithUserResponse(
-                quizItem.prompt, quizItem.correctResponse, isCorrect,
-                quizItem.userResponses, userAnswer), quizGroups)
+        val prevMemLevel = quizItem.numCorrectResponsesInARow
+        val updQuizItem = quizItem.updatedWithUserResponse(quizItem.correctResponse,
+            isCorrect, userResponse)
+
+        Quiz.quizGroupsLens.set(this, mapVPLens(quizGroupHeader) mod
+            ((_: QuizGroup).updateWithQuizItem(updQuizItem, isCorrect, prevMemLevel), quizGroups)
         )
-        reportMemoryLevelStats(quizItem.numCorrectResponsesInARow)
-
-        Quiz.statsLens.mod((_: StatsAllMemoryLevels).incrementResponses(
-            memoryLevel = quizItem.numCorrectResponsesInARow, isCorrect), updatedQuiz)
       case _ => this
     }
-  }
-
-  private def reportMemoryLevelStats(memoryLevel: Int) {
-    memoryLevels.memoryLevelsStats.reportIfAtLimit(memoryLevel).foreach(
-        report => l.log("Memory level " + report))
-  }
 
   def nearTheEnd = quizGroups.exists(qgwh =>
-      (qgwh._2.numPrompts - qgwh._2.currentPromptNumber) < memoryLevels.maxDiffInPromptNumMinimum)
+      (qgwh._2.numPrompts - qgwh._2.currentPromptNumber) < qgwh._2.maxDiffInPromptNumMinimum)
 
   def searchLocalDictionary(searchInput: String): Try[List[SearchResult]] = {
     import Dictionary._  // make special search utilities available
@@ -251,11 +248,11 @@ object Quiz extends AppDependencyAccess {
       get = (_: Quiz).quizGroups,
       set = (q: Quiz, qgs: Map[QuizGroupHeader, QuizGroup]) => q.copy(quizGroups = qgs))
 
-  val memoryLevelsLens: Lens[Quiz, MemoryLevels] = Lens.lensu(
+  /*
+  val memoryLevelsLens: Lens[Quiz, MemoryLevelsOld] = Lens.lensu(
       get = (_: Quiz).memoryLevels,
-      set = (q: Quiz, ml: MemoryLevels) => q.copy(memoryLevels = ml))
-
-  val statsLens: Lens[Quiz, StatsAllMemoryLevels] = MemoryLevels.statsLens compose memoryLevelsLens
+      set = (q: Quiz, ml: MemoryLevelsOld) => q.copy(memoryLevels = ml))
+  */
 
   def quizGroupMapLens[QuizGroupHeader, QuizGroup](header: QuizGroupHeader):
       Lens[Map[QuizGroupHeader, QuizGroup], Option[QuizGroup]] =
@@ -279,24 +276,34 @@ object Quiz extends AppDependencyAccess {
         qgWithHeader => Pair(qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }
 
+  val memLevelsWithLowIntervals =
+      "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"2\"\n" +
+      "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"2\"\n" +
+      "#quizGroupPartition numCorrectResponsesInARow=\"3\" repetitionInterval=\"2\"\n" +
+      "#quizGroupPartition numCorrectResponsesInARow=\"4\" repetitionInterval=\"2\"\n" +
+      "#quizGroupPartition numCorrectResponsesInARow=\"5\" repetitionInterval=\"2\"\n" +
+      "#quizGroupPartition numCorrectResponsesInARow=\"6\" repetitionInterval=\"2\"\n"
+
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
 
     "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
-    "#quizGroupPartition numCorrectResponsesInARow=\"0\"\n" +
+    "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
     "en route|unterwegs\n" +
     "contract|Vertrag\n" +
     "treaty|Vertrag\n" +
     "against|wider\n" +
-    "entertain|unterhalten\n",
+    "entertain|unterhalten\n" +
+    memLevelsWithLowIntervals,
 
     "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
-    "#quizGroupPartition numCorrectResponsesInARow=\"0\"\n" +
+    "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
     "unterwegs|en route\n" +
     "Vertrag|contract\n" +
     "Vertrag|treaty\n" +
     "wider|against\n" +
-    "unterhalten|entertain"
+    "unterhalten|entertain" +
+    memLevelsWithLowIntervals
   )
 
 }

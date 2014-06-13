@@ -28,15 +28,15 @@ class MyMemoryTranslateSpec extends Specification with AppDependencyAccess {
 
   "the mymemory translation provider" should {
 
+    val qghGerEng = QuizGroupHeader(WordMapping, "German word", "English word", "|", 4)
+
     "translate a word successfully" in {
-      val qgHeader = QuizGroupHeader(WordMapping, "German word", "English word", "|")
-      val results: List[SearchResult] = MyMemoryTranslate.translateQgh("Bett", qgHeader)
+      val results: List[SearchResult] = MyMemoryTranslate.translateQgh("Bett", qghGerEng)
       results.head.valueSet.containsValue("Bed") mustEqual true
     }
 
     "return an empty list if there is a problem translating a word" in {
-      val qgHeader = QuizGroupHeader(WordMapping, "German word", "English word", "|")
-      val results: List[SearchResult] = MyMemoryTranslate.translateQgh("abcdef", qgHeader)
+      val results: List[SearchResult] = MyMemoryTranslate.translateQgh("abcdef", qghGerEng)
       results.isEmpty mustEqual true
     }
   }

@@ -55,14 +55,17 @@ trait Simulation {
 
       presentableQuizItem match {
         case (Some((quizItem, qgWithHeader))) =>
-          output("Prompt: " + quizItem.prompt + "\tChoices: " + quizItem.allChoices.mkString(", "))
+          val strChoices =
+            if (quizItem.useMultipleChoice)
+              "\tChoices: " + quizItem.allChoices.mkString(", ")
+            else ""
+          output(responsesProcessed + ". Prompt: " + quizItem.prompt + strChoices)
           val problem = findProblem(timeTakenToFindItem, quizItem, lastQuizItem, quiz)
           problem.foreach(output(_))
           if (!problem.isDefined) {
-            val updatedQuiz = quiz.updatedPromptNumber(qgWithHeader)
-            val simulatedResponse = makeResponse(quizItem, quiz)
+            val simulatedResponse = makeResponse(quizItem, quiz, responsesProcessed)
             output("Simulated response: " + simulatedResponse)
-            val quizAfterResponse = processUserResponse(updatedQuiz, simulatedResponse, quizItem)
+            val quizAfterResponse = processUserResponse(quiz, simulatedResponse, quizItem)
 
             responsesProcessed += 1
             testWithQuizItems(quizAfterResponse, Some(quizItem))
@@ -120,7 +123,8 @@ trait Simulation {
   }
 
   // For now, just return the correct Answer
-  private def makeResponse(quizItem: QuizItemViewWithChoices, quiz: Quiz): String =
+  protected def makeResponse(quizItem: QuizItemViewWithChoices, quiz: Quiz,
+      responsesProcessed: Long): String =
     quizItem.correctResponse.value
 
   private def processUserResponse(quiz: Quiz, userResponseTxt: String,
@@ -140,7 +144,7 @@ trait Simulation {
     val (score: BigDecimal, timeTaken) = Util.stopwatch(quiz.scoreSoFar)
     if (shouldMeasureTime) totalMillisToComputeScore += timeTaken
     val formattedScore = StringUtil.formatScore(score)
-    output("Score: " + formattedScore)
+    output("Score: " + formattedScore + "\n")
   }
 
   // Don't measure processing times while the system is still "warming up"

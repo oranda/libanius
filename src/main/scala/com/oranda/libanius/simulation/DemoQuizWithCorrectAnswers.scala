@@ -16,23 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.consoleui
+package com.oranda.libanius.simulation
 
-import Output._
-import com.oranda.libanius.model._
-
-object DemoQuiz extends InteractiveQuiz {
+object DemoQuizWithCorrectAnswers extends App with DemoQuiz {
 
   runQuiz()
-
-  def runQuiz() {
-
-    output("Running demo quiz...")
-    val quiz = Quiz.demoQuiz()
-    output("OK, the quiz begins! To quit, type q at any time.\n")
-    testUserWithQuizItem(quiz)
-  }
-
-  // Don't save the small demo quiz. It should be completed in one sitting if at all.
-  override def saveQuiz(quiz: Quiz) {}
 }

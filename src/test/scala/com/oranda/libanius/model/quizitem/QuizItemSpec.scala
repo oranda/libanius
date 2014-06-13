@@ -20,7 +20,7 @@ package com.oranda.libanius.model.quizitem
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.{MemoryLevel, UserResponses, UserResponse}
+import com.oranda.libanius.model.{UserResponses, UserResponse}
 
 class QuizItemSpec extends Specification with AppDependencyAccess {
 
@@ -53,25 +53,11 @@ class QuizItemSpec extends Specification with AppDependencyAccess {
       quizItem mustEqual quizItemExpected
     }
 
-    def isPresentable(quizItem: QuizItem, numCorrectAnswersInARowDesired: Int,
-        diffInPromptNumMinimum: Int, currentPromptNum: Int) = {
-      val criteria = MemoryLevel(numCorrectAnswersInARowDesired, diffInPromptNumMinimum)
-      criteria.isPresentable(currentPromptNum, quizItem.promptNumInMostRecentAnswer,
-          quizItem.numCorrectResponsesInARow)
-    }
-
     "be presentable in the quiz, given certain criteria" in {
-
-      isPresentable(quizItem, numCorrectAnswersInARowDesired = 2,
-          diffInPromptNumMinimum = 2, currentPromptNum = 11) mustEqual true
-      isPresentable(quizItem, numCorrectAnswersInARowDesired = 3,
-          diffInPromptNumMinimum = 2, currentPromptNum = 11) mustEqual false
-      isPresentable(quizItem, numCorrectAnswersInARowDesired = 2,
-          diffInPromptNumMinimum = 3, currentPromptNum = 11) mustEqual false
-      isPresentable(quizItem, numCorrectAnswersInARowDesired = 2,
-          diffInPromptNumMinimum = 2, currentPromptNum = 10) mustEqual false
+      val repetitionInterval = 2
+      quizItem.isPresentable(currentPromptNumber = 11, repetitionInterval) mustEqual true
+      quizItem.isPresentable(currentPromptNumber = 10, repetitionInterval) mustEqual false
     }
-
 
     "be matchable against another by the first few letters" in {
       quizItem.correctResponse.hasSameStart("nachfahren")(4) mustEqual true

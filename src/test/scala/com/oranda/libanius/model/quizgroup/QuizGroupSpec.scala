@@ -20,20 +20,19 @@ package com.oranda.libanius.model.quizgroup
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices}
+import com.oranda.libanius.model.quizitem.QuizItem
 
-import com.oranda.libanius.model.{MemoryLevels, UserResponse, UserResponses}
+import com.oranda.libanius.model.UserResponse
+import com.oranda.libanius.model.wordmapping.Dictionary
 import com.oranda.libanius.util.Util
 
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
   "a quiz group" should {
 
-    implicit val ml = MemoryLevels()
-
     val qgCustomFormat =
-      "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" currentPromptNumber=\"10\" isActive=\"true\"\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"0\"\n" +
+        "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" useMultipleChoiceUntil=\"4\" currentPromptNumber=\"10\" isActive=\"true\"\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
         "en route|unterwegs|\n" +
         "full|satt|\n" +
         "full|voll|\n" +
@@ -42,42 +41,45 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
         "rides|reitet|\n" +
         "on|auf|\n" +
         "sweeps|streicht|\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"1\"\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"5\"\n" +
         "entertain|unterhalten|8;2\n" +
         "winner|Siegerin|5;0\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"2\"\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"15\"\n" +
         "against|wider|9,7;6\n" +
-        "teach|unterrichten|4,3;1\n"
+        "teach|unterrichten|4,3;1\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"3\" repetitionInterval=\"15\"\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"4\" repetitionInterval=\"60\"\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"5\" repetitionInterval=\"600\"\n" +
+        "#quizGroupPartition numCorrectResponsesInARow=\"6\" repetitionInterval=\"0\"\n"
 
-    def makeQgPartition0: QuizGroupMemoryLevel = QuizGroupMemoryLevel(List(
-      QuizItem("en route", "unterwegs"),
-      QuizItem("full", "satt"),
-      QuizItem("full", "voll"),
-      QuizItem("interrupted", "unterbrochen"),
-      QuizItem("contract", "Vertrag"),
-      QuizItem("rides", "reitet"),
-      QuizItem("on", "auf"),
-      QuizItem("sweeps", "streicht")).toStream)
+    def makeQgMemLevel0: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
+        QuizItem("en route", "unterwegs"),
+        QuizItem("full", "satt"),
+        QuizItem("full", "voll"),
+        QuizItem("interrupted", "unterbrochen"),
+        QuizItem("contract", "Vertrag"),
+        QuizItem("rides", "reitet"),
+        QuizItem("on", "auf"),
+        QuizItem("sweeps", "streicht")).toStream)
 
-    def makeQgPartition1: QuizGroupMemoryLevel = QuizGroupMemoryLevel(List(
-      QuizItem("entertain", "unterhalten", List(8), List(2)),
-      QuizItem("winner", "Siegerin", List(5), List(0))).toStream)
+    def makeQgMemLevel1: QuizGroupMemoryLevel = QuizGroupMemoryLevel(5, List(
+        QuizItem("entertain", "unterhalten", List(8), List(2)),
+        QuizItem("winner", "Siegerin", List(5), List(0))).toStream)
 
-    def makeQgPartition2: QuizGroupMemoryLevel = QuizGroupMemoryLevel(List(
-      QuizItem("against", "wider", List(9, 7), List(6)),
-      QuizItem("teach", "unterrichten", List(4, 3), List(1))).toStream)
+    def makeQgMemLevel2: QuizGroupMemoryLevel = QuizGroupMemoryLevel(15, List(
+        QuizItem("against", "wider", List(9, 7), List(6)),
+        QuizItem("teach", "unterrichten", List(4, 3), List(1))).toStream)
 
     def makeQuizGroup = QuizGroup(
-        List(makeQgPartition0, makeQgPartition1, makeQgPartition2), QuizGroupUserData(true, 10))
+        Map(0 -> makeQgMemLevel0, 1-> makeQgMemLevel1, 2-> makeQgMemLevel2),
+        QuizGroupUserData(true, 10), new Dictionary())
     val quizGroup = makeQuizGroup
 
-    def makeSimpleQuizGroup = QuizGroup(List(makeQgPartition0), QuizGroupUserData(true, 0))
+    def makeSimpleQuizGroup = QuizGroup(Map(0 -> makeQgMemLevel0), QuizGroupUserData(true, 0))
     val quizGroupSimple = makeSimpleQuizGroup
 
-
-
     def makeQgwh(quizGroup: QuizGroup): QuizGroupWithHeader = {
-      val header = QuizGroupHeader(WordMapping, "English word", "German word", "|")
+      val header = QuizGroupHeader(WordMapping, "English word", "German word", "|", 4)
       QuizGroupWithHeader(header, quizGroup)
     }
     val qgwh: QuizGroupWithHeader = makeQgwh(quizGroup)
@@ -90,15 +92,18 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     // defaults for read-only
     val qgWithHeader = makeQgWithHeader
 
-    def updateWithUserAnswer(qg: QuizGroup, quizItem: QuizItemViewWithChoices): QuizGroup = {
-      val userAnswer = new UserResponse(qg.currentPromptNumber)
-      qg.updatedWithUserResponse(quizItem.prompt, quizItem.correctResponse, true, UserResponses(),
-        userAnswer).updatedPromptNumber
+    def updatedWithUserResponse(qg: QuizGroup, quizItem: QuizItem): QuizGroup = {
+      val userResponse = new UserResponse(qg.currentPromptNumber)
+      val wasCorrect = true
+      val quizItemUpdated = quizItem.updatedWithUserResponse(
+          quizItem.correctResponse, wasCorrect, userResponse)
+      val prevMemLevel = quizItemUpdated.numCorrectResponsesInARow
+      qg.updateWithQuizItem(quizItemUpdated, wasCorrect, prevMemLevel)
     }
 
     def pullQuizItemAndAnswerCorrectly(qgwh: QuizGroupWithHeader): QuizGroupWithHeader = {
-      val quizItem = qgwh.findPresentableQuizItem(MemoryLevels()).get
-      QuizGroupWithHeader(qgwh.header, updateWithUserAnswer(qgwh.quizGroup, quizItem))
+      val quizItem = qgwh.findPresentableQuizItem.get.quizItem
+      QuizGroupWithHeader(qgwh.header, updatedWithUserResponse(qgwh.quizGroup, quizItem))
     }
 
     "be parseable from custom format" in {
@@ -106,9 +111,9 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       qgWithHeader.promptType mustEqual "English word"
       qgWithHeader.responseType mustEqual "German word"
 
-      qgWithHeader.partitions(0).size mustEqual 8
-      qgWithHeader.partitions(1).size mustEqual 2
-      qgWithHeader.partitions(2).size mustEqual 2
+      qgWithHeader.levels(0).size mustEqual 8
+      qgWithHeader.levels(1).size mustEqual 2
+      qgWithHeader.levels(2).size mustEqual 2
     }
 
     "be serializable to custom format" in {
@@ -122,13 +127,12 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     def pullQuizItem(qgwh: QuizGroupWithHeader): (QuizGroup, (String, String)) = {
-      val quizItem = qgwh.findPresentableQuizItem(MemoryLevels())
-      quizItem.isDefined mustEqual true
+      val qiView = qgwh.findPresentableQuizItem
+      qiView.isDefined mustEqual true
+      val quizItem = qiView.get.quizItem
       // Each time a quiz item is pulled, a user answer must be set
-      val qgUpdated = qgwh.quizGroup.updatedWithUserResponse(quizItem.get.prompt,
-          quizItem.get.correctResponse, true, UserResponses(),
-          new UserResponse(qgwh.currentPromptNumber))
-      (qgUpdated, (quizItem.get.prompt.value, quizItem.get.correctResponse.value))
+      val qgUpdated = updatedWithUserResponse(qgwh.quizGroup, quizItem)
+      (qgUpdated, (quizItem.prompt.value, quizItem.correctResponse.value))
     }
 
     "find a presentable quiz item" in {
@@ -146,30 +150,29 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       qgUpdated.contains("good") mustEqual true
     }
 
-    "update partitions on a user response" in {
-      qgwhSimple.quizGroup.partitions(1).size mustEqual 0
+    "update MemLevels on a user response" in {
+      qgwhSimple.quizGroup.levels(1).size mustEqual 0
       val quizItem = qgwhSimple.quizGroup.findPresentableQuizItem
-      val qgUpdated = qgwhSimple.quizGroup.updatedWithUserResponse(quizItem.get.prompt,
-          quizItem.get.correctResponse, true, UserResponses(),
-          new UserResponse(qgwhSimple.currentPromptNumber))
-      qgUpdated.partitions(1).size mustEqual 1
+      val qgUpdated = updatedWithUserResponse(qgwhSimple.quizGroup, quizItem.get)
+      qgUpdated.levels(1).size mustEqual 1
     }
 
     /*
      * This assumes the following Criteria in UserResponses:
      * Criteria(numCorrectResponsesInARowDesired = 1, diffInPromptNumMinimum = 5),
      */
+
+
     "present an item that has been answered before after five prompts" in {
       var qgwhLocal = makeSimpleQgWithHeader
-      val quizItem0 = qgwhLocal.findPresentableQuizItem(MemoryLevels()).get
+      val quizItem0 = qgwhLocal.findPresentableQuizItem.get
       quizItem0.prompt.value mustEqual "en route" // "against"
       qgwhLocal = QuizGroupWithHeader(qgwhLocal.header,
-          updateWithUserAnswer(qgwhLocal, quizItem0))
-
+          updatedWithUserResponse(qgwhLocal, quizItem0.quizItem))
       for (promptNum <- 1 until 5)
         qgwhLocal = pullQuizItemAndAnswerCorrectly(qgwhLocal)
 
-      val quizItem5 = qgwhLocal.findPresentableQuizItem(MemoryLevels())
+      val quizItem5 = qgwhLocal.findPresentableQuizItem
       quizItem5.get.prompt.value mustEqual "en route" // "against"
     }
 
@@ -180,17 +183,40 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
-    "make false answers" in {
+    "construct wrong choices" in {
       val quizItemCorrect: QuizItem = qgWithHeader.quizGroup.quizItems.find(
           _.prompt.value == "entertain").get
 
       val (falseAnswers, timeTaken) = Util.stopwatch(qgWithHeader.quizGroup.constructWrongChoices(
-          quizItemCorrect: QuizItem, numCorrectResponsesSoFar = 1,
-          numWrongChoicesRequired = 2))
+          quizItemCorrect, numCorrectResponsesSoFar = 1, numWrongChoicesRequired = 2))
 
-      l.log("falseAnswers: " + falseAnswers)
       falseAnswers.contains("unterbrochen") mustEqual true
       timeTaken must be lessThan 100
+    }
+
+    /**
+     * This reproduces a (former) bug, where only one wrong choice was being produced.
+     */
+    "construct a full set of wrong choices" in {
+
+      val demoGroupHeader = "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"21\" isActive=\"true\"\n"
+      val demoGroupText = demoGroupHeader +
+          "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
+          "entertain|unterhalten'\n" +
+          "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"5\"\n" +
+          "against|wider'13\n" +
+          "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"15\"\n" +
+          "treaty|Vertrag'11,5\n" +
+          "contract|Vertrag'9,3\n" +
+          "en route|unterwegs'7,1\n"
+
+      val demoGroup = QuizGroup.fromCustomFormat(demoGroupText, "|", demoGroupHeader)
+      val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get
+
+      val (falseAnswers, _) = Util.stopwatch(demoGroup.constructWrongChoices(
+          quizItemCorrect, numCorrectResponsesSoFar = 2, numWrongChoicesRequired = 2))
+
+      falseAnswers.size mustEqual 2
     }
 
     "remove a quiz pair" in {
@@ -201,8 +227,8 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "add a new quiz item to the front of its queue" in {
       val qgUpdated = quizGroupSimple.addNewQuizItem("to exchange", "tauschen")
-      qgUpdated.findPresentableQuizItem(MemoryLevels()) mustEqual
-          Some(QuizItem("to exchange", "tauschen"))
+      qgUpdated.findPresentableQuizItem mustEqual Some(
+          QuizItem("to exchange", "tauschen"))
     }
 
     "move an existing quiz pair to the front of its queue" in {
@@ -211,7 +237,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
       val qgwhUpdated = QuizGroupWithHeader(qgwh.header, qgUpdated)
-      qgwhUpdated.quizGroup.partitions(0).findPresentableQuizItem(
+      qgwhUpdated.quizGroup.levels(0).findPresentableQuizItem(
           qgwhUpdated.currentPromptNumber) mustEqual Some(QuizItem("sweeps", "streicht"))
     }
 
@@ -221,7 +247,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
       val qgwhUpdated = QuizGroupWithHeader(qgwh.header, qgUpdated)
-      qgwhUpdated.quizGroup.partitions(0).findPresentableQuizItem(
+      qgwhUpdated.quizGroup.levels(0).findPresentableQuizItem(
           qgwhUpdated.currentPromptNumber) mustEqual Some(QuizItem("on", "zu"))
     }
 
@@ -235,6 +261,35 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       (keyWord, value) mustEqual ("whole", "ganz")
       val qgwhUnrolled = QuizGroupWithHeader(qgwhSimple.header, qgUnrolled)
       pullQuizItem(qgwhUnrolled)._2 mustEqual ("to exchange", "tauschen")
+    }
+
+    val memLevel2 = QuizGroupMemoryLevel(repetitionInterval = 15, totalResponses = 2,
+        numCorrectResponses = 1)
+    val qg = QuizGroup(Map(2 -> memLevel2))
+
+    "be updated for a correct answer" in {
+      val updatedQg = qg.incrementResponsesCorrect(2)
+      updatedQg.totalResponses(2) mustEqual 3
+      updatedQg.numCorrectResponses(2) mustEqual 2
+    }
+
+    "be updated for a incorrect answer" in {
+      val updatedQg = qg.incrementResponsesIncorrect(2)
+      updatedQg.totalResponses(2) mustEqual 3
+      updatedQg.numCorrectResponses(2) mustEqual 1
+    }
+
+    "throw an exception on an attempt to get information from an unknown memory level" in {
+      qg.totalResponses(9) must throwA[IndexOutOfBoundsException]
+    }
+
+    "have a count reset for a level" in {
+      val memLevel2 = QuizGroupMemoryLevel(repetitionInterval = 15, totalResponses = 10,
+        numCorrectResponses = 1)
+      val qg = QuizGroup(Map(2 -> memLevel2))
+      val updatedQg = qg.incrementResponsesCorrect(2)
+      updatedQg.totalResponses(2) mustEqual 1
+      updatedQg.numCorrectResponses(2) mustEqual 1
     }
   }
 }

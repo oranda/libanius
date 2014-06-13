@@ -47,17 +47,17 @@ case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
    * See if this quiz item meets any of the defined criteria sets that would make it presentable.
    * (Intended to be called over many quiz items until one fits.)
    */
-  def isPresentable(currentPromptNum: Int)(implicit ml: MemoryLevels): Boolean =
-    isPresentable(currentPromptNum, promptNumInMostRecentResponse, numCorrectResponsesInARow)
+  protected[model] def isPresentable(currentPromptNum: Int, repetitionInterval: Int): Boolean =
+      wasNotTooRecentlyUsed(currentPromptNum, promptNumInMostRecentResponse, repetitionInterval)
 
-  protected[model] def isPresentable(currentPromptNum : Int,
-      promptNumInMostRecentResponse: Option[Int], numCorrectResponsesInARow: Int)
-      (implicit ml: MemoryLevels): Boolean =
-    numCorrectResponsesInARow == 0 || ml.memoryLevels.exists(_.isPresentable(
-        currentPromptNum, promptNumInMostRecentResponse, numCorrectResponsesInARow))
+  def wasNotTooRecentlyUsed(currentPromptNum: Int,
+      promptNumInMostRecentResponse: Option[Int], repetitionInterval: Int) =
+    promptNumInMostRecentResponse.forall {
+      case promptNumInMostRecentResponse =>
+        val diffInPromptNum = currentPromptNum - promptNumInMostRecentResponse
+        diffInPromptNum >= repetitionInterval
+    }
 
-  def isUnfinished(numCorrectResponsesRequired: Int): Boolean =
-    numCorrectResponsesInARow < numCorrectResponsesRequired
   
   def numCorrectResponsesInARow = correctResponsesInARow.length
   

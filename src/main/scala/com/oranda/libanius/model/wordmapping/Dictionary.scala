@@ -23,7 +23,7 @@ import scala.collection.JavaConversions.mapAsScalaMap
 import scala.collection.immutable.Stream
 import scala.util.Try
 import com.oranda.libanius.model.{SearchResultPair, ModelComponent, SearchResult}
-import com.oranda.libanius.model.quizgroup.QuizGroupHeader
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader}
 import com.oranda.libanius.model.quizitem.QuizItem
 
 /**
@@ -64,12 +64,13 @@ object Dictionary {
       wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
     }
 
-  def fromQuizItems(quizItems: Stream[QuizItem]) = {
+  def fromQuizItems(quizItems: Stream[QuizItem]) =
     new Dictionary() {
       val wordMappingsStream = WordMappingGroup.quizItemsToWordMappingPairs(quizItems, "|")
       wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
     }
-  }
+
+  def fromQuizGroup(quizGroup: QuizGroup): Dictionary = fromQuizItems(quizGroup.quizItems)
 
   /*
    * Example:

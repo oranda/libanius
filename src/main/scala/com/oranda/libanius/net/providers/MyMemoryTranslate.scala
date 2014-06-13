@@ -62,7 +62,7 @@ object MyMemoryTranslate extends AppDependencyAccess {
     // Group by key so as to go from (key, value) to (key, values)
     val groupedMatches = matches.groupByOrdered(_._1).map {
       case (key, valueSet) => SearchResult(header,
-        SearchResultPair(key, ValueSet(valueSet.map(_._2).toList)))
+          SearchResultPair(key, ValueSet(valueSet.map(_._2).toList)))
     }
     groupedMatches.filterNot(_.keyWordMatchesValue).toList
   }

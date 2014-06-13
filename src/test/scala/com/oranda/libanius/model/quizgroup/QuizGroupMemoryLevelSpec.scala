@@ -22,19 +22,17 @@ import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 
-import com.oranda.libanius.model.{MemoryLevels, UserResponse, UserResponses}
+import com.oranda.libanius.model.{UserResponse, UserResponses}
 import java.lang.StringBuilder
 
 class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
-  "a quiz group partition" should {
-
-    implicit val ml = MemoryLevels()
+  "a quiz group memory level" should {
 
     /*
      * Construct a quiz group partition.
      */
-    def makeQgPartition: QuizGroupMemoryLevel = QuizGroupMemoryLevel(List(
+    def makeQgMemLevel: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
         QuizItem("against", "wider"),
         QuizItem("entertain", "unterhalten"),
         QuizItem("teach", "unterrichten"),
@@ -48,53 +46,52 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
         QuizItem("on", "auf"),
         QuizItem("sweeps", "streicht")).toStream)
 
-    def makeQgPartitionSimple: QuizGroupMemoryLevel = QuizGroupMemoryLevel(List(
+    def makeQgMemLevelSimple: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
         QuizItem("against", "wider"),
         QuizItem("entertain", "unterhalten")).toStream)
 
 
     // defaults for read-only
-    val qgPartition = makeQgPartition
-    val qgPartitionSimple = makeQgPartitionSimple
+    val qgMemLevel = makeQgMemLevel
+    val qgMemLevelSimple = makeQgMemLevelSimple
 
-    val qgPartitionSimpleCustomFormat =
+    val qgMemLevelSimpleCustomFormat =
         "against|wider|\n" +
         "entertain|unterhalten|\n"
 
-
     "be parseable from custom format" in {
-      val qgp = QuizGroupMemoryLevel.fromCustomFormat(
-          qgPartitionSimpleCustomFormat, "|")
-      qgp.numQuizItems mustEqual 2
+      val qgml = QuizGroupMemoryLevel.fromCustomFormat(qgMemLevelSimpleCustomFormat, 0, "|")
+      qgml.numQuizItems mustEqual 2
     }
 
     "be serializable to custom format" in {
-      val customFormat = qgPartitionSimple.toCustomFormat(new StringBuilder(), "|", 0)
+      val customFormat = qgMemLevelSimple.toCustomFormat(new StringBuilder(), "|", 0)
       customFormat.toString mustEqual
-          "#quizGroupPartition numCorrectResponsesInARow=\"0\"\n" + qgPartitionSimpleCustomFormat
+          "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
+                qgMemLevelSimpleCustomFormat
     }
 
     "find values for a prompt" in {
-      qgPartition.findResponsesFor("on") mustEqual List("auf")
+      qgMemLevel.findResponsesFor("on") mustEqual List("auf")
     }
 
     "accept the addition of a new word-mapping" in {
-      qgPartition.contains("good") mustEqual false
-      val qgUpdated = qgPartition.addNewQuizItem("good", "gut")
+      qgMemLevel.contains("good") mustEqual false
+      val qgUpdated = qgMemLevel.addNewQuizItem("good", "gut")
       qgUpdated.contains("good") mustEqual true
     }
 
     "accept new values for an existing word-mapping" in {
-      val valuesForAgainst = qgPartition.findResponsesFor("against")
+      val valuesForAgainst = qgMemLevel.findResponsesFor("against")
       valuesForAgainst.size mustEqual 1
-      val qgUpdated = qgPartition.addQuizItem(TextValue("against"), TextValue("gegen"))
+      val qgUpdated = qgMemLevel.addQuizItem(TextValue("against"), TextValue("gegen"))
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
     "generate false answers similar to a correct answer" in {
       def hasSameEnd = (value1: TextValue, value2: String) => value1.hasSameEnd(value2)
 
-      val falseAnswers = qgPartition.constructWrongChoicesSimilar(
+      val falseAnswers = qgMemLevel.constructWrongChoicesSimilar(
         correctResponses = List("unterhalten"),
         numWrongResponsesRequired = 5,
         correctValue = "unterhalten",
@@ -103,78 +100,79 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
       falseAnswers.contains("unterrichten") mustEqual true
     }
 
-    def pullQuizItem(qgp: QuizGroupMemoryLevel, currentPromptNumber: Int):
+    def pullQuizItem(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int):
         (QuizGroupMemoryLevel, (String, String)) = {
-      val quizItem = qgp.findPresentableQuizItem(currentPromptNumber)
+      val quizItem = qgml.findPresentableQuizItem(currentPromptNumber)
       quizItem.isDefined mustEqual true
       // Each time a quiz item is pulled, a user answer must be set
-      val qgpUpdated = qgp.updatedWithUserAnswer(quizItem.get.prompt,
+      val qgmlUpdated1 = qgml.updatedWithUserAnswer(quizItem.get.prompt,
           quizItem.get.correctResponse, true, UserResponses(), new UserResponse(0))
-      (qgpUpdated, (quizItem.get.prompt.value, quizItem.get.correctResponse.value))
+      val qgmlUpdated2 = qgmlUpdated1.removeQuizItem(quizItem.get)
+      (qgmlUpdated2, (quizItem.get.prompt.value, quizItem.get.correctResponse.value))
     }
 
     "find a presentable quiz item" in {
-      pullQuizItem(qgPartition, 0)._2 mustEqual ("against", "wider")
+      pullQuizItem(qgMemLevel, 0)._2 mustEqual ("against", "wider")
     }
 
     "remove a quiz pair" in {
       val itemToRemove = QuizItem("against", "wider")
-      val qgUpdated = qgPartition.removeQuizItem(itemToRemove)
+      val qgUpdated = qgMemLevel.removeQuizItem(itemToRemove)
       qgUpdated.contains("against") mustEqual false
     }
 
     "add a new quiz item to the front of its queue" in {
-      val qgUpdated = qgPartition.addNewQuizItem("to exchange", "tauschen")
+      val qgUpdated = qgMemLevel.addNewQuizItem("to exchange", "tauschen")
       pullQuizItem(qgUpdated, 0)._2 mustEqual ("to exchange", "tauschen")
     }
 
     "move an existing quiz pair to the front of its queue" in {
-      val numPromptsBefore = qgPartition.numPrompts
-      val qgUpdated = qgPartition.addQuizItemToFront(QuizItem("sweeps", "streicht"))
+      val numPromptsBefore = qgMemLevel.numPrompts
+      val qgUpdated = qgMemLevel.addQuizItemToFront(QuizItem("sweeps", "streicht"))
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
       pullQuizItem(qgUpdated, 0)._2 mustEqual ("sweeps", "streicht")
     }
 
     "move a quiz pair to the front of its queue where only the prompt already exists" in {
-      val sizeBefore = qgPartition.size
-      val qgUpdated = qgPartition.addQuizItemToFront(QuizItem("entertain", "bewirten"))
+      val sizeBefore = qgMemLevel.size
+      val qgUpdated = qgMemLevel.addQuizItemToFront(QuizItem("entertain", "bewirten"))
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
       pullQuizItem(qgUpdated, 0)._2 mustEqual ("entertain", "bewirten")
     }
 
     "add more than one new quiz pair to the front of its queue" in {
-      val qgUpdated1 = qgPartition.addQuizItemToFront(QuizItem("to exchange", "tauschen"))
+      val qgUpdated1 = qgMemLevel.addQuizItemToFront(QuizItem("to exchange", "tauschen"))
       val qgUpdated2 = qgUpdated1.addQuizItemToFront(QuizItem("whole", "ganz"))
       val (qgUnrolled, (keyWord, value)) = pullQuizItem(qgUpdated2, 0)
       (keyWord, value) mustEqual ("whole", "ganz")
       pullQuizItem(qgUnrolled, 1)._2 mustEqual ("to exchange", "tauschen")
     }
 
-    def pullQuizItemAndAnswerCorrectly(qgp: QuizGroupMemoryLevel, currentPromptNumber: Int):
+    def pullQuizItemAndAnswerCorrectly(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int):
         QuizGroupMemoryLevel = {
-      val quizItem = qgp.findPresentableQuizItem(currentPromptNumber).get
-      updateWithUserAnswer(qgp, quizItem, currentPromptNumber)
+      val quizItem = qgml.findPresentableQuizItem(currentPromptNumber).get
+      updateWithUserAnswer(qgml, quizItem, currentPromptNumber)
     }
 
-    def updateWithUserAnswer(qgp: QuizGroupMemoryLevel, quizItem: QuizItem,
+    def updateWithUserAnswer(qgml: QuizGroupMemoryLevel, quizItem: QuizItem,
         currentPromptNumber: Int): QuizGroupMemoryLevel = {
       val userAnswer = new UserResponse(currentPromptNumber)
-      qgp.updatedWithUserAnswer(quizItem.prompt, quizItem.correctResponse, true,
+      qgml.updatedWithUserAnswer(quizItem.prompt, quizItem.correctResponse, true,
           UserResponses(), userAnswer)
     }
 
     "present an item that has been answered before after five prompts" in {
-      var qgpLocal = makeQgPartition
-      val quizItem0 = qgpLocal.findPresentableQuizItem(0).get
+      var qgmlLocal = makeQgMemLevel
+      val quizItem0 = qgmlLocal.findPresentableQuizItem(0).get
       quizItem0.prompt.value mustEqual "against"
-      qgpLocal = updateWithUserAnswer(qgpLocal, quizItem0, 0)
+      qgmlLocal = updateWithUserAnswer(qgmlLocal, quizItem0, 0)
 
       for (promptNum <- 1 until 5)
-        qgpLocal = pullQuizItemAndAnswerCorrectly(qgpLocal, promptNum)
+        qgmlLocal = pullQuizItemAndAnswerCorrectly(qgmlLocal, promptNum)
 
-      val quizItem5 = qgpLocal.findPresentableQuizItem(5)
+      val quizItem5 = qgmlLocal.findPresentableQuizItem(5)
       quizItem5.get.prompt.value mustEqual "against"
     }
   }

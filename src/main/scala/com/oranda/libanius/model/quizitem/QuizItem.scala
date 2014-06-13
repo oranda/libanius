@@ -18,9 +18,8 @@
 
 package com.oranda.libanius.model.quizitem
 
-import com.oranda.libanius.model.{MemoryLevels, UserResponse, UserResponses}
+import com.oranda.libanius.model.{ModelComponent, UserResponse, UserResponses}
 import com.oranda.libanius.model.wordmapping.WordMappingValue
-import com.oranda.libanius.dependencies.AppDependencyAccess
 
 /*
  * A connection between two things, and user information associated with the connection.
@@ -35,21 +34,25 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
  */
 case class QuizItem(prompt: TextValue, correctResponse: TextValue,
     userResponses: UserResponses = new UserResponses())
-  extends AppDependencyAccess {
+  extends ModelComponent {
 
   def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
   def numCorrectResponsesInARow = userResponses.numCorrectResponsesInARow
 
-  def isComplete(implicit ml: MemoryLevels) = numCorrectResponsesInARow >= ml.numCorrectResponsesRequired
-
   def samePromptAndResponse(other: QuizItem) =
     other.prompt == prompt && other.correctResponse == correctResponse
 
-  def isPresentable(currentPromptNumber: Int)(implicit ml: MemoryLevels) =
-    userResponses.isPresentable(currentPromptNumber)
+  def isPresentable(currentPromptNumber: Int, repetitionInterval: Int) =
+    userResponses.isPresentable(currentPromptNumber, repetitionInterval)
 
   def looselyMatches(userResponse: String): Boolean =
     correctResponse.looselyMatches(userResponse)
+
+  def updatedWithUserResponse(response: TextValue, wasCorrect: Boolean,
+      userResponse: UserResponse): QuizItem = {
+    val userResponsesUpdated = userResponses.add(userResponse, wasCorrect)
+    QuizItem(prompt, response, userResponsesUpdated)
+  }
 
   def toCustomFormat(strBuilder: java.lang.StringBuilder, mainSeparator: String) = {
     strBuilder.append(prompt).append(mainSeparator).append(correctResponse).

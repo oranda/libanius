@@ -31,19 +31,17 @@ import scalaz.PLens._
 import scala.collection.immutable.Stream
 import scala.collection.immutable.List
 import scala.Predef._
-import scala.collection.immutable.Set
 import com.oranda.libanius.util.{StringUtil, Util}
-import com.oranda.libanius.model.UserResponse
 
 /*
  * Contains quiz items for a topic.
- * For performance reasons, the quiz items are partitioned according to how
- * many times as a user has answered each item correctly. (This is an example
- * of a "disjoint set" or "union find" data structure.) The index in the ArrayList
- * of partitions matches correctResponseInARow.
+ * For performance reasons, the quiz items are partitioned into "memory levels"
+ * corresponding to how many times as a user has answered each item correctly. (This
+ * is an example of a "disjoint set" or "union find" data structure.) The index in the
+ * List of partitions matches correctResponseInARow.
  */
-case class QuizGroup private(partitions: List[QuizGroupMemoryLevel] = List(),
-    userData: QuizGroupUserData = QuizGroupUserData(), dictionary: Dictionary = new Dictionary)
+case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
+    userData: QuizGroupUserData, dictionary: Dictionary)
   extends ModelComponent {
 
   lazy val currentPromptNumber = userData.currentPromptNumber
@@ -54,33 +52,39 @@ case class QuizGroup private(partitions: List[QuizGroupMemoryLevel] = List(),
   def activate = QuizGroup.activeLens.set(this, true)
   def deactivate = QuizGroup.activeLens.set(this, false)
 
-  def contains(quizItem: QuizItem): Boolean = partitions.exists(_.contains(quizItem))
+  def contains(quizItem: QuizItem): Boolean = levels.exists(_.contains(quizItem))
   def hasPrompt(prompt: String): Boolean = contains(prompt)
   def contains(prompt: String): Boolean = contains(TextValue(prompt))
-  def contains(prompt: TextValue): Boolean = partitions.exists(_.contains(prompt))
-  def numQuizItems = (0 /: partitions)(_ + _.numQuizItems)
+  def contains(prompt: TextValue): Boolean = levels.exists(_.contains(prompt))
+  def numQuizItems = (0 /: levels)(_ + _.numQuizItems)
 
-  def isEmpty = partitions.forall(_.isEmpty)
+  def isEmpty = levels.forall(_.isEmpty)
   def size = numQuizItems
   def numPrompts = size
   def numResponses = size
+  def numLevels = levels.size
+  def numCorrectResponsesRequired = numLevels - 1
 
-  // Because partition index corresponds to numCorrectAnswersInARow, score computation is fast
-  def numCorrectAnswers: Int = partitions.zipWithIndex.foldLeft(0) {
-      case (accum, (partition, index)) => accum + partition.size * index
-  }
+  // Because memLevel index corresponds to numCorrectAnswersInARow, score computation is fast
+  def numCorrectResponses: Int = levels.zipWithIndex.foldLeft(0) {
+      case (accum, (level, index)) => accum + level.size * index
+    }
+
+  def maxDiffInPromptNumMinimum = (0 /: levels)(_ max _.repetitionInterval)
+
+  def totalCorrectResponsesRequired = numQuizItems * numCorrectResponsesRequired
+
+  def totalResponses(level: Int): Int = get(level).totalResponses
+  def numCorrectResponses(level: Int): Int = get(level).numCorrectResponses
+  def memoryLevelInterval(level: Int) = get(level).repetitionInterval
+  def isAtLimit(level: Int): Boolean = get(level).isAtLimit
 
   def updatedDictionary(newDictionary: Dictionary) =
     QuizGroup.dictionaryLens.set(this, newDictionary)
 
-  def quizItems: Stream[QuizItem] = partitions.flatMap(_.quizItems).toStream
+  def numDictionaryKeyWords = dictionary.numKeyWords
 
-  protected[model] def updatedWithUserResponse(prompt: TextValue, response: TextValue,
-      wasCorrect: Boolean, userResponses: UserResponses, userResponse: UserResponse):
-      QuizGroup = {
-    val userResponsesUpdated = userResponses.add(userResponse, wasCorrect)
-    moveQuizItem(QuizItem(prompt, response, userResponsesUpdated))
-  }
+  def quizItems: Stream[QuizItem] = levels.flatMap(_.quizItems).toStream
 
   /*
    * Low usage expected. Slow because we are not using a Map for quizItems.
@@ -101,29 +105,41 @@ case class QuizGroup private(partitions: List[QuizGroupMemoryLevel] = List(),
     quizItems.find(quizItem => quizItem.prompt.matches(prompt) &&
         quizItem.correctResponse.matches(response))
 
-  protected[model] def moveQuizItem(quizItem: QuizItem): QuizGroup = {
+  protected[model] def findQuizItem(prompt: String): Option[QuizItem] =
+    quizItems.find(quizItem => quizItem.prompt.matches(prompt))
+
+
+  protected[model] def updateWithQuizItem(quizItem: QuizItem, isCorrect: Boolean,
+      prevMemLevel: Int): QuizGroup = {
+    val updatedQuizGroup1 = moveQuizItem(quizItem)
+    val updatedQuizGroup2 = updatedQuizGroup1.incrementResponses(prevMemLevel, isCorrect)
+    val updatedQuizGroup3 = updatedQuizGroup2.updatedPromptNumber
+    updatedQuizGroup3.updateIntervalForLevel(prevMemLevel)
+  }
+
+
+  private def moveQuizItem(quizItem: QuizItem): QuizGroup = {
     val qgUpdated = removeQuizItem(quizItem)
-    qgUpdated.prependItemToNthPartition(quizItem, quizItem.numCorrectResponsesInARow)
+    qgUpdated.prependItemToNthLevel(quizItem, quizItem.numCorrectResponsesInARow)
   }
 
   protected[model] def addNewQuizItem(prompt: String, response: String): QuizGroup =
     if (!prompt.isEmpty && !response.isEmpty && prompt.toLowerCase != response.toLowerCase)
-      //addQuizItemToFront(QuizItem(prompt, response))
-      prependItemToFirstPartition(QuizItem(prompt, response))
+      prependItemToFirstLevel(QuizItem(prompt, response))
     else
       this
 
-  private def prependItemToFirstPartition(quizItem: QuizItem): QuizGroup =
-    prependItemToNthPartition(quizItem, 0)
+  private def prependItemToFirstLevel(quizItem: QuizItem): QuizGroup =
+    prependItemToNthLevel(quizItem, 0)
 
-  private def prependItemToNthPartition(quizItem: QuizItem, n: Int): QuizGroup = {
-    val firstPartitionLens = listNthPLens(n) compose QuizGroup.partitionsLens.partial
-    val firstPartitionItemsLens = QuizGroupMemoryLevel.itemsLens.partial compose firstPartitionLens
-    firstPartitionItemsLens.mod(quizItem +: _.filterNot(_ == quizItem), this)
+  private def prependItemToNthLevel(quizItem: QuizItem, n: Int): QuizGroup = {
+    val nthLevelLens = listNthPLens(n) compose QuizGroup.levelsLens.partial
+    val nthLevelItemsLens = QuizGroupMemoryLevel.itemsLens.partial compose nthLevelLens
+    nthLevelItemsLens.mod(quizItem +: _.filterNot(_ == quizItem), this)
   }
 
   protected[model] def removeQuizItem(quizItem: QuizItem) =
-    QuizGroup.partitionsLens.set(this, partitions.map(_.removeQuizItem(quizItem)))
+    QuizGroup.levelsLens.set(this, levels.map(_.removeQuizItem(quizItem)))
 
   /*
    * This may give similar results to findResponsesFor but it uses the dictionary
@@ -133,7 +149,7 @@ case class QuizGroup private(partitions: List[QuizGroupMemoryLevel] = List(),
     dictionary.findValuesFor(prompt).values.map(_.value)
 
   protected[model] def constructWrongChoices(itemCorrect: QuizItem,
-      numCorrectResponsesSoFar: Int, numWrongChoicesRequired: Int = 2): Set[String] = {
+      numCorrectResponsesSoFar: Int, numWrongChoicesRequired: Int = 2): List[String] = {
 
     val correctResponses = Util.stopwatch(findResponsesFor(itemCorrect.prompt.value),
         "findResponsesFor")
@@ -142,7 +158,7 @@ case class QuizGroup private(partitions: List[QuizGroupMemoryLevel] = List(),
             itemCorrect, numWrongChoicesRequired, correctResponses) ++
         constructWrongChoicesRandom(correctResponses, numWrongChoicesRequired, itemCorrect) ++
         constructWrongChoicesDummy(numWrongChoicesRequired)
-    falseResponses.take(numWrongChoicesRequired).toSet
+    falseResponses.distinct.take(numWrongChoicesRequired)
   }
 
   /*
@@ -159,13 +175,13 @@ case class QuizGroup private(partitions: List[QuizGroupMemoryLevel] = List(),
       def hasSameStart = (value1: TextValue, value2: String) => value1.hasSameStart(value2)
       def hasSameEnd = (value1: TextValue, value2: String) => value1.hasSameEnd(value2)
       val similarityPredicate = if (numCorrectResponsesSoFar % 2 == 1) hasSameStart else hasSameEnd
-      partitions.flatMap( _.constructWrongChoicesSimilar(correctResponses,
+      levels.flatMap( _.constructWrongChoicesSimilar(correctResponses,
           numWrongChoicesRequired, correctValuePresented, similarityPredicate))
     }
 
   protected[quizgroup] def constructWrongChoicesRandom(correctResponses: List[String],
       numWrongChoicesRequired: Int, itemCorrect: QuizItem): List[String] =
-    partitions.filterNot(_.isEmpty).flatMap(_.constructWrongChoicesRandom(
+    levels.filterNot(_.isEmpty).flatMap(_.constructWrongChoicesRandom(
         correctResponses, numWrongChoicesRequired, itemCorrect))
 
   protected[quizgroup] def constructWrongChoicesDummy(numWrongChoicesRequired: Int):
@@ -178,26 +194,44 @@ case class QuizGroup private(partitions: List[QuizGroupMemoryLevel] = List(),
       characters.map(_.toString).take(numWrongChoicesRequired).toList
   }
 
-  protected[model] def findAnyUnfinishedQuizItem(numCorrectResponsesRequired: Int):
-      Option[QuizItem] =
-    (for {
-      partition <- partitions.reverse.toStream
-      quizItem <- partition.findAnyUnfinishedQuizItem(numCorrectResponsesRequired)
-    } yield quizItem).headOption
-
-
   /*
-   * The partitions are searched in reverse order for presentable quiz items,
+   * The memLevels are searched in reverse order for presentable quiz items,
    * meaning that an item that has been answered correctly (once or more) will
    * be preferred over an item with no correct answers, assuming the
-   * diffInPromptNumMinimum criteria is satisfied.
+   * interval criteria (difference with the prompt number) is satisfied.
    */
-  def findPresentableQuizItem(implicit ml: MemoryLevels): Option[QuizItem] =
+  def findPresentableQuizItem: Option[QuizItem] =
     (for {
-      partition <- partitions.reverse.toStream
-      quizItem <- partition.findPresentableQuizItem(currentPromptNumber).toStream
+      (memLevel, levelIndex) <- levels.zipWithIndex.reverse.tail.toStream
+      quizItem <- memLevel.findPresentableQuizItem(currentPromptNumber).toStream
     } yield quizItem).headOption
 
+
+  protected[model] def findAnyUnfinishedQuizItem: Option[QuizItem] =
+    (for {
+      (memLevel, levelIndex) <- levels.zipWithIndex.reverse.tail.toStream
+      quizItem <- memLevel.findAnyUnfinishedQuizItem
+    } yield quizItem).headOption
+
+  def incrementResponsesCorrect(memoryLevel: Int) = incrementResponses(memoryLevel, true)
+  def incrementResponsesIncorrect(memoryLevel: Int) = incrementResponses(memoryLevel, false)
+
+  def incrementResponses(memoryLevel: Int, isCorrect: Boolean): QuizGroup =
+    QuizGroup.levelsListLens(memoryLevel).mod((_: QuizGroupMemoryLevel).inc(isCorrect), this)
+
+  def updateIntervalForLevel(memoryLevel: Int): QuizGroup =
+    if (memoryLevel > 0 && isAtLimit(memoryLevel)) {
+      val mlsIntervalLens = QuizGroupMemoryLevel.intervalLens.partial compose
+          QuizGroup.levelsListLens(memoryLevel)
+      val mlsUpdated = mlsIntervalLens.mod(Int => get(memoryLevel).updatedInterval, this)
+      def strIntervals(qg: QuizGroup) = qg.levels.map(_.repetitionInterval)
+      l.log("Updating memory intervals from " + strIntervals(this) + " to " +
+          strIntervals(mlsUpdated) + ", numCorrectResponses: " + numCorrectResponses(memoryLevel))
+      mlsUpdated
+    } else
+      this
+
+  protected[model] def get(level: Int): QuizGroupMemoryLevel = levels(level)
 
   /*
    * Example of custom format:
@@ -206,75 +240,59 @@ case class QuizGroup private(partitions: List[QuizGroupMemoryLevel] = List(),
    *    against|wider
    *    entertain|unterhalten
    */
-  def toCustomFormat(strBuilder: StringBuilder, header: QuizGroupHeader) = {
+  def toCustomFormat(strBuilder: StringBuilder, header: QuizGroupHeader): StringBuilder = {
     userData.toCustomFormat(header.toCustomFormat(strBuilder))
     strBuilder.append('\n')
-    for (partition <- partitions.zipWithIndex.toStream)
-      partition._1.toCustomFormat(strBuilder, header.mainSeparator, partition._2)
+    toCustomFormat(strBuilder, header.mainSeparator)
+    strBuilder
+  }
 
+  private def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String): StringBuilder = {
+    for (memLevel <- levels.zipWithIndex.toStream)
+      memLevel._1.toCustomFormat(strBuilder, mainSeparator, memLevel._2)
     strBuilder
   }
 }
 
-
+import com.oranda.libanius.model.UserResponse
 object QuizGroup extends AppDependencyAccess {
 
-  def apply(): QuizGroup = QuizGroup(List(), QuizGroupUserData(true), new Dictionary())
-
-  def apply(quizItems: Stream[QuizItem]): QuizGroup  =
-    apply(quizItems, new QuizGroupUserData(true), new Dictionary())
-
-  private[this] val numPartitions = MemoryLevels.maxCorrectResponsesRequired + 1
+  //def apply(quizItems: Stream[QuizItem] = Stream.empty): QuizGroup  =
+  //  apply(quizItems, new QuizGroupUserData(true), new Dictionary())
 
   /*
    * Form a QuizGroup from quiz items with no user responses.
    */
-  def apply(quizItems: Stream[QuizItem], userData: QuizGroupUserData,
-      dictionary: Dictionary): QuizGroup = {
-    val partitions = Array.fill(numPartitions)(QuizGroupMemoryLevel())
-    partitions(0) = QuizGroupMemoryLevel(quizItems)
-    QuizGroup(partitions.toList, userData, dictionary)
-  }
+  def fromQuizItems(quizItems: Stream[QuizItem] = Stream.empty,
+      userData: QuizGroupUserData = QuizGroupUserData(true),
+      dictionary: Dictionary = new Dictionary()): QuizGroup =
+    QuizGroup(Map(0 -> QuizGroupMemoryLevel(0, quizItems)), userData, dictionary)
 
-  def createFromPartitions(partitionMap: Map[Int, QuizGroupMemoryLevel],
+  def apply(memLevelMap: Map[Int, QuizGroupMemoryLevel] = Map(),
+      userData: QuizGroupUserData = QuizGroupUserData(true),
+      dictionary: Dictionary = new Dictionary()): QuizGroup =
+    QuizGroup(toMemLevelList(memLevelMap), userData, dictionary)
+
+  def createFromMemLevels(memLevelMap: Map[Int, QuizGroupMemoryLevel],
       userData: QuizGroupUserData): QuizGroup =
-    QuizGroup(toPartitionArray(partitionMap), userData, new Dictionary())
+    QuizGroup(toMemLevelList(memLevelMap), userData, new Dictionary())
 
-  def apply(partitions: Array[QuizGroupMemoryLevel], userData: QuizGroupUserData,
-      dictionary: Dictionary): QuizGroup =
-    QuizGroup(partitions.toList, userData, dictionary)
-
-  def apply(partitions: List[QuizGroupMemoryLevel], userData: QuizGroupUserData): QuizGroup =
-    QuizGroup(toPartitionArray(partitions), userData, new Dictionary())
-
-  def apply(userData: QuizGroupUserData): QuizGroup =
-    QuizGroup(List(), userData)
-
-  def apply(partitions: List[QuizGroupMemoryLevel], dictionary: Dictionary,
-      numCorrectResponsesRequired: Int): QuizGroup =
-    QuizGroup(toPartitionArray(partitions), QuizGroupUserData(),
-        dictionary)
-
-  def toPartitionArray(partitions: List[QuizGroupMemoryLevel]): Array[QuizGroupMemoryLevel] = {
-    val partitionArray = Array.fill(numPartitions)(QuizGroupMemoryLevel())
-    partitions.toArray.copyToArray(partitionArray)
-    partitionArray
-  }
-
-  def toPartitionArray(partitionMap: Map[Int, QuizGroupMemoryLevel]):
-      Array[QuizGroupMemoryLevel] = {
-    val partitionArray = Array.fill(numPartitions)(QuizGroupMemoryLevel())
-    partitionMap.foreach {
-      case (numCorrectAnswers: Int, partition: QuizGroupMemoryLevel) =>
-        partitionArray(numCorrectAnswers) = partition
+  private def toMemLevelList(memLevelMap: Map[Int, QuizGroupMemoryLevel]):
+      List[QuizGroupMemoryLevel] = {
+    // Note: the final "level" is just a resting place for complete items
+    val defaultIntervalList = List(0, 5, 15, 15, 60, 600, 0)
+    defaultIntervalList.zipWithIndex.map {
+      case (level, index) => memLevelMap.get(index).getOrElse(QuizGroupMemoryLevel(level))
     }
-    partitionArray
   }
 
-  val partitionsLens: Lens[QuizGroup, List[QuizGroupMemoryLevel]] = Lens.lensu(
-    get = (_: QuizGroup).partitions,
+  val levelsLens: Lens[QuizGroup, List[QuizGroupMemoryLevel]] = Lens.lensu(
+    get = (_: QuizGroup).levels,
     set = (qGroup: QuizGroup,
-           qPartitions: List[QuizGroupMemoryLevel]) => qGroup.copy(partitions = qPartitions))
+        qLevels: List[QuizGroupMemoryLevel]) => qGroup.copy(levels = qLevels))
+
+  protected[quizgroup] def levelsListLens(memoryLevel: Int) =
+    listNthPLens(memoryLevel) compose levelsLens.partial
 
   val dictionaryLens: Lens[QuizGroup, Dictionary] = Lens.lensu(
       get = (_: QuizGroup).dictionary,
@@ -301,21 +319,24 @@ object QuizGroup extends AppDependencyAccess {
 
     val quizGroupParts = text.split("#quizGroupPartition ")
     val headerLine = quizGroupParts.head
-    val quizGroupPartitions = quizGroupParts.tail
+    val quizGroupLevels = quizGroupParts.tail
 
-    def parsePartitionText(partitionText: String): Pair[Int, QuizGroupMemoryLevel] = {
-      val headerLine = partitionText.takeWhile(_ != '\n')
-      val mainPartitionText = partitionText.dropWhile(_ != '\n').tail
-      val partition = QuizGroupMemoryLevel.fromCustomFormat(mainPartitionText, mainSeparator)
+    def parseMemLevelText(memLevelText: String): Pair[Int, QuizGroupMemoryLevel] = {
+      val headerLine = memLevelText.takeWhile(_ != '\n')
+      val mainMemLevelText = memLevelText.dropWhile(_ != '\n').tail
       val index = StringUtil.parseValue(headerLine,
           "numCorrectResponsesInARow=\"", "\"").getOrElse("0").toInt
-      Pair(index, partition)
+      val repetitionInterval = StringUtil.parseValue(headerLine,
+          "repetitionInterval=\"", "\"").getOrElse("0").toInt
+      val memLevel = QuizGroupMemoryLevel.fromCustomFormat(mainMemLevelText,
+          repetitionInterval, mainSeparator)
+      Pair(index, memLevel)
     }
 
-    val partitionMap = quizGroupPartitions.map(parsePartitionText(_)).toMap
+    val levelsMap = quizGroupLevels.map(parseMemLevelText(_)).toMap
     val userData: QuizGroupUserData = QuizGroupUserData(headerLine)
 
-    QuizGroup.createFromPartitions(partitionMap, userData)
+    QuizGroup.createFromMemLevels(levelsMap, userData)
   }
 }
 

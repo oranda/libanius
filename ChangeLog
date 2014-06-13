@@ -1,3 +1,10 @@
+== 0.97 June 13 2014
+
+  * Memory Levels will now adapt their intervals based on user performance.
+
+  * Moved useMultipleChoiceUntil from global configuration to be tied to individual quiz groups.
+
+
 == 0.96 March 2 2014
 
   * Removed SearchResultsContainer in favour of just returning a Try.

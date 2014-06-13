@@ -28,13 +28,16 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import scalaz._
 import scalaz.std.set
 import scalaz.Scalaz._
-import com.oranda.libanius.model.{MemoryLevels, UserResponses, ModelComponent, UserResponse}
+import com.oranda.libanius.model.{UserResponses, ModelComponent}
 import scala._
 import scala.collection.immutable.Stream
 import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
 import java.lang.StringBuilder
 import com.oranda.libanius.util.StringSplitter
+import scalaz.PLens._
+import scala.Some
+import com.oranda.libanius.model.UserResponse
 
 /*
  * QuizGroupMemoryLevel: a partition of a QuizGroup, containing quiz items which have
@@ -42,8 +45,9 @@ import com.oranda.libanius.util.StringSplitter
  * (A ListMap was formerly used to store quiz items but this was found to be too
  * slow for bulk insert. Currently a Stream is used.)
  */
-case class QuizGroupMemoryLevel(quizItemStream: Stream[QuizItem] = Stream.empty)
-    extends ModelComponent {
+case class QuizGroupMemoryLevel(repetitionInterval: Int,
+    quizItemStream: Stream[QuizItem] = Stream.empty, totalResponses: Int = 0,
+    numCorrectResponses: Int = 0) extends ModelComponent {
 
   lazy val quizItems = quizItemStream.toList
 
@@ -124,18 +128,13 @@ case class QuizGroupMemoryLevel(quizItemStream: Stream[QuizItem] = Stream.empty)
   protected[quizgroup] def findQuizItem(prompt: String, response: String): Option[QuizItem] =
     quizItems.find(_.samePromptAndResponse(QuizItem(prompt, response)))
 
-  protected[quizgroup] def findAnyUnfinishedQuizItem(numCorrectResponsesRequired: Int):
-      Option[QuizItem] =
-    (for {
-      quizItem <- quizItems.toStream
-      if quizItem.userResponses.isUnfinished(numCorrectResponsesRequired)
-    } yield quizItem).headOption
+  protected[quizgroup] def findAnyUnfinishedQuizItem: Option[QuizItem] =
+    quizItems.headOption
 
-  def findPresentableQuizItem(currentPromptNumber: Int)(implicit ml: MemoryLevels):
-      Option[QuizItem] =
+  def findPresentableQuizItem(currentPromptNumber: Int): Option[QuizItem] =
     (for {
       quizItem <- quizItems.toStream
-      if quizItem.isPresentable(currentPromptNumber)
+      if quizItem.isPresentable(currentPromptNumber, repetitionInterval)
     } yield quizItem).headOption
 
   protected[quizgroup] def constructWrongChoicesSimilar(correctResponses: List[String],
@@ -184,9 +183,50 @@ case class QuizGroupMemoryLevel(quizItemStream: Stream[QuizItem] = Stream.empty)
       quizItems.slice(randomStart, randomStart + sliceSize)
     }
 
+
+  override def toString =
+    repetitionInterval + ":" + numCorrectResponses + "/" + totalResponses + ": " +
+    quizItems.map(_.prompt)
+
+  def isAtLimit = totalResponses >= QuizGroupMemoryLevel.totalResponsesLimit
+
+  def inc(isCorrect: Boolean) = {
+    val numCorrectToAdd = if (isCorrect) 1 else 0
+    // For each memory level, only check the recent performance. Reset the counters after a limit.
+    if (!isAtLimit)
+      QuizGroupMemoryLevel(repetitionInterval, quizItemStream, totalResponses + 1,
+          numCorrectResponses + numCorrectToAdd)
+    else // reset the counters
+      QuizGroupMemoryLevel(repetitionInterval, quizItemStream, 1, numCorrectToAdd)
+  }
+
+  def wasNotTooRecentlyUsed(currentPromptNum : Int, promptNumInMostRecentResponse: Option[Int]) =
+    promptNumInMostRecentResponse.forall {
+      case promptNumInMostRecentResponse =>
+        val diffInPromptNum = currentPromptNum - promptNumInMostRecentResponse
+        diffInPromptNum >= repetitionInterval
+    }
+
+  def updatedInterval: Int = {
+    def modifyBy(anInt: Int, aReal: Double) =
+      if (totalResponses <= 5)
+        repetitionInterval + anInt
+      else
+        (repetitionInterval * (1 + aReal)).toInt
+
+    math.max(0,
+      if (numCorrectResponses < 7)
+        modifyBy(-1, -0.2)
+      else if (numCorrectResponses > 8)
+        modifyBy(1, 0.2)
+      else
+        repetitionInterval
+    )
+  }
+
   def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String, index: Int) = {
-    if (!quizItems.isEmpty)
-      strBuilder.append("#quizGroupPartition numCorrectResponsesInARow=\"" + index + "\"" + '\n')
+    strBuilder.append("#quizGroupPartition numCorrectResponsesInARow=\"" + index +
+        "\" repetitionInterval=\"" + repetitionInterval + "\"" + '\n')
     for (quizItem <- quizItems.toStream) {
       quizItem.toCustomFormat(strBuilder, mainSeparator)
       strBuilder.append('\n')
@@ -206,11 +246,17 @@ object QuizGroupMemoryLevel extends AppDependencyAccess {
       List[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
 
+  val totalResponsesLimit = 10
+
+  val intervalLens: Lens[QuizGroupMemoryLevel, Int] = Lens.lensu(
+    get = (_: QuizGroupMemoryLevel).repetitionInterval,
+    set = (qgml: QuizGroupMemoryLevel, ri: Int) => qgml.copy(repetitionInterval = ri))
 
   /*
    * Text does not include header line
    */
-  def fromCustomFormat(text: String, mainSeparator: String): QuizGroupMemoryLevel = {
+  def fromCustomFormat(text: String, repetitionInterval: Int,
+      mainSeparator: String): QuizGroupMemoryLevel = {
 
     def parseQuizItem(strPromptResponse: String): Option[QuizItem] = {
       Try(Some(QuizItem.fromCustomFormat(strPromptResponse, mainSeparator))).recover {
@@ -234,6 +280,6 @@ object QuizGroupMemoryLevel extends AppDependencyAccess {
     lineSplitter.setString(text)
     val quizItems = parseQuizItems(lineSplitter)
 
-    QuizGroupMemoryLevel(quizItems)
+    QuizGroupMemoryLevel(repetitionInterval, quizItems)
   }
 }

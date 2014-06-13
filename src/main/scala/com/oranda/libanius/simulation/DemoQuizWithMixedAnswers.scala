@@ -18,14 +18,26 @@
 
 package com.oranda.libanius.simulation
 
+import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import com.oranda.libanius.model.Quiz
-import com.oranda.libanius.dependencies.AppDependencyAccess
 
-trait DemoQuiz extends Simulation {
+object DemoQuizWithMixedAnswers extends App with DemoQuiz {
 
-  protected def runQuiz() {
+  runQuiz()
 
-    val quiz = Quiz.demoQuiz()
-    testAllQuizItems(quiz)
-  }
+  /**
+   * Give wrong and right answers according to a schedule, changing the pattern every
+   * hundred prompts, and keep cycling.
+   */
+  override def makeResponse(quizItem: QuizItemViewWithChoices, quiz: Quiz,
+      responsesProcessed: Long): String =
+    (responsesProcessed / 100) % 3 match {
+      // intervals should stay about the same
+      case 0 => if (responsesProcessed % 10 < 8) quizItem.correctResponse.value else "wrong"
+      // intervals should narrow
+      case 1 => if (responsesProcessed % 10 < 5) quizItem.correctResponse.value else "wrong2"
+      // intervals should widen
+      case 2 => quizItem.correctResponse.value
+    }
+
 }

@@ -25,16 +25,20 @@ import java.lang.StringBuilder
 import com.oranda.libanius.model.ModelComponent
 
 case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
-    responseType: String, mainSeparator: String) extends ModelComponent {
+    responseType: String, mainSeparator: String, useMultipleChoiceUntil: Int)
+  extends ModelComponent {
   // promptType example: "English word"
   // responseType example: "German word"
 
   override def toString = quizGroupType + ": " + promptType + "-" + responseType
 
   def toCustomFormat(strBuilder: StringBuilder) =
-    strBuilder.append("#quizGroup type=\"").append(quizGroupType).append("\" promptType=\"").
-        append(promptType).append("\" responseType=\"").append(responseType).
-        append("\" mainSeparator=\"").append(mainSeparator).append("\"")
+    strBuilder.append("#quizGroup type=\"").append(quizGroupType).
+        append("\" promptType=\""). append(promptType).
+        append("\" responseType=\"").append(responseType).
+        append("\" mainSeparator=\"").append(mainSeparator).
+        append("\" useMultipleChoiceUntil=\"").append(useMultipleChoiceUntil).
+        append("\"")
 
   def matches(other: QuizGroupHeader) =
     promptType == other.promptType && responseType == other.responseType
@@ -42,7 +46,8 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
   def makeQgFileName = promptType + "-" + responseType + ".qgr"
   def makeDictFileName = promptType + "-" + responseType + ".dct"
 
-  def reverse = QuizGroupHeader(quizGroupType, responseType, promptType, mainSeparator)
+  def reverse = QuizGroupHeader(quizGroupType, responseType, promptType, mainSeparator,
+      useMultipleChoiceUntil)
 
   def createQuizGroup(text: String): QuizGroup =
     QuizGroupWithHeader.fromCustomFormat(text, mainSeparator).quizGroup
@@ -52,7 +57,8 @@ object QuizGroupHeader extends AppDependencyAccess {
 
   def apply(headerLine: String): QuizGroupHeader =
     this(parseQuizGroupType(headerLine), parsePromptType(headerLine),
-        parseResponseType(headerLine), parseMainSeparator(headerLine))
+        parseResponseType(headerLine), parseMainSeparator(headerLine),
+        parseUseMultipleChoiceUntil(headerLine))
 
   def parseQuizGroupType(str: String): QuizGroupType =
     quizGroupType(StringUtil.parseValue(str, "type=\"", "\"").getOrElse(""))
@@ -71,6 +77,8 @@ object QuizGroupHeader extends AppDependencyAccess {
     StringUtil.parseValue(str, "responseType=\"", "\"").getOrElse("")
   def parseMainSeparator(str: String): String =
     StringUtil.parseValue(str, "mainSeparator=\"", "\"").getOrElse("|")
+  def parseUseMultipleChoiceUntil(str: String): Int =
+    StringUtil.parseValue(str, "useMultipleChoiceUntil=\"", "\"").getOrElse("4").toInt
 
 }
 

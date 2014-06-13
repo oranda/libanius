@@ -19,7 +19,7 @@
 package com.oranda.libanius.model.quizitem
 
 import scala.util.Random
-import com.oranda.libanius.model.{MemoryLevels, UserResponses}
+import com.oranda.libanius.model.UserResponses
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
@@ -31,8 +31,10 @@ case class QuizItemViewWithChoices(
     val quizItem: QuizItem,
     val qgCurrentPromptNumber: Int,
     val quizGroupHeader: QuizGroupHeader,
-    val falseAnswers: Set[String],
-    val numCorrectAnswersInARow: Int) {
+    val falseAnswers: List[String],
+    val numCorrectResponsesInARow: Int,
+    val numCorrectResponsesRequired: Int,
+    val useMultipleChoice: Boolean) {
 
   lazy val prompt = quizItem.prompt
   lazy val correctResponse = quizItem.correctResponse
@@ -41,21 +43,10 @@ case class QuizItemViewWithChoices(
 
   lazy val allChoices: List[String] = choicesInRandomOrder(quizItem.userResponses, falseAnswers)
 
-  def isComplete(implicit ml: MemoryLevels) = quizItem.isComplete
+  def isComplete = numCorrectResponsesInARow >= numCorrectResponsesRequired
 
-  def choicesInRandomOrder(quizValue: UserResponses, otherChoices: Set[String]): List[String] = {
-    val allChoices = otherChoices + quizItem.correctResponse.value
-    Random.shuffle(allChoices.toList)
+  def choicesInRandomOrder(quizValue: UserResponses, otherChoices: List[String]): List[String] = {
+    val allChoices = quizItem.correctResponse.value :: otherChoices
+    Random.shuffle(allChoices)
   }
-
-  /*
-   * A quiz item might be presented initially in multiple-choice format,
-   * then later wihout any such assistance.
-   */
-  def useMultipleChoice = QuizItemViewWithChoices.useMultipleChoice(numCorrectAnswersInARow)
-}
-
-object QuizItemViewWithChoices extends AppDependencyAccess {
-  def useMultipleChoice(numCorrectAnswersInARow: Int) =
-    numCorrectAnswersInARow < conf.useMultipleChoiceUntil
 }

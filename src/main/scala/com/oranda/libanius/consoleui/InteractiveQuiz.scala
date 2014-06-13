@@ -46,11 +46,8 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   def testUserWithQuizItem(quiz: Quiz) {
     showScore(quiz)
     Util.stopwatch(quiz.findPresentableQuizItem, "find quiz items") match {
-      case (Some((quizItem, qgWithHeader))) =>
-        val updatedQuiz = quiz.updatedPromptNumber(qgWithHeader)
-        keepShowingQuizItems(updatedQuiz, quizItem)
-      case _ =>
-        output("No more questions found! Done!")
+      case (Some((quizItem, qgWithHeader))) => keepShowingQuizItems(quiz, quizItem)
+      case _ => output("No more questions found! Done!")
     }
   }
 
@@ -60,9 +57,8 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
         output("Invalid input\n")
         keepShowingQuizItems(updatedQuiz, quizItem)
       case (Quit, updatedQuiz) =>
-        output("Exiting")
+        output("Exiting... .")
         saveQuiz(updatedQuiz)
-        System.exit(0)
       case (_, updatedQuiz) =>
         testUserWithQuizItem(updatedQuiz)
     }
@@ -82,10 +78,10 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
       (UserConsoleResponse, Quiz) = {
     val wordText = ": what is the " + quizItem.responseType + " for this " +
         quizItem.promptType + "?"
-    val answeredText = " (correctly answered " + quizItem.numCorrectAnswersInARow + " times)"
-    val questionText = quizItem.prompt +
+    val answeredText = " (correctly answered " + quizItem.numCorrectResponsesInARow + " times)"
+    val questionText = quizItem.qgCurrentPromptNumber + ": " + quizItem.prompt +
         (if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else "") +
-        (if (quizItem.numCorrectAnswersInARow > 0) answeredText else "")
+        (if (quizItem.numCorrectResponsesInARow > 0) answeredText else "")
     output(questionText + "\n")
 
     if (quizItem.useMultipleChoice) showChoicesAndProcessResponse(quiz, quizItem)
@@ -103,10 +99,12 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   }
 
   def getTextResponseAndProcess(quiz: Quiz, quizItem: QuizItemViewWithChoices):
-      (UserConsoleResponse, Quiz) =
+      (UserConsoleResponse, Quiz) = {
+    output("(Not multiple choice. Type it in.)")
     Try(getAnswerFromInput).recover {
       case e: Exception => Invalid
     }.map(userResponse => processAnswer(quiz, userResponse, quizItem)).get
+  }
 
   def processAnswer(quiz: Quiz, userResponse: UserConsoleResponse,
       quizItem: QuizItemViewWithChoices): (UserConsoleResponse, Quiz) = {
