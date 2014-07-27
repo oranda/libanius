@@ -19,15 +19,18 @@
 package com.oranda.libanius.model.quizgroup
 
 import scala.language.implicitConversions
-import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices}
+import com.oranda.libanius.model.quizitem.{QuizItem}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.util.Util
+import com.oranda.libanius.model.{ParamsDefault, CustomFormatForModelComponents, CustomFormat, ModelComponent}
+import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
+import java.lang.StringBuilder
 
 /*
  * Convenience class for passing around a key-value pair from the Quiz.quizGroups map.
  */
 case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
-    extends AppDependencyAccess {
+    extends ModelComponent {
   def toPair = Pair(header, quizGroup)
 
   def findPresentableQuizItem: Option[QuizItemViewWithChoices] =
@@ -52,6 +55,12 @@ case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
     new QuizItemViewWithChoices(quizItem, quizGroup.currentPromptNumber,
         header, falseAnswers, numCorrectResponses, numCorrectResponsesRequired,
         useMultipleChoice)
+  }
+
+  def toCustomFormat: String = {
+    import CustomFormat._
+    import CustomFormatForModelComponents._
+    to(this, new ParamsDefault(new StringBuilder)).toString
   }
 }
 

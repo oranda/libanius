@@ -58,7 +58,6 @@ case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
         diffInPromptNum >= repetitionInterval
     }
 
-  
   def numCorrectResponsesInARow = correctResponsesInARow.length
   
   def promptNumInMostRecentResponse: Option[Int] =
@@ -68,17 +67,6 @@ case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
   def updated(correctResponsesInARow: List[UserResponse], incorrectResponses: List[UserResponse]):
       UserResponses =
     UserResponses(correctResponsesInARow, incorrectResponses)
-
-  // Example: nachlösen:1,7,9;6
-  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String): StringBuilder = {
-    if (!correctResponsesInARow.isEmpty)
-      StringUtil.mkString(strBuilder, correctResponsesInARow, responsePromptNumber, ',')
-    if (!incorrectResponses.isEmpty) {
-      strBuilder.append(';')
-      StringUtil.mkString(strBuilder, incorrectResponses, responsePromptNumber, ',')
-    }
-    strBuilder
-  }
 
   def responsePromptNumber(strBuilder: StringBuilder, response: UserResponse) =
     strBuilder.append(response.promptNumber)

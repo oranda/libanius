@@ -22,105 +22,13 @@ import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.QuizItem
 
-import com.oranda.libanius.model.UserResponse
-import com.oranda.libanius.model.wordmapping.Dictionary
 import com.oranda.libanius.util.Util
+
+import com.oranda.libanius.model.TestData._
 
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
   "a quiz group" should {
-
-    val qgCustomFormat =
-        "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" useMultipleChoiceUntil=\"4\" currentPromptNumber=\"10\" isActive=\"true\"\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-        "en route|unterwegs|\n" +
-        "full|satt|\n" +
-        "full|voll|\n" +
-        "interrupted|unterbrochen|\n" +
-        "contract|Vertrag|\n" +
-        "rides|reitet|\n" +
-        "on|auf|\n" +
-        "sweeps|streicht|\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"5\"\n" +
-        "entertain|unterhalten|8;2\n" +
-        "winner|Siegerin|5;0\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"15\"\n" +
-        "against|wider|9,7;6\n" +
-        "teach|unterrichten|4,3;1\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"3\" repetitionInterval=\"15\"\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"4\" repetitionInterval=\"60\"\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"5\" repetitionInterval=\"600\"\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"6\" repetitionInterval=\"0\"\n"
-
-    def makeQgMemLevel0: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
-        QuizItem("en route", "unterwegs"),
-        QuizItem("full", "satt"),
-        QuizItem("full", "voll"),
-        QuizItem("interrupted", "unterbrochen"),
-        QuizItem("contract", "Vertrag"),
-        QuizItem("rides", "reitet"),
-        QuizItem("on", "auf"),
-        QuizItem("sweeps", "streicht")).toStream)
-
-    def makeQgMemLevel1: QuizGroupMemoryLevel = QuizGroupMemoryLevel(5, List(
-        QuizItem("entertain", "unterhalten", List(8), List(2)),
-        QuizItem("winner", "Siegerin", List(5), List(0))).toStream)
-
-    def makeQgMemLevel2: QuizGroupMemoryLevel = QuizGroupMemoryLevel(15, List(
-        QuizItem("against", "wider", List(9, 7), List(6)),
-        QuizItem("teach", "unterrichten", List(4, 3), List(1))).toStream)
-
-    def makeQuizGroup = QuizGroup(
-        Map(0 -> makeQgMemLevel0, 1-> makeQgMemLevel1, 2-> makeQgMemLevel2),
-        QuizGroupUserData(true, 10), new Dictionary())
-    val quizGroup = makeQuizGroup
-
-    def makeSimpleQuizGroup = QuizGroup(Map(0 -> makeQgMemLevel0), QuizGroupUserData(true, 0))
-    val quizGroupSimple = makeSimpleQuizGroup
-
-    def makeQgwh(quizGroup: QuizGroup): QuizGroupWithHeader = {
-      val header = QuizGroupHeader(WordMapping, "English word", "German word", "|", 4)
-      QuizGroupWithHeader(header, quizGroup)
-    }
-    val qgwh: QuizGroupWithHeader = makeQgwh(quizGroup)
-
-    def makeQgWithHeader: QuizGroupWithHeader = makeQgwh(makeQuizGroup)
-    def makeSimpleQgWithHeader: QuizGroupWithHeader = makeQgwh(makeSimpleQuizGroup)
-
-    val qgwhSimple: QuizGroupWithHeader = makeSimpleQgWithHeader
-
-    // defaults for read-only
-    val qgWithHeader = makeQgWithHeader
-
-    def updatedWithUserResponse(qg: QuizGroup, quizItem: QuizItem): QuizGroup = {
-      val userResponse = new UserResponse(qg.currentPromptNumber)
-      val wasCorrect = true
-      val quizItemUpdated = quizItem.updatedWithUserResponse(
-          quizItem.correctResponse, wasCorrect, userResponse)
-      val prevMemLevel = quizItemUpdated.numCorrectResponsesInARow
-      qg.updateWithQuizItem(quizItemUpdated, wasCorrect, prevMemLevel)
-    }
-
-    def pullQuizItemAndAnswerCorrectly(qgwh: QuizGroupWithHeader): QuizGroupWithHeader = {
-      val quizItem = qgwh.findPresentableQuizItem.get.quizItem
-      QuizGroupWithHeader(qgwh.header, updatedWithUserResponse(qgwh.quizGroup, quizItem))
-    }
-
-    "be parseable from custom format" in {
-      qgWithHeader.currentPromptNumber mustEqual 10
-      qgWithHeader.promptType mustEqual "English word"
-      qgWithHeader.responseType mustEqual "German word"
-
-      qgWithHeader.levels(0).size mustEqual 8
-      qgWithHeader.levels(1).size mustEqual 2
-      qgWithHeader.levels(2).size mustEqual 2
-    }
-
-    "be serializable to custom format" in {
-      val customFormat = qgWithHeader.quizGroup.toCustomFormat(new java.lang.StringBuilder(),
-          qgWithHeader.header)
-      customFormat.toString mustEqual qgCustomFormat
-    }
 
     "find values for a prompt" in {
       qgWithHeader.findResponsesFor("on") mustEqual List("auf")

@@ -22,53 +22,17 @@ import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 
-import com.oranda.libanius.model.{UserResponse, UserResponses}
-import java.lang.StringBuilder
+import com.oranda.libanius.model._
+import com.oranda.libanius.model.UserResponse
+import TestData._
 
 class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
   "a quiz group memory level" should {
 
-    /*
-     * Construct a quiz group partition.
-     */
-    def makeQgMemLevel: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
-        QuizItem("against", "wider"),
-        QuizItem("entertain", "unterhalten"),
-        QuizItem("teach", "unterrichten"),
-        QuizItem("winner", "Siegerin"),
-        QuizItem("en route", "unterwegs"),
-        QuizItem("full", "satt"),
-        QuizItem("full", "voll"),
-        QuizItem("interrupted", "unterbrochen"),
-        QuizItem("contract", "Vertrag"),
-        QuizItem("rides", "reitet"),
-        QuizItem("on", "auf"),
-        QuizItem("sweeps", "streicht")).toStream)
-
-    def makeQgMemLevelSimple: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
-        QuizItem("against", "wider"),
-        QuizItem("entertain", "unterhalten")).toStream)
-
-
-    // defaults for read-only
-    val qgMemLevel = makeQgMemLevel
-    val qgMemLevelSimple = makeQgMemLevelSimple
-
-    val qgMemLevelSimpleCustomFormat =
-        "against|wider|\n" +
-        "entertain|unterhalten|\n"
-
     "be parseable from custom format" in {
       val qgml = QuizGroupMemoryLevel.fromCustomFormat(qgMemLevelSimpleCustomFormat, 0, "|")
       qgml.numQuizItems mustEqual 2
-    }
-
-    "be serializable to custom format" in {
-      val customFormat = qgMemLevelSimple.toCustomFormat(new StringBuilder(), "|", 0)
-      customFormat.toString mustEqual
-          "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-                qgMemLevelSimpleCustomFormat
     }
 
     "find values for a prompt" in {

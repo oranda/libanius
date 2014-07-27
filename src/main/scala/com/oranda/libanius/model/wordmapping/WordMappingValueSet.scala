@@ -21,12 +21,10 @@ package com.oranda.libanius.model.wordmapping
 import scala.util.Try
 import scala.collection.mutable.ListBuffer
 
-import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.{ValueSet, ModelComponent}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
-import java.lang.StringBuilder
 import scala.language.implicitConversions
 
 /*
@@ -48,15 +46,6 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil)
   def removeValue(value: String) = filterOut(value)
 
   override def toString = values.map(_.value).mkString(", ")
-
-  // Example: contract:696,697;698/treaty:796;798
-  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String) = {
-
-    def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue): StringBuilder =
-      wmv.toCustomFormat(strBuilder, mainSeparator)
-
-    StringUtil.mkString(strBuilder, values, wmvToCustomFormat, '/')
-  }
 
   def strings: Iterable[String] = values.map(_.value)
 

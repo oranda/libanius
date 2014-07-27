@@ -232,26 +232,6 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
       this
 
   protected[model] def get(level: Int): QuizGroupMemoryLevel = levels(level)
-
-  /*
-   * Example of custom format:
-   *
-   * quizGroup type="WordMapping" promptType="English word" responseType="German word" currentPromptNumber="0" isActive="true"
-   *    against|wider
-   *    entertain|unterhalten
-   */
-  def toCustomFormat(strBuilder: StringBuilder, header: QuizGroupHeader): StringBuilder = {
-    userData.toCustomFormat(header.toCustomFormat(strBuilder))
-    strBuilder.append('\n')
-    toCustomFormat(strBuilder, header.mainSeparator)
-    strBuilder
-  }
-
-  private def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String): StringBuilder = {
-    for (memLevel <- levels.zipWithIndex.toStream)
-      memLevel._1.toCustomFormat(strBuilder, mainSeparator, memLevel._2)
-    strBuilder
-  }
 }
 
 import com.oranda.libanius.model.UserResponse

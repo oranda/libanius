@@ -21,7 +21,6 @@ package com.oranda.libanius.model.quizgroup
 import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
-import java.lang.StringBuilder
 import com.oranda.libanius.model.ModelComponent
 
 case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
@@ -31,14 +30,6 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
   // responseType example: "German word"
 
   override def toString = quizGroupType + ": " + promptType + "-" + responseType
-
-  def toCustomFormat(strBuilder: StringBuilder) =
-    strBuilder.append("#quizGroup type=\"").append(quizGroupType).
-        append("\" promptType=\""). append(promptType).
-        append("\" responseType=\"").append(responseType).
-        append("\" mainSeparator=\"").append(mainSeparator).
-        append("\" useMultipleChoiceUntil=\"").append(useMultipleChoiceUntil).
-        append("\"")
 
   def matches(other: QuizGroupHeader) =
     promptType == other.promptType && responseType == other.responseType

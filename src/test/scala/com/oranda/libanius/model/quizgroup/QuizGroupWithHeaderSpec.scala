@@ -16,21 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.model.wordmapping
+package com.oranda.libanius.model.quizgroup
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.dependencies.{AppDependencyAccess}
-import com.oranda.libanius.model.TestData._
 
-class WordMappingValueSpec extends Specification with AppDependencyAccess {
+import com.oranda.libanius.model.TestData
+import TestData._
 
-  "a word-mapping value" should {
+class QuizGroupWithHeaderSpec extends Specification {
+
+  "a quiz group with header" should {
 
     "be parseable from custom format" in {
-      wmv.value mustEqual "nachlösen"
-      wmv.userAnswers.length mustEqual 3
-      wmv.numCorrectAnswersInARow mustEqual 2
+      qgWithHeader.currentPromptNumber mustEqual 10
+      qgWithHeader.promptType mustEqual "English word"
+      qgWithHeader.responseType mustEqual "German word"
+
+      qgWithHeader.levels(0).size mustEqual 8
+      qgWithHeader.levels(1).size mustEqual 2
+      qgWithHeader.levels(2).size mustEqual 2
     }
   }
-  
 }

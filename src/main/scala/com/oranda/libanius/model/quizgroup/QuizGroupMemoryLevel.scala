@@ -28,7 +28,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import scalaz._
 import scalaz.std.set
 import scalaz.Scalaz._
-import com.oranda.libanius.model.{UserResponses, ModelComponent}
+import com.oranda.libanius.model._
 import scala._
 import scala.collection.immutable.Stream
 import scala.collection.immutable.List
@@ -222,16 +222,6 @@ case class QuizGroupMemoryLevel(repetitionInterval: Int,
       else
         repetitionInterval
     )
-  }
-
-  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String, index: Int) = {
-    strBuilder.append("#quizGroupPartition numCorrectResponsesInARow=\"" + index +
-        "\" repetitionInterval=\"" + repetitionInterval + "\"" + '\n')
-    for (quizItem <- quizItems.toStream) {
-      quizItem.toCustomFormat(strBuilder, mainSeparator)
-      strBuilder.append('\n')
-    }
-    strBuilder
   }
 }
 

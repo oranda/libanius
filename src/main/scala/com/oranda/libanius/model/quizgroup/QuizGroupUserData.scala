@@ -20,22 +20,13 @@ package com.oranda.libanius.model.quizgroup
 
 import scala.util.Try
 import com.oranda.libanius.util.StringUtil
-import java.lang.StringBuilder
 
 import scalaz._
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.ModelComponent
 
 case class QuizGroupUserData(isActive: Boolean = false, currentPromptNumber: Int = 0)
-    extends ModelComponent {
-
-  def toCustomFormat(strBuilder: StringBuilder) = {
-    strBuilder.append(" currentPromptNumber=\"").
-        append(currentPromptNumber).append("\"").append(" isActive=\"").
-        append(isActive).append("\"")
-    strBuilder
-  }
-}
+    extends ModelComponent
 
 object QuizGroupUserData extends AppDependencyAccess {
 

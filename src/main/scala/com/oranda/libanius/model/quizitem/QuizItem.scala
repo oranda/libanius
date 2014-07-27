@@ -53,13 +53,6 @@ case class QuizItem(prompt: TextValue, correctResponse: TextValue,
     val userResponsesUpdated = userResponses.add(userResponse, wasCorrect)
     QuizItem(prompt, response, userResponsesUpdated)
   }
-
-  def toCustomFormat(strBuilder: java.lang.StringBuilder, mainSeparator: String) = {
-    strBuilder.append(prompt).append(mainSeparator).append(correctResponse).
-        append(mainSeparator)
-    userResponses.toCustomFormat(strBuilder, mainSeparator)
-    strBuilder
-  }
 }
 
 object QuizItem {

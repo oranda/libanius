@@ -23,10 +23,8 @@ import scala.collection.immutable.Set
 import scala.util.Try
 import com.oranda.libanius.io.{DefaultIO, PlatformIO}
 import com.oranda.libanius.model.wordmapping.Dictionary
-import com.oranda.libanius.model.Quiz
-import java.lang.StringBuilder
-import com.oranda.libanius.model.quizgroup.{QuizGroupHeader, QuizGroup}
-import scala.Some
+import com.oranda.libanius.model._
+import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup}
 
 class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
@@ -83,10 +81,12 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
     def saveToFile(header: QuizGroupHeader, quizGroup: QuizGroup) = {
       val fileName = header.makeQgFileName
-      val serialized = quizGroup.toCustomFormat(new StringBuilder, header)
+      val qgwh = QuizGroupWithHeader(header, quizGroup)
+      val serialized = qgwh.toCustomFormat
+
       l.log("Saving quiz group " + header.promptType + ", quiz group has promptNumber " +
-        quizGroup.currentPromptNumber + " to " + fileName)
-      io.writeToFile(path + fileName, serialized.toString)
+          quizGroup.currentPromptNumber + " to " + fileName)
+      io.writeToFile(path + fileName, serialized)
     }
     quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg) }
   }

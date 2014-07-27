@@ -18,8 +18,7 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.model.UserResponse
-import com.oranda.libanius.util.StringUtil
+import com.oranda.libanius.model.{ModelComponent, UserResponse}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem, Value}
 
@@ -28,7 +27,7 @@ import java.lang.StringBuilder
 case class WordMappingValue(override val value: String,
     correctAnswersInARow: List[UserResponse] = Nil,
     incorrectAnswers: List[UserResponse] = Nil)
-  extends Value[String](value) {
+  extends Value[String](value) with ModelComponent {
 
   def updated(correctAnswersInARow: List[UserResponse], incorrectAnswers: List[UserResponse]):
       WordMappingValue =
@@ -45,21 +44,6 @@ case class WordMappingValue(override val value: String,
   def userAnswers = correctAnswersInARow ++ incorrectAnswers
 
   def numCorrectAnswersInARow = correctAnswersInARow.size
-
-  // Example: nachlösen:1,7,9;6
-  def toCustomFormat(strBuilder: StringBuilder, mainSeparator: String): StringBuilder = {
-    strBuilder.append(value)
-
-    if (!correctAnswersInARow.isEmpty || !incorrectAnswers.isEmpty)
-      strBuilder.append(mainSeparator)
-    if (!correctAnswersInARow.isEmpty)
-      StringUtil.mkString(strBuilder, correctAnswersInARow, answerPromptNumber, ',')
-    if (!incorrectAnswers.isEmpty) {
-      strBuilder.append(';')
-      StringUtil.mkString(strBuilder, incorrectAnswers, answerPromptNumber, ',')
-    }
-    strBuilder
-  }
 
   def answerPromptNumber(strBuilder: StringBuilder, answer: UserResponse) =
     strBuilder.append(answer.promptNumber)

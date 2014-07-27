@@ -20,23 +20,11 @@ package com.oranda.libanius.model.quizitem
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.{UserResponses, UserResponse}
+import com.oranda.libanius.model.TestData._
 
 class QuizItemSpec extends Specification with AppDependencyAccess {
 
   "a quiz item" should {
-
-    val correctAnswersInARow = List(UserResponse(9), UserResponse(7))
-    val incorrectAnswers = List(UserResponse(6))
-    val userResponses = UserResponses(correctAnswersInARow, incorrectAnswers)
-    val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponses)
-
-    val quizItemCustomFormat = "solve|nachlösen|9,7;6"
-
-    "be serializable to custom format" in {
-      val customFormat = quizItem.toCustomFormat(new java.lang.StringBuilder(), "|")
-      customFormat.toString mustEqual quizItemCustomFormat
-    }
 
     "be parseable from custom format with the standard separator" in {
       val quizItemStr = "on|auf|"
