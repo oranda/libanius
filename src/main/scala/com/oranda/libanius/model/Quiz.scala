@@ -270,8 +270,10 @@ object Quiz extends AppDependencyAccess {
 
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
-    val qgsWithHeader: Iterable[QuizGroupWithHeader] =
-        quizGroupsData.map(QuizGroupWithHeader.fromCustomFormat(_) )
+    import CustomFormat._
+    import CustomFormatForModelComponents.customFormatQuizGroupWithHeader
+    val qgsWithHeader: Iterable[QuizGroupWithHeader] = quizGroupsData.map(
+        from(_, FromParamsWithSeparator("|")))
     Quiz(qgsWithHeader.map(
         qgWithHeader => Pair(qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }

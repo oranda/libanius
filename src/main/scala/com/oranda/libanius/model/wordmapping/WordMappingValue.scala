@@ -64,43 +64,4 @@ object WordMappingValue extends AppDependencyAccess {
     WordMappingValue(quizItem.correctResponse.toString,
         quizItem.userResponses.correctResponsesInARow,
         quizItem.userResponses.incorrectResponses)
-
-  // Example: text = "nachlösen|1,7,9;6"
-  def fromCustomFormat(str: String, mainSeparator: String): WordMappingValue = {
-
-    import com.oranda.libanius.util.StringUtil.RichString
-    str.optionalIndex(mainSeparator) match {
-      case Some(index) =>
-        val strResponse = str.substring(0, index)
-        val strAllAnswers = str.substring(index + mainSeparator.length)
-
-        val wmv = WordMappingValue(strResponse.trim)
-        if (strAllAnswers.isEmpty)
-          wmv
-        else {
-          val (correctAnswers, incorrectAnswers) = parseAnswers(strAllAnswers)
-          wmv.addUserAnswersBatch(correctAnswers, incorrectAnswers)
-        }
-      case None => WordMappingValue(str.trim)
-    }
-  }
-
-  private def parseAnswers(strAllAnswers: String): (List[String], List[String]) = {
-    // This code needs to be both fast and thread-safe so special "splitters" are used.
-    val allAnswersSplitter = stringSplitterFactory.getSplitter(';')
-    val answersSplitter = stringSplitterFactory.getSplitter(',')
-    allAnswersSplitter.setString(strAllAnswers)
-
-    val correctPromptNums = allAnswersSplitter.next
-    answersSplitter.setString(correctPromptNums)
-    val correctAnswers = answersSplitter.toList
-    val incorrectAnswers =
-      if (allAnswersSplitter.hasNext) {
-        val incorrectPromptNums = allAnswersSplitter.next
-        answersSplitter.setString(incorrectPromptNums)
-        answersSplitter.toList
-      } else
-        Nil
-    (correctAnswers, incorrectAnswers)
-  }
 }

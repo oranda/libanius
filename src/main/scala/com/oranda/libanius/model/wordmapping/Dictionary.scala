@@ -21,7 +21,6 @@ package com.oranda.libanius.model.wordmapping
 import scala.collection.JavaConversions.mapAsScalaMap
 
 import scala.collection.immutable.Stream
-import scala.util.Try
 import com.oranda.libanius.model.{SearchResultPair, ModelComponent, SearchResult}
 import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader}
 import com.oranda.libanius.model.quizitem.QuizItem
@@ -71,45 +70,6 @@ object Dictionary {
     }
 
   def fromQuizGroup(quizGroup: QuizGroup): Dictionary = fromQuizItems(quizGroup.quizItems)
-
-  /*
-   * Example:
-   *
-   * quizGroup type="WordMapping" promptType="English word" responseType="German word"
-   *    against|wider
-   *    entertain|unterhalten
-   */
-  def fromCustomFormat(str: String): Dictionary =
-
-    new Dictionary() {
-
-      def parseCustomFormat = {
-
-        val splitterLineBreak = stringSplitterFactory.getSplitter('\n')
-        val splitterKeyValue = stringSplitterFactory.getSplitter('|')
-
-        splitterLineBreak.setString(str)
-        splitterLineBreak.next // skip the first line, which has already been parsed
-
-        while (splitterLineBreak.hasNext) {
-          splitterKeyValue.setString(splitterLineBreak.next)
-
-          if (splitterKeyValue.hasNext) {
-            val strKey = splitterKeyValue.next
-            if (splitterKeyValue.hasNext) {
-              val strValues = splitterKeyValue.next
-              // for efficiency, avoid an extra method call into Dictionary here
-              wordMappings.put(strKey, WordMappingValueSetLazyProxy(strValues, "|"))
-            }
-          }
-        }
-      }
-
-      Try(parseCustomFormat) recover {
-        case e: Exception => l.logError("Could not parse dictionary: " + e.getMessage(), e)
-                             None
-      }
-    }
 
   // Useful functions for search:
 

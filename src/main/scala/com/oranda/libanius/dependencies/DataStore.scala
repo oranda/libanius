@@ -131,8 +131,10 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
   // return None if the specified fileName is not found on disk
   private def readDictionary(fileName: String): Option[Dictionary] = {
     val fileText = Util.stopwatch(io.readFile(fileName), "reading dictionary " + fileName)
-    val dictionary = Util.stopwatch(fileText.map(Dictionary.fromCustomFormat(_)),
-        "parsing dictionary")
+    import CustomFormat._
+    import CustomFormatForModelComponents._
+    val dictionary: Option[Dictionary] =
+        Util.stopwatch(fileText.map(from(_, FromParamsDefault())), "parsing dictionary")
     l.log("Finished reading " + dictionary.map(_.numKeyWords).getOrElse(0) +
         " dictionary prompt words")
     dictionary

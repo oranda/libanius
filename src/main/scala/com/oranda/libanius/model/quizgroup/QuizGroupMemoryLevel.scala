@@ -242,34 +242,4 @@ object QuizGroupMemoryLevel extends AppDependencyAccess {
     get = (_: QuizGroupMemoryLevel).repetitionInterval,
     set = (qgml: QuizGroupMemoryLevel, ri: Int) => qgml.copy(repetitionInterval = ri))
 
-  /*
-   * Text does not include header line
-   */
-  def fromCustomFormat(text: String, repetitionInterval: Int,
-      mainSeparator: String): QuizGroupMemoryLevel = {
-
-    def parseQuizItem(strPromptResponse: String): Option[QuizItem] = {
-      Try(Some(QuizItem.fromCustomFormat(strPromptResponse, mainSeparator))).recover {
-        case e: Exception => l.logError("could not parse quiz item with text " +
-          strPromptResponse + " using separator " + mainSeparator)
-          None
-      }.get
-    }
-
-    def parseQuizItems(lineSplitter: StringSplitter): Stream[QuizItem] = {
-      if (lineSplitter.hasNext)
-        parseQuizItem(lineSplitter.next) match {
-          case Some(line) => Stream.cons(line, parseQuizItems(lineSplitter))
-          case _ => parseQuizItems(lineSplitter)
-        }
-      else
-        Stream.empty
-    }
-
-    val lineSplitter = stringSplitterFactory.getSplitter('\n')
-    lineSplitter.setString(text)
-    val quizItems = parseQuizItems(lineSplitter)
-
-    QuizGroupMemoryLevel(repetitionInterval, quizItems)
-  }
 }

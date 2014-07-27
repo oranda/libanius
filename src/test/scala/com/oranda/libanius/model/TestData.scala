@@ -24,6 +24,56 @@ import com.oranda.libanius.model.quizgroup._
 
 object TestData {
 
+  import CustomFormat._
+  import CustomFormatForModelComponents._
+
+  // word-mapping value
+  val wmvCustomFormat = "nachlösen|9,7;6"
+  val wmv: WordMappingValue = customFormatWordMappingValue.from(wmvCustomFormat,
+      FromParamsWithSeparator("|"))
+
+  // word-mapping value set
+  val wmvsCustomFormat = "contract|698,696;697/treaty|796;798"
+  val wmvs: WordMappingValueSet = customFormatWordMappingValueSet.from(wmvsCustomFormat,
+      FromParamsWithSeparator("|"))
+
+  // QuizItem data
+  val correctAnswersInARow = List(UserResponse(9), UserResponse(7))
+  val incorrectAnswers = List(UserResponse(6))
+  val userResponses = UserResponses(correctAnswersInARow, incorrectAnswers)
+  val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponses)
+
+  // Memory level
+  /*
+   * Construct a quiz group partition.
+   */
+  def makeQgMemLevel: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
+    QuizItem("against", "wider"),
+    QuizItem("entertain", "unterhalten"),
+    QuizItem("teach", "unterrichten"),
+    QuizItem("winner", "Siegerin"),
+    QuizItem("en route", "unterwegs"),
+    QuizItem("full", "satt"),
+    QuizItem("full", "voll"),
+    QuizItem("interrupted", "unterbrochen"),
+    QuizItem("contract", "Vertrag"),
+    QuizItem("rides", "reitet"),
+    QuizItem("on", "auf"),
+    QuizItem("sweeps", "streicht")).toStream)
+
+  def makeQgMemLevelSimple: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
+    QuizItem("against", "wider"),
+    QuizItem("entertain", "unterhalten")).toStream)
+
+
+  // defaults for read-only
+  val qgMemLevel = makeQgMemLevel
+  val qgMemLevelSimple = makeQgMemLevelSimple
+
+  val qgMemLevelSimpleCustomFormat =
+    "against|wider|\n" +
+      "entertain|unterhalten|\n"
+
   val qgCustomFormat =
     "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
         "en route|unterwegs|\n" +
@@ -93,7 +143,7 @@ object TestData {
     val userResponse = new UserResponse(qg.currentPromptNumber)
     val wasCorrect = true
     val quizItemUpdated = quizItem.updatedWithUserResponse(
-      quizItem.correctResponse, wasCorrect, userResponse)
+        quizItem.correctResponse, wasCorrect, userResponse)
     val prevMemLevel = quizItemUpdated.numCorrectResponsesInARow
     qg.updateWithQuizItem(quizItemUpdated, wasCorrect, prevMemLevel)
   }
@@ -104,49 +154,5 @@ object TestData {
   }
 
 
-  // QuizItem data
 
-  val correctAnswersInARow = List(UserResponse(9), UserResponse(7))
-  val incorrectAnswers = List(UserResponse(6))
-  val userResponses = UserResponses(correctAnswersInARow, incorrectAnswers)
-  val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponses)
-
-  // Memory level
-  /*
-   * Construct a quiz group partition.
-   */
-  def makeQgMemLevel: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
-    QuizItem("against", "wider"),
-    QuizItem("entertain", "unterhalten"),
-    QuizItem("teach", "unterrichten"),
-    QuizItem("winner", "Siegerin"),
-    QuizItem("en route", "unterwegs"),
-    QuizItem("full", "satt"),
-    QuizItem("full", "voll"),
-    QuizItem("interrupted", "unterbrochen"),
-    QuizItem("contract", "Vertrag"),
-    QuizItem("rides", "reitet"),
-    QuizItem("on", "auf"),
-    QuizItem("sweeps", "streicht")).toStream)
-
-  def makeQgMemLevelSimple: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
-    QuizItem("against", "wider"),
-    QuizItem("entertain", "unterhalten")).toStream)
-
-
-  // defaults for read-only
-  val qgMemLevel = makeQgMemLevel
-  val qgMemLevelSimple = makeQgMemLevelSimple
-
-  val qgMemLevelSimpleCustomFormat =
-      "against|wider|\n" +
-      "entertain|unterhalten|\n"
-
-  // word-mapping value set
-  val wmvsCustomFormat = "contract|698,696;697/treaty|796;798"
-  val wmvs = WordMappingValueSet.fromCustomFormat(wmvsCustomFormat, "|")
-
-  // word-mapping value
-  val wmvCustomFormat = "nachlösen|9,7;6"
-  val wmv = WordMappingValue.fromCustomFormat(wmvCustomFormat, "|")
 }

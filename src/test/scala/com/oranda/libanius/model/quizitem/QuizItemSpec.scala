@@ -21,6 +21,9 @@ package com.oranda.libanius.model.quizitem
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.TestData._
+import com.oranda.libanius.model.CustomFormat._
+import com.oranda.libanius.model.CustomFormatForModelComponents.customFormatQuizItem
+import com.oranda.libanius.model.FromParamsWithSeparator
 
 class QuizItemSpec extends Specification with AppDependencyAccess {
 
@@ -28,14 +31,14 @@ class QuizItemSpec extends Specification with AppDependencyAccess {
 
     "be parseable from custom format with the standard separator" in {
       val quizItemStr = "on|auf|"
-      val quizItem = QuizItem.fromCustomFormat(quizItemStr)
+      val quizItem = from(quizItemStr, FromParamsWithSeparator("|"))
       val quizItemExpected = QuizItem("on", "auf")
       quizItem mustEqual quizItemExpected
     }
 
     "be parseable from custom format with a special separator" in {
       val quizItemStr = "Given a String s = \"2.3\" convert it to a Double ||| s.toDouble"
-      val quizItem = QuizItem.fromCustomFormat(quizItemStr, "|||")
+      val quizItem = from(quizItemStr, FromParamsWithSeparator("|||"))
       val quizItemExpected = QuizItem("Given a String s = \"2.3\" convert it to a Double",
           "s.toDouble")
       quizItem mustEqual quizItemExpected

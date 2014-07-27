@@ -21,7 +21,8 @@ package com.oranda.libanius.model.quizgroup
 import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
-import com.oranda.libanius.model.ModelComponent
+import com.oranda.libanius.model.{FromParamsWithSeparator, ModelComponent}
+import com.oranda.libanius.model.CustomFormat._
 
 case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
     responseType: String, mainSeparator: String, useMultipleChoiceUntil: Int)
@@ -40,8 +41,14 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
   def reverse = QuizGroupHeader(quizGroupType, responseType, promptType, mainSeparator,
       useMultipleChoiceUntil)
 
-  def createQuizGroup(text: String): QuizGroup =
-    QuizGroupWithHeader.fromCustomFormat(text, mainSeparator).quizGroup
+  def createQuizGroup(text: String): QuizGroup = {
+
+    import com.oranda.libanius.model.CustomFormatForModelComponents.customFormatQuizGroupWithHeader
+
+    val qgh: QuizGroupWithHeader = from(text, FromParamsWithSeparator("|"))
+    qgh.quizGroup
+  }
+
 }
 
 object QuizGroupHeader extends AppDependencyAccess {

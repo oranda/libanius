@@ -29,9 +29,9 @@ import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 
 class CustomFormatSpec extends Specification with AppDependencyAccess {
 
-  def paramsDefault = ParamsDefault(new StringBuilder)
-  def paramsWithSeparator = ParamsWithSeparator(new StringBuilder, "|")
-  def paramsWithSeparatorAndIndex = ParamsWithSeparatorAndIndex(new StringBuilder(), "|", 0)
+  def paramsDefault = ParamsDefault()
+  def paramsWithSeparator = ParamsWithSeparator("|")
+  def paramsWithSeparatorAndIndex = ParamsWithSeparatorAndIndex("|", 0)
 
   val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponses)
   val quizItemCustomFormat = "solve|nachlösen|9,7;6"
@@ -39,34 +39,34 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
   "the custom-format functionality " should {
 
     "serialize a word mapping value" in {
-      val customFormat = to(wmv, paramsWithSeparator).toString
+      val customFormat = to(wmv, new StringBuilder, paramsWithSeparator).toString
       customFormat mustEqual wmvCustomFormat
     }
 
     "serialize a word mapping value set" in {
-      val customFormat = to(wmvs, paramsWithSeparator)
+      val customFormat = to(wmvs, new StringBuilder, paramsWithSeparator)
       customFormat.toString mustEqual wmvsCustomFormat
     }
 
     "serialize a quiz item" in {
-      val customFormat = to(quizItem, paramsWithSeparator)
+      val customFormat = to(quizItem, new StringBuilder, paramsWithSeparator)
       customFormat.toString mustEqual quizItemCustomFormat
     }
 
     "serialize a quiz group memory level" in {
-      val customFormat = to(qgMemLevelSimple, paramsWithSeparatorAndIndex)
+      val customFormat = to(qgMemLevelSimple, new StringBuilder, paramsWithSeparatorAndIndex)
       customFormat.toString mustEqual
         "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-          qgMemLevelSimpleCustomFormat
+            qgMemLevelSimpleCustomFormat
     }
 
     "serialize a quiz group" in {
-      val customFormat = to(qgWithHeader.quizGroup, paramsWithSeparator)
+      val customFormat = to(qgWithHeader.quizGroup, new StringBuilder, paramsWithSeparator)
       customFormat.toString mustEqual qgCustomFormat
     }
 
     "serialize a quiz group with header" in {
-      val customFormat = to(qgWithHeader, paramsDefault)
+      val customFormat = to(qgWithHeader, new StringBuilder, paramsDefault)
       customFormat.toString mustEqual qgwhCustomFormat
     }
   }

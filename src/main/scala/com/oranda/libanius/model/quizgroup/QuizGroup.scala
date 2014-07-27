@@ -26,12 +26,11 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import scalaz._
 import com.oranda.libanius.model._
-import java.lang.StringBuilder
 import scalaz.PLens._
 import scala.collection.immutable.Stream
 import scala.collection.immutable.List
 import scala.Predef._
-import com.oranda.libanius.util.{StringUtil, Util}
+import com.oranda.libanius.util.{Util}
 
 /*
  * Contains quiz items for a topic.
@@ -290,34 +289,6 @@ object QuizGroup extends AppDependencyAccess {
 
   def remove(quizItems: Stream[QuizItem], quizItem: QuizItem): Stream[QuizItem] =
     quizItems.filterNot(_.samePromptAndResponse(quizItem))
-
-
-  /*
-   * Text includes header line
-   */
-  def fromCustomFormat(text: String, mainSeparator: String, headerLine: String): QuizGroup = {
-
-    val quizGroupParts = text.split("#quizGroupPartition ")
-    val headerLine = quizGroupParts.head
-    val quizGroupLevels = quizGroupParts.tail
-
-    def parseMemLevelText(memLevelText: String): Pair[Int, QuizGroupMemoryLevel] = {
-      val headerLine = memLevelText.takeWhile(_ != '\n')
-      val mainMemLevelText = memLevelText.dropWhile(_ != '\n').tail
-      val index = StringUtil.parseValue(headerLine,
-          "numCorrectResponsesInARow=\"", "\"").getOrElse("0").toInt
-      val repetitionInterval = StringUtil.parseValue(headerLine,
-          "repetitionInterval=\"", "\"").getOrElse("0").toInt
-      val memLevel = QuizGroupMemoryLevel.fromCustomFormat(mainMemLevelText,
-          repetitionInterval, mainSeparator)
-      Pair(index, memLevel)
-    }
-
-    val levelsMap = quizGroupLevels.map(parseMemLevelText(_)).toMap
-    val userData: QuizGroupUserData = QuizGroupUserData(headerLine)
-
-    QuizGroup.createFromMemLevels(levelsMap, userData)
-  }
 }
 
 

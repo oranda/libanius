@@ -31,7 +31,11 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
   "a quiz group memory level" should {
 
     "be parseable from custom format" in {
-      val qgml = QuizGroupMemoryLevel.fromCustomFormat(qgMemLevelSimpleCustomFormat, 0, "|")
+
+      import CustomFormat._
+      import CustomFormatForModelComponents._
+
+      val qgml = from(qgMemLevelSimpleCustomFormat, FromParamsWithSeparatorAndRepetitionInterval("|", 0))
       qgml.numQuizItems mustEqual 2
     }
 

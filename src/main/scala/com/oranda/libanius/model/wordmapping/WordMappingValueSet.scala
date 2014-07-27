@@ -18,14 +18,12 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.util.Try
-import scala.collection.mutable.ListBuffer
-
 import com.oranda.libanius.model.quizitem.QuizItem
-import com.oranda.libanius.model.{ValueSet, ModelComponent}
+import com.oranda.libanius.model._
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import scala.language.implicitConversions
+import com.oranda.libanius.model.ValueSet
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
@@ -73,23 +71,6 @@ object WordMappingValueSet extends AppDependencyAccess {
 
   def combineValueSets(valueSets: Iterable[WordMappingValueSet]): List[WordMappingValue] =
     valueSets.flatMap(_.values).toList
-
-  // Example: contract:696,697;698/treaty:796;798
-  def fromCustomFormat(str: String, mainSeparator: String): WordMappingValueSet = {
-    val values = new ListBuffer[WordMappingValue]()
-    val wmvsSplitter = stringSplitterFactory.getSplitter('/')
-    def parseFromCustomFormat {
-      wmvsSplitter.setString(str)
-      while (wmvsSplitter.hasNext) {
-        val nextVal = wmvsSplitter.next
-        values += WordMappingValue.fromCustomFormat(nextVal, mainSeparator)
-      }
-    }
-    Try(parseFromCustomFormat) recover {
-      case e: Exception => l.logError("WordMappingValueSet: Could not parse text " + str, e)
-    }
-    WordMappingValueSet(values.toList)
-  }
 }
 
 abstract class WordMappingValueSetWrapperBase {
@@ -109,10 +90,12 @@ object WordMappingValueSetWrapperBase {
  * supports lazy initialization.
  */
 case class WordMappingValueSetLazyProxy(strValues: String, mainSeparator: String)
-    extends WordMappingValueSetWrapperBase {   
-  
-  lazy val wmvs: WordMappingValueSet =
-    WordMappingValueSet.fromCustomFormat(strValues, mainSeparator)
+    extends WordMappingValueSetWrapperBase {
+
+  import CustomFormat._
+  import CustomFormatForModelComponents.customFormatWordMappingValueSet
+
+  lazy val wmvs: WordMappingValueSet = from(strValues, FromParamsWithSeparator("|"))
 }
 
 /*
@@ -127,5 +110,4 @@ object WordMappingValueSetWrapper {
     val wmvs = values.map(WordMappingValue(_)).toList
     WordMappingValueSetWrapper(WordMappingValueSet(wmvs), mainSeparator)
   }
-
 }

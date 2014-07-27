@@ -60,7 +60,7 @@ case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
   def toCustomFormat: String = {
     import CustomFormat._
     import CustomFormatForModelComponents._
-    to(this, new ParamsDefault(new StringBuilder)).toString
+    to(this, new StringBuilder, new ParamsDefault).toString
   }
 }
 
@@ -70,13 +70,5 @@ object QuizGroupWithHeader extends AppDependencyAccess {
 
   // Forward access to QuizGroup whenever necessary
   implicit def qgwh2qg(qgwh: QuizGroupWithHeader): QuizGroup = qgwh.quizGroup
-
-  def fromCustomFormat(text: String, mainSeparator: String = "|"): QuizGroupWithHeader = {
-    val headerLine = text.takeWhile(_ != '\n')
-    val qgHeader = QuizGroupHeader(headerLine)
-    val qg = Util.stopwatch(QuizGroup.fromCustomFormat(text, mainSeparator, headerLine),
-        "QuizGroup.fromCustomFormat")
-    QuizGroupWithHeader(qgHeader, qg)
-  }
 }
 

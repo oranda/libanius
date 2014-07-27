@@ -1,3 +1,10 @@
+== 0.98 July ? 2014
+
+  * Decoupled serialization/deserialization from the model with the new CustomFormat typeclass.
+
+  * TODO: turned Value/TextValue into a typeclass
+
+
 == 0.97 June 13 2014
 
   * Memory Levels will now adapt their intervals based on user performance.

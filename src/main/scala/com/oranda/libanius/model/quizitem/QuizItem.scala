@@ -19,7 +19,6 @@
 package com.oranda.libanius.model.quizitem
 
 import com.oranda.libanius.model.{ModelComponent, UserResponse, UserResponses}
-import com.oranda.libanius.model.wordmapping.WordMappingValue
 
 /*
  * A connection between two things, and user information associated with the connection.
@@ -64,14 +63,4 @@ object QuizItem {
     QuizItem(TextValue(prompt), TextValue(response),
         new UserResponses(correctResponses.map(UserResponse(_)),
         incorrectResponses.map(UserResponse(_))))
-
-  def fromCustomFormat(strPromptResponse: String, mainSeparator: String = "|"): QuizItem = {
-    val i = strPromptResponse.indexOf(mainSeparator)
-    val strPrompt = strPromptResponse.substring(0, i).trim
-    val strResponseAndUserInfo = strPromptResponse.substring(i + mainSeparator.length)
-
-    val wmv = WordMappingValue.fromCustomFormat(strResponseAndUserInfo, mainSeparator)
-    val userResponses = UserResponses(wmv.correctAnswersInARow, wmv.incorrectAnswers)
-    QuizItem(TextValue(strPrompt), TextValue(wmv.value), userResponses)
-  }
 }
