@@ -23,46 +23,11 @@ import com.oranda.libanius.dependencies.{AppDependencyAccess}
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, WordMapping, QuizGroupHeader, QuizGroup}
 
+import TestData._
+
 class QuizSpec extends Specification with AppDependencyAccess {
   
   "a quiz" should {
-    
-    val quizData = List(
-
-        "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-        "against|wider\n" +
-        "entertain|unterhalten\n" +
-        "teach|unterrichten\n" +
-        "winner|Siegerin\n" +
-        "en route|unterwegs\n" +
-        "full|satt\n" +
-        "full|voll\n" +
-        "interrupted|unterbrochen\n" +
-        "contract|Vertrag\n" +
-        "rides|reitet\n" +
-        "on|auf\n" +
-        "the|der\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"3\" repetitionInterval=\"15\"\n" +
-        "sweeps|streicht|100,200,300;405\n",
-
-        "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-        "unterwegs|en route\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"5\"\n" +
-        "Vertrag|treaty|796;798\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"15\"\n" +
-        "Vertrag|contract|697,696;698\n"
-    )
-
-    val quiz = Quiz.demoQuiz(quizData)
-    val qghEngGer = QuizGroupHeader(WordMapping, "English word", "German word", "|", 4)
-    val qghGerEng = QuizGroupHeader(WordMapping, "German word", "English word", "|", 4)
-
-    "be parseable from custom format" in {
-      quiz.numActiveGroups mustEqual 2
-      quiz.numQuizItems mustEqual 16
-    }
 
     "find values for a prompt" in {
       quiz.findResponsesFor("on", qghEngGer) mustEqual List("auf")

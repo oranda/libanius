@@ -25,7 +25,7 @@ import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.util.Util
 
 import com.oranda.libanius.model.TestData._
-import com.oranda.libanius.model.{FromParamsWithSeparator, CustomFormatForModelComponents, CustomFormat}
+import com.oranda.libanius.model._
 
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
@@ -59,7 +59,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       qgUpdated.contains("good") mustEqual true
     }
 
-    "update MemLevels on a user response" in {
+    "update memory levels on a user response" in {
       qgwhSimple.quizGroup.levels(1).size mustEqual 0
       val quizItem = qgwhSimple.quizGroup.findPresentableQuizItem
       val qgUpdated = updatedWithUserResponse(qgwhSimple.quizGroup, quizItem.get)
@@ -70,8 +70,6 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
      * This assumes the following Criteria in UserResponses:
      * Criteria(numCorrectResponsesInARowDesired = 1, diffInPromptNumMinimum = 5),
      */
-
-
     "present an item that has been answered before after five prompts" in {
       var qgwhLocal = makeSimpleQgWithHeader
       val quizItem0 = qgwhLocal.findPresentableQuizItem.get

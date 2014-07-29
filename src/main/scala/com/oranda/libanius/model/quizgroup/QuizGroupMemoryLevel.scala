@@ -56,7 +56,7 @@ case class QuizGroupMemoryLevel(repetitionInterval: Int,
   protected[quizgroup] def contains(prompt: TextValue): Boolean =
     quizItems.exists(_.prompt == prompt)
   protected[quizgroup] def contains(prompt: String): Boolean = contains(TextValue(prompt))
-  protected[quizgroup] def numQuizItems = quizItems.size
+  protected[model] def numQuizItems = quizItems.size
   protected[quizgroup] def size = numQuizItems
   protected[quizgroup] def isEmpty = quizItems.isEmpty
   protected[quizgroup] def numPrompts = size

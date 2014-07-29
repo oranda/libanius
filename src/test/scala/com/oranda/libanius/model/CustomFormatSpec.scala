@@ -26,6 +26,8 @@ import java.lang.StringBuilder
 import CustomFormat._
 import CustomFormatForModelComponents._
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.quizgroup.QuizGroup
+import com.oranda.libanius.util.Util
 
 class CustomFormatSpec extends Specification with AppDependencyAccess {
 
@@ -69,6 +71,56 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
       val customFormat = to(qgWithHeader, new StringBuilder, paramsDefault)
       customFormat.toString mustEqual qgwhCustomFormat
     }
-  }
 
+    "deserialize a word mapping value" in {
+      wmv.value mustEqual "nachlösen"
+      wmv.userAnswers.length mustEqual 3
+      wmv.numCorrectAnswersInARow mustEqual 2
+    }
+
+    "deserialize a word mapping value set" in {
+      wmvs.containsValue("treaty")
+      wmvs.size mustEqual 2
+    }
+
+    "deserialize a quiz item" in {
+      val quizItemStr = "on|auf|"
+      val quizItem = customFormatQuizItem.from(quizItemStr, FromParamsWithSeparator("|"))
+      val quizItemExpected = QuizItem("on", "auf")
+      quizItem mustEqual quizItemExpected
+    }
+
+    "deserialize a quiz item with a special separator" in {
+      val quizItemStr = "Given a String s = \"2.3\" convert it to a Double ||| s.toDouble"
+      val quizItem = customFormatQuizItem.from(quizItemStr, FromParamsWithSeparator("|||"))
+      val quizItemExpected = QuizItem("Given a String s = \"2.3\" convert it to a Double",
+        "s.toDouble")
+      quizItem mustEqual quizItemExpected
+    }
+
+    "deserialize a quiz group memory level" in {
+      import CustomFormat._
+      import CustomFormatForModelComponents._
+
+      val qgml = from(qgMemLevelSimpleCustomFormat,
+          FromParamsWithSeparatorAndRepetitionInterval("|", 0))
+      qgml.numQuizItems mustEqual 2
+    }
+
+
+    "deserialize a QuizGroupWithHeader" in {
+      qgWithHeader.currentPromptNumber mustEqual 10
+      qgWithHeader.promptType mustEqual "English word"
+      qgWithHeader.responseType mustEqual "German word"
+
+      qgWithHeader.levels(0).numQuizItems mustEqual 8
+      qgWithHeader.levels(1).numQuizItems mustEqual 2
+      qgWithHeader.levels(2).numQuizItems mustEqual 2
+    }
+
+    "deserialize a quiz" in {
+      quiz.numActiveGroups mustEqual 2
+      quiz.numQuizItems mustEqual 16
+    }
+  }
 }

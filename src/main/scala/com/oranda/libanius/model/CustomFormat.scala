@@ -200,8 +200,7 @@ object CustomFormatForModelComponents {
       if (!wmv.correctAnswersInARow.isEmpty || !wmv.incorrectAnswers.isEmpty)
         strBuilder.append(extraParams.mainSeparator)
       if (!wmv.correctAnswersInARow.isEmpty)
-        StringUtil.mkString(strBuilder, wmv.correctAnswersInARow,
-            wmv.answerPromptNumber, ',')
+        StringUtil.mkString(strBuilder, wmv.correctAnswersInARow, wmv.answerPromptNumber, ',')
       if (!wmv.incorrectAnswers.isEmpty) {
         strBuilder.append(';')
         StringUtil.mkString(strBuilder, wmv.incorrectAnswers, wmv.answerPromptNumber, ',')

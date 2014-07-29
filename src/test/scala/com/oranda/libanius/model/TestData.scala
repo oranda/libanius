@@ -29,12 +29,12 @@ object TestData {
 
   // word-mapping value
   val wmvCustomFormat = "nachlösen|9,7;6"
-  val wmv: WordMappingValue = customFormatWordMappingValue.from(wmvCustomFormat,
+  val wmv: WordMappingValue = from[WordMappingValue, ParamsWithSeparator, FromParamsWithSeparator](wmvCustomFormat,
       FromParamsWithSeparator("|"))
 
   // word-mapping value set
   val wmvsCustomFormat = "contract|698,696;697/treaty|796;798"
-  val wmvs: WordMappingValueSet = customFormatWordMappingValueSet.from(wmvsCustomFormat,
+  val wmvs: WordMappingValueSet = from[WordMappingValueSet, ParamsWithSeparator, FromParamsWithSeparator](wmvsCustomFormat,
       FromParamsWithSeparator("|"))
 
   // QuizItem data
@@ -138,6 +138,39 @@ object TestData {
 
   // defaults for read-only
   val qgWithHeader = makeQgWithHeader
+
+
+  val quizData = List(
+
+    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
+      "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
+      "against|wider\n" +
+      "entertain|unterhalten\n" +
+      "teach|unterrichten\n" +
+      "winner|Siegerin\n" +
+      "en route|unterwegs\n" +
+      "full|satt\n" +
+      "full|voll\n" +
+      "interrupted|unterbrochen\n" +
+      "contract|Vertrag\n" +
+      "rides|reitet\n" +
+      "on|auf\n" +
+      "the|der\n" +
+      "#quizGroupPartition numCorrectResponsesInARow=\"3\" repetitionInterval=\"15\"\n" +
+      "sweeps|streicht|100,200,300;405\n",
+
+    "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
+      "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
+      "unterwegs|en route\n" +
+      "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"5\"\n" +
+      "Vertrag|treaty|796;798\n" +
+      "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"15\"\n" +
+      "Vertrag|contract|697,696;698\n"
+  )
+
+  val quiz = Quiz.demoQuiz(quizData)
+  val qghEngGer = QuizGroupHeader(WordMapping, "English word", "German word", "|", 4)
+  val qghGerEng = QuizGroupHeader(WordMapping, "German word", "English word", "|", 4)
 
   def updatedWithUserResponse(qg: QuizGroup, quizItem: QuizItem): QuizGroup = {
     val userResponse = new UserResponse(qg.currentPromptNumber)

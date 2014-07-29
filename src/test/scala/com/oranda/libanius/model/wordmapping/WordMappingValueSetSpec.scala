@@ -26,11 +26,6 @@ class WordMappingValueSetSpec extends Specification {
 
   "a word-mapping-value-set" should {
 
-    "be parseable from custom format" in {
-      wmvs.containsValue("treaty")
-      wmvs.size mustEqual 2
-    }
-
     "allow a word-mapping value to be added" in {
       val wmvsUpdated = wmvs.addValueToEnd(WordMappingValue("agreement"))
       wmvsUpdated.size mustEqual 3
