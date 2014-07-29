@@ -27,6 +27,9 @@ import com.oranda.libanius.util.Util
 import com.oranda.libanius.model.TestData._
 import com.oranda.libanius.model._
 
+import CustomFormat._
+import CustomFormatForModelComponents._
+
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
   "a quiz group" should {
@@ -117,11 +120,8 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
           "contract|Vertrag'9,3\n" +
           "en route|unterwegs'7,1\n"
 
-
-      import CustomFormat._
-      import CustomFormatForModelComponents.customFormatQuizGroup
-
-      val demoGroup: QuizGroup = from(demoGroupText, FromParamsWithSeparator("|"))
+      val demoGroup: QuizGroup = from[QuizGroup, FromParamsWithSeparator](
+          demoGroupText, FromParamsWithSeparator("|"))
       val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get
 
       val (falseAnswers, _) = Util.stopwatch(demoGroup.constructWrongChoices(

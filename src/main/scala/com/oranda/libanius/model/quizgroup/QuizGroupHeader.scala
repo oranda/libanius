@@ -43,9 +43,10 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
 
   def createQuizGroup(text: String): QuizGroup = {
 
-    import com.oranda.libanius.model.CustomFormatForModelComponents.customFormatQuizGroupWithHeader
+    import com.oranda.libanius.model.CustomFormatForModelComponents._
 
-    val qgh: QuizGroupWithHeader = from(text, FromParamsWithSeparator("|"))
+    val qgh: QuizGroupWithHeader = from[QuizGroupWithHeader, FromParamsWithSeparator](
+        text, FromParamsWithSeparator("|"))
     qgh.quizGroup
   }
 

@@ -25,6 +25,9 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import scala.language.implicitConversions
 import com.oranda.libanius.model.ValueSet
 
+import CustomFormat._
+import CustomFormatForModelComponents._
+
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
  */
@@ -92,10 +95,8 @@ object WordMappingValueSetWrapperBase {
 case class WordMappingValueSetLazyProxy(strValues: String, mainSeparator: String)
     extends WordMappingValueSetWrapperBase {
 
-  import CustomFormat._
-  import CustomFormatForModelComponents.customFormatWordMappingValueSet
-
-  lazy val wmvs: WordMappingValueSet = from(strValues, FromParamsWithSeparator("|"))
+  lazy val wmvs: WordMappingValueSet = from[WordMappingValueSet, FromParamsWithSeparator](
+      strValues, FromParamsWithSeparator("|"))
 }
 
 /*

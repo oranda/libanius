@@ -54,8 +54,6 @@ case class FromParamsWithSeparator(mainSeparator: String) extends FromParams {
 case class FromParamsWithSeparatorAndRepetitionInterval(mainSeparator: String,
     repetitionInterval: Int) extends FromParams
 
-//abstract class FormattingParams(val strBuilder: StringBuilder)
-
 trait Params {}
 
 case class ParamsDefault() extends Params {
@@ -73,20 +71,20 @@ case class ParamsWithSeparatorAndIndex(mainSeparator: String, index: Int) extend
 // provides external access to the typeclass, forwarding the call to the appropriate type
 object CustomFormat {
 
-  def to[A <: ModelComponent, B <: Params, C <: FromParams](component: A,
+  def to[A <: ModelComponent, B <: Params](component: A,
       strBuilder: StringBuilder, params: B)
-      (implicit customFormat: CustomFormat[A, B, C]): StringBuilder =
+      (implicit customFormat: ToCustomFormat[A, B]): StringBuilder =
     customFormat.to(component, strBuilder, params)
 
-  def from[A <: ModelComponent, B <: Params, C <: FromParams](str: String,
-      fromParams: C)(implicit customFormat: CustomFormat[A, B, C]): A =
+  def from[A <: ModelComponent, B <: FromParams](str: String,
+      fromParams: B)(implicit customFormat: FromCustomFormat[A, B]): A =
     customFormat.from(str, fromParams)
 }
 
 object CustomFormatForModelComponents {
   implicit object customFormatQuizGroupHeader
       extends CustomFormat[QuizGroupHeader, ParamsDefault, FromParams] {
-    // def _fromCustomFormat = TODO
+
     def to(qgh: QuizGroupHeader, strBuilder: StringBuilder, params: ParamsDefault) =
       strBuilder.append("#quizGroup type=\"").append(qgh.quizGroupType).
           append("\" promptType=\""). append(qgh.promptType).
@@ -100,7 +98,7 @@ object CustomFormatForModelComponents {
 
   implicit object customFormatQuizGroupUserData
       extends CustomFormat[QuizGroupUserData, ParamsDefault, FromParams] {
-    // def _fromCustomFormat = TODO
+
     def to(qgud: QuizGroupUserData, strBuilder: StringBuilder, params: ParamsDefault) =
       strBuilder.append(" currentPromptNumber=\"").
           append(qgud.currentPromptNumber).append("\"").append(" isActive=\"").

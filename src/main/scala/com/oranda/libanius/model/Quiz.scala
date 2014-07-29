@@ -26,6 +26,9 @@ import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem, QuizItemViewWithChoices}
 import com.oranda.libanius.model.wordmapping.Dictionary
 
+import CustomFormat._
+import CustomFormatForModelComponents._
+
 import scalaz._
 import scalaz.std.set
 import Scalaz._, PLens._
@@ -270,10 +273,8 @@ object Quiz extends AppDependencyAccess {
 
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
-    import CustomFormat._
-    import CustomFormatForModelComponents.customFormatQuizGroupWithHeader
     val qgsWithHeader: Iterable[QuizGroupWithHeader] = quizGroupsData.map(
-        from(_, FromParamsWithSeparator("|")))
+        from[QuizGroupWithHeader, FromParamsWithSeparator](_, FromParamsWithSeparator("|")))
     Quiz(qgsWithHeader.map(
         qgWithHeader => Pair(qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }

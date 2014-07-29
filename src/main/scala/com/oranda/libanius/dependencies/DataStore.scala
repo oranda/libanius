@@ -18,12 +18,15 @@
 
 package com.oranda.libanius.dependencies
 
+import com.oranda.libanius.model._
+import com.oranda.libanius.model.FromParamsDefault
+import CustomFormat._
+import CustomFormatForModelComponents._
 import com.oranda.libanius.util.Util
 import scala.collection.immutable.Set
 import scala.util.Try
 import com.oranda.libanius.io.{DefaultIO, PlatformIO}
 import com.oranda.libanius.model.wordmapping.Dictionary
-import com.oranda.libanius.model._
 import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup}
 
 class DataStore(io: PlatformIO) extends AppDependencyAccess {
@@ -131,10 +134,9 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
   // return None if the specified fileName is not found on disk
   private def readDictionary(fileName: String): Option[Dictionary] = {
     val fileText = Util.stopwatch(io.readFile(fileName), "reading dictionary " + fileName)
-    import CustomFormat._
-    import CustomFormatForModelComponents._
     val dictionary: Option[Dictionary] =
-        Util.stopwatch(fileText.map(from(_, FromParamsDefault())), "parsing dictionary")
+        Util.stopwatch(fileText.map(from[Dictionary, FromParamsDefault](_, FromParamsDefault())),
+        "parsing dictionary")
     l.log("Finished reading " + dictionary.map(_.numKeyWords).getOrElse(0) +
         " dictionary prompt words")
     dictionary

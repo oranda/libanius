@@ -22,20 +22,20 @@ import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.wordmapping.{WordMappingValue, WordMappingValueSet, Dictionary}
 import com.oranda.libanius.model.quizgroup._
 
-object TestData {
+import CustomFormat._
+import CustomFormatForModelComponents._
 
-  import CustomFormat._
-  import CustomFormatForModelComponents._
+object TestData {
 
   // word-mapping value
   val wmvCustomFormat = "nachlösen|9,7;6"
-  val wmv: WordMappingValue = from[WordMappingValue, ParamsWithSeparator, FromParamsWithSeparator](wmvCustomFormat,
-      FromParamsWithSeparator("|"))
+  val wmv: WordMappingValue = from[WordMappingValue, FromParamsWithSeparator](
+      wmvCustomFormat, FromParamsWithSeparator("|"))
 
   // word-mapping value set
   val wmvsCustomFormat = "contract|698,696;697/treaty|796;798"
-  val wmvs: WordMappingValueSet = from[WordMappingValueSet, ParamsWithSeparator, FromParamsWithSeparator](wmvsCustomFormat,
-      FromParamsWithSeparator("|"))
+  val wmvs: WordMappingValueSet = from[WordMappingValueSet, FromParamsWithSeparator](
+      wmvsCustomFormat, FromParamsWithSeparator("|"))
 
   // QuizItem data
   val correctAnswersInARow = List(UserResponse(9), UserResponse(7))

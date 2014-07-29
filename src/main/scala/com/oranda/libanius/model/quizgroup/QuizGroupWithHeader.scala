@@ -26,6 +26,9 @@ import com.oranda.libanius.model.{ParamsDefault, CustomFormatForModelComponents,
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import java.lang.StringBuilder
 
+import CustomFormat._
+import CustomFormatForModelComponents._
+
 /*
  * Convenience class for passing around a key-value pair from the Quiz.quizGroups map.
  */
@@ -58,8 +61,6 @@ case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
   }
 
   def toCustomFormat: String = {
-    import CustomFormat._
-    import CustomFormatForModelComponents._
     to(this, new StringBuilder, new ParamsDefault).toString
   }
 }

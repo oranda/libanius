@@ -26,8 +26,6 @@ import java.lang.StringBuilder
 import CustomFormat._
 import CustomFormatForModelComponents._
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
-import com.oranda.libanius.model.quizgroup.QuizGroup
-import com.oranda.libanius.util.Util
 
 class CustomFormatSpec extends Specification with AppDependencyAccess {
 
