@@ -71,12 +71,12 @@ case class ParamsWithSeparatorAndIndex(mainSeparator: String, index: Int) extend
 // provides external access to the typeclass, forwarding the call to the appropriate type
 object CustomFormat {
 
-  def to[A <: ModelComponent, B <: Params](component: A,
+  def serialize[A <: ModelComponent, B <: Params](component: A,
       strBuilder: StringBuilder, params: B)
       (implicit customFormat: ToCustomFormat[A, B]): StringBuilder =
     customFormat.to(component, strBuilder, params)
 
-  def from[A <: ModelComponent, B <: FromParams](str: String,
+  def deserialize[A <: ModelComponent, B <: FromParams](str: String,
       fromParams: B)(implicit customFormat: FromCustomFormat[A, B]): A =
     customFormat.from(str, fromParams)
 }

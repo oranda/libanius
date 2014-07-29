@@ -120,7 +120,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
           "contract|Vertrag'9,3\n" +
           "en route|unterwegs'7,1\n"
 
-      val demoGroup: QuizGroup = from[QuizGroup, FromParamsWithSeparator](
+      val demoGroup: QuizGroup = deserialize[QuizGroup, FromParamsWithSeparator](
           demoGroupText, FromParamsWithSeparator("|"))
       val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get
 

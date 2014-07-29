@@ -39,34 +39,34 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
   "the custom-format functionality " should {
 
     "serialize a word mapping value" in {
-      val customFormat = to(wmv, new StringBuilder, paramsWithSeparator).toString
+      val customFormat = serialize(wmv, new StringBuilder, paramsWithSeparator).toString
       customFormat mustEqual wmvCustomFormat
     }
 
     "serialize a word mapping value set" in {
-      val customFormat = to(wmvs, new StringBuilder, paramsWithSeparator)
+      val customFormat = serialize(wmvs, new StringBuilder, paramsWithSeparator)
       customFormat.toString mustEqual wmvsCustomFormat
     }
 
     "serialize a quiz item" in {
-      val customFormat = to(quizItem, new StringBuilder, paramsWithSeparator)
+      val customFormat = serialize(quizItem, new StringBuilder, paramsWithSeparator)
       customFormat.toString mustEqual quizItemCustomFormat
     }
 
     "serialize a quiz group memory level" in {
-      val customFormat = to(qgMemLevelSimple, new StringBuilder, paramsWithSeparatorAndIndex)
+      val customFormat = serialize(qgMemLevelSimple, new StringBuilder, paramsWithSeparatorAndIndex)
       customFormat.toString mustEqual
         "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
             qgMemLevelSimpleCustomFormat
     }
 
     "serialize a quiz group" in {
-      val customFormat = to(qgWithHeader.quizGroup, new StringBuilder, paramsWithSeparator)
+      val customFormat = serialize(qgWithHeader.quizGroup, new StringBuilder, paramsWithSeparator)
       customFormat.toString mustEqual qgCustomFormat
     }
 
     "serialize a quiz group with header" in {
-      val customFormat = to(qgWithHeader, new StringBuilder, paramsDefault)
+      val customFormat = serialize(qgWithHeader, new StringBuilder, paramsDefault)
       customFormat.toString mustEqual qgwhCustomFormat
     }
 
@@ -83,7 +83,8 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
 
     "deserialize a quiz item" in {
       val quizItemStr = "on|auf|"
-      val quizItem = customFormatQuizItem.from(quizItemStr, FromParamsWithSeparator("|"))
+      val quizItem = deserialize[QuizItem, FromParamsWithSeparator](quizItemStr,
+          FromParamsWithSeparator("|"))
       val quizItemExpected = QuizItem("on", "auf")
       quizItem mustEqual quizItemExpected
     }
@@ -100,7 +101,7 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
       import CustomFormat._
       import CustomFormatForModelComponents._
 
-      val qgml = from(qgMemLevelSimpleCustomFormat,
+      val qgml = deserialize(qgMemLevelSimpleCustomFormat,
           FromParamsWithSeparatorAndRepetitionInterval("|", 0))
       qgml.numQuizItems mustEqual 2
     }

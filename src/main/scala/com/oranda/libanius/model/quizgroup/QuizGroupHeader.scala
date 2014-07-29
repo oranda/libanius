@@ -45,7 +45,7 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
 
     import com.oranda.libanius.model.CustomFormatForModelComponents._
 
-    val qgh: QuizGroupWithHeader = from[QuizGroupWithHeader, FromParamsWithSeparator](
+    val qgh: QuizGroupWithHeader = deserialize[QuizGroupWithHeader, FromParamsWithSeparator](
         text, FromParamsWithSeparator("|"))
     qgh.quizGroup
   }

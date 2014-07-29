@@ -61,7 +61,7 @@ case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
   }
 
   def toCustomFormat: String = {
-    to(this, new StringBuilder, new ParamsDefault).toString
+    serialize(this, new StringBuilder, new ParamsDefault).toString
   }
 }
 
