@@ -29,9 +29,9 @@ import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 
 class CustomFormatSpec extends Specification with AppDependencyAccess {
 
-  def paramsDefault = ParamsDefault()
-  def paramsWithSeparator = ParamsWithSeparator("|")
-  def paramsWithSeparatorAndIndex = ParamsWithSeparatorAndIndex("|", 0)
+  def paramsDefault = EmptyParams()
+  def paramsWithSeparator = Separator("|")
+  def paramsWithSeparatorAndIndex = SeparatorAndIndex("|", 0)
 
   val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponses)
   val quizItemCustomFormat = "solve|nachlösen|9,7;6"
@@ -83,15 +83,15 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
 
     "deserialize a quiz item" in {
       val quizItemStr = "on|auf|"
-      val quizItem = deserialize[QuizItem, FromParamsWithSeparator](quizItemStr,
-          FromParamsWithSeparator("|"))
+      val quizItem = deserialize[QuizItem, Separator](quizItemStr,
+          Separator("|"))
       val quizItemExpected = QuizItem("on", "auf")
       quizItem mustEqual quizItemExpected
     }
 
     "deserialize a quiz item with a special separator" in {
       val quizItemStr = "Given a String s = \"2.3\" convert it to a Double ||| s.toDouble"
-      val quizItem = customFormatQuizItem.from(quizItemStr, FromParamsWithSeparator("|||"))
+      val quizItem = customFormatQuizItem.from(quizItemStr, Separator("|||"))
       val quizItemExpected = QuizItem("Given a String s = \"2.3\" convert it to a Double",
         "s.toDouble")
       quizItem mustEqual quizItemExpected
@@ -102,7 +102,7 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
       import CustomFormatForModelComponents._
 
       val qgml = deserialize(qgMemLevelSimpleCustomFormat,
-          FromParamsWithSeparatorAndRepetitionInterval("|", 0))
+          SeparatorAndRepetitionInterval("|", 0))
       qgml.numQuizItems mustEqual 2
     }
 

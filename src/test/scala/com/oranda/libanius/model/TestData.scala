@@ -29,13 +29,13 @@ object TestData {
 
   // word-mapping value
   val wmvCustomFormat = "nachlösen|9,7;6"
-  val wmv: WordMappingValue = deserialize[WordMappingValue, FromParamsWithSeparator](
-      wmvCustomFormat, FromParamsWithSeparator("|"))
+  val wmv: WordMappingValue = deserialize[WordMappingValue, Separator](
+      wmvCustomFormat, Separator("|"))
 
   // word-mapping value set
   val wmvsCustomFormat = "contract|698,696;697/treaty|796;798"
-  val wmvs: WordMappingValueSet = deserialize[WordMappingValueSet, FromParamsWithSeparator](
-      wmvsCustomFormat, FromParamsWithSeparator("|"))
+  val wmvs: WordMappingValueSet = deserialize[WordMappingValueSet, Separator](
+      wmvsCustomFormat, Separator("|"))
 
   // QuizItem data
   val correctAnswersInARow = List(UserResponse(9), UserResponse(7))

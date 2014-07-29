@@ -22,7 +22,7 @@ import scala.language.implicitConversions
 import com.oranda.libanius.model.quizitem.{QuizItem}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.util.Util
-import com.oranda.libanius.model.{ParamsDefault, CustomFormatForModelComponents, CustomFormat, ModelComponent}
+import com.oranda.libanius.model.{EmptyParams, CustomFormatForModelComponents, CustomFormat, ModelComponent}
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import java.lang.StringBuilder
 
@@ -60,9 +60,7 @@ case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
         useMultipleChoice)
   }
 
-  def toCustomFormat: String = {
-    serialize(this, new StringBuilder, new ParamsDefault).toString
-  }
+  def toCustomFormat = serialize(this, new StringBuilder, new EmptyParams).toString
 }
 
 object QuizGroupWithHeader extends AppDependencyAccess {
