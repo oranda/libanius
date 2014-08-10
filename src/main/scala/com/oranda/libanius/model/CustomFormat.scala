@@ -36,8 +36,8 @@ import scala.collection.immutable.Stream
 trait CustomFormat[A <: ModelComponent, B <: ToParams, C <: FromParams]
   extends ToCustomFormat[A, B] with FromCustomFormat[A, C]
 
-trait FromCustomFormat[A <: ModelComponent, C <: FromParams] {
-  def from(str: String, extraParams: C): A
+trait FromCustomFormat[A <: ModelComponent, B <: FromParams] {
+  def from(str: String, extraParams: B): A
 }
 
 trait ToCustomFormat[A <: ModelComponent, B <: ToParams] {
@@ -81,8 +81,12 @@ object CustomFormat {
 
 object CustomFormatForModelComponents {
   implicit object customFormatQuizGroupHeader
-      extends CustomFormat[QuizGroupHeader, EmptyParams, FromParams] {
+      extends CustomFormat[QuizGroupHeader, EmptyParams, EmptyParams] with AppDependencyAccess {
 
+    /**
+     * StringBuilder holds mutable state, but the serialization needs to be
+     * highly efficient on Android for large quiz files.
+     */
     def to(qgh: QuizGroupHeader, strBuilder: StringBuilder, params: EmptyParams) =
       strBuilder.append("#quizGroup type=\"").append(qgh.quizGroupType).
           append("\" promptType=\""). append(qgh.promptType).
@@ -91,18 +95,55 @@ object CustomFormatForModelComponents {
           append("\" useMultipleChoiceUntil=\"").append(qgh.useMultipleChoiceUntil).
           append("\"")
 
-    def from(str: String, fromParams: FromParams) = ???
+    def from(str: String, params: EmptyParams) =
+      QuizGroupHeader(parseQuizGroupType(str), parsePromptType(str),
+          parseResponseType(str), parseMainSeparator(str),
+          parseUseMultipleChoiceUntil(str))
+
+    private def parseQuizGroupType(str: String): QuizGroupType =
+      quizGroupType(StringUtil.parseValue(str, "type=\"", "\"").getOrElse(""))
+
+    private def quizGroupType(str: String): QuizGroupType =
+      str match {
+        case "WordMapping" => WordMapping
+        case "QuestionAndAnswer" => QuestionAndAnswer
+        case _ => l.logError("QuizGroupType " + str + " not recognized")
+          QuestionAndAnswer
+      }
+
+    private def parsePromptType(str: String): String =
+      StringUtil.parseValue(str, "promptType=\"", "\"").getOrElse("")
+    private def parseResponseType(str: String): String =
+      StringUtil.parseValue(str, "responseType=\"", "\"").getOrElse("")
+    private def parseMainSeparator(str: String): String =
+      StringUtil.parseValue(str, "mainSeparator=\"", "\"").getOrElse("|")
+    private def parseUseMultipleChoiceUntil(str: String): Int =
+      StringUtil.parseValue(str, "useMultipleChoiceUntil=\"", "\"").getOrElse("4").toInt
+
   }
 
   implicit object customFormatQuizGroupUserData
-      extends CustomFormat[QuizGroupUserData, EmptyParams, FromParams] {
+      extends CustomFormat[QuizGroupUserData, EmptyParams, EmptyParams] with AppDependencyAccess {
 
     def to(qgud: QuizGroupUserData, strBuilder: StringBuilder, params: EmptyParams) =
       strBuilder.append(" currentPromptNumber=\"").
           append(qgud.currentPromptNumber).append("\"").append(" isActive=\"").
           append(qgud.isActive).append("\"")
 
-    def from(str: String, fromParams: FromParams) = ???
+    def from(str: String, fromParams: EmptyParams) =
+      QuizGroupUserData(parseIsActive(str), parseCurrentPromptNumber(str))
+
+    private def parseIsActive(str: String): Boolean =
+      Try(StringUtil.parseValue(str, "isActive=\"", "\"").get.toBoolean).recover {
+        case e: Exception => l.logError("Could not parse isActive from " + str)
+          false
+      }.get
+
+    private def parseCurrentPromptNumber(str: String): Int =
+      Try(StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").get.toInt).recover {
+        case e: Exception => l.logError("Could not parse prompt number from " + str)
+          0
+      }.get
   }
 
   implicit object customFormatQuizGroupWithHeader
@@ -246,15 +287,17 @@ object CustomFormatForModelComponents {
 
   // Example: 1,7,9;6
   implicit object customFormatUserResponses
-      extends CustomFormat[UserResponses, EmptyParams, FromParams] {
+      extends CustomFormat[UserResponses, EmptyParams, Separator] {
 
-    def from(str: String, fromParams: FromParams): UserResponses = ???
+    def from(str: String, fromParams: Separator): UserResponses = {
+      val wmv = customFormatWordMappingValue.from(str, fromParams)
+      UserResponses(wmv.correctAnswersInARow, wmv.incorrectAnswers)
+    }
 
     def to(ur: UserResponses, strBuilder: StringBuilder, extraParams: EmptyParams):
         StringBuilder = {
       if (!ur.correctResponsesInARow.isEmpty)
-        StringUtil.mkString(strBuilder, ur.correctResponsesInARow,
-          ur.responsePromptNumber, ',')
+        StringUtil.mkString(strBuilder, ur.correctResponsesInARow, ur.responsePromptNumber, ',')
       if (!ur.incorrectResponses.isEmpty) {
         strBuilder.append(';')
         StringUtil.mkString(strBuilder, ur.incorrectResponses, ur.responsePromptNumber, ',')
@@ -326,7 +369,7 @@ object CustomFormatForModelComponents {
         Try(Some(customFormatQuizItem.from(strPromptResponse,
             Separator(fromParams.mainSeparator)))).recover {
           case e: Exception => l.logError("could not parse quiz item with text " +
-            strPromptResponse + " using separator " + fromParams.mainSeparator)
+              strPromptResponse + " using separator " + fromParams.mainSeparator)
             None
         }.get
       }
@@ -352,6 +395,10 @@ object CustomFormatForModelComponents {
   implicit object customFormatDictionary
       extends CustomFormat[Dictionary, Separator, EmptyParams] {
 
+    /*
+     * Currently, dictionaries are written by external scripts, and are read-only within
+     * a running Libanius app, so this function is not implemented.
+     */
     def to(component: Dictionary, strBuilder: StringBuilder, params: Separator) =
       ???
 
@@ -399,6 +446,9 @@ object CustomFormatForModelComponents {
       extends CustomFormat[WordMappingGroup, Separator, Separator]
       with AppDependencyAccess {
 
+    /*
+     * Not used, as WordMappingGroup is only used within Dictionary, which is not written to.
+     */
     def to(component: WordMappingGroup, strBuilder: StringBuilder, params: Separator) =
       ???
 

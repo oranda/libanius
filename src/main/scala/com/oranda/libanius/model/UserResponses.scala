@@ -18,8 +18,6 @@
 
 package com.oranda.libanius.model
 
-import com.oranda.libanius.util.StringUtil
-
 import java.lang.StringBuilder
 
 import scalaz._

@@ -1,8 +1,6 @@
-== 0.98 July ? 2014
+== 0.971 August 10 2014
 
   * Decoupled serialization/deserialization from the model with the new CustomFormat typeclass.
-
-  * TODO: turned Value/TextValue into a typeclass
 
 
 == 0.97 June 13 2014

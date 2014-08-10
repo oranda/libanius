@@ -29,13 +29,18 @@ object TestData {
 
   // word-mapping value
   val wmvCustomFormat = "nachlösen|9,7;6"
-  val wmv: WordMappingValue = deserialize[WordMappingValue, Separator](
-      wmvCustomFormat, Separator("|"))
+  val wmv: WordMappingValue = WordMappingValue("nachlösen",
+      List(UserResponse(9), UserResponse(7)),
+      List(UserResponse(6)))
 
   // word-mapping value set
   val wmvsCustomFormat = "contract|698,696;697/treaty|796;798"
-  val wmvs: WordMappingValueSet = deserialize[WordMappingValueSet, Separator](
-      wmvsCustomFormat, Separator("|"))
+  val wmvs: WordMappingValueSet = WordMappingValueSet(List(
+        WordMappingValue("contract",
+        List(UserResponse(698), UserResponse(696)), List(UserResponse(697))),
+        WordMappingValue("treaty",
+        List(UserResponse(796)), List(UserResponse(798)))
+  ))
 
   // QuizItem data
   val correctAnswersInARow = List(UserResponse(9), UserResponse(7))
@@ -71,7 +76,7 @@ object TestData {
   val qgMemLevelSimple = makeQgMemLevelSimple
 
   val qgMemLevelSimpleCustomFormat =
-    "against|wider|\n" +
+      "against|wider|\n" +
       "entertain|unterhalten|\n"
 
   val qgCustomFormat =
@@ -100,14 +105,14 @@ object TestData {
       qgCustomFormat
 
   def makeQgMemLevel0: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
-    QuizItem("en route", "unterwegs"),
-    QuizItem("full", "satt"),
-    QuizItem("full", "voll"),
-    QuizItem("interrupted", "unterbrochen"),
-    QuizItem("contract", "Vertrag"),
-    QuizItem("rides", "reitet"),
-    QuizItem("on", "auf"),
-    QuizItem("sweeps", "streicht")).toStream)
+      QuizItem("en route", "unterwegs"),
+      QuizItem("full", "satt"),
+      QuizItem("full", "voll"),
+      QuizItem("interrupted", "unterbrochen"),
+      QuizItem("contract", "Vertrag"),
+      QuizItem("rides", "reitet"),
+      QuizItem("on", "auf"),
+      QuizItem("sweeps", "streicht")).toStream)
 
   def makeQgMemLevel1: QuizGroupMemoryLevel = QuizGroupMemoryLevel(5, List(
     QuizItem("entertain", "unterhalten", List(8), List(2)),

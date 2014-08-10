@@ -26,6 +26,8 @@ import java.lang.StringBuilder
 import CustomFormat._
 import CustomFormatForModelComponents._
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.wordmapping.{WordMappingValueSet, WordMappingValue}
+import com.oranda.libanius.model.quizgroup.QuizGroupWithHeader
 
 class CustomFormatSpec extends Specification with AppDependencyAccess {
 
@@ -71,29 +73,31 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
     }
 
     "deserialize a word mapping value" in {
+      val wmv: WordMappingValue = deserialize[WordMappingValue, Separator](
+          wmvCustomFormat, Separator("|"))
       wmv.value mustEqual "nachlösen"
       wmv.userAnswers.length mustEqual 3
       wmv.numCorrectAnswersInARow mustEqual 2
     }
 
     "deserialize a word mapping value set" in {
+      val wmvs = deserialize[WordMappingValueSet, Separator](wmvsCustomFormat, Separator("|"))
       wmvs.containsValue("treaty")
       wmvs.size mustEqual 2
     }
 
     "deserialize a quiz item" in {
       val quizItemStr = "on|auf|"
-      val quizItem = deserialize[QuizItem, Separator](quizItemStr,
-          Separator("|"))
+      val quizItem = deserialize[QuizItem, Separator](quizItemStr, Separator("|"))
       val quizItemExpected = QuizItem("on", "auf")
       quizItem mustEqual quizItemExpected
     }
 
     "deserialize a quiz item with a special separator" in {
       val quizItemStr = "Given a String s = \"2.3\" convert it to a Double ||| s.toDouble"
-      val quizItem = customFormatQuizItem.from(quizItemStr, Separator("|||"))
+      val quizItem = deserialize[QuizItem, Separator](quizItemStr, Separator("|||"))
       val quizItemExpected = QuizItem("Given a String s = \"2.3\" convert it to a Double",
-        "s.toDouble")
+          "s.toDouble")
       quizItem mustEqual quizItemExpected
     }
 
@@ -101,25 +105,20 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
       import CustomFormat._
       import CustomFormatForModelComponents._
 
-      val qgml = deserialize(qgMemLevelSimpleCustomFormat,
-          SeparatorAndRepetitionInterval("|", 0))
+      val qgml = deserialize(qgMemLevelSimpleCustomFormat, SeparatorAndRepetitionInterval("|", 0))
       qgml.numQuizItems mustEqual 2
     }
 
 
     "deserialize a QuizGroupWithHeader" in {
-      qgWithHeader.currentPromptNumber mustEqual 10
-      qgWithHeader.promptType mustEqual "English word"
-      qgWithHeader.responseType mustEqual "German word"
+      val qgwh = deserialize[QuizGroupWithHeader, Separator](qgwhCustomFormat, Separator("|"))
+      qgwh.currentPromptNumber mustEqual 10
+      qgwh.promptType mustEqual "English word"
+      qgwh.responseType mustEqual "German word"
 
-      qgWithHeader.levels(0).numQuizItems mustEqual 8
-      qgWithHeader.levels(1).numQuizItems mustEqual 2
-      qgWithHeader.levels(2).numQuizItems mustEqual 2
-    }
-
-    "deserialize a quiz" in {
-      quiz.numActiveGroups mustEqual 2
-      quiz.numQuizItems mustEqual 16
+      qgwh.levels(0).numQuizItems mustEqual 8
+      qgwh.levels(1).numQuizItems mustEqual 2
+      qgwh.levels(2).numQuizItems mustEqual 2
     }
   }
 }

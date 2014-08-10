@@ -24,6 +24,10 @@ import com.oranda.libanius.model.quizitem.{TextValue, QuizItem, Value}
 
 import java.lang.StringBuilder
 
+/**
+ * TODO: this old class is only used by Dictionary now so perhaps
+ * correctAnswersInARow and incorrectAnswers are unnecessary now
+ */
 case class WordMappingValue(override val value: String,
     correctAnswersInARow: List[UserResponse] = Nil,
     incorrectAnswers: List[UserResponse] = Nil)

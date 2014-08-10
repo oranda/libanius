@@ -29,6 +29,15 @@ class QuizSpec extends Specification with AppDependencyAccess {
   
   "a quiz" should {
 
+
+    "have a certain number of active groups" in {
+      quiz.numActiveGroups mustEqual 2
+    }
+
+    "have a certain number of quiz items" in {
+      quiz.numQuizItems mustEqual 16
+    }
+
     "find values for a prompt" in {
       quiz.findResponsesFor("on", qghEngGer) mustEqual List("auf")
     }

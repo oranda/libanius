@@ -18,11 +18,14 @@
 
 package com.oranda.libanius.model.quizgroup
 
-import com.oranda.libanius.util.StringUtil
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
-import com.oranda.libanius.model.{Separator, ModelComponent}
-import com.oranda.libanius.model.CustomFormat._
+import com.oranda.libanius.model._
+import CustomFormat._
+import com.oranda.libanius.model.Separator
+import com.oranda.libanius.model.EmptyParams
+import CustomFormatForModelComponents._
+
 
 case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
     responseType: String, mainSeparator: String, useMultipleChoiceUntil: Int)
@@ -55,30 +58,7 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
 object QuizGroupHeader extends AppDependencyAccess {
 
   def apply(headerLine: String): QuizGroupHeader =
-    this(parseQuizGroupType(headerLine), parsePromptType(headerLine),
-        parseResponseType(headerLine), parseMainSeparator(headerLine),
-        parseUseMultipleChoiceUntil(headerLine))
-
-  def parseQuizGroupType(str: String): QuizGroupType =
-    quizGroupType(StringUtil.parseValue(str, "type=\"", "\"").getOrElse(""))
-
-  def quizGroupType(str: String): QuizGroupType =
-    str match {
-      case "WordMapping" => WordMapping
-      case "QuestionAndAnswer" => QuestionAndAnswer
-      case _ => l.logError("QuizGroupType " + str + " not recognized")
-                QuestionAndAnswer
-    }
-
-  def parsePromptType(str: String): String =
-    StringUtil.parseValue(str, "promptType=\"", "\"").getOrElse("")
-  def parseResponseType(str: String): String =
-    StringUtil.parseValue(str, "responseType=\"", "\"").getOrElse("")
-  def parseMainSeparator(str: String): String =
-    StringUtil.parseValue(str, "mainSeparator=\"", "\"").getOrElse("|")
-  def parseUseMultipleChoiceUntil(str: String): Int =
-    StringUtil.parseValue(str, "useMultipleChoiceUntil=\"", "\"").getOrElse("4").toInt
-
+      deserialize[QuizGroupHeader, EmptyParams](headerLine, EmptyParams())
 }
 
 abstract class QuizGroupType
