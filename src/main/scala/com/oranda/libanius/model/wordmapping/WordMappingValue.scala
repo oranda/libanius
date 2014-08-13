@@ -20,7 +20,7 @@ package com.oranda.libanius.model.wordmapping
 
 import com.oranda.libanius.model.{ModelComponent, UserResponse}
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem, Value}
+import com.oranda.libanius.model.quizitem.QuizItem
 
 import java.lang.StringBuilder
 
@@ -28,22 +28,14 @@ import java.lang.StringBuilder
  * TODO: this old class is only used by Dictionary now so perhaps
  * correctAnswersInARow and incorrectAnswers are unnecessary now
  */
-case class WordMappingValue(override val value: String,
+case class WordMappingValue(value: String,
     correctAnswersInARow: List[UserResponse] = Nil,
     incorrectAnswers: List[UserResponse] = Nil)
-  extends Value[String](value) with ModelComponent {
+  extends ModelComponent {
 
   def updated(correctAnswersInARow: List[UserResponse], incorrectAnswers: List[UserResponse]):
       WordMappingValue =
     WordMappingValue(value, correctAnswersInARow, incorrectAnswers)
-
-  override def matches(otherText: String) = value == otherText
-
-  override def hasSameStart(otherValue: String): Int => Boolean =
-    TextValue.hasSameStart(value, otherValue)
-
-  override def hasSameEnd(otherValue: String): Int => Boolean =
-    TextValue.hasSameEnd(value, otherValue)
 
   def userAnswers = correctAnswersInARow ++ incorrectAnswers
 

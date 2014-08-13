@@ -23,7 +23,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.util.StringUtil
 import StringUtil._
 
-case class TextValue(override val value: String) extends Value[String](value) {
+case class TextValue(val value: String) {
 
   override def toString = value
 
@@ -36,9 +36,9 @@ case class TextValue(override val value: String) extends Value[String](value) {
   def looselyMatches(userResponse: String): Boolean =
     DesiredResponse(value).matches(userResponse)
 
-  override def hasSameStart(otherValue: String): Int => Boolean =
+  def hasSameStart(otherValue: String): Int => Boolean =
     TextValue.hasSameStart(value, otherValue)
-  override def hasSameEnd(otherValue: String): Int => Boolean =
+  def hasSameEnd(otherValue: String): Int => Boolean =
     TextValue.hasSameEnd(value, otherValue)
 
 }

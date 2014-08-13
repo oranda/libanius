@@ -478,18 +478,18 @@ object CustomFormatForModelComponents {
             val strResponseAndUserInfo = strPromptResponse.substring(i +
                 fromParams.mainSeparator.length)
             wordMappingsMutable += WordMappingPair(strPrompt,
-              WordMappingValueSetLazyProxy(strResponseAndUserInfo, fromParams.mainSeparator))
+                WordMappingValueSetLazyProxy(strResponseAndUserInfo, fromParams.mainSeparator))
           }
 
           Try(parsePromptResponse) recover {
             case e: Exception => l.logError("could not parse prompt-response string: " +
-              strPromptResponse)
+                strPromptResponse)
           }
         }
       }
       Try(parseQuizGroup) recover {
         case e: Exception => l.logError("could not parse wmg with text " + str.take(100) + "..." +
-          str.takeRight(100))
+            str.takeRight(100))
       }
 
       val wordMappingsStream = wordMappingsMutable.toStream
