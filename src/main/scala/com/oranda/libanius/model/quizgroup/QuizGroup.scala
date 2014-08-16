@@ -21,16 +21,15 @@ package com.oranda.libanius.model.quizgroup
 import scala.language.postfixOps
 
 import com.oranda.libanius.model.wordmapping._
-import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
+import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, QuizItem, TextValue}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import scalaz._
 import com.oranda.libanius.model._
 import scalaz.PLens._
-import scala.collection.immutable.Stream
-import scala.collection.immutable.List
+import scala.collection.immutable.{Stream, List}
 import scala.Predef._
-import com.oranda.libanius.util.{Util}
+import com.oranda.libanius.util.Util
 
 /*
  * Contains quiz items for a topic.
@@ -229,6 +228,26 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
       this
 
   protected[model] def get(level: Int): QuizGroupMemoryLevel = levels(level)
+
+
+  protected[model] def quizItemWithChoices(quizItem: QuizItem, header: QuizGroupHeader):
+      QuizItemViewWithChoices = {
+    val numCorrectResponses = quizItem.userResponses.numCorrectResponsesInARow
+    /*
+     * A quiz item might be presented initially in multiple-choice format,
+     * then later wihout any such assistance.
+     */
+    val useMultipleChoice = numCorrectResponses < header.useMultipleChoiceUntil
+    val falseAnswers =
+      if (useMultipleChoice)
+        Util.stopwatch(constructWrongChoices(quizItem, numCorrectResponses),
+          "constructWrongChoices")
+      else Nil
+    val numCorrectResponsesRequired = numLevels
+    new QuizItemViewWithChoices(quizItem, currentPromptNumber, header,
+        falseAnswers, numCorrectResponses, numCorrectResponsesRequired,
+        useMultipleChoice)
+  }
 }
 
 import com.oranda.libanius.model.UserResponse

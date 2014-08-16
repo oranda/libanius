@@ -19,11 +19,9 @@
 package com.oranda.libanius.model.quizgroup
 
 import scala.language.implicitConversions
-import com.oranda.libanius.model.quizitem.{QuizItem}
+import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.util.Util
 import com.oranda.libanius.model.{EmptyParams, CustomFormatForModelComponents, CustomFormat, ModelComponent}
-import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import java.lang.StringBuilder
 
 import CustomFormat._
@@ -36,29 +34,8 @@ case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
     extends ModelComponent {
   def toPair = Pair(header, quizGroup)
 
-  def findPresentableQuizItem: Option[QuizItemViewWithChoices] =
-    quizGroup.findPresentableQuizItem.map(quizItemWithChoices(_, quizGroup.numLevels))
-
-  def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] =
-    quizGroup.findAnyUnfinishedQuizItem.map(quizItemWithChoices(_, quizGroup.numLevels))
-
-  protected[model] def quizItemWithChoices(quizItem: QuizItem, numCorrectResponsesRequired: Int):
-      QuizItemViewWithChoices = {
-    val numCorrectResponses = quizItem.userResponses.numCorrectResponsesInARow
-    /*
-     * A quiz item might be presented initially in multiple-choice format,
-     * then later wihout any such assistance.
-     */
-    val useMultipleChoice = numCorrectResponses < header.useMultipleChoiceUntil
-    val falseAnswers =
-      if (useMultipleChoice)
-        Util.stopwatch(quizGroup.constructWrongChoices(quizItem, numCorrectResponses),
-            "constructWrongChoices")
-      else Nil
-    new QuizItemViewWithChoices(quizItem, quizGroup.currentPromptNumber,
-        header, falseAnswers, numCorrectResponses, numCorrectResponsesRequired,
-        useMultipleChoice)
-  }
+  def findPresentableQuizItem: Option[QuizItem] = quizGroup.findPresentableQuizItem
+  def findAnyUnfinishedQuizItem: Option[QuizItem] = quizGroup.findAnyUnfinishedQuizItem
 
   def toCustomFormat = serialize(this, new StringBuilder, new EmptyParams).toString
 }

@@ -39,9 +39,9 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     def pullQuizItem(qgwh: QuizGroupWithHeader): (QuizGroup, (String, String)) = {
-      val qiView = qgwh.findPresentableQuizItem
-      qiView.isDefined mustEqual true
-      val quizItem = qiView.get.quizItem
+      val quizItemOpt = qgwh.findPresentableQuizItem
+      quizItemOpt.isDefined mustEqual true
+      val quizItem = quizItemOpt.get
       // Each time a quiz item is pulled, a user answer must be set
       val qgUpdated = updatedWithUserResponse(qgwh.quizGroup, quizItem)
       (qgUpdated, (quizItem.prompt.value, quizItem.correctResponse.value))
@@ -78,7 +78,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val quizItem0 = qgwhLocal.findPresentableQuizItem.get
       quizItem0.prompt.value mustEqual "en route" // "against"
       qgwhLocal = QuizGroupWithHeader(qgwhLocal.header,
-          updatedWithUserResponse(qgwhLocal, quizItem0.quizItem))
+          updatedWithUserResponse(qgwhLocal, quizItem0))
       for (promptNum <- 1 until 5)
         qgwhLocal = pullQuizItemAndAnswerCorrectly(qgwhLocal)
 

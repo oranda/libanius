@@ -23,7 +23,7 @@ import scala.collection.immutable._
 import scala.language.postfixOps
 import scala.math.BigDecimal.double2bigDecimal
 import com.oranda.libanius.dependencies._
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem, QuizItemViewWithChoices}
+import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.wordmapping.Dictionary
 
 import CustomFormat._
@@ -38,6 +38,8 @@ import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
 import com.oranda.libanius.net.providers.MyMemoryTranslate
 import scala.util.Try
+import com.oranda.libanius.util.Util
+import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
     extends ModelComponent {
@@ -74,8 +76,8 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def findPresentableQuizItem: Option[QuizItemViewWithChoices] =
     (for {
       (header, quizGroup) <- activeQuizGroups.toStream
-      quizItemView <- QuizGroupWithHeader(header, quizGroup).findPresentableQuizItem.toStream
-    } yield quizItemView).headOption.orElse(findAnyUnfinishedQuizItem)
+      quizItem <- quizGroup.findPresentableQuizItem.toStream
+    } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
 
   /*
    * Near the end of the quiz, there will be items that are "nearly learnt" because they
@@ -87,8 +89,8 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
     l.log("calling findAnyUnfinishedQuizItem")
     (for {
       (header, quizGroup) <- activeQuizGroups
-      quizItemView <- QuizGroupWithHeader(header, quizGroup).findAnyUnfinishedQuizItem
-    } yield quizItemView).headOption
+      quizItem <- quizGroup.findAnyUnfinishedQuizItem
+    } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
   }
 
   def resultsBeginningWith(input: String): List[SearchResult] =
