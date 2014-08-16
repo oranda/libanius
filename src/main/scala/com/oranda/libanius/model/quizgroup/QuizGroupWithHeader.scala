@@ -19,7 +19,6 @@
 package com.oranda.libanius.model.quizgroup
 
 import scala.language.implicitConversions
-import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.{EmptyParams, CustomFormatForModelComponents, CustomFormat, ModelComponent}
 import java.lang.StringBuilder
@@ -33,10 +32,6 @@ import CustomFormatForModelComponents._
 case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
     extends ModelComponent {
   def toPair = Pair(header, quizGroup)
-
-  def findPresentableQuizItem: Option[QuizItem] = quizGroup.findPresentableQuizItem
-  def findAnyUnfinishedQuizItem: Option[QuizItem] = quizGroup.findAnyUnfinishedQuizItem
-
   def toCustomFormat = serialize(this, new StringBuilder, new EmptyParams).toString
 }
 
