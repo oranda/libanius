@@ -102,7 +102,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
     }
 
     "find a presentable quiz item" in {
-      val (quizItemViewWithChoices, _) = quiz.findPresentableQuizItem.get
+      val quizItemViewWithChoices = quiz.findPresentableQuizItem.get
       quizItemViewWithChoices.prompt mustEqual TextValue("against")
     }
 

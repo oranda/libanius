@@ -22,7 +22,6 @@ import com.oranda.libanius.consoleui.Output._
 import com.oranda.libanius.model.Quiz
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import com.oranda.libanius.util.{StringUtil, Util}
-import com.oranda.libanius.model.quizgroup.QuizGroupWithHeader
 import scala.annotation.tailrec
 
 /*
@@ -54,7 +53,7 @@ trait Simulation {
       if (shouldMeasureTime) totalMillisToFindPresentableItems += timeTakenToFindItem
 
       presentableQuizItem match {
-        case (Some((quizItem, qgWithHeader))) =>
+        case Some(quizItem) =>
           val strChoices =
             if (quizItem.useMultipleChoice)
               "\tChoices: " + quizItem.allChoices.mkString(", ")

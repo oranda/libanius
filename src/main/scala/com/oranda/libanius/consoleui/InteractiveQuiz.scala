@@ -46,7 +46,7 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   def testUserWithQuizItem(quiz: Quiz) {
     showScore(quiz)
     Util.stopwatch(quiz.findPresentableQuizItem, "find quiz items") match {
-      case (Some((quizItem, qgWithHeader))) => keepShowingQuizItems(quiz, quizItem)
+      case Some(quizItem) => keepShowingQuizItems(quiz, quizItem)
       case _ => output("No more questions found! Done!")
     }
   }

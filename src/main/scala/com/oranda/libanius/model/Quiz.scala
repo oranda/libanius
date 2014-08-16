@@ -30,7 +30,6 @@ import CustomFormat._
 import CustomFormatForModelComponents._
 
 import scalaz._
-import scalaz.std.set
 import Scalaz._, PLens._
 import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup}
 import scala._
@@ -72,12 +71,11 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
    * Find the first available "presentable" quiz item.
    * Return a quiz item view and the associated quiz group header.
    */
-  def findPresentableQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] =
+  def findPresentableQuizItem: Option[QuizItemViewWithChoices] =
     (for {
       (header, quizGroup) <- activeQuizGroups.toStream
-      quizItem <- QuizGroupWithHeader(header, quizGroup).findPresentableQuizItem.toStream
-    } yield (quizItem, QuizGroupWithHeader(header, quizGroup))).headOption.orElse(
-        findAnyUnfinishedQuizItem)
+      quizItemView <- QuizGroupWithHeader(header, quizGroup).findPresentableQuizItem.toStream
+    } yield quizItemView).headOption.orElse(findAnyUnfinishedQuizItem)
 
   /*
    * Near the end of the quiz, there will be items that are "nearly learnt" because they
@@ -85,13 +83,12 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
    * normal criteria, because the last correct response was recent. However, they do need
    * to be presented in order for the quiz to finish, so this method is called as a last try.
    */
-  def findAnyUnfinishedQuizItem: Option[(QuizItemViewWithChoices, QuizGroupWithHeader)] = {
+  def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] = {
     l.log("calling findAnyUnfinishedQuizItem")
     (for {
       (header, quizGroup) <- activeQuizGroups
-      quizItemView: QuizItemViewWithChoices <- QuizGroupWithHeader(header, quizGroup).findAnyUnfinishedQuizItem
-    } yield (quizItemView, QuizGroupWithHeader(header, quizGroup))).headOption
-
+      quizItemView <- QuizGroupWithHeader(header, quizGroup).findAnyUnfinishedQuizItem
+    } yield quizItemView).headOption
   }
 
   def resultsBeginningWith(input: String): List[SearchResult] =
@@ -250,12 +247,6 @@ object Quiz extends AppDependencyAccess {
   val quizGroupsLens: Lens[Quiz, Map[QuizGroupHeader, QuizGroup]] = Lens.lensu(
       get = (_: Quiz).quizGroups,
       set = (q: Quiz, qgs: Map[QuizGroupHeader, QuizGroup]) => q.copy(quizGroups = qgs))
-
-  /*
-  val memoryLevelsLens: Lens[Quiz, MemoryLevelsOld] = Lens.lensu(
-      get = (_: Quiz).memoryLevels,
-      set = (q: Quiz, ml: MemoryLevelsOld) => q.copy(memoryLevels = ml))
-  */
 
   def quizGroupMapLens[QuizGroupHeader, QuizGroup](header: QuizGroupHeader):
       Lens[Map[QuizGroupHeader, QuizGroup], Option[QuizGroup]] =

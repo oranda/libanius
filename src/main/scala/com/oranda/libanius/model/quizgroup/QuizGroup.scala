@@ -107,7 +107,6 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
   protected[model] def findQuizItem(prompt: String): Option[QuizItem] =
     quizItems.find(quizItem => quizItem.prompt.matches(prompt))
 
-
   protected[model] def updateWithQuizItem(quizItem: QuizItem, isCorrect: Boolean,
       prevMemLevel: Int): QuizGroup = {
     val updatedQuizGroup1 = moveQuizItem(quizItem)
@@ -115,7 +114,6 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
     val updatedQuizGroup3 = updatedQuizGroup2.updatedPromptNumber
     updatedQuizGroup3.updateIntervalForLevel(prevMemLevel)
   }
-
 
   private def moveQuizItem(quizItem: QuizItem): QuizGroup = {
     val qgUpdated = removeQuizItem(quizItem)
