@@ -42,4 +42,3 @@ object QuizGroupWithHeader extends AppDependencyAccess {
   // Forward access to QuizGroup whenever necessary
   implicit def qgwh2qg(qgwh: QuizGroupWithHeader): QuizGroup = qgwh.quizGroup
 }
-

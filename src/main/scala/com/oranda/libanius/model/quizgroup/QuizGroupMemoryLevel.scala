@@ -45,7 +45,7 @@ import com.oranda.libanius.model.UserResponse
  * (A ListMap was formerly used to store quiz items but this was found to be too
  * slow for bulk insert. Currently a Stream is used.)
  */
-case class QuizGroupMemoryLevel(repetitionInterval: Int,
+case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval: Int,
     quizItemStream: Stream[QuizItem] = Stream.empty, totalResponses: Int = 0,
     numCorrectResponses: Int = 0) extends ModelComponent {
 
@@ -194,10 +194,11 @@ case class QuizGroupMemoryLevel(repetitionInterval: Int,
     val numCorrectToAdd = if (isCorrect) 1 else 0
     // For each memory level, only check the recent performance. Reset the counters after a limit.
     if (!isAtLimit)
-      QuizGroupMemoryLevel(repetitionInterval, quizItemStream, totalResponses + 1,
-          numCorrectResponses + numCorrectToAdd)
+      QuizGroupMemoryLevel(correctResponsesInARow, repetitionInterval,
+          quizItemStream, totalResponses + 1, numCorrectResponses + numCorrectToAdd)
     else // reset the counters
-      QuizGroupMemoryLevel(repetitionInterval, quizItemStream, 1, numCorrectToAdd)
+      QuizGroupMemoryLevel(correctResponsesInARow, repetitionInterval,
+          quizItemStream, 1, numCorrectToAdd)
   }
 
   def wasNotTooRecentlyUsed(currentPromptNum : Int, promptNumInMostRecentResponse: Option[Int]) =

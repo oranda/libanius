@@ -53,15 +53,16 @@ case class EmptyParams() extends ToParams with FromParams {
 
 case class Separator(mainSeparator: String) extends ToParams with FromParams {
   def withIndex(index: Int) = SeparatorAndIndex(mainSeparator, index)
-  def withRepetitionInterval(repetitionInterval: Int) =
-    SeparatorAndRepetitionInterval(mainSeparator, repetitionInterval)
+  def withIndexAndRepetitionInterval(index: Int, repetitionInterval: Int) =
+    SeparatorIndexAndRepetitionInterval(mainSeparator, index, repetitionInterval)
 }
 
 case class SeparatorAndIndex(mainSeparator: String, index: Int) extends ToParams {
   def withoutIndex = Separator(mainSeparator)
 }
 
-case class SeparatorAndRepetitionInterval(mainSeparator: String, repetitionInterval: Int)
+case class SeparatorIndexAndRepetitionInterval(mainSeparator: String, index: Int,
+    repetitionInterval: Int)
   extends FromParams
 
 
@@ -334,7 +335,7 @@ object CustomFormatForModelComponents {
         val repetitionInterval = StringUtil.parseValue(headerLine,
             "repetitionInterval=\"", "\"").getOrElse("0").toInt
         val memLevel = customFormatQuizGroupMemoryLevel.from(mainMemLevelText,
-            fromParams.withRepetitionInterval(repetitionInterval))
+            fromParams.withIndexAndRepetitionInterval(index, repetitionInterval))
         Pair(index, memLevel)
       }
 
@@ -346,7 +347,7 @@ object CustomFormatForModelComponents {
   }
 
   implicit object customFormatQuizGroupMemoryLevel
-      extends CustomFormat[QuizGroupMemoryLevel, SeparatorAndIndex, SeparatorAndRepetitionInterval]
+      extends CustomFormat[QuizGroupMemoryLevel, SeparatorAndIndex, SeparatorIndexAndRepetitionInterval]
       with AppDependencyAccess {
     def to(qgml: QuizGroupMemoryLevel, strBuilder: StringBuilder,
         extraParams: SeparatorAndIndex) = {
@@ -363,7 +364,8 @@ object CustomFormatForModelComponents {
     /*
      * Text does not include header line
      */
-    def from(text: String, fromParams: SeparatorAndRepetitionInterval): QuizGroupMemoryLevel = {
+    def from(text: String, fromParams: SeparatorIndexAndRepetitionInterval):
+        QuizGroupMemoryLevel = {
 
       def parseQuizItem(strPromptResponse: String): Option[QuizItem] = {
         Try(Some(customFormatQuizItem.from(strPromptResponse,
@@ -388,7 +390,7 @@ object CustomFormatForModelComponents {
       lineSplitter.setString(text)
       val quizItems = parseQuizItems(lineSplitter)
 
-      QuizGroupMemoryLevel(fromParams.repetitionInterval, quizItems)
+      QuizGroupMemoryLevel(fromParams.index, fromParams.repetitionInterval, quizItems)
     }
   }
 

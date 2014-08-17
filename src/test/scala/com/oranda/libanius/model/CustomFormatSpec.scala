@@ -105,7 +105,8 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
       import CustomFormat._
       import CustomFormatForModelComponents._
 
-      val qgml = deserialize(qgMemLevelSimpleCustomFormat, SeparatorAndRepetitionInterval("|", 0))
+      val qgml = deserialize(qgMemLevelSimpleCustomFormat,
+          SeparatorIndexAndRepetitionInterval("|", 0, 0))
       qgml.numQuizItems mustEqual 2
     }
 

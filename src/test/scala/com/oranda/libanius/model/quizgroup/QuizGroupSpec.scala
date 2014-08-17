@@ -174,8 +174,8 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       pullQuizItem(qgwhUnrolled)._2 mustEqual ("to exchange", "tauschen")
     }
 
-    val memLevel2 = QuizGroupMemoryLevel(repetitionInterval = 15, totalResponses = 2,
-        numCorrectResponses = 1)
+    val memLevel2 = QuizGroupMemoryLevel(correctResponsesInARow = 2,
+        repetitionInterval = 15, totalResponses = 2, numCorrectResponses = 1)
     val qg = QuizGroup(Map(2 -> memLevel2))
 
     "be updated for a correct answer" in {
@@ -195,8 +195,8 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     "have a count reset for a level" in {
-      val memLevel2 = QuizGroupMemoryLevel(repetitionInterval = 15, totalResponses = 10,
-        numCorrectResponses = 1)
+      val memLevel2 = QuizGroupMemoryLevel(correctResponsesInARow = 2,
+          repetitionInterval = 15, totalResponses = 10, numCorrectResponses = 1)
       val qg = QuizGroup(Map(2 -> memLevel2))
       val updatedQg = qg.incrementResponsesCorrect(2)
       updatedQg.totalResponses(2) mustEqual 1

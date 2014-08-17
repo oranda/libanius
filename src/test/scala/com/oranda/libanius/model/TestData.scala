@@ -52,23 +52,23 @@ object TestData {
   /*
    * Construct a quiz group partition.
    */
-  def makeQgMemLevel: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
-    QuizItem("against", "wider"),
-    QuizItem("entertain", "unterhalten"),
-    QuizItem("teach", "unterrichten"),
-    QuizItem("winner", "Siegerin"),
-    QuizItem("en route", "unterwegs"),
-    QuizItem("full", "satt"),
-    QuizItem("full", "voll"),
-    QuizItem("interrupted", "unterbrochen"),
-    QuizItem("contract", "Vertrag"),
-    QuizItem("rides", "reitet"),
-    QuizItem("on", "auf"),
-    QuizItem("sweeps", "streicht")).toStream)
+  def makeQgMemLevel: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, 0, List(
+      QuizItem("against", "wider"),
+      QuizItem("entertain", "unterhalten"),
+      QuizItem("teach", "unterrichten"),
+      QuizItem("winner", "Siegerin"),
+      QuizItem("en route", "unterwegs"),
+      QuizItem("full", "satt"),
+      QuizItem("full", "voll"),
+      QuizItem("interrupted", "unterbrochen"),
+      QuizItem("contract", "Vertrag"),
+      QuizItem("rides", "reitet"),
+      QuizItem("on", "auf"),
+      QuizItem("sweeps", "streicht")).toStream)
 
-  def makeQgMemLevelSimple: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
-    QuizItem("against", "wider"),
-    QuizItem("entertain", "unterhalten")).toStream)
+  def makeQgMemLevelSimple: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, 0, List(
+      QuizItem("against", "wider"),
+      QuizItem("entertain", "unterhalten")).toStream)
 
 
   // defaults for read-only
@@ -104,7 +104,7 @@ object TestData {
       "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" useMultipleChoiceUntil=\"4\" currentPromptNumber=\"10\" isActive=\"true\"\n" +
       qgCustomFormat
 
-  def makeQgMemLevel0: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, List(
+  def makeQgMemLevel0: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, 0, List(
       QuizItem("en route", "unterwegs"),
       QuizItem("full", "satt"),
       QuizItem("full", "voll"),
@@ -114,11 +114,11 @@ object TestData {
       QuizItem("on", "auf"),
       QuizItem("sweeps", "streicht")).toStream)
 
-  def makeQgMemLevel1: QuizGroupMemoryLevel = QuizGroupMemoryLevel(5, List(
+  def makeQgMemLevel1: QuizGroupMemoryLevel = QuizGroupMemoryLevel(1, 5, List(
     QuizItem("entertain", "unterhalten", List(8), List(2)),
     QuizItem("winner", "Siegerin", List(5), List(0))).toStream)
 
-  def makeQgMemLevel2: QuizGroupMemoryLevel = QuizGroupMemoryLevel(15, List(
+  def makeQgMemLevel2: QuizGroupMemoryLevel = QuizGroupMemoryLevel(2, 15, List(
     QuizItem("against", "wider", List(9, 7), List(6)),
     QuizItem("teach", "unterrichten", List(4, 3), List(1))).toStream)
 

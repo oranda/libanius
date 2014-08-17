@@ -262,7 +262,7 @@ object QuizGroup extends AppDependencyAccess {
   def fromQuizItems(quizItems: Stream[QuizItem] = Stream.empty,
       userData: QuizGroupUserData = QuizGroupUserData(true),
       dictionary: Dictionary = new Dictionary()): QuizGroup =
-    QuizGroup(Map(0 -> QuizGroupMemoryLevel(0, quizItems)), userData, dictionary)
+    QuizGroup(Map(0 -> QuizGroupMemoryLevel(0, 0, quizItems)), userData, dictionary)
 
   def apply(memLevelMap: Map[Int, QuizGroupMemoryLevel] = Map(),
       userData: QuizGroupUserData = QuizGroupUserData(true),
@@ -278,7 +278,7 @@ object QuizGroup extends AppDependencyAccess {
     // Note: the final "level" is just a resting place for complete items
     val defaultIntervalList = List(0, 5, 15, 15, 60, 600, 0)
     defaultIntervalList.zipWithIndex.map {
-      case (level, index) => memLevelMap.get(index).getOrElse(QuizGroupMemoryLevel(level))
+      case (level, index) => memLevelMap.get(index).getOrElse(QuizGroupMemoryLevel(index, level))
     }
   }
 
