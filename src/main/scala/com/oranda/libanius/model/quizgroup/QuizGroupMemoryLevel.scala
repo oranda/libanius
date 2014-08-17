@@ -128,15 +128,6 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
   protected[quizgroup] def findQuizItem(prompt: String, response: String): Option[QuizItem] =
     quizItems.find(_.samePromptAndResponse(QuizItem(prompt, response)))
 
-  protected[quizgroup] def findAnyUnfinishedQuizItem: Option[QuizItem] =
-    quizItems.headOption
-
-  def findPresentableQuizItem(currentPromptNumber: Int): Option[QuizItem] =
-    (for {
-      quizItem <- quizItems.toStream
-      if quizItem.isPresentable(currentPromptNumber, repetitionInterval)
-    } yield quizItem).headOption
-
   protected[quizgroup] def constructWrongChoicesSimilar(correctResponses: List[String],
       numWrongResponsesRequired: Int, correctValue: String,
       similarityPredicate: (TextValue, String) => Int => Boolean): List[String] = {
@@ -182,7 +173,6 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
       val randomStart = Random.nextInt(size - sliceSize)
       quizItems.slice(randomStart, randomStart + sliceSize)
     }
-
 
   override def toString =
     repetitionInterval + ":" + numCorrectResponses + "/" + totalResponses + ": " +

@@ -39,8 +39,7 @@ import com.oranda.libanius.util.Util
  * List of partitions matches correctResponseInARow.
  */
 case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
-    userData: QuizGroupUserData, dictionary: Dictionary)
-  extends ModelComponent {
+    userData: QuizGroupUserData, dictionary: Dictionary) extends ModelComponent {
 
   lazy val currentPromptNumber = userData.currentPromptNumber
   lazy val isActive = userData.isActive
@@ -190,25 +189,6 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
       characters.map(_.toString).take(numWrongChoicesRequired).toList
   }
 
-  /*
-   * The memLevels are searched in reverse order for presentable quiz items,
-   * meaning that an item that has been answered correctly (once or more) will
-   * be preferred over an item with no correct answers, assuming the
-   * interval criteria (difference with the prompt number) is satisfied.
-   */
-  def findPresentableQuizItem: Option[QuizItem] =
-    (for {
-      (memLevel, levelIndex) <- levels.zipWithIndex.reverse.tail.toStream
-      quizItem <- memLevel.findPresentableQuizItem(currentPromptNumber).toStream
-    } yield quizItem).headOption
-
-
-  protected[model] def findAnyUnfinishedQuizItem: Option[QuizItem] =
-    (for {
-      (memLevel, levelIndex) <- levels.zipWithIndex.reverse.tail.toStream
-      quizItem <- memLevel.findAnyUnfinishedQuizItem
-    } yield quizItem).headOption
-
   def incrementResponsesCorrect(memoryLevel: Int) = incrementResponses(memoryLevel, true)
   def incrementResponsesIncorrect(memoryLevel: Int) = incrementResponses(memoryLevel, false)
 
@@ -252,9 +232,6 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
 
 import com.oranda.libanius.model.UserResponse
 object QuizGroup extends AppDependencyAccess {
-
-  //def apply(quizItems: Stream[QuizItem] = Stream.empty): QuizGroup  =
-  //  apply(quizItems, new QuizGroupUserData(true), new Dictionary())
 
   /*
    * Form a QuizGroup from quiz items with no user responses.

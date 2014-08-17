@@ -187,7 +187,11 @@ object TestData {
   }
 
   def pullQuizItemAndAnswerCorrectly(qgwh: QuizGroupWithHeader): QuizGroupWithHeader = {
-    val quizItem = qgwh.findPresentableQuizItem.get
+
+    import ProduceQuizItem._
+    import ProduceQuizItemForModelComponents._
+
+    val quizItem = ProduceQuizItem.findPresentableQuizItem(qgwh.quizGroup, Empty()).get
     QuizGroupWithHeader(qgwh.header, updatedWithUserResponse(qgwh.quizGroup, quizItem))
   }
 

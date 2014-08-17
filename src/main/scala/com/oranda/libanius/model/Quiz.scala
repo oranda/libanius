@@ -32,14 +32,15 @@ import CustomFormatForModelComponents._
 import scalaz._
 import Scalaz._, PLens._
 import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup}
-import scala._
 import scala.collection.immutable.Nil
 import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
 import com.oranda.libanius.net.providers.MyMemoryTranslate
 import scala.util.Try
-import com.oranda.libanius.util.Util
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
+
+import ProduceQuizItem._
+import ProduceQuizItemForModelComponents._
 
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
     extends ModelComponent {
@@ -76,7 +77,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def findPresentableQuizItem: Option[QuizItemViewWithChoices] =
     (for {
       (header, quizGroup) <- activeQuizGroups.toStream
-      quizItem <- quizGroup.findPresentableQuizItem.toStream
+      quizItem <- ProduceQuizItem.findPresentableQuizItem(quizGroup, Empty()).toStream
     } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
 
   /*
@@ -89,7 +90,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
     l.log("calling findAnyUnfinishedQuizItem")
     (for {
       (header, quizGroup) <- activeQuizGroups
-      quizItem <- quizGroup.findAnyUnfinishedQuizItem
+      quizItem <- ProduceQuizItem.findAnyUnfinishedQuizItem(quizGroup, Empty())
     } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
   }
 

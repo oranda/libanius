@@ -27,8 +27,15 @@ import com.oranda.libanius.util.Util
 import com.oranda.libanius.model.TestData._
 import com.oranda.libanius.model._
 
+import com.oranda.libanius.model.Empty
+import com.oranda.libanius.model.Separator
+
 import CustomFormat._
 import CustomFormatForModelComponents._
+
+import ProduceQuizItem._
+import ProduceQuizItemForModelComponents._
+
 
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
@@ -39,7 +46,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     def pullQuizItem(qgwh: QuizGroupWithHeader): (QuizGroup, (String, String)) = {
-      val quizItemOpt = qgwh.findPresentableQuizItem
+      val quizItemOpt = ProduceQuizItem.findPresentableQuizItem(qgwh.quizGroup, Empty())
       quizItemOpt.isDefined mustEqual true
       val quizItem = quizItemOpt.get
       // Each time a quiz item is pulled, a user answer must be set
@@ -64,7 +71,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "update memory levels on a user response" in {
       qgwhSimple.quizGroup.levels(1).size mustEqual 0
-      val quizItem = qgwhSimple.quizGroup.findPresentableQuizItem
+      val quizItem = ProduceQuizItem.findPresentableQuizItem(qgwhSimple.quizGroup, Empty())
       val qgUpdated = updatedWithUserResponse(qgwhSimple.quizGroup, quizItem.get)
       qgUpdated.levels(1).size mustEqual 1
     }
@@ -75,14 +82,15 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
      */
     "present an item that has been answered before after five prompts" in {
       var qgwhLocal = makeSimpleQgWithHeader
-      val quizItem0 = qgwhLocal.findPresentableQuizItem.get
+      val quizItem0 = ProduceQuizItem.findPresentableQuizItem(
+          qgwhLocal.quizGroup, Empty()).get
       quizItem0.prompt.value mustEqual "en route" // "against"
       qgwhLocal = QuizGroupWithHeader(qgwhLocal.header,
           updatedWithUserResponse(qgwhLocal, quizItem0))
       for (promptNum <- 1 until 5)
         qgwhLocal = pullQuizItemAndAnswerCorrectly(qgwhLocal)
 
-      val quizItem5 = qgwhLocal.findPresentableQuizItem
+      val quizItem5 = ProduceQuizItem.findPresentableQuizItem(qgwhLocal.quizGroup, Empty())
       quizItem5.get.prompt.value mustEqual "en route" // "against"
     }
 
@@ -138,8 +146,8 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "add a new quiz item to the front of its queue" in {
       val qgUpdated = quizGroupSimple.addNewQuizItem("to exchange", "tauschen")
-      qgUpdated.findPresentableQuizItem mustEqual Some(
-          QuizItem("to exchange", "tauschen"))
+      val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(qgUpdated, Empty())
+      foundQuizItem mustEqual Some(QuizItem("to exchange", "tauschen"))
     }
 
     "move an existing quiz pair to the front of its queue" in {
@@ -148,8 +156,9 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
       val qgwhUpdated = QuizGroupWithHeader(qgwh.header, qgUpdated)
-      qgwhUpdated.quizGroup.levels(0).findPresentableQuizItem(
-          qgwhUpdated.currentPromptNumber) mustEqual Some(QuizItem("sweeps", "streicht"))
+      val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(
+          qgwhUpdated.quizGroup.levels(0), CurrentPromptNumber(qgwhUpdated.currentPromptNumber))
+      foundQuizItem mustEqual Some(QuizItem("sweeps", "streicht"))
     }
 
     "add a quiz pair where only the prompt already exists" in {
@@ -158,8 +167,9 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
       val qgwhUpdated = QuizGroupWithHeader(qgwh.header, qgUpdated)
-      qgwhUpdated.quizGroup.levels(0).findPresentableQuizItem(
-          qgwhUpdated.currentPromptNumber) mustEqual Some(QuizItem("on", "zu"))
+      val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(
+        qgwhUpdated.quizGroup.levels(0), CurrentPromptNumber(qgwhUpdated.currentPromptNumber))
+      foundQuizItem mustEqual Some(QuizItem("on", "zu"))
     }
 
 

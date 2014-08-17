@@ -26,6 +26,9 @@ import com.oranda.libanius.model._
 import com.oranda.libanius.model.UserResponse
 import TestData._
 
+import ProduceQuizItem._
+import ProduceQuizItemForModelComponents._
+
 class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
   "a quiz group memory level" should {
@@ -61,7 +64,10 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
     def pullQuizItem(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int):
         (QuizGroupMemoryLevel, (String, String)) = {
-      val quizItem = qgml.findPresentableQuizItem(currentPromptNumber)
+
+      val quizItem = ProduceQuizItem.findPresentableQuizItem(qgml,
+        CurrentPromptNumber(currentPromptNumber))
+
       quizItem.isDefined mustEqual true
       // Each time a quiz item is pulled, a user answer must be set
       val qgmlUpdated1 = qgml.updatedWithUserAnswer(quizItem.get.prompt,
@@ -111,7 +117,7 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
     def pullQuizItemAndAnswerCorrectly(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int):
         QuizGroupMemoryLevel = {
-      val quizItem = qgml.findPresentableQuizItem(currentPromptNumber).get
+      val quizItem = findPresentableQuizItem(qgml, CurrentPromptNumber(currentPromptNumber)).get
       updateWithUserAnswer(qgml, quizItem, currentPromptNumber)
     }
 
@@ -124,14 +130,14 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
     "present an item that has been answered before after five prompts" in {
       var qgmlLocal = makeQgMemLevel
-      val quizItem0 = qgmlLocal.findPresentableQuizItem(0).get
+      val quizItem0 = findPresentableQuizItem(qgmlLocal, CurrentPromptNumber(0)).get
       quizItem0.prompt.value mustEqual "against"
       qgmlLocal = updateWithUserAnswer(qgmlLocal, quizItem0, 0)
 
       for (promptNum <- 1 until 5)
         qgmlLocal = pullQuizItemAndAnswerCorrectly(qgmlLocal, promptNum)
 
-      val quizItem5 = qgmlLocal.findPresentableQuizItem(5)
+      val quizItem5 = findPresentableQuizItem(qgmlLocal, CurrentPromptNumber(5))
       quizItem5.get.prompt.value mustEqual "against"
     }
   }
