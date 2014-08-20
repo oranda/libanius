@@ -18,15 +18,16 @@
 
 package com.oranda.libanius.model
 
-import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, QuizItem}
 import com.oranda.libanius.model.quizgroup.{QuizGroupMemoryLevel, QuizGroup}
+import com.oranda.libanius.dependencies.AppDependencyAccess
 
 /**
  * Type class definition for finding quiz items in model entities.
  */
-trait ProduceQuizItem[A <: ModelComponent, B <: Params] {
-  def findPresentableQuizItem(component: A, params: B): Option[QuizItem]
-  def findAnyUnfinishedQuizItem(component: A, params: B): Option[QuizItem]
+trait ProduceQuizItem[A <: ModelComponent, B <: Params, C] {
+  def findPresentableQuizItem(component: A, params: B): Option[C]
+  def findAnyUnfinishedQuizItem(component: A, params: B): Option[C]
 }
 
 trait Params {}
@@ -39,18 +40,47 @@ object CurrentPromptNumber {
 // provides external access to the typeclass, forwarding the call to the appropriate type
 object ProduceQuizItem {
 
-  def findPresentableQuizItem[A <: ModelComponent, B <: Params](component: A, params: B)
-      (implicit pqi: ProduceQuizItem[A, B]): Option[QuizItem] =
+  // TODO: use context bounds and/or implicitly to shorten these signatures
+
+  def findPresentableQuizItem[A <: ModelComponent, B <: Params, C]
+      (component: A, params: B)(implicit pqi: ProduceQuizItem[A, B, C], c: C => QuizItem): Option[C] =
     pqi.findPresentableQuizItem(component, params)
 
-  def findAnyUnfinishedQuizItem[A <: ModelComponent, B <: Params](component: A, params: B)
-      (implicit pqi: ProduceQuizItem[A, B]): Option[QuizItem] =
+  def findAnyUnfinishedQuizItem[A <: ModelComponent, B <: Params, C]
+      (component: A, params: B)(implicit pqi: ProduceQuizItem[A, B, C], c: C => QuizItem): Option[C] =
     pqi.findAnyUnfinishedQuizItem(component, params)
 }
 
-object ProduceQuizItemForModelComponents {
+object ProduceQuizItemForModelComponents extends AppDependencyAccess {
 
-  implicit object produceQuizItemQuizGroup extends ProduceQuizItem[QuizGroup, Empty] {
+  implicit object produceQuizItemQuiz extends ProduceQuizItem[Quiz, Empty, QuizItemViewWithChoices] {
+
+    /*
+     * Find the first available "presentable" quiz item.
+     * Return a quiz item view and the associated quiz group header.
+     */
+    def findPresentableQuizItem(quiz: Quiz, params: Empty): Option[QuizItemViewWithChoices] =
+      (for {
+        (header, quizGroup) <- quiz.activeQuizGroups.toStream
+        quizItem <- produceQuizItemQuizGroup.findPresentableQuizItem(quizGroup, Empty()).toStream
+      } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
+
+    /*
+     * Near the end of the quiz, there will be items that are "nearly learnt" because they
+     * have been answered correctly several times, but are not considered presentable under
+     * normal criteria, because the last correct response was recent. However, they do need
+     * to be presented in order for the quiz to finish, so this method is called as a last try.
+     */
+    def findAnyUnfinishedQuizItem(quiz: Quiz, params: Empty): Option[QuizItemViewWithChoices] = {
+      l.log("calling findAnyUnfinishedQuizItem")
+      (for {
+        (header, quizGroup) <- quiz.activeQuizGroups
+        quizItem <- produceQuizItemQuizGroup.findAnyUnfinishedQuizItem(quizGroup, Empty())
+      } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
+    }
+  }
+
+  implicit object produceQuizItemQuizGroup extends ProduceQuizItem[QuizGroup, Empty, QuizItem] {
     /*
      * The memLevels are searched in reverse order for presentable quiz items,
      * meaning that an item that has been answered correctly (once or more) will
@@ -74,7 +104,7 @@ object ProduceQuizItemForModelComponents {
   }
 
   implicit object produceQuizItemQuizGroupMemoryLevel
-      extends ProduceQuizItem[QuizGroupMemoryLevel, CurrentPromptNumber] {
+      extends ProduceQuizItem[QuizGroupMemoryLevel, CurrentPromptNumber, QuizItem] {
 
     def findPresentableQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber):
         Option[QuizItem] =

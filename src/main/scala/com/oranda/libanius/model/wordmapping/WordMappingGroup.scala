@@ -38,7 +38,7 @@ case class WordMappingGroup(header: QuizGroupHeader,
   def toQuizGroup: QuizGroup = {
     def makeQuizItems(wmPair: WordMappingPair): Iterable[QuizItem] =
       wmPair.valueSet.values.map(value =>
-        QuizItem(TextValue(wmPair.key), TextValue(value.value),
+        QuizItem(wmPair.key, value.value,
             UserResponses(value.correctAnswersInARow, value.incorrectAnswers)))
 
     val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems(_))

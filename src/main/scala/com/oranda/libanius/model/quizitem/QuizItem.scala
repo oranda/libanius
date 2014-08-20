@@ -20,6 +20,24 @@ package com.oranda.libanius.model.quizitem
 
 import com.oranda.libanius.model.{ModelComponent, UserResponse, UserResponses}
 
+trait QuizItem extends ModelComponent {
+  def prompt: TextValue
+  def correctResponse: TextValue
+  def userResponses: UserResponses
+
+  def promptNumInMostRecentAnswer: Option[Int]
+  def numCorrectResponsesInARow: Int
+
+  def samePromptAndResponse(other: QuizItem): Boolean
+
+  def isPresentable(currentPromptNumber: Int, repetitionInterval: Int): Boolean
+
+  def looselyMatches(userResponse: String): Boolean
+
+  def updatedWithUserResponse(response: TextValue, wasCorrect: Boolean,
+                              userResponse: UserResponse): QuizItem
+}
+
 /*
  * A connection between two things, and user information associated with the connection.
  *
@@ -27,13 +45,13 @@ import com.oranda.libanius.model.{ModelComponent, UserResponse, UserResponses}
  * correctResponse: the desired correctResponse
  * userResponses: a history of actual responses
  *
- * Examples of QuizItems:
- *  - a question and an answer in the quiz
- *  - a word and a translation
+ * TODO: split this into two or more subtypes, representing:
+ *  1. a QuizItem for a word and a translation
+ *  2. a QuizItem for a question and an answer
  */
-case class QuizItem(prompt: TextValue, correctResponse: TextValue,
+case class QuizItemConcrete(prompt: TextValue, correctResponse: TextValue,
     userResponses: UserResponses = new UserResponses())
-  extends ModelComponent {
+  extends QuizItem {
 
   def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
   def numCorrectResponsesInARow = userResponses.numCorrectResponsesInARow
@@ -50,17 +68,25 @@ case class QuizItem(prompt: TextValue, correctResponse: TextValue,
   def updatedWithUserResponse(response: TextValue, wasCorrect: Boolean,
       userResponse: UserResponse): QuizItem = {
     val userResponsesUpdated = userResponses.add(userResponse, wasCorrect)
-    QuizItem(prompt, response, userResponsesUpdated)
+    QuizItemConcrete(prompt, response, userResponsesUpdated)
   }
 }
 
 object QuizItem {
+
+  def apply(prompt: TextValue, response: TextValue,
+      userResponses: UserResponses = new UserResponses()): QuizItem =
+    QuizItemConcrete(prompt, response, userResponses)
+
   def apply(prompt: String, response: String): QuizItem =
-    QuizItem(TextValue(prompt), TextValue(response))
+    QuizItemConcrete(TextValue(prompt), TextValue(response))
+
+  def apply(prompt: String, response: String, userResponses: UserResponses): QuizItem =
+    QuizItemConcrete(TextValue(prompt), TextValue(response), userResponses)
 
   def apply(prompt: String, response: String, correctResponses: List[Int],
       incorrectResponses: List[Int]): QuizItem =
-    QuizItem(TextValue(prompt), TextValue(response),
+    QuizItemConcrete(TextValue(prompt), TextValue(response),
         new UserResponses(correctResponses.map(UserResponse(_)),
         incorrectResponses.map(UserResponse(_))))
 }

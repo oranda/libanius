@@ -191,7 +191,7 @@ object TestData {
     import ProduceQuizItem._
     import ProduceQuizItemForModelComponents._
 
-    val quizItem = ProduceQuizItem.findPresentableQuizItem(qgwh.quizGroup, Empty()).get
+    val quizItem = findPresentableQuizItem(qgwh.quizGroup, Empty()).get
     QuizGroupWithHeader(qgwh.header, updatedWithUserResponse(qgwh.quizGroup, quizItem))
   }
 

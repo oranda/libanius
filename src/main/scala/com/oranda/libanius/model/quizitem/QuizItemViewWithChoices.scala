@@ -18,10 +18,10 @@
 
 package com.oranda.libanius.model.quizitem
 
+import scala.language.implicitConversions
 import scala.util.Random
-import com.oranda.libanius.model.UserResponses
+import com.oranda.libanius.model.{UserResponse, UserResponses}
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
-import com.oranda.libanius.dependencies.AppDependencyAccess
 
 /**
  * Quiz item data holder:
@@ -36,8 +36,9 @@ case class QuizItemViewWithChoices(
     val numCorrectResponsesRequired: Int,
     val useMultipleChoice: Boolean) {
 
-  lazy val prompt = quizItem.prompt
-  lazy val correctResponse = quizItem.correctResponse
+  lazy val prompt: TextValue = quizItem.prompt
+  lazy val correctResponse: TextValue = quizItem.correctResponse
+  lazy val userResponses = quizItem.userResponses
   lazy val promptType = quizGroupHeader.promptType
   lazy val responseType = quizGroupHeader.responseType
 
@@ -49,4 +50,10 @@ case class QuizItemViewWithChoices(
     val allChoices = quizItem.correctResponse.value :: otherChoices
     Random.shuffle(allChoices)
   }
+}
+
+object QuizItemViewWithChoices {
+  // Allow QuizItemViewWithChoices to stand in for QuizItem whenever necessary
+  implicit def qiView2qi(quizItemView: QuizItemViewWithChoices): QuizItem =
+    quizItemView.quizItem
 }

@@ -191,7 +191,7 @@ object CustomFormatForModelComponents {
 
       val wmv = customFormatWordMappingValue.from(strResponseAndUserInfo, fromParams)
       val userResponses = UserResponses(wmv.correctAnswersInARow, wmv.incorrectAnswers)
-      QuizItem(TextValue(strPrompt), TextValue(wmv.value), userResponses)
+      QuizItem(strPrompt, wmv.value, userResponses)
     }
   }
 

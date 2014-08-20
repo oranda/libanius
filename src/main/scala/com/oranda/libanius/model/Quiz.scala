@@ -70,30 +70,6 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
   def numDictionaryKeyWords(qgh: QuizGroupHeader) = quizGroups(qgh).numDictionaryKeyWords
 
-  /*
-   * Find the first available "presentable" quiz item.
-   * Return a quiz item view and the associated quiz group header.
-   */
-  def findPresentableQuizItem: Option[QuizItemViewWithChoices] =
-    (for {
-      (header, quizGroup) <- activeQuizGroups.toStream
-      quizItem <- ProduceQuizItem.findPresentableQuizItem(quizGroup, Empty()).toStream
-    } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
-
-  /*
-   * Near the end of the quiz, there will be items that are "nearly learnt" because they
-   * have been answered correctly several times, but are not considered presentable under
-   * normal criteria, because the last correct response was recent. However, they do need
-   * to be presented in order for the quiz to finish, so this method is called as a last try.
-   */
-  def findAnyUnfinishedQuizItem: Option[QuizItemViewWithChoices] = {
-    l.log("calling findAnyUnfinishedQuizItem")
-    (for {
-      (header, quizGroup) <- activeQuizGroups
-      quizItem <- ProduceQuizItem.findAnyUnfinishedQuizItem(quizGroup, Empty())
-    } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
-  }
-
   def resultsBeginningWith(input: String): List[SearchResult] =
     activeQuizGroups.flatMap {
       case (header, quizGroup) => Dictionary.convertToSearchResults(

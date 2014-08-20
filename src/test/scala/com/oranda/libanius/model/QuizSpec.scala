@@ -25,6 +25,9 @@ import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, WordMapping, Quiz
 
 import TestData._
 
+import ProduceQuizItem._
+import ProduceQuizItemForModelComponents._
+
 class QuizSpec extends Specification with AppDependencyAccess {
   
   "a quiz" should {
@@ -102,7 +105,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
     }
 
     "find a presentable quiz item" in {
-      val quizItemViewWithChoices = quiz.findPresentableQuizItem.get
+      val quizItemViewWithChoices = findPresentableQuizItem(quiz, Empty()).get
       quizItemViewWithChoices.prompt mustEqual TextValue("against")
     }
 

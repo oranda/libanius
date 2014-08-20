@@ -46,7 +46,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     def pullQuizItem(qgwh: QuizGroupWithHeader): (QuizGroup, (String, String)) = {
-      val quizItemOpt = ProduceQuizItem.findPresentableQuizItem(qgwh.quizGroup, Empty())
+      val quizItemOpt = findPresentableQuizItem(qgwh.quizGroup, Empty())
       quizItemOpt.isDefined mustEqual true
       val quizItem = quizItemOpt.get
       // Each time a quiz item is pulled, a user answer must be set
@@ -71,7 +71,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "update memory levels on a user response" in {
       qgwhSimple.quizGroup.levels(1).size mustEqual 0
-      val quizItem = ProduceQuizItem.findPresentableQuizItem(qgwhSimple.quizGroup, Empty())
+      val quizItem = findPresentableQuizItem(qgwhSimple.quizGroup, Empty())
       val qgUpdated = updatedWithUserResponse(qgwhSimple.quizGroup, quizItem.get)
       qgUpdated.levels(1).size mustEqual 1
     }
@@ -82,15 +82,14 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
      */
     "present an item that has been answered before after five prompts" in {
       var qgwhLocal = makeSimpleQgWithHeader
-      val quizItem0 = ProduceQuizItem.findPresentableQuizItem(
-          qgwhLocal.quizGroup, Empty()).get
+      val quizItem0 = findPresentableQuizItem(qgwhLocal.quizGroup, Empty()).get
       quizItem0.prompt.value mustEqual "en route" // "against"
       qgwhLocal = QuizGroupWithHeader(qgwhLocal.header,
           updatedWithUserResponse(qgwhLocal, quizItem0))
       for (promptNum <- 1 until 5)
         qgwhLocal = pullQuizItemAndAnswerCorrectly(qgwhLocal)
 
-      val quizItem5 = ProduceQuizItem.findPresentableQuizItem(qgwhLocal.quizGroup, Empty())
+      val quizItem5 = findPresentableQuizItem(qgwhLocal.quizGroup, Empty())
       quizItem5.get.prompt.value mustEqual "en route" // "against"
     }
 

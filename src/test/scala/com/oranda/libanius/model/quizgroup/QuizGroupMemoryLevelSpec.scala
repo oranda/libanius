@@ -65,8 +65,7 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
     def pullQuizItem(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int):
         (QuizGroupMemoryLevel, (String, String)) = {
 
-      val quizItem = ProduceQuizItem.findPresentableQuizItem(qgml,
-        CurrentPromptNumber(currentPromptNumber))
+      val quizItem = findPresentableQuizItem(qgml, CurrentPromptNumber(currentPromptNumber))
 
       quizItem.isDefined mustEqual true
       // Each time a quiz item is pulled, a user answer must be set
