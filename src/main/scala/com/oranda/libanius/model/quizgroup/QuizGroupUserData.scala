@@ -20,9 +20,10 @@ package com.oranda.libanius.model.quizgroup
 
 import scalaz._
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.{EmptyParams, ModelComponent}
-import com.oranda.libanius.model.CustomFormat._
-import com.oranda.libanius.model.CustomFormatForModelComponents._
+import com.oranda.libanius.model.ModelComponent
+import com.oranda.libanius.model.action.customformat._
+import CustomFormat._
+import CustomFormatForModelComponents._
 
 case class QuizGroupUserData(isActive: Boolean = false, currentPromptNumber: Int = 0)
     extends ModelComponent
@@ -30,7 +31,7 @@ case class QuizGroupUserData(isActive: Boolean = false, currentPromptNumber: Int
 object QuizGroupUserData extends AppDependencyAccess {
 
   def apply(headerLine: String): QuizGroupUserData =
-    deserialize[QuizGroupUserData, EmptyParams](headerLine, EmptyParams())
+    deserialize[QuizGroupUserData, NoParams](headerLine, NoParams())
 
   val activeLens: Lens[QuizGroupUserData, Boolean] = Lens.lensu(
       get = (_: QuizGroupUserData).isActive,

@@ -26,6 +26,7 @@ import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.wordmapping.Dictionary
 
+import com.oranda.libanius.model.action.customformat._
 import CustomFormat._
 import CustomFormatForModelComponents._
 
@@ -37,10 +38,6 @@ import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
 import com.oranda.libanius.net.providers.MyMemoryTranslate
 import scala.util.Try
-import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
-
-import ProduceQuizItem._
-import ProduceQuizItemForModelComponents._
 
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
     extends ModelComponent {

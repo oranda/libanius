@@ -25,17 +25,10 @@ import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.util.Util
 
 import com.oranda.libanius.model.TestData._
-import com.oranda.libanius.model._
 
-import com.oranda.libanius.model.Empty
-import com.oranda.libanius.model.Separator
-
-import CustomFormat._
-import CustomFormatForModelComponents._
-
+import com.oranda.libanius.model.action.producequizitem._
 import ProduceQuizItem._
 import ProduceQuizItemForModelComponents._
-
 
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
@@ -46,7 +39,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     }
 
     def pullQuizItem(qgwh: QuizGroupWithHeader): (QuizGroup, (String, String)) = {
-      val quizItemOpt = findPresentableQuizItem(qgwh.quizGroup, Empty())
+      val quizItemOpt = findPresentableQuizItem(qgwh.quizGroup, NoParams())
       quizItemOpt.isDefined mustEqual true
       val quizItem = quizItemOpt.get
       // Each time a quiz item is pulled, a user answer must be set
@@ -71,7 +64,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "update memory levels on a user response" in {
       qgwhSimple.quizGroup.levels(1).size mustEqual 0
-      val quizItem = findPresentableQuizItem(qgwhSimple.quizGroup, Empty())
+      val quizItem = findPresentableQuizItem(qgwhSimple.quizGroup, NoParams())
       val qgUpdated = updatedWithUserResponse(qgwhSimple.quizGroup, quizItem.get)
       qgUpdated.levels(1).size mustEqual 1
     }
@@ -82,14 +75,14 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
      */
     "present an item that has been answered before after five prompts" in {
       var qgwhLocal = makeSimpleQgWithHeader
-      val quizItem0 = findPresentableQuizItem(qgwhLocal.quizGroup, Empty()).get
+      val quizItem0 = findPresentableQuizItem(qgwhLocal.quizGroup, NoParams()).get
       quizItem0.prompt.value mustEqual "en route" // "against"
       qgwhLocal = QuizGroupWithHeader(qgwhLocal.header,
           updatedWithUserResponse(qgwhLocal, quizItem0))
       for (promptNum <- 1 until 5)
         qgwhLocal = pullQuizItemAndAnswerCorrectly(qgwhLocal)
 
-      val quizItem5 = findPresentableQuizItem(qgwhLocal.quizGroup, Empty())
+      val quizItem5 = findPresentableQuizItem(qgwhLocal.quizGroup, NoParams())
       quizItem5.get.prompt.value mustEqual "en route" // "against"
     }
 
@@ -127,6 +120,11 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
           "contract|Vertrag'9,3\n" +
           "en route|unterwegs'7,1\n"
 
+
+      import com.oranda.libanius.model.action.customformat._
+      import CustomFormat._
+      import CustomFormatForModelComponents._
+
       val demoGroup: QuizGroup =
           deserialize[QuizGroup, Separator](demoGroupText, Separator("|"))
       val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get
@@ -145,7 +143,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "add a new quiz item to the front of its queue" in {
       val qgUpdated = quizGroupSimple.addNewQuizItem("to exchange", "tauschen")
-      val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(qgUpdated, Empty())
+      val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(qgUpdated, NoParams())
       foundQuizItem mustEqual Some(QuizItem("to exchange", "tauschen"))
     }
 

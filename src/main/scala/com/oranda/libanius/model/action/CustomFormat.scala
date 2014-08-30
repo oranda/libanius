@@ -16,11 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.model
+package com.oranda.libanius.model.action.customformat
 
 import com.oranda.libanius.model.quizgroup._
 import java.lang.StringBuilder
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.wordmapping._
 import com.oranda.libanius.util.{StringSplitter, Util, StringUtil}
 import scala.util.Try
@@ -29,6 +29,7 @@ import com.oranda.libanius.model.wordmapping.WordMappingPair
 import com.oranda.libanius.model.wordmapping.WordMappingValueSetLazyProxy
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import scala.collection.immutable.Stream
+import com.oranda.libanius.model._
 
 /**
  * Type class definition for ModelComponent serialization/deserialization using a custom format.
@@ -44,10 +45,10 @@ trait ToCustomFormat[A <: ModelComponent, B <: ToParams] {
   def to(component: A, strBuilder: StringBuilder, extraParams: B): StringBuilder
 }
 
-trait FromParams {}
-trait ToParams {}
+trait FromParams
+trait ToParams
 
-case class EmptyParams() extends ToParams with FromParams {
+case class NoParams() extends FromParams with ToParams {
   def withSeparator(separator: String) = Separator(separator)
 }
 
@@ -81,14 +82,15 @@ object CustomFormat {
 }
 
 object CustomFormatForModelComponents {
+
   implicit object customFormatQuizGroupHeader
-      extends CustomFormat[QuizGroupHeader, EmptyParams, EmptyParams] with AppDependencyAccess {
+      extends CustomFormat[QuizGroupHeader, NoParams, NoParams] with AppDependencyAccess {
 
     /**
      * StringBuilder holds mutable state, but the serialization needs to be
      * highly efficient on Android for large quiz files.
      */
-    def to(qgh: QuizGroupHeader, strBuilder: StringBuilder, params: EmptyParams) =
+    def to(qgh: QuizGroupHeader, strBuilder: StringBuilder, params: NoParams) =
       strBuilder.append("#quizGroup type=\"").append(qgh.quizGroupType).
           append("\" promptType=\""). append(qgh.promptType).
           append("\" responseType=\"").append(qgh.responseType).
@@ -96,7 +98,7 @@ object CustomFormatForModelComponents {
           append("\" useMultipleChoiceUntil=\"").append(qgh.useMultipleChoiceUntil).
           append("\"")
 
-    def from(str: String, params: EmptyParams) =
+    def from(str: String, params: NoParams) =
       QuizGroupHeader(parseQuizGroupType(str), parsePromptType(str),
           parseResponseType(str), parseMainSeparator(str),
           parseUseMultipleChoiceUntil(str))
@@ -124,14 +126,14 @@ object CustomFormatForModelComponents {
   }
 
   implicit object customFormatQuizGroupUserData
-      extends CustomFormat[QuizGroupUserData, EmptyParams, EmptyParams] with AppDependencyAccess {
+      extends CustomFormat[QuizGroupUserData, NoParams, NoParams] with AppDependencyAccess {
 
-    def to(qgud: QuizGroupUserData, strBuilder: StringBuilder, params: EmptyParams) =
+    def to(qgud: QuizGroupUserData, strBuilder: StringBuilder, params: NoParams) =
       strBuilder.append(" currentPromptNumber=\"").
           append(qgud.currentPromptNumber).append("\"").append(" isActive=\"").
           append(qgud.isActive).append("\"")
 
-    def from(str: String, fromParams: EmptyParams) =
+    def from(str: String, fromParams: NoParams) =
       QuizGroupUserData(parseIsActive(str), parseCurrentPromptNumber(str))
 
     private def parseIsActive(str: String): Boolean =
@@ -148,7 +150,7 @@ object CustomFormatForModelComponents {
   }
 
   implicit object customFormatQuizGroupWithHeader
-      extends CustomFormat[QuizGroupWithHeader, EmptyParams, Separator] {
+      extends CustomFormat[QuizGroupWithHeader, NoParams, Separator] {
     /*
      * Example of custom format:
      *
@@ -156,7 +158,7 @@ object CustomFormatForModelComponents {
      *    against|wider
      *    entertain|unterhalten
      */
-    def to(qgwh: QuizGroupWithHeader, strBuilder: StringBuilder, extraParams: EmptyParams):
+    def to(qgwh: QuizGroupWithHeader, strBuilder: StringBuilder, extraParams: NoParams):
         StringBuilder = {
       customFormatQuizGroupHeader.to(qgwh.header, strBuilder, extraParams)
       customFormatQuizGroupUserData.to(qgwh.quizGroup.userData, strBuilder, extraParams)
@@ -180,7 +182,7 @@ object CustomFormatForModelComponents {
         StringBuilder = {
       strBuilder.append(qi.prompt).append(extraParams.mainSeparator).
           append(qi.correctResponse).append(extraParams.mainSeparator)
-      customFormatUserResponses.to(qi.userResponses, strBuilder, EmptyParams())
+      customFormatUserResponses.to(qi.userResponses, strBuilder, NoParams())
     }
 
     def from(strPromptResponse: String, fromParams: Separator): QuizItem = {
@@ -288,14 +290,14 @@ object CustomFormatForModelComponents {
 
   // Example: 1,7,9;6
   implicit object customFormatUserResponses
-      extends CustomFormat[UserResponses, EmptyParams, Separator] {
+      extends CustomFormat[UserResponses, NoParams, Separator] {
 
     def from(str: String, fromParams: Separator): UserResponses = {
       val wmv = customFormatWordMappingValue.from(str, fromParams)
       UserResponses(wmv.correctAnswersInARow, wmv.incorrectAnswers)
     }
 
-    def to(ur: UserResponses, strBuilder: StringBuilder, extraParams: EmptyParams):
+    def to(ur: UserResponses, strBuilder: StringBuilder, extraParams: NoParams):
         StringBuilder = {
       if (!ur.correctResponsesInARow.isEmpty)
         StringUtil.mkString(strBuilder, ur.correctResponsesInARow, ur.responsePromptNumber, ',')
@@ -396,7 +398,7 @@ object CustomFormatForModelComponents {
   }
 
   implicit object customFormatDictionary
-      extends CustomFormat[Dictionary, Separator, EmptyParams] {
+      extends CustomFormat[Dictionary, Separator, NoParams] {
 
     /*
      * Currently, dictionaries are written by external scripts, and are read-only within
@@ -412,7 +414,7 @@ object CustomFormatForModelComponents {
      *    against|wider
      *    entertain|unterhalten
      */
-    def from(str: String, fromParams: EmptyParams): Dictionary =
+    def from(str: String, fromParams: NoParams): Dictionary =
 
       new Dictionary() {
 

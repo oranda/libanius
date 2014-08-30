@@ -16,11 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.model
+package com.oranda.libanius.model.action.customformat
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import TestData._
 import java.lang.StringBuilder
 
 import CustomFormat._
@@ -28,10 +27,11 @@ import CustomFormatForModelComponents._
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.wordmapping.{WordMappingValueSet, WordMappingValue}
 import com.oranda.libanius.model.quizgroup.QuizGroupWithHeader
+import com.oranda.libanius.model.TestData._
 
 class CustomFormatSpec extends Specification with AppDependencyAccess {
 
-  def paramsDefault = EmptyParams()
+  def paramsDefault = NoParams()
   def paramsWithSeparator = Separator("|")
   def paramsWithSeparatorAndIndex = SeparatorAndIndex("|", 0)
 

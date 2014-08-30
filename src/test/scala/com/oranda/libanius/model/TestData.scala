@@ -22,8 +22,11 @@ import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.wordmapping.{WordMappingValue, WordMappingValueSet, Dictionary}
 import com.oranda.libanius.model.quizgroup._
 
+import com.oranda.libanius.model.action.customformat._
 import CustomFormat._
 import CustomFormatForModelComponents._
+
+
 
 object TestData {
 
@@ -188,10 +191,11 @@ object TestData {
 
   def pullQuizItemAndAnswerCorrectly(qgwh: QuizGroupWithHeader): QuizGroupWithHeader = {
 
+    import com.oranda.libanius.model.action.producequizitem._
     import ProduceQuizItem._
     import ProduceQuizItemForModelComponents._
 
-    val quizItem = findPresentableQuizItem(qgwh.quizGroup, Empty()).get
+    val quizItem = findPresentableQuizItem(qgwh.quizGroup, NoParams()).get
     QuizGroupWithHeader(qgwh.header, updatedWithUserResponse(qgwh.quizGroup, quizItem))
   }
 

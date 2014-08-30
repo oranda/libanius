@@ -20,11 +20,12 @@ package com.oranda.libanius.model
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.{AppDependencyAccess}
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, TextValue, QuizItem}
 import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, WordMapping, QuizGroupHeader, QuizGroup}
 
 import TestData._
 
+import com.oranda.libanius.model.action.producequizitem._
 import ProduceQuizItem._
 import ProduceQuizItemForModelComponents._
 
@@ -105,7 +106,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
     }
 
     "find a presentable quiz item" in {
-      val quizItemViewWithChoices = findPresentableQuizItem(quiz, Empty()).get
+      val quizItemViewWithChoices = findPresentableQuizItem(quiz, NoParams()).get
       quizItemViewWithChoices.prompt mustEqual TextValue("against")
     }
 

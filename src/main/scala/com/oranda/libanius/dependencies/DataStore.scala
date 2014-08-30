@@ -19,7 +19,7 @@
 package com.oranda.libanius.dependencies
 
 import com.oranda.libanius.model._
-import com.oranda.libanius.model.EmptyParams
+import com.oranda.libanius.model.action.customformat._
 import CustomFormat._
 import CustomFormatForModelComponents._
 import com.oranda.libanius.util.Util
@@ -136,7 +136,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     val fileText = Util.stopwatch(io.readFile(fileName), "reading dictionary " + fileName)
     val dictionary: Option[Dictionary] =
         Util.stopwatch(fileText.map(
-            deserialize[Dictionary, EmptyParams](_, EmptyParams())),
+            deserialize[Dictionary, NoParams](_, NoParams())),
             "parsing dictionary")
     l.log("Finished reading " + dictionary.map(_.numKeyWords).getOrElse(0) +
         " dictionary prompt words")

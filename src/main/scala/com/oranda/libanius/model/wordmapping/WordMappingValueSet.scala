@@ -25,6 +25,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import scala.language.implicitConversions
 import com.oranda.libanius.model.ValueSet
 
+import com.oranda.libanius.model.action.customformat._
 import CustomFormat._
 import CustomFormatForModelComponents._
 

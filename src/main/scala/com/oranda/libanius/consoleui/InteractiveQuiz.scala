@@ -27,6 +27,7 @@ import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import com.oranda.libanius.model.quizgroup.{WordMapping, QuizGroupHeader, QuizGroup}
 
+import com.oranda.libanius.model.action.producequizitem._
 import ProduceQuizItem._
 import ProduceQuizItemForModelComponents._
 
@@ -48,7 +49,7 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
 
   def testUserWithQuizItem(quiz: Quiz) {
     showScore(quiz)
-    Util.stopwatch(findPresentableQuizItem(quiz, Empty()), "find quiz items") match {
+    Util.stopwatch(findPresentableQuizItem(quiz, NoParams()), "find quiz items") match {
       case Some(quizItem) => keepShowingQuizItems(quiz, quizItem)
       case _ => output("No more questions found! Done!")
     }

@@ -20,9 +20,10 @@ package com.oranda.libanius.model.quizgroup
 
 import scala.language.implicitConversions
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.{EmptyParams, CustomFormatForModelComponents, CustomFormat, ModelComponent}
+import com.oranda.libanius.model.ModelComponent
 import java.lang.StringBuilder
 
+import com.oranda.libanius.model.action.customformat._
 import CustomFormat._
 import CustomFormatForModelComponents._
 
@@ -32,7 +33,7 @@ import CustomFormatForModelComponents._
 case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
     extends ModelComponent {
   def toPair = Pair(header, quizGroup)
-  def toCustomFormat = serialize(this, new StringBuilder, new EmptyParams).toString
+  def toCustomFormat = serialize(this, new StringBuilder, new NoParams).toString
 }
 
 object QuizGroupWithHeader extends AppDependencyAccess {

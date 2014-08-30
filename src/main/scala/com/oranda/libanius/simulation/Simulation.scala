@@ -19,11 +19,12 @@
 package com.oranda.libanius.simulation
 
 import com.oranda.libanius.consoleui.Output._
-import com.oranda.libanius.model.{Empty, ProduceQuizItemForModelComponents, ProduceQuizItem, Quiz}
+import com.oranda.libanius.model.{Quiz}
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import com.oranda.libanius.util.{StringUtil, Util}
 import scala.annotation.tailrec
 
+import com.oranda.libanius.model.action.producequizitem._
 import ProduceQuizItem._
 import ProduceQuizItemForModelComponents._
 
@@ -51,7 +52,7 @@ trait Simulation {
 
     if (responsesProcessed < maxResponses) {
 
-      val (presentableQuizItem, timeTakenToFindItem) = Util.stopwatch(findPresentableQuizItem(quiz, Empty()))
+      val (presentableQuizItem, timeTakenToFindItem) = Util.stopwatch(findPresentableQuizItem(quiz, NoParams()))
       output("time for findPresentableQuizItem: " + timeTakenToFindItem)
       if (shouldMeasureTime) totalMillisToFindPresentableItems += timeTakenToFindItem
 

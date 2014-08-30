@@ -26,6 +26,7 @@ import com.oranda.libanius.model._
 import com.oranda.libanius.model.UserResponse
 import TestData._
 
+import com.oranda.libanius.model.action.producequizitem._
 import ProduceQuizItem._
 import ProduceQuizItemForModelComponents._
 
