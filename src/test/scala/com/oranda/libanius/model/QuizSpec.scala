@@ -19,20 +19,17 @@
 package com.oranda.libanius.model
 
 import org.specs2.mutable.Specification
-import com.oranda.libanius.dependencies.{AppDependencyAccess}
-import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, TextValue, QuizItem}
-import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, WordMapping, QuizGroupHeader, QuizGroup}
+import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, QuizGroupHeader, QuizGroup}
 
 import TestData._
 
 import com.oranda.libanius.model.action.producequizitem._
-import ProduceQuizItem._
-import ProduceQuizItemForModelComponents._
 
 class QuizSpec extends Specification with AppDependencyAccess {
   
   "a quiz" should {
-
 
     "have a certain number of active groups" in {
       quiz.numActiveGroups mustEqual 2
@@ -103,11 +100,6 @@ class QuizSpec extends Specification with AppDependencyAccess {
       val quizUpdated = quiz.updateWithUserResponse(true, qghEngGer, quizItem)
       quizUpdated.numCorrectResponses mustEqual 7
       quizUpdated.numCorrectResponses(qghEngGer, 0) mustEqual 1
-    }
-
-    "find a presentable quiz item" in {
-      val quizItemViewWithChoices = findPresentableQuizItem(quiz, NoParams()).get
-      quizItemViewWithChoices.prompt mustEqual TextValue("against")
     }
 
     def updateWithResponsesFor(quiz: Quiz, wasCorrect: Boolean,

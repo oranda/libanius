@@ -29,6 +29,7 @@ import TestData._
 import com.oranda.libanius.model.action.producequizitem._
 import ProduceQuizItem._
 import ProduceQuizItemForModelComponents._
+import ProduceQuizItemSpec._
 
 class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
@@ -61,23 +62,6 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
         similarityPredicate = hasSameEnd)
 
       falseAnswers.contains("unterrichten") mustEqual true
-    }
-
-    def pullQuizItem(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int):
-        (QuizGroupMemoryLevel, (String, String)) = {
-
-      val quizItem = findPresentableQuizItem(qgml, CurrentPromptNumber(currentPromptNumber))
-
-      quizItem.isDefined mustEqual true
-      // Each time a quiz item is pulled, a user answer must be set
-      val qgmlUpdated1 = qgml.updatedWithUserAnswer(quizItem.get.prompt,
-          quizItem.get.correctResponse, true, UserResponses(), new UserResponse(0))
-      val qgmlUpdated2 = qgmlUpdated1.removeQuizItem(quizItem.get)
-      (qgmlUpdated2, (quizItem.get.prompt.value, quizItem.get.correctResponse.value))
-    }
-
-    "find a presentable quiz item" in {
-      pullQuizItem(qgMemLevel, 0)._2 mustEqual ("against", "wider")
     }
 
     "remove a quiz pair" in {
@@ -115,30 +99,5 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
       pullQuizItem(qgUnrolled, 1)._2 mustEqual ("to exchange", "tauschen")
     }
 
-    def pullQuizItemAndAnswerCorrectly(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int):
-        QuizGroupMemoryLevel = {
-      val quizItem = findPresentableQuizItem(qgml, CurrentPromptNumber(currentPromptNumber)).get
-      updateWithUserAnswer(qgml, quizItem, currentPromptNumber)
-    }
-
-    def updateWithUserAnswer(qgml: QuizGroupMemoryLevel, quizItem: QuizItem,
-        currentPromptNumber: Int): QuizGroupMemoryLevel = {
-      val userAnswer = new UserResponse(currentPromptNumber)
-      qgml.updatedWithUserAnswer(quizItem.prompt, quizItem.correctResponse, true,
-          UserResponses(), userAnswer)
-    }
-
-    "present an item that has been answered before after five prompts" in {
-      var qgmlLocal = makeQgMemLevel
-      val quizItem0 = findPresentableQuizItem(qgmlLocal, CurrentPromptNumber(0)).get
-      quizItem0.prompt.value mustEqual "against"
-      qgmlLocal = updateWithUserAnswer(qgmlLocal, quizItem0, 0)
-
-      for (promptNum <- 1 until 5)
-        qgmlLocal = pullQuizItemAndAnswerCorrectly(qgmlLocal, promptNum)
-
-      val quizItem5 = findPresentableQuizItem(qgmlLocal, CurrentPromptNumber(5))
-      quizItem5.get.prompt.value mustEqual "against"
-    }
   }
 }

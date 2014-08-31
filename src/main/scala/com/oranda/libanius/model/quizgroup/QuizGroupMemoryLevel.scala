@@ -65,7 +65,7 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
   protected[quizgroup] def updatedQuizItems(newQuizItems: List[QuizItem]): QuizGroupMemoryLevel =
     QuizGroupMemoryLevel.itemsLens.set(this, newQuizItems)
 
-  protected[quizgroup] def updatedWithUserAnswer(prompt: TextValue, response: TextValue,
+  def updatedWithUserAnswer(prompt: TextValue, response: TextValue,
       wasCorrect: Boolean, userResponses: UserResponses, userAnswer: UserResponse):
       QuizGroupMemoryLevel = {
     val userResponseUpdated = userResponses.add(userAnswer, wasCorrect)
@@ -96,7 +96,7 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
       QuizGroupMemoryLevel =
     updatedQuizItems(remove(quizItem) :+ quizItem)
 
-  protected[quizgroup] def removeQuizItem(quizItem: QuizItem): QuizGroupMemoryLevel =
+  def removeQuizItem(quizItem: QuizItem): QuizGroupMemoryLevel =
     QuizGroupMemoryLevel.itemsLens.set(this, remove(quizItem))
 
   protected[quizgroup] def remove(quizItem: QuizItem): List[QuizItem] =

@@ -29,6 +29,7 @@ import com.oranda.libanius.model.TestData._
 import com.oranda.libanius.model.action.producequizitem._
 import ProduceQuizItem._
 import ProduceQuizItemForModelComponents._
+import ProduceQuizItemSpec._
 
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
@@ -36,19 +37,6 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "find values for a prompt" in {
       qgWithHeader.findResponsesFor("on") mustEqual List("auf")
-    }
-
-    def pullQuizItem(qgwh: QuizGroupWithHeader): (QuizGroup, (String, String)) = {
-      val quizItemOpt = findPresentableQuizItem(qgwh.quizGroup, NoParams())
-      quizItemOpt.isDefined mustEqual true
-      val quizItem = quizItemOpt.get
-      // Each time a quiz item is pulled, a user answer must be set
-      val qgUpdated = updatedWithUserResponse(qgwh.quizGroup, quizItem)
-      (qgUpdated, (quizItem.prompt.value, quizItem.correctResponse.value))
-    }
-
-    "find a presentable quiz item" in {
-      pullQuizItem(qgWithHeader)._2 mustEqual ("winner", "Siegerin")
     }
 
     "accept an updated prompt number" in {
@@ -67,23 +55,6 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val quizItem = findPresentableQuizItem(qgwhSimple.quizGroup, NoParams())
       val qgUpdated = updatedWithUserResponse(qgwhSimple.quizGroup, quizItem.get)
       qgUpdated.levels(1).size mustEqual 1
-    }
-
-    /*
-     * This assumes the following Criteria in UserResponses:
-     * Criteria(numCorrectResponsesInARowDesired = 1, diffInPromptNumMinimum = 5),
-     */
-    "present an item that has been answered before after five prompts" in {
-      var qgwhLocal = makeSimpleQgWithHeader
-      val quizItem0 = findPresentableQuizItem(qgwhLocal.quizGroup, NoParams()).get
-      quizItem0.prompt.value mustEqual "en route" // "against"
-      qgwhLocal = QuizGroupWithHeader(qgwhLocal.header,
-          updatedWithUserResponse(qgwhLocal, quizItem0))
-      for (promptNum <- 1 until 5)
-        qgwhLocal = pullQuizItemAndAnswerCorrectly(qgwhLocal)
-
-      val quizItem5 = findPresentableQuizItem(qgwhLocal.quizGroup, NoParams())
-      quizItem5.get.prompt.value mustEqual "en route" // "against"
     }
 
     "accept new values for an existing word-mapping" in {
@@ -165,7 +136,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       sizeAfter mustEqual sizeBefore + 1
       val qgwhUpdated = QuizGroupWithHeader(qgwh.header, qgUpdated)
       val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(
-        qgwhUpdated.quizGroup.levels(0), CurrentPromptNumber(qgwhUpdated.currentPromptNumber))
+          qgwhUpdated.quizGroup.levels(0), CurrentPromptNumber(qgwhUpdated.currentPromptNumber))
       foundQuizItem mustEqual Some(QuizItem("on", "zu"))
     }
 
