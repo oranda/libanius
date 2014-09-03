@@ -184,11 +184,10 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
     val numCorrectToAdd = if (isCorrect) 1 else 0
     // For each memory level, only check the recent performance. Reset the counters after a limit.
     if (!isAtLimit)
-      QuizGroupMemoryLevel(correctResponsesInARow, repetitionInterval,
-          quizItemStream, totalResponses + 1, numCorrectResponses + numCorrectToAdd)
+      copy(totalResponses = totalResponses + 1,
+          numCorrectResponses = numCorrectResponses + numCorrectToAdd)
     else // reset the counters
-      QuizGroupMemoryLevel(correctResponsesInARow, repetitionInterval,
-          quizItemStream, 1, numCorrectToAdd)
+      copy(totalResponses = 1, numCorrectResponses = numCorrectToAdd)
   }
 
   def wasNotTooRecentlyUsed(currentPromptNum : Int, promptNumInMostRecentResponse: Option[Int]) =
