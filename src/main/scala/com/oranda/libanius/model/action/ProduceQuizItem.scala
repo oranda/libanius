@@ -24,18 +24,10 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.ModelComponent
 import com.oranda.libanius.model.Quiz
 
-/**
- * Type class definition for finding quiz items in model entities.
- */
-trait ProduceQuizItem[A <: ModelComponent, B <: Params, C] {
-  def findPresentableQuizItem(component: A, params: B): Option[C]
-  def findAnyUnfinishedQuizItem(component: A, params: B): Option[C]
-}
 
 trait Params
 case class NoParams() extends Params
 case class CurrentPromptNumber(currentPromptNumber: Int) extends Params
-
 /**
  * Provide factory method based on quiz group for CurrentPromptNumber Params.
  */
@@ -43,30 +35,45 @@ object CurrentPromptNumber {
   def apply(qg: QuizGroup): CurrentPromptNumber = CurrentPromptNumber(qg.currentPromptNumber)
 }
 
+/**
+ * Type class definition for finding quiz items in model entities.
+ */
+trait ProduceQuizItemBase[A <: ModelComponent, B <: Params, C] {
+  def findPresentableQuizItem(component: A, params: B): Option[C]
+  def findAnyUnfinishedQuizItem(component: A, params:B): Option[C]
+}
+
+/**
+ * In the normal case of ProduceQuizItem, there are no extra parameters needed.
+ */
+trait ProduceQuizItem[A <: ModelComponent, C] extends ProduceQuizItemBase[A, NoParams, C]
+
+
 // provides external access to the typeclass, forwarding the call to the appropriate type
 object ProduceQuizItem {
 
   def findPresentableQuizItem[A <: ModelComponent, B <: Params, C](component: A, params: B)
-      (implicit pqi: ProduceQuizItem[A, B, C], c: C => QuizItem): Option[C] =
+      (implicit pqi: ProduceQuizItemBase[A, B, C], c: C => QuizItem): Option[C] =
     pqi.findPresentableQuizItem(component, params)
 
   def findAnyUnfinishedQuizItem[A <: ModelComponent, B <: Params, C](component: A, params: B)
-      (implicit pqi: ProduceQuizItem[A, B, C], c: C => QuizItem): Option[C] =
+      (implicit pqi: ProduceQuizItemBase[A, B, C], c: C => QuizItem): Option[C] =
     pqi.findAnyUnfinishedQuizItem(component, params)
 }
 
 object ProduceQuizItemForModelComponents extends AppDependencyAccess {
 
-  implicit object produceQuizItemQuiz extends ProduceQuizItem[Quiz, NoParams, QuizItemViewWithChoices] {
+  implicit object produceQuizItemQuiz extends ProduceQuizItem[Quiz, QuizItemViewWithChoices] {
 
     /*
      * Find the first available "presentable" quiz item.
      * Return a quiz item view and the associated quiz group header.
      */
-    def findPresentableQuizItem(quiz: Quiz, params: NoParams): Option[QuizItemViewWithChoices] =
+    def findPresentableQuizItem(quiz: Quiz, params: NoParams = NoParams()):
+        Option[QuizItemViewWithChoices] =
       (for {
         (header, quizGroup) <- quiz.activeQuizGroups.toStream
-        quizItem <- produceQuizItemQuizGroup.findPresentableQuizItem(quizGroup, NoParams()).toStream
+        quizItem <- produceQuizItemQuizGroup.findPresentableQuizItem(quizGroup).toStream
       } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
 
     /*
@@ -75,8 +82,9 @@ object ProduceQuizItemForModelComponents extends AppDependencyAccess {
      * normal criteria, because the last correct response was recent. However, they do need
      * to be presented in order for the quiz to finish, so this method is called as a last try.
      */
-    def findAnyUnfinishedQuizItem(quiz: Quiz, params: NoParams): Option[QuizItemViewWithChoices] = {
-      l.log("calling findAnyUnfinishedQuizItem")
+    def findAnyUnfinishedQuizItem(quiz: Quiz, params: NoParams = NoParams()):
+        Option[QuizItemViewWithChoices] = {
+      l.log("calling Quiz.findAnyUnfinishedQuizItem")
       (for {
         (header, quizGroup) <- quiz.activeQuizGroups
         quizItem <- produceQuizItemQuizGroup.findAnyUnfinishedQuizItem(quizGroup, NoParams())
@@ -84,21 +92,21 @@ object ProduceQuizItemForModelComponents extends AppDependencyAccess {
     }
   }
 
-  implicit object produceQuizItemQuizGroup extends ProduceQuizItem[QuizGroup, NoParams, QuizItem] {
+  implicit object produceQuizItemQuizGroup extends ProduceQuizItem[QuizGroup, QuizItem] {
     /*
      * The memLevels are searched in reverse order for presentable quiz items,
      * meaning that an item that has been answered correctly (once or more) will
      * be preferred over an item with no correct answers, assuming the
      * interval criteria (difference with the prompt number) is satisfied.
      */
-    def findPresentableQuizItem(qg: QuizGroup, params: NoParams): Option[QuizItem] =
+    def findPresentableQuizItem(qg: QuizGroup, params: NoParams = NoParams()): Option[QuizItem] =
       (for {
         (memLevel, levelIndex) <- qg.levels.zipWithIndex.reverse.tail.toStream
         quizItem <- produceQuizItemQuizGroupMemoryLevel.findPresentableQuizItem(memLevel,
             CurrentPromptNumber(qg)).toStream
       } yield quizItem).headOption
 
-    def findAnyUnfinishedQuizItem(qg: QuizGroup, params: NoParams): Option[QuizItem] =
+    def findAnyUnfinishedQuizItem(qg: QuizGroup, params: NoParams = NoParams()): Option[QuizItem] =
       (for {
         (memLevel, levelIndex) <- qg.levels.zipWithIndex.reverse.tail.toStream
         quizItem <- produceQuizItemQuizGroupMemoryLevel.findAnyUnfinishedQuizItem(
@@ -107,7 +115,7 @@ object ProduceQuizItemForModelComponents extends AppDependencyAccess {
   }
 
   implicit object produceQuizItemQuizGroupMemoryLevel
-      extends ProduceQuizItem[QuizGroupMemoryLevel, CurrentPromptNumber, QuizItem] {
+      extends ProduceQuizItemBase[QuizGroupMemoryLevel, CurrentPromptNumber, QuizItem] {
 
     def findPresentableQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber):
         Option[QuizItem] =
