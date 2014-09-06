@@ -69,7 +69,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
           _.prompt.value == "entertain").get
 
       val (falseAnswers, timeTaken) = Util.stopwatch(qgWithHeader.quizGroup.constructWrongChoices(
-          quizItemCorrect, numCorrectResponsesSoFar = 1, numWrongChoicesRequired = 2))
+          quizItemCorrect, numWrongChoicesRequired = 2))
 
       falseAnswers.contains("unterbrochen") mustEqual true
       timeTaken must be lessThan 100
@@ -101,7 +101,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get
 
       val (falseAnswers, _) = Util.stopwatch(demoGroup.constructWrongChoices(
-          quizItemCorrect, numCorrectResponsesSoFar = 2, numWrongChoicesRequired = 2))
+          quizItemCorrect, numWrongChoicesRequired = 2))
 
       falseAnswers.size mustEqual 2
     }

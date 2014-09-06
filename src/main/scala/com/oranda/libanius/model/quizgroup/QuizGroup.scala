@@ -144,10 +144,11 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
     dictionary.findValuesFor(prompt).values.map(_.value)
 
   protected[model] def constructWrongChoices(itemCorrect: QuizItem,
-      numCorrectResponsesSoFar: Int, numWrongChoicesRequired: Int = 2): List[String] = {
+      numWrongChoicesRequired: Int = 2): List[String] = {
 
     val correctResponses = Util.stopwatch(findResponsesFor(itemCorrect.prompt.value),
         "findResponsesFor")
+    val numCorrectResponsesSoFar = itemCorrect.userResponses.numCorrectResponsesInARow
     val falseResponses: List[String] =
         constructWrongChoicesSimilar(correctResponses, numWrongChoicesRequired,
             itemCorrect, numCorrectResponsesSoFar) ++
@@ -218,8 +219,7 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
     val useMultipleChoice = numCorrectResponses < header.useMultipleChoiceUntil
     val falseAnswers =
       if (useMultipleChoice)
-        Util.stopwatch(constructWrongChoices(quizItem, numCorrectResponses),
-          "constructWrongChoices")
+        Util.stopwatch(constructWrongChoices(quizItem), "constructWrongChoices")
       else Nil
     val numCorrectResponsesRequired = numLevels
     new QuizItemViewWithChoices(quizItem, currentPromptNumber, header,
