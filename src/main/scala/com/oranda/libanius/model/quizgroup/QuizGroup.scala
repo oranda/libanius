@@ -150,9 +150,9 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
         "findResponsesFor")
     val numCorrectResponsesSoFar = itemCorrect.userResponses.numCorrectResponsesInARow
     val falseResponses: List[String] =
-        constructWrongChoicesSimilar(correctResponses, numWrongChoicesRequired,
-            itemCorrect, numCorrectResponsesSoFar) ++
-        constructWrongChoicesRandom(correctResponses, numWrongChoicesRequired, itemCorrect) ++
+        constructWrongChoicesSimilar(itemCorrect, numWrongChoicesRequired, correctResponses,
+            numCorrectResponsesSoFar) ++
+        constructWrongChoicesRandom(itemCorrect, numWrongChoicesRequired, correctResponses) ++
         constructWrongChoicesDummy(numWrongChoicesRequired)
     falseResponses.distinct.take(numWrongChoicesRequired)
   }
@@ -161,22 +161,22 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
    * If the user has already been having success with this item, first try to
    * find responses that look similar to the correct one.
    */
-  def constructWrongChoicesSimilar(correctResponses: List[String], numWrongChoicesRequired: Int,
-      itemCorrect: QuizItem, numCorrectResponsesSoFar: Long): List[String] =
+  def constructWrongChoicesSimilar(itemCorrect: QuizItem, numWrongChoicesRequired: Int,
+      correctResponses: List[String], numCorrectResponsesSoFar: Long): List[String] =
     if (numCorrectResponsesSoFar == 0)
       Nil
     else {
       def hasSameStart = (value1: TextValue, value2: String) => value1.hasSameStart(value2)
       def hasSameEnd = (value1: TextValue, value2: String) => value1.hasSameEnd(value2)
       val similarityPredicate = if (numCorrectResponsesSoFar % 2 == 1) hasSameStart else hasSameEnd
-      levels.flatMap( _.constructWrongChoicesSimilar(correctResponses,
-          numWrongChoicesRequired, itemCorrect, similarityPredicate))
+      levels.flatMap( _.constructWrongChoicesSimilar(itemCorrect, numWrongChoicesRequired,
+          correctResponses, similarityPredicate))
     }
 
-  protected[quizgroup] def constructWrongChoicesRandom(correctResponses: List[String],
-      numWrongChoicesRequired: Int, itemCorrect: QuizItem): List[String] =
-    levels.filterNot(_.isEmpty).flatMap(_.constructWrongChoicesRandom(
-        correctResponses, numWrongChoicesRequired, itemCorrect))
+  protected[quizgroup] def constructWrongChoicesRandom(itemCorrect: QuizItem,
+      numWrongChoicesRequired: Int, correctResponses: List[String]): List[String] =
+    levels.filterNot(_.isEmpty).flatMap(_.constructWrongChoicesRandom(itemCorrect,
+        numWrongChoicesRequired, correctResponses))
 
   protected[quizgroup] def constructWrongChoicesDummy(numWrongChoicesRequired: Int):
       List[String] = {

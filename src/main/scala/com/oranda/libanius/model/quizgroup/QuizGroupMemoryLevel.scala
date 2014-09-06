@@ -128,8 +128,8 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
   protected[quizgroup] def findQuizItem(prompt: String, response: String): Option[QuizItem] =
     quizItems.find(_.samePromptAndResponse(QuizItem(prompt, response)))
 
-  protected[quizgroup] def constructWrongChoicesSimilar(correctResponses: List[String],
-      numWrongResponsesRequired: Int, itemCorrect: QuizItem,
+  protected[quizgroup] def constructWrongChoicesSimilar(itemCorrect: QuizItem,
+      numWrongResponsesRequired: Int, correctResponses: List[String],
       similarityPredicate: (TextValue, String) => Int => Boolean): List[String] = {
 
     var similarWords = new HashSet[String]
@@ -154,8 +154,8 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
   protected[quizgroup] def randomValues(sliceSize: Int): List[TextValue] =
     randomSliceOfQuizItems(sliceSize).map(_.correctResponse).toList
 
-  protected[quizgroup] def constructWrongChoicesRandom(correctResponses: List[String],
-      numWrongChoicesRequired: Int, itemCorrect: QuizItem): List[String] = {
+  protected[quizgroup] def constructWrongChoicesRandom(itemCorrect: QuizItem,
+      numWrongChoicesRequired: Int, correctResponses: List[String]): List[String] = {
 
     def randomFalseWordValue(sliceIndex: Int): Option[String] = {
       val sliceSize = (numQuizItems / numWrongChoicesRequired)
