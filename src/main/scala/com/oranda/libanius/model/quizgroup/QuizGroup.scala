@@ -149,9 +149,13 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
     val correctResponses = Util.stopwatch(findResponsesFor(itemCorrect.prompt.value),
         "findResponsesFor")
     val numCorrectResponsesSoFar = itemCorrect.userResponses.numCorrectResponsesInARow
+
+    def hasSameStart = (value1: TextValue, value2: String) => value1.hasSameStart(value2)
+    def hasSameEnd = (value1: TextValue, value2: String) => value1.hasSameEnd(value2)
+    val similarityPredicate = if (numCorrectResponsesSoFar % 2 == 1) hasSameStart else hasSameEnd
     val falseResponses: List[String] =
-        constructWrongChoicesSimilar(itemCorrect, numWrongChoicesRequired, correctResponses,
-            numCorrectResponsesSoFar) ++
+        constructWrongChoicesSimilar(itemCorrect, numWrongChoicesRequired,
+            numCorrectResponsesSoFar, correctResponses, similarityPredicate) ++
         constructWrongChoicesRandom(itemCorrect, numWrongChoicesRequired, correctResponses) ++
         constructWrongChoicesDummy(numWrongChoicesRequired)
     falseResponses.distinct.take(numWrongChoicesRequired)
@@ -162,16 +166,11 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
    * find responses that look similar to the correct one.
    */
   def constructWrongChoicesSimilar(itemCorrect: QuizItem, numWrongChoicesRequired: Int,
-      correctResponses: List[String], numCorrectResponsesSoFar: Long): List[String] =
-    if (numCorrectResponsesSoFar == 0)
-      Nil
-    else {
-      def hasSameStart = (value1: TextValue, value2: String) => value1.hasSameStart(value2)
-      def hasSameEnd = (value1: TextValue, value2: String) => value1.hasSameEnd(value2)
-      val similarityPredicate = if (numCorrectResponsesSoFar % 2 == 1) hasSameStart else hasSameEnd
-      levels.flatMap( _.constructWrongChoicesSimilar(itemCorrect, numWrongChoicesRequired,
-          correctResponses, similarityPredicate))
-    }
+      numCorrectResponsesSoFar: Long, correctResponses: List[String],
+      similarityPredicate: (TextValue, String) => Int => Boolean): List[String] =
+    if (numCorrectResponsesSoFar == 0) Nil
+    else levels.flatMap( _.constructWrongChoicesSimilar(itemCorrect,
+        numWrongChoicesRequired, correctResponses, similarityPredicate))
 
   protected[quizgroup] def constructWrongChoicesRandom(itemCorrect: QuizItem,
       numWrongChoicesRequired: Int, correctResponses: List[String]): List[String] =
