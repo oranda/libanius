@@ -149,8 +149,8 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
     val correctResponses = Util.stopwatch(findResponsesFor(itemCorrect.prompt.value),
         "findResponsesFor")
     val falseResponses: List[String] =
-        constructWrongChoicesSimilar(numCorrectResponsesSoFar,
-            itemCorrect, numWrongChoicesRequired, correctResponses) ++
+        constructWrongChoicesSimilar(correctResponses, numWrongChoicesRequired,
+            itemCorrect, numCorrectResponsesSoFar) ++
         constructWrongChoicesRandom(correctResponses, numWrongChoicesRequired, itemCorrect) ++
         constructWrongChoicesDummy(numWrongChoicesRequired)
     falseResponses.distinct.take(numWrongChoicesRequired)
@@ -160,18 +160,16 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
    * If the user has already been having success with this item, first try to
    * find responses that look similar to the correct one.
    */
-  def constructWrongChoicesSimilar(numCorrectResponsesSoFar: Long, itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int, correctResponses: List[String]): List[String] =
+  def constructWrongChoicesSimilar(correctResponses: List[String], numWrongChoicesRequired: Int,
+      itemCorrect: QuizItem, numCorrectResponsesSoFar: Long): List[String] =
     if (numCorrectResponsesSoFar == 0)
       Nil
     else {
-      val correctValuePresented = itemCorrect.correctResponse.value
-
       def hasSameStart = (value1: TextValue, value2: String) => value1.hasSameStart(value2)
       def hasSameEnd = (value1: TextValue, value2: String) => value1.hasSameEnd(value2)
       val similarityPredicate = if (numCorrectResponsesSoFar % 2 == 1) hasSameStart else hasSameEnd
       levels.flatMap( _.constructWrongChoicesSimilar(correctResponses,
-          numWrongChoicesRequired, correctValuePresented, similarityPredicate))
+          numWrongChoicesRequired, itemCorrect, similarityPredicate))
     }
 
   protected[quizgroup] def constructWrongChoicesRandom(correctResponses: List[String],

@@ -58,7 +58,7 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
       val falseAnswers = qgMemLevel.constructWrongChoicesSimilar(
         correctResponses = List("unterhalten"),
         numWrongResponsesRequired = 5,
-        correctValue = "unterhalten",
+        itemCorrect = QuizItem("entertain", "unterhalten"),
         similarityPredicate = hasSameEnd)
 
       falseAnswers.contains("unterrichten") mustEqual true

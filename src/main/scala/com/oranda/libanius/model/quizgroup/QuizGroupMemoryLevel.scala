@@ -129,12 +129,15 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
     quizItems.find(_.samePromptAndResponse(QuizItem(prompt, response)))
 
   protected[quizgroup] def constructWrongChoicesSimilar(correctResponses: List[String],
-      numWrongResponsesRequired: Int, correctValue: String,
+      numWrongResponsesRequired: Int, itemCorrect: QuizItem,
       similarityPredicate: (TextValue, String) => Int => Boolean): List[String] = {
 
     var similarWords = new HashSet[String]
     var numValueSetsSearched = 0
     val numSimilarLettersRequired = 2
+
+    val correctValue = itemCorrect.correctResponse.value
+
     quizItems.iterator.takeWhile(_ => similarWords.size < numWrongResponsesRequired).
       foreach(quizItem => {
         numValueSetsSearched = numValueSetsSearched + 1
@@ -151,19 +154,19 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
   protected[quizgroup] def randomValues(sliceSize: Int): List[TextValue] =
     randomSliceOfQuizItems(sliceSize).map(_.correctResponse).toList
 
-  protected[quizgroup] def constructWrongChoicesRandom(correctValues: List[String],
-      numFalseAnswersRequired: Int, itemCorrect: QuizItem): List[String] = {
+  protected[quizgroup] def constructWrongChoicesRandom(correctResponses: List[String],
+      numWrongChoicesRequired: Int, itemCorrect: QuizItem): List[String] = {
 
     def randomFalseWordValue(sliceIndex: Int): Option[String] = {
-      val sliceSize = (numQuizItems / numFalseAnswersRequired)
+      val sliceSize = (numQuizItems / numWrongChoicesRequired)
       val sliceStartIndex = sliceIndex * sliceSize
       val randomOffset = Random.nextInt(math.max(sliceSize, 1))
       val randomIndex = math.min(sliceStartIndex + randomOffset, numQuizItems - 1)
       val randomItem = Some(quizItems(randomIndex).correctResponse.value)
-      randomItem.filter(!correctValues.contains(_))
+      randomItem.filter(!correctResponses.contains(_))
     }
 
-    (0 until numFalseAnswersRequired).map(
+    (0 until numWrongChoicesRequired).map(
         sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toList
   }
 
