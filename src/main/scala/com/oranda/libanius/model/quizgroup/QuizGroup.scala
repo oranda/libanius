@@ -150,9 +150,8 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
         "findResponsesFor")
     val numCorrectResponsesSoFar = itemCorrect.userResponses.numCorrectResponsesInARow
 
-    def hasSameStart = (value1: TextValue, value2: String) => value1.hasSameStart(value2)
-    def hasSameEnd = (value1: TextValue, value2: String) => value1.hasSameEnd(value2)
-    val similarityPredicate = if (numCorrectResponsesSoFar % 2 == 1) hasSameStart else hasSameEnd
+    val similarityPredicate =
+      if (numCorrectResponsesSoFar % 2 == 1) TextValue.sameStart else TextValue.sameEnd
     val falseResponses: List[String] =
         constructWrongChoicesSimilar(itemCorrect, numWrongChoicesRequired,
             numCorrectResponsesSoFar, correctResponses, similarityPredicate) ++
@@ -167,7 +166,7 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
    */
   def constructWrongChoicesSimilar(itemCorrect: QuizItem, numWrongChoicesRequired: Int,
       numCorrectResponsesSoFar: Long, correctResponses: List[String],
-      similarityPredicate: (TextValue, String) => Int => Boolean): List[String] =
+      similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String] =
     if (numCorrectResponsesSoFar == 0) Nil
     else levels.flatMap( _.constructWrongChoicesSimilar(itemCorrect,
         numWrongChoicesRequired, correctResponses, similarityPredicate))

@@ -130,13 +130,13 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
 
   protected[quizgroup] def constructWrongChoicesSimilar(itemCorrect: QuizItem,
       numWrongResponsesRequired: Int, correctResponses: List[String],
-      similarityPredicate: (TextValue, String) => Int => Boolean): List[String] = {
+      similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String] = {
 
     var similarWords = new HashSet[String]
     var numValueSetsSearched = 0
     val numSimilarLettersRequired = 2
 
-    val correctValue = itemCorrect.correctResponse.value
+    val correctValue = itemCorrect.correctResponse
 
     quizItems.iterator.takeWhile(_ => similarWords.size < numWrongResponsesRequired).
       foreach(quizItem => {

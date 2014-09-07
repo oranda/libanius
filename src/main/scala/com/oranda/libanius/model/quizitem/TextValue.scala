@@ -44,6 +44,12 @@ case class TextValue(val value: String) {
 }
 
 object TextValue {
+
+  def sameStart =
+    (value1: TextValue, value2: TextValue) => hasSameStart(value1.value, value2.value)
+  def sameEnd =
+    (value1: TextValue, value2: TextValue) => hasSameEnd(value1.value, value2.value)
+
   def hasSameStart(value: String, otherValue: String): Int => Boolean =
     (numOfLetters: Int) => otherValue != value &&
         value.take(numOfLetters) == otherValue.take(numOfLetters)

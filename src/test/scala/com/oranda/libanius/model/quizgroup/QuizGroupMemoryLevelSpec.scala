@@ -53,13 +53,11 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
     }
 
     "generate false answers similar to a correct answer" in {
-      def hasSameEnd = (value1: TextValue, value2: String) => value1.hasSameEnd(value2)
-
       val falseAnswers = qgMemLevel.constructWrongChoicesSimilar(
         correctResponses = List("unterhalten"),
         numWrongResponsesRequired = 5,
         itemCorrect = QuizItem("entertain", "unterhalten"),
-        similarityPredicate = hasSameEnd)
+        similarityPredicate = TextValue.sameEnd)
 
       falseAnswers.contains("unterrichten") mustEqual true
     }
