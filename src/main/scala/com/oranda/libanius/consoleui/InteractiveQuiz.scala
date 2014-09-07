@@ -27,7 +27,7 @@ import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import com.oranda.libanius.model.quizgroup.{WordMapping, QuizGroupHeader, QuizGroup}
 
-import com.oranda.libanius.model.action.producequizitem._
+import com.oranda.libanius.model.action._
 import ProduceQuizItem._
 import ProduceQuizItemForModelComponents._
 

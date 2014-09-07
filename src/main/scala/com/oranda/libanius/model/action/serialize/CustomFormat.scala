@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.model.action.customformat
+package com.oranda.libanius.model.action.serialize
 
 import com.oranda.libanius.model.quizgroup._
 import java.lang.StringBuilder

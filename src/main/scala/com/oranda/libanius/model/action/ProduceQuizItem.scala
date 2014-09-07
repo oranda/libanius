@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.model.action.producequizitem
+package com.oranda.libanius.model.action
 
 import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, QuizItem}
 import com.oranda.libanius.model.quizgroup.{QuizGroupMemoryLevel, QuizGroup}

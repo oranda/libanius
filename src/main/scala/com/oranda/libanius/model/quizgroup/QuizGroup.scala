@@ -31,6 +31,10 @@ import scala.collection.immutable.{Stream, List}
 import scala.Predef._
 import com.oranda.libanius.util.Util
 
+import com.oranda.libanius.model.action.wrongchoices._
+import ConstructWrongChoices._
+import ConstructWrongChoicesForModelComponents._
+
 /*
  * Contains quiz items for a topic.
  * For performance reasons, the quiz items are partitioned into "memory levels"
@@ -143,49 +147,6 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
   protected[model] def findValuesFor(prompt: String): List[String] =
     dictionary.findValuesFor(prompt).values.map(_.value)
 
-  protected[model] def constructWrongChoices(itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int = 2): List[String] = {
-
-    val correctResponses = Util.stopwatch(findResponsesFor(itemCorrect.prompt.value),
-        "findResponsesFor")
-    val numCorrectResponsesSoFar = itemCorrect.userResponses.numCorrectResponsesInARow
-
-    val similarityPredicate =
-      if (numCorrectResponsesSoFar % 2 == 1) TextValue.sameStart else TextValue.sameEnd
-    val falseResponses: List[String] =
-        constructWrongChoicesSimilar(itemCorrect, numWrongChoicesRequired,
-            numCorrectResponsesSoFar, correctResponses, similarityPredicate) ++
-        constructWrongChoicesRandom(itemCorrect, numWrongChoicesRequired, correctResponses) ++
-        constructWrongChoicesDummy(numWrongChoicesRequired)
-    falseResponses.distinct.take(numWrongChoicesRequired)
-  }
-
-  /*
-   * If the user has already been having success with this item, first try to
-   * find responses that look similar to the correct one.
-   */
-  def constructWrongChoicesSimilar(itemCorrect: QuizItem, numWrongChoicesRequired: Int,
-      numCorrectResponsesSoFar: Long, correctResponses: List[String],
-      similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String] =
-    if (numCorrectResponsesSoFar == 0) Nil
-    else levels.flatMap( _.constructWrongChoicesSimilar(itemCorrect,
-        numWrongChoicesRequired, correctResponses, similarityPredicate))
-
-  protected[quizgroup] def constructWrongChoicesRandom(itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int, correctResponses: List[String]): List[String] =
-    levels.filterNot(_.isEmpty).flatMap(_.constructWrongChoicesRandom(itemCorrect,
-        numWrongChoicesRequired, correctResponses))
-
-  protected[quizgroup] def constructWrongChoicesDummy(numWrongChoicesRequired: Int):
-      List[String] = {
-    val characters = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray
-    if (numWrongChoicesRequired > characters.length) {
-      l.logError("Too many dummy answers requested.")
-      Nil
-    } else
-      characters.map(_.toString).take(numWrongChoicesRequired).toList
-  }
-
   def incrementResponsesCorrect(memoryLevel: Int) = incrementResponses(memoryLevel, true)
   def incrementResponsesIncorrect(memoryLevel: Int) = incrementResponses(memoryLevel, false)
 
@@ -206,7 +167,6 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
 
   protected[model] def get(level: Int): QuizGroupMemoryLevel = levels(level)
 
-
   protected[model] def quizItemWithChoices(quizItem: QuizItem, header: QuizGroupHeader):
       QuizItemViewWithChoices = {
     val numCorrectResponses = quizItem.userResponses.numCorrectResponsesInARow
@@ -217,7 +177,7 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
     val useMultipleChoice = numCorrectResponses < header.useMultipleChoiceUntil
     val falseAnswers =
       if (useMultipleChoice)
-        Util.stopwatch(constructWrongChoices(quizItem), "constructWrongChoices")
+        Util.stopwatch(ConstructWrongChoices.execute(this, quizItem), "constructWrongChoices")
       else Nil
     val numCorrectResponsesRequired = numLevels
     new QuizItemViewWithChoices(quizItem, currentPromptNumber, header,

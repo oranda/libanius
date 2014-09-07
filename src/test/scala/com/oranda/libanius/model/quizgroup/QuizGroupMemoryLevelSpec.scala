@@ -23,13 +23,15 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 
 import com.oranda.libanius.model._
-import com.oranda.libanius.model.UserResponse
 import TestData._
 
-import com.oranda.libanius.model.action.producequizitem._
-import ProduceQuizItem._
-import ProduceQuizItemForModelComponents._
+import com.oranda.libanius.model.action._
 import ProduceQuizItemSpec._
+
+import com.oranda.libanius.model.action.wrongchoices._
+import ConstructWrongChoices._
+import ConstructWrongChoicesForModelComponents._
+
 
 class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
@@ -53,11 +55,11 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
     }
 
     "generate false answers similar to a correct answer" in {
-      val falseAnswers = qgMemLevel.constructWrongChoicesSimilar(
-        correctResponses = List("unterhalten"),
-        numWrongResponsesRequired = 5,
-        itemCorrect = QuizItem("entertain", "unterhalten"),
-        similarityPredicate = TextValue.sameEnd)
+      val falseAnswers = constructWrongChoicesSimilar(qgMemLevel,
+          itemCorrect = QuizItem("entertain", "unterhalten"),
+          correctResponses = List("unterhalten"),
+          numWrongChoicesRequired = 5,
+          similarityPredicate = TextValue.sameEnd)
 
       falseAnswers.contains("unterrichten") mustEqual true
     }

@@ -18,9 +18,8 @@
 
 package com.oranda.libanius.model.quizgroup
 
-import scala.collection.immutable._
 import scala.language.postfixOps
-import scala.util.{Try, Random}
+import scala.util.{Random}
 
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 import com.oranda.libanius.dependencies.AppDependencyAccess
@@ -33,10 +32,7 @@ import scala._
 import scala.collection.immutable.Stream
 import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
-import java.lang.StringBuilder
-import com.oranda.libanius.util.StringSplitter
 import scalaz.PLens._
-import scala.Some
 import com.oranda.libanius.model.UserResponse
 
 /*
@@ -51,18 +47,18 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
 
   lazy val quizItems = quizItemStream.toList
 
-  protected[quizgroup] def contains(quizItem: QuizItem): Boolean =
-    quizItems.exists(_.samePromptAndResponse(quizItem))
-  protected[quizgroup] def contains(prompt: TextValue): Boolean =
-    quizItems.exists(_.prompt == prompt)
-  protected[quizgroup] def contains(prompt: String): Boolean = contains(TextValue(prompt))
+  protected[model] def contains(quizItem: QuizItem): Boolean =
+      quizItems.exists(_.samePromptAndResponse(quizItem))
+  protected[model] def contains(prompt: TextValue): Boolean =
+      quizItems.exists(_.prompt == prompt)
+  protected[model] def contains(prompt: String): Boolean = contains(TextValue(prompt))
   protected[model] def numQuizItems = quizItems.size
-  protected[quizgroup] def size = numQuizItems
-  protected[quizgroup] def isEmpty = quizItems.isEmpty
-  protected[quizgroup] def numPrompts = size
-  protected[quizgroup] def numResponses = size
+  protected[model] def size = numQuizItems
+  protected[model] def isEmpty = quizItems.isEmpty
+  protected[model] def numPrompts = size
+  protected[model] def numResponses = size
 
-  protected[quizgroup] def updatedQuizItems(newQuizItems: List[QuizItem]): QuizGroupMemoryLevel =
+  protected[model] def updatedQuizItems(newQuizItems: List[QuizItem]): QuizGroupMemoryLevel =
     QuizGroupMemoryLevel.itemsLens.set(this, newQuizItems)
 
   def updatedWithUserAnswer(prompt: TextValue, response: TextValue,
@@ -128,47 +124,8 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
   protected[quizgroup] def findQuizItem(prompt: String, response: String): Option[QuizItem] =
     quizItems.find(_.samePromptAndResponse(QuizItem(prompt, response)))
 
-  protected[quizgroup] def constructWrongChoicesSimilar(itemCorrect: QuizItem,
-      numWrongResponsesRequired: Int, correctResponses: List[String],
-      similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String] = {
-
-    var similarWords = new HashSet[String]
-    var numValueSetsSearched = 0
-    val numSimilarLettersRequired = 2
-
-    val correctValue = itemCorrect.correctResponse
-
-    quizItems.iterator.takeWhile(_ => similarWords.size < numWrongResponsesRequired).
-      foreach(quizItem => {
-        numValueSetsSearched = numValueSetsSearched + 1
-        // Avoid selecting values belonging to the "correct" correctResponse set
-        if (!correctResponses.contains(quizItem.correctResponse)) {
-          if (similarWords.size < numWrongResponsesRequired &&
-            similarityPredicate(quizItem.correctResponse, correctValue)(numSimilarLettersRequired))
-            similarWords += quizItem.correctResponse.value
-        }
-      })
-    similarWords.toList
-  }
-
   protected[quizgroup] def randomValues(sliceSize: Int): List[TextValue] =
     randomSliceOfQuizItems(sliceSize).map(_.correctResponse).toList
-
-  protected[quizgroup] def constructWrongChoicesRandom(itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int, correctResponses: List[String]): List[String] = {
-
-    def randomFalseWordValue(sliceIndex: Int): Option[String] = {
-      val sliceSize = (numQuizItems / numWrongChoicesRequired)
-      val sliceStartIndex = sliceIndex * sliceSize
-      val randomOffset = Random.nextInt(math.max(sliceSize, 1))
-      val randomIndex = math.min(sliceStartIndex + randomOffset, numQuizItems - 1)
-      val randomItem = Some(quizItems(randomIndex).correctResponse.value)
-      randomItem.filter(!correctResponses.contains(_))
-    }
-
-    (0 until numWrongChoicesRequired).map(
-        sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toList
-  }
 
   protected[quizgroup] def randomSliceOfQuizItems(sliceSize: Int): Iterable[QuizItem] =
     if (sliceSize >= size) quizItems.toList
@@ -202,18 +159,14 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
 
   def updatedInterval: Int = {
     def modifyBy(anInt: Int, aReal: Double) =
-      if (totalResponses <= 5)
-        repetitionInterval + anInt
+      if (totalResponses <= 5) repetitionInterval + anInt
       else
         (repetitionInterval * (1 + aReal)).toInt
 
     math.max(0,
-      if (numCorrectResponses < 7)
-        modifyBy(-1, -0.2)
-      else if (numCorrectResponses > 8)
-        modifyBy(1, 0.2)
-      else
-        repetitionInterval
+      if (numCorrectResponses < 7) modifyBy(-1, -0.2)
+      else if (numCorrectResponses > 8)  modifyBy(1, 0.2)
+      else repetitionInterval
     )
   }
 }
@@ -234,5 +187,4 @@ object QuizGroupMemoryLevel extends AppDependencyAccess {
   val intervalLens: Lens[QuizGroupMemoryLevel, Int] = Lens.lensu(
     get = (_: QuizGroupMemoryLevel).repetitionInterval,
     set = (qgml: QuizGroupMemoryLevel, ri: Int) => qgml.copy(repetitionInterval = ri))
-
 }

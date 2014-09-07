@@ -26,10 +26,12 @@ import com.oranda.libanius.util.Util
 
 import com.oranda.libanius.model.TestData._
 
-import com.oranda.libanius.model.action.producequizitem._
+import com.oranda.libanius.model.action._
 import ProduceQuizItem._
 import ProduceQuizItemForModelComponents._
 import ProduceQuizItemSpec._
+
+import com.oranda.libanius.model.action.wrongchoices._
 
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 
@@ -68,8 +70,8 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val quizItemCorrect: QuizItem = qgWithHeader.quizGroup.quizItems.find(
           _.prompt.value == "entertain").get
 
-      val (falseAnswers, timeTaken) = Util.stopwatch(qgWithHeader.quizGroup.constructWrongChoices(
-          quizItemCorrect, numWrongChoicesRequired = 2))
+      val (falseAnswers, timeTaken) = Util.stopwatch(ConstructWrongChoices.execute(
+          qgWithHeader.quizGroup, quizItemCorrect, numWrongChoicesRequired = 2))
 
       falseAnswers.contains("unterbrochen") mustEqual true
       timeTaken must be lessThan 100
@@ -92,7 +94,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
           "en route|unterwegs'7,1\n"
 
 
-      import com.oranda.libanius.model.action.customformat._
+      import com.oranda.libanius.model.action.serialize._
       import CustomFormat._
       import CustomFormatForModelComponents._
 
@@ -100,7 +102,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
           deserialize[QuizGroup, Separator](demoGroupText, Separator("|"))
       val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get
 
-      val (falseAnswers, _) = Util.stopwatch(demoGroup.constructWrongChoices(
+      val (falseAnswers, _) = Util.stopwatch(ConstructWrongChoices.execute(demoGroup,
           quizItemCorrect, numWrongChoicesRequired = 2))
 
       falseAnswers.size mustEqual 2

@@ -16,12 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oranda.libanius.model.action.customformat
+package com.oranda.libanius.model.action.serialize
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import java.lang.StringBuilder
 
+import com.oranda.libanius.model.action.serialize._
 import CustomFormat._
 import CustomFormatForModelComponents._
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}

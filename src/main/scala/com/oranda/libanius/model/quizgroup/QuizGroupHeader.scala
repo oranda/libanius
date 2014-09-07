@@ -21,7 +21,7 @@ package com.oranda.libanius.model.quizgroup
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import com.oranda.libanius.model._
-import com.oranda.libanius.model.action.customformat._
+import com.oranda.libanius.model.action.serialize._
 import CustomFormat._
 import CustomFormatForModelComponents._
 

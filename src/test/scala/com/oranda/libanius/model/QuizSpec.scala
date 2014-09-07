@@ -25,8 +25,6 @@ import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, QuizGroupHeader, 
 
 import TestData._
 
-import com.oranda.libanius.model.action.producequizitem._
-
 class QuizSpec extends Specification with AppDependencyAccess {
   
   "a quiz" should {

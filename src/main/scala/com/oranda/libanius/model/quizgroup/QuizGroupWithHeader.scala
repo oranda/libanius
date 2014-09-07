@@ -23,7 +23,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.ModelComponent
 import java.lang.StringBuilder
 
-import com.oranda.libanius.model.action.customformat._
+import com.oranda.libanius.model.action.serialize._
 import CustomFormat._
 import CustomFormatForModelComponents._
 

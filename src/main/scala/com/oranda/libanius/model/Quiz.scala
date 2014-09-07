@@ -26,7 +26,7 @@ import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.wordmapping.Dictionary
 
-import com.oranda.libanius.model.action.customformat._
+import com.oranda.libanius.model.action.serialize._
 import CustomFormat._
 import CustomFormatForModelComponents._
 

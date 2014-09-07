@@ -19,7 +19,7 @@
 package com.oranda.libanius.dependencies
 
 import com.oranda.libanius.model._
-import com.oranda.libanius.model.action.customformat._
+import com.oranda.libanius.model.action.serialize._
 import CustomFormat._
 import CustomFormatForModelComponents._
 import com.oranda.libanius.util.Util

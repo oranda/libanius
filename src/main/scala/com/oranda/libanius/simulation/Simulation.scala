@@ -24,7 +24,7 @@ import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import com.oranda.libanius.util.{StringUtil, Util}
 import scala.annotation.tailrec
 
-import com.oranda.libanius.model.action.producequizitem._
+import com.oranda.libanius.model.action._
 import ProduceQuizItem._
 import ProduceQuizItemForModelComponents._
 
