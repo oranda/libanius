@@ -66,48 +66,6 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
-    "construct wrong choices" in {
-      val quizItemCorrect: QuizItem = qgWithHeader.quizGroup.quizItems.find(
-          _.prompt.value == "entertain").get
-
-      val (falseAnswers, timeTaken) = Util.stopwatch(ConstructWrongChoices.execute(
-          qgWithHeader.quizGroup, quizItemCorrect, numWrongChoicesRequired = 2))
-
-      falseAnswers.contains("unterbrochen") mustEqual true
-      timeTaken must be lessThan 100
-    }
-
-    /**
-     * This reproduces a (former) bug, where only one wrong choice was being produced.
-     */
-    "construct a full set of wrong choices" in {
-
-      val demoGroupHeader = "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"21\" isActive=\"true\"\n"
-      val demoGroupText = demoGroupHeader +
-          "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-          "entertain|unterhalten'\n" +
-          "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"5\"\n" +
-          "against|wider'13\n" +
-          "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"15\"\n" +
-          "treaty|Vertrag'11,5\n" +
-          "contract|Vertrag'9,3\n" +
-          "en route|unterwegs'7,1\n"
-
-
-      import com.oranda.libanius.model.action.serialize._
-      import CustomFormat._
-      import CustomFormatForModelComponents._
-
-      val demoGroup: QuizGroup =
-          deserialize[QuizGroup, Separator](demoGroupText, Separator("|"))
-      val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get
-
-      val (falseAnswers, _) = Util.stopwatch(ConstructWrongChoices.execute(demoGroup,
-          quizItemCorrect, numWrongChoicesRequired = 2))
-
-      falseAnswers.size mustEqual 2
-    }
-
     "remove a quiz pair" in {
       val itemToRemove = QuizItem("against", "wider")
       val qgUpdated = quizGroup.removeQuizItem(itemToRemove)

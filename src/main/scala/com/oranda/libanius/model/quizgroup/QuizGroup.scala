@@ -179,7 +179,7 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
       if (useMultipleChoice)
         Util.stopwatch(ConstructWrongChoices.execute(this, quizItem), "constructWrongChoices")
       else Nil
-    val numCorrectResponsesRequired = numLevels
+    val numCorrectResponsesRequired = numLevels // TODO: check inconsistency with the def numCorrectResponsesRequired
     new QuizItemViewWithChoices(quizItem, currentPromptNumber, header,
         falseAnswers, numCorrectResponses, numCorrectResponsesRequired,
         useMultipleChoice)

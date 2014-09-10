@@ -54,16 +54,6 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
-    "generate false answers similar to a correct answer" in {
-      val falseAnswers = constructWrongChoicesSimilar(qgMemLevel,
-          itemCorrect = QuizItem("entertain", "unterhalten"),
-          correctResponses = List("unterhalten"),
-          numWrongChoicesRequired = 5,
-          similarityPredicate = TextValue.sameEnd)
-
-      falseAnswers.contains("unterrichten") mustEqual true
-    }
-
     "remove a quiz pair" in {
       val itemToRemove = QuizItem("against", "wider")
       val qgUpdated = qgMemLevel.removeQuizItem(itemToRemove)

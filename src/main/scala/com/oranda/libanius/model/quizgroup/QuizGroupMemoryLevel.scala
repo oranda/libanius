@@ -160,8 +160,7 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
   def updatedInterval: Int = {
     def modifyBy(anInt: Int, aReal: Double) =
       if (totalResponses <= 5) repetitionInterval + anInt
-      else
-        (repetitionInterval * (1 + aReal)).toInt
+      else (repetitionInterval * (1 + aReal)).toInt
 
     math.max(0,
       if (numCorrectResponses < 7) modifyBy(-1, -0.2)
