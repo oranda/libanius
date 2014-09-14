@@ -19,7 +19,7 @@
 package com.oranda.libanius.model.quizgroup
 
 import scala.language.postfixOps
-import scala.util.{Random}
+import scala.util.Random
 
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 import com.oranda.libanius.dependencies.AppDependencyAccess
@@ -61,38 +61,24 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
   protected[model] def updatedQuizItems(newQuizItems: List[QuizItem]): QuizGroupMemoryLevel =
     QuizGroupMemoryLevel.itemsLens.set(this, newQuizItems)
 
-  def updatedWithUserAnswer(prompt: TextValue, response: TextValue,
+  protected[model] def updatedWithUserAnswer(prompt: TextValue, response: TextValue,
       wasCorrect: Boolean, userResponses: UserResponses, userAnswer: UserResponse):
       QuizGroupMemoryLevel = {
     val userResponseUpdated = userResponses.add(userAnswer, wasCorrect)
-    addQuizItem(prompt, response, userResponseUpdated)
+    this + QuizItem(prompt, response, userResponseUpdated)
   }
-
-  protected[quizgroup] def addQuizItem(prompt: TextValue, response: TextValue,
-      userResponses: UserResponses = UserResponses()): QuizGroupMemoryLevel =
-    addQuizItemToFront(QuizItem(prompt, response, userResponses))
 
   protected[quizgroup] def addNewQuizItem(prompt: String, response: String): QuizGroupMemoryLevel =
     if (!prompt.isEmpty && !response.isEmpty && prompt.toLowerCase != response.toLowerCase)
-      addQuizItemToFront(QuizItem(prompt, response))
+      this + QuizItem(prompt, response)
     else
       this
 
-  protected[quizgroup] def addQuizItemToFront(quizItem: QuizItem): QuizGroupMemoryLevel =
-    addQuizItemToFront(quizItems, quizItem)
-
-  protected[quizgroup] def addQuizItemToFront(quizItems: List[QuizItem],
-      quizItem: QuizItem): QuizGroupMemoryLevel =
+  // addQuizItemToFront
+  protected[quizgroup] def +(quizItem: QuizItem): QuizGroupMemoryLevel =
     QuizGroupMemoryLevel.itemsLens.set(this, quizItem +: remove(quizItem))
 
-  protected[quizgroup] def addQuizItemToEnd(quizItem: QuizItem): QuizGroupMemoryLevel =
-    addQuizItemToEnd(quizItems, quizItem)
-
-  protected[quizgroup] def addQuizItemToEnd(quizItems: List[QuizItem], quizItem: QuizItem):
-      QuizGroupMemoryLevel =
-    updatedQuizItems(remove(quizItem) :+ quizItem)
-
-  def removeQuizItem(quizItem: QuizItem): QuizGroupMemoryLevel =
+  protected[model] def -(quizItem: QuizItem): QuizGroupMemoryLevel =
     QuizGroupMemoryLevel.itemsLens.set(this, remove(quizItem))
 
   protected[quizgroup] def remove(quizItem: QuizItem): List[QuizItem] =
@@ -138,9 +124,9 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
     repetitionInterval + ":" + numCorrectResponses + "/" + totalResponses + ": " +
     quizItems.map(_.prompt)
 
-  def isAtLimit = totalResponses >= QuizGroupMemoryLevel.totalResponsesLimit
+  protected[model] def isAtLimit = totalResponses >= QuizGroupMemoryLevel.totalResponsesLimit
 
-  def inc(isCorrect: Boolean) = {
+  protected[model] def inc(isCorrect: Boolean) = {
     val numCorrectToAdd = if (isCorrect) 1 else 0
     // For each memory level, only check the recent performance. Reset the counters after a limit.
     if (!isAtLimit)
@@ -150,14 +136,15 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
       copy(totalResponses = 1, numCorrectResponses = numCorrectToAdd)
   }
 
-  def wasNotTooRecentlyUsed(currentPromptNum : Int, promptNumInMostRecentResponse: Option[Int]) =
+  protected[model] def wasNotTooRecentlyUsed(currentPromptNum : Int,
+      promptNumInMostRecentResponse: Option[Int]) =
     promptNumInMostRecentResponse.forall {
       case promptNumInMostRecentResponse =>
         val diffInPromptNum = currentPromptNum - promptNumInMostRecentResponse
         diffInPromptNum >= repetitionInterval
     }
 
-  def updatedInterval: Int = {
+  protected[model] def updatedInterval: Int = {
     def modifyBy(anInt: Int, aReal: Double) =
       if (totalResponses <= 5) repetitionInterval + anInt
       else (repetitionInterval * (1 + aReal)).toInt
@@ -176,10 +163,6 @@ object QuizGroupMemoryLevel extends AppDependencyAccess {
     get = (_: QuizGroupMemoryLevel).quizItems,
     set = (qgp: QuizGroupMemoryLevel,
            qItems: List[QuizItem]) => qgp.copy(quizItemStream = qItems.toStream))
-
-  protected[quizgroup] def remove(quizItems: List[QuizItem], quizItem: QuizItem):
-      List[QuizItem] =
-    quizItems.filterNot(_.samePromptAndResponse(quizItem))
 
   val totalResponsesLimit = 10
 

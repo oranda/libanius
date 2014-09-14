@@ -1,6 +1,12 @@
+== 0.973
+
+  * In the model classes, adopted the Scala idiom of using symbolic names rather than
+    descriptive names for method names where operations are purely functional.
+
+
 == 0.972 September 10 2014
 
-  * Refactored code for finding quiz items and contructing wrong choices into new typeclasses.
+  * Refactored code for finding quiz items and constructing wrong choices into new typeclasses.
 
 
 == 0.971 August 10 2014

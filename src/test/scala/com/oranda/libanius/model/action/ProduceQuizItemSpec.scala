@@ -105,7 +105,7 @@ object ProduceQuizItemSpec {
     // Each time a quiz item is pulled, a user answer must be set
     val qgmlUpdated1 = qgml.updatedWithUserAnswer(quizItem.get.prompt,
       quizItem.get.correctResponse, true, UserResponses(), new UserResponse(0))
-    val qgmlUpdated2 = qgmlUpdated1.removeQuizItem(quizItem.get)
+    val qgmlUpdated2 = qgmlUpdated1 - quizItem.get
     (qgmlUpdated2, (quizItem.get.prompt.value, quizItem.get.correctResponse.value))
   }
 

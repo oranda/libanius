@@ -23,7 +23,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 
 import com.oranda.libanius.model._
-import TestData._
+import com.oranda.libanius.model.TestData._
 
 import com.oranda.libanius.model.action._
 import ProduceQuizItemSpec._
@@ -31,6 +31,7 @@ import ProduceQuizItemSpec._
 import com.oranda.libanius.model.action.wrongchoices._
 import ConstructWrongChoices._
 import ConstructWrongChoicesForModelComponents._
+import scala._
 
 
 class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
@@ -50,13 +51,12 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
     "accept new values for an existing word-mapping" in {
       val valuesForAgainst = qgMemLevel.findResponsesFor("against")
       valuesForAgainst.size mustEqual 1
-      val qgUpdated = qgMemLevel.addQuizItem(TextValue("against"), TextValue("gegen"))
+      val qgUpdated = qgMemLevel + QuizItem(TextValue("against"), TextValue("gegen"))
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
     "remove a quiz pair" in {
-      val itemToRemove = QuizItem("against", "wider")
-      val qgUpdated = qgMemLevel.removeQuizItem(itemToRemove)
+      val qgUpdated = qgMemLevel - QuizItem("against", "wider")
       qgUpdated.contains("against") mustEqual false
     }
 
@@ -67,7 +67,7 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
     "move an existing quiz pair to the front of its queue" in {
       val numPromptsBefore = qgMemLevel.numPrompts
-      val qgUpdated = qgMemLevel.addQuizItemToFront(QuizItem("sweeps", "streicht"))
+      val qgUpdated = qgMemLevel + QuizItem("sweeps", "streicht")
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
       pullQuizItem(qgUpdated, 0)._2 mustEqual ("sweeps", "streicht")
@@ -75,15 +75,15 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
     "move a quiz pair to the front of its queue where only the prompt already exists" in {
       val sizeBefore = qgMemLevel.size
-      val qgUpdated = qgMemLevel.addQuizItemToFront(QuizItem("entertain", "bewirten"))
+      val qgUpdated = qgMemLevel + QuizItem("entertain", "bewirten")
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
       pullQuizItem(qgUpdated, 0)._2 mustEqual ("entertain", "bewirten")
     }
 
     "add more than one new quiz pair to the front of its queue" in {
-      val qgUpdated1 = qgMemLevel.addQuizItemToFront(QuizItem("to exchange", "tauschen"))
-      val qgUpdated2 = qgUpdated1.addQuizItemToFront(QuizItem("whole", "ganz"))
+      val qgUpdated1 = qgMemLevel + QuizItem("to exchange", "tauschen")
+      val qgUpdated2 = qgUpdated1 + QuizItem("whole", "ganz")
       val (qgUnrolled, (keyWord, value)) = pullQuizItem(qgUpdated2, 0)
       (keyWord, value) mustEqual ("whole", "ganz")
       pullQuizItem(qgUnrolled, 1)._2 mustEqual ("to exchange", "tauschen")

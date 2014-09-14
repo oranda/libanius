@@ -138,7 +138,7 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
   }
 
   protected[model] def removeQuizItem(quizItem: QuizItem) =
-    QuizGroup.levelsLens.set(this, levels.map(_.removeQuizItem(quizItem)))
+    QuizGroup.levelsLens.set(this, levels.map(_ - quizItem))
 
   /*
    * This may give similar results to findResponsesFor but it uses the dictionary
@@ -236,9 +236,6 @@ object QuizGroup extends AppDependencyAccess {
 
   val promptNumberLens: Lens[QuizGroup, Int] =
     QuizGroupUserData.promptNumberLens compose userDataLens
-
-  def remove(quizItems: Stream[QuizItem], quizItem: QuizItem): Stream[QuizItem] =
-    quizItems.filterNot(_.samePromptAndResponse(quizItem))
 }
 
 
