@@ -74,7 +74,7 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
     else
       this
 
-  // addQuizItemToFront
+  // Adds the quiz item to the front of the queue
   protected[quizgroup] def +(quizItem: QuizItem): QuizGroupMemoryLevel =
     QuizGroupMemoryLevel.itemsLens.set(this, quizItem +: remove(quizItem))
 

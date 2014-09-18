@@ -18,6 +18,7 @@
 
 package com.oranda.libanius.model.quizitem
 
+import scala.language.implicitConversions
 import com.oranda.libanius.model.{ModelComponent, UserResponse, UserResponses}
 
 trait QuizItem extends ModelComponent {
@@ -33,6 +34,8 @@ trait QuizItem extends ModelComponent {
   def isPresentable(currentPromptNumber: Int, repetitionInterval: Int): Boolean
 
   def looselyMatches(userResponse: String): Boolean
+
+  def isValid: Boolean
 
   def updatedWithUserResponse(response: TextValue, wasCorrect: Boolean,
                               userResponse: UserResponse): QuizItem
@@ -65,6 +68,10 @@ case class QuizItemConcrete(prompt: TextValue, correctResponse: TextValue,
   def looselyMatches(userResponse: String): Boolean =
     correctResponse.looselyMatches(userResponse)
 
+  def isValid: Boolean =
+    !prompt.isEmpty && !correctResponse.isEmpty &&
+        !(prompt.toLowerCase == correctResponse.toLowerCase)
+
   def updatedWithUserResponse(response: TextValue, wasCorrect: Boolean,
       userResponse: UserResponse): QuizItem = {
     val userResponsesUpdated = userResponses.add(userResponse, wasCorrect)
@@ -72,6 +79,9 @@ case class QuizItemConcrete(prompt: TextValue, correctResponse: TextValue,
   }
 }
 
+/**
+ * Instantiate quiz items using the default QuizItemConcrete.
+ */
 object QuizItem {
 
   def apply(prompt: TextValue, response: TextValue,

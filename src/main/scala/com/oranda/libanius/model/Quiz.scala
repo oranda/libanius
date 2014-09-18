@@ -135,10 +135,17 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   private def setQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup): Quiz =
     Quiz.quizGroupsLens.set(this, quizGroups + (header -> quizGroup))
 
-  def addQuizItemToFront(header: QuizGroupHeader, prompt: String, response: String): Quiz =
+  // adds the quiz item to the front of the right queue within the Quiz data structure
+  def addQuizItemToFront(quizItem: QuizItem, header: QuizGroupHeader): Quiz =
     Quiz.quizGroupsLens.set(this,
-      mapVPLens(header) mod ((_: QuizGroup).addNewQuizItem(prompt, response), quizGroups)
+      mapVPLens(header) mod ((_: QuizGroup) + quizItem, quizGroups)
     )
+
+  /*
+   * This is intended for reversible quiz items, principally word translations.
+   */
+  def addQuizItemToFrontOfTwoGroups(quizItem: QuizItem, header: QuizGroupHeader): Quiz =
+    addQuizItemToFront(quizItem, header).addQuizItemToFront(quizItem, header.reverse)
 
   def removeQuizItem(prompt: String, response: String, header: QuizGroupHeader): (Quiz, Boolean) =
     removeQuizItem(QuizItem(prompt, response), header)
@@ -149,23 +156,8 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def removeQuizItem(quizItem: QuizItem, header: QuizGroupHeader): (Quiz, Boolean) = {
     val quizItemExisted = existsQuizItem(quizItem, header)
     val quiz: Quiz = Quiz.quizGroupsLens.set(this,
-        mapVPLens(header) mod ((_: QuizGroup).removeQuizItem(quizItem), quizGroups))
+        mapVPLens(header) mod ((_: QuizGroup) - quizItem, quizGroups))
     (quiz, quizItemExisted)
-  }
-
-  /*
-   * This is intended for reversible quiz items, principally word translations.
-   */
-  def addQuizItemToFrontOfTwoGroups(header: QuizGroupHeader,
-      prompt: String, response: String): Quiz = {
-
-    // E.g. add to the English -> German group
-    val quizUpdated1 = addQuizItemToFront(header, prompt, response)
-
-    // E.g. add to the German -> English group
-    val quizUpdated2 = quizUpdated1.addQuizItemToFront(header.reverse, response, prompt)
-
-    quizUpdated2
   }
 
   def qgCurrentPromptNumber(header: QuizGroupHeader): Option[Int] =

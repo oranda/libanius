@@ -84,13 +84,17 @@ class ProduceQuizItemSpec extends Specification with AppDependencyAccess {
 
 object ProduceQuizItemSpec {
 
+  // pullQuizItem for QuizGroupWithHeader
+  def pullQuizItem(qgwh: QuizGroupWithHeader): (QuizGroup, (String, String)) =
+    pullQuizItem(qgwh.quizGroup)
+
   // pullQuizItem for QuizGroup
-  def pullQuizItem(qgwh: QuizGroupWithHeader): (QuizGroup, (String, String)) = {
-    val quizItemOpt = findPresentableQuizItem(qgwh.quizGroup, NoParams())
+  def pullQuizItem(qg: QuizGroup): (QuizGroup, (String, String)) = {
+    val quizItemOpt = findPresentableQuizItem(qg, NoParams())
     assert(quizItemOpt.isDefined)
     val quizItem = quizItemOpt.get
     // Each time a quiz item is pulled, a user answer must be set
-    val qgUpdated = updatedWithUserResponse(qgwh.quizGroup, quizItem)
+    val qgUpdated = updatedWithUserResponse(qg, quizItem)
     (qgUpdated, (quizItem.prompt.value, quizItem.correctResponse.value))
   }
 

@@ -48,7 +48,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "accept the addition of a new word-mapping" in {
       quizGroup.contains("good") mustEqual false
-      val qgUpdated = quizGroup.addNewQuizItem("good", "gut")
+      val qgUpdated = quizGroup + QuizItem("good", "gut")
       qgUpdated.contains("good") mustEqual true
     }
 
@@ -62,54 +62,49 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
     "accept new values for an existing word-mapping" in {
       val valuesForAgainst = quizGroup.findResponsesFor("against")
       valuesForAgainst.size mustEqual 1
-      val qgUpdated = quizGroup.addNewQuizItem("against", "gegen")
+      val qgUpdated = quizGroup + QuizItem("against", "gegen")
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
     "remove a quiz pair" in {
       val itemToRemove = QuizItem("against", "wider")
-      val qgUpdated = quizGroup.removeQuizItem(itemToRemove)
+      val qgUpdated = quizGroup - itemToRemove
       qgUpdated.contains("against") mustEqual false
     }
 
     "add a new quiz item to the front of its queue" in {
-      val qgUpdated = quizGroupSimple.addNewQuizItem("to exchange", "tauschen")
+      val qgUpdated = quizGroupSimple + QuizItem("to exchange", "tauschen")
       val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(qgUpdated, NoParams())
       foundQuizItem mustEqual Some(QuizItem("to exchange", "tauschen"))
     }
 
     "move an existing quiz pair to the front of its queue" in {
-      val numPromptsBefore = qgwh.numPrompts
-      val qgUpdated = qgwh.addNewQuizItem("sweeps", "streicht")
+      val numPromptsBefore = quizGroup.numPrompts
+      val qgUpdated = quizGroup + QuizItem("sweeps", "streicht")
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
-      val qgwhUpdated = QuizGroupWithHeader(qgwh.header, qgUpdated)
       val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(
-          qgwhUpdated.quizGroup.levels(0), CurrentPromptNumber(qgwhUpdated.currentPromptNumber))
+          qgUpdated.levels(0), CurrentPromptNumber(qgUpdated.currentPromptNumber))
       foundQuizItem mustEqual Some(QuizItem("sweeps", "streicht"))
     }
 
     "add a quiz pair where only the prompt already exists" in {
-      val sizeBefore = qgwh.size
-      val qgUpdated = qgwh.addNewQuizItem("on", "zu")
+      val sizeBefore = quizGroup.size
+      val qgUpdated = quizGroup + QuizItem("on", "zu")
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
-      val qgwhUpdated = QuizGroupWithHeader(qgwh.header, qgUpdated)
       val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(
-          qgwhUpdated.quizGroup.levels(0), CurrentPromptNumber(qgwhUpdated.currentPromptNumber))
+          qgUpdated.levels(0), CurrentPromptNumber(qgUpdated.currentPromptNumber))
       foundQuizItem mustEqual Some(QuizItem("on", "zu"))
     }
 
-
     "add more than one new quiz pair" in {
-      val qgwhSimple = makeSimpleQgWithHeader
-      val qgUpdated1 = qgwhSimple.addNewQuizItem("to exchange", "tauschen")
-      val qgUpdated2 = qgUpdated1.addNewQuizItem("whole", "ganz")
-      val qgwhUpdated2 = QuizGroupWithHeader(qgwhSimple.header, qgUpdated2)
-      val (qgUnrolled, (keyWord, value)) = pullQuizItem(qgwhUpdated2)
+      val qgSimple = makeSimpleQuizGroup
+      val qgUpdated1 = qgSimple + QuizItem("to exchange", "tauschen")
+      val qgUpdated2 = qgUpdated1 + QuizItem("whole", "ganz")
+      val (qgUnrolled, (keyWord, value)) = pullQuizItem(qgUpdated2)
       (keyWord, value) mustEqual ("whole", "ganz")
-      val qgwhUnrolled = QuizGroupWithHeader(qgwhSimple.header, qgUnrolled)
-      pullQuizItem(qgwhUnrolled)._2 mustEqual ("to exchange", "tauschen")
+      pullQuizItem(qgUnrolled)._2 mustEqual ("to exchange", "tauschen")
     }
 
     val memLevel2 = QuizGroupMemoryLevel(correctResponsesInARow = 2,

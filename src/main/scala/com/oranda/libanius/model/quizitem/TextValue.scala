@@ -18,6 +18,7 @@
 
 package com.oranda.libanius.model.quizitem
 
+import scala.language.implicitConversions
 import scala.util.matching.Regex
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.util.StringUtil
@@ -57,8 +58,10 @@ object TextValue {
   def hasSameEnd(value: String, otherValue: String): Int => Boolean =
     (numOfLetters: Int) => otherValue != value &&
         value.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
-}
 
+  // Forward calls to String where necessary.
+  implicit def textValue2String(textValue: TextValue): String = textValue.value
+}
 
 /*
  * A correct response with bracketed expressions that are optional.

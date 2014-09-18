@@ -118,15 +118,12 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
   }
 
   private def moveQuizItem(quizItem: QuizItem): QuizGroup = {
-    val qgUpdated = removeQuizItem(quizItem)
+    val qgUpdated = this - quizItem
     qgUpdated.prependItemToNthLevel(quizItem, quizItem.numCorrectResponsesInARow)
   }
 
-  protected[model] def addNewQuizItem(prompt: String, response: String): QuizGroup =
-    if (!prompt.isEmpty && !response.isEmpty && prompt.toLowerCase != response.toLowerCase)
-      prependItemToFirstLevel(QuizItem(prompt, response))
-    else
-      this
+  protected[model] def +(quizItem: QuizItem): QuizGroup =
+    if (quizItem.isValid) prependItemToFirstLevel(quizItem) else this
 
   private def prependItemToFirstLevel(quizItem: QuizItem): QuizGroup =
     prependItemToNthLevel(quizItem, 0)
@@ -137,7 +134,7 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
     nthLevelItemsLens.mod(quizItem +: _.filterNot(_ == quizItem), this)
   }
 
-  protected[model] def removeQuizItem(quizItem: QuizItem) =
+  protected[model] def -(quizItem: QuizItem) =
     QuizGroup.levelsLens.set(this, levels.map(_ - quizItem))
 
   /*

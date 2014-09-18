@@ -49,8 +49,9 @@ class QuizSpec extends Specification with AppDependencyAccess {
 
     "add a new quiz item to a specified group" in {
       val quizBefore = Quiz.demoQuiz(quizData)
-      val quizUpdated = quizBefore.addQuizItemToFront(qghEngGer, "to exchange", "tauschen")
-      quizUpdated.existsQuizItem(QuizItem("to exchange", "tauschen"), qghEngGer) mustEqual true
+      val quizItem = QuizItem("to exchange", "tauschen")
+      val quizUpdated = quizBefore.addQuizItemToFront(quizItem, qghEngGer)
+      quizUpdated.existsQuizItem(quizItem, qghEngGer) mustEqual true
     }
 
     "delete a quiz pair without deleting all values for that prompt" in {
