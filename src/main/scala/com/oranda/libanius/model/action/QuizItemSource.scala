@@ -25,55 +25,45 @@ import com.oranda.libanius.model.ModelComponent
 import com.oranda.libanius.model.Quiz
 
 
-trait Params
-case class NoParams() extends Params
-case class CurrentPromptNumber(currentPromptNumber: Int) extends Params
-/**
- * Provide factory method based on quiz group for CurrentPromptNumber Params.
- */
-object CurrentPromptNumber {
-  def apply(qg: QuizGroup): CurrentPromptNumber = CurrentPromptNumber(qg.currentPromptNumber)
-}
-
 /**
  * Type class definition for finding quiz items in model entities.
  */
-trait ProduceQuizItemBase[A <: ModelComponent, B <: Params, C] {
-  def findPresentableQuizItem(component: A, params: B): Option[C]
+trait QuizItemSourceBase[A <: ModelComponent, B <: Params, C] {
+  def produceQuizItem(component: A, params: B): Option[C]
   def findAnyUnfinishedQuizItem(component: A, params:B): Option[C]
 }
 
 /**
- * In the normal case of ProduceQuizItem, there are no extra parameters needed.
+ * In the normal case of QuizItemSource, there are no extra parameters needed.
  */
-trait ProduceQuizItem[A <: ModelComponent, C] extends ProduceQuizItemBase[A, NoParams, C]
+trait QuizItemSource[A <: ModelComponent, C] extends QuizItemSourceBase[A, NoParams, C]
 
 
 // provides external access to the typeclass, forwarding the call to the appropriate type
-object ProduceQuizItem {
+object QuizItemSource {
 
-  def findPresentableQuizItem[A <: ModelComponent, B <: Params, C](component: A, params: B)
-      (implicit pqi: ProduceQuizItemBase[A, B, C], c: C => QuizItem): Option[C] =
-    pqi.findPresentableQuizItem(component, params)
+  def produceQuizItem[A <: ModelComponent, B <: Params, C](component: A, params: B)
+      (implicit qis: QuizItemSourceBase[A, B, C], c: C => QuizItem): Option[C] =
+    qis.produceQuizItem(component, params)
 
   def findAnyUnfinishedQuizItem[A <: ModelComponent, B <: Params, C](component: A, params: B)
-      (implicit pqi: ProduceQuizItemBase[A, B, C], c: C => QuizItem): Option[C] =
-    pqi.findAnyUnfinishedQuizItem(component, params)
+      (implicit qis: QuizItemSourceBase[A, B, C], c: C => QuizItem): Option[C] =
+    qis.findAnyUnfinishedQuizItem(component, params)
 }
 
-object ProduceQuizItemForModelComponents extends AppDependencyAccess {
+object modelComponentsAsQuizItemSources extends AppDependencyAccess {
 
-  implicit object produceQuizItemQuiz extends ProduceQuizItem[Quiz, QuizItemViewWithChoices] {
+  implicit object quizAsSource extends QuizItemSource[Quiz, QuizItemViewWithChoices] {
 
     /*
      * Find the first available "presentable" quiz item.
      * Return a quiz item view and the associated quiz group header.
      */
-    def findPresentableQuizItem(quiz: Quiz, params: NoParams = NoParams()):
+    def produceQuizItem(quiz: Quiz, params: NoParams = NoParams()):
         Option[QuizItemViewWithChoices] =
       (for {
         (header, quizGroup) <- quiz.activeQuizGroups.toStream
-        quizItem <- produceQuizItemQuizGroup.findPresentableQuizItem(quizGroup).toStream
+        quizItem <- quizGroupAsSource.produceQuizItem(quizGroup).toStream
       } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
 
     /*
@@ -87,37 +77,37 @@ object ProduceQuizItemForModelComponents extends AppDependencyAccess {
       l.log("calling Quiz.findAnyUnfinishedQuizItem")
       (for {
         (header, quizGroup) <- quiz.activeQuizGroups
-        quizItem <- produceQuizItemQuizGroup.findAnyUnfinishedQuizItem(quizGroup, NoParams())
+        quizItem <- quizGroupAsSource.findAnyUnfinishedQuizItem(quizGroup, NoParams())
       } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
     }
   }
 
-  implicit object produceQuizItemQuizGroup extends ProduceQuizItem[QuizGroup, QuizItem] {
+  implicit object quizGroupAsSource extends QuizItemSource[QuizGroup, QuizItem] {
     /*
      * The memLevels are searched in reverse order for presentable quiz items,
      * meaning that an item that has been answered correctly (once or more) will
      * be preferred over an item with no correct answers, assuming the
      * interval criteria (difference with the prompt number) is satisfied.
      */
-    def findPresentableQuizItem(qg: QuizGroup, params: NoParams = NoParams()): Option[QuizItem] =
+    def produceQuizItem(qg: QuizGroup, params: NoParams = NoParams()): Option[QuizItem] =
       (for {
         (memLevel, levelIndex) <- qg.levels.zipWithIndex.reverse.tail.toStream
-        quizItem <- produceQuizItemQuizGroupMemoryLevel.findPresentableQuizItem(memLevel,
+        quizItem <- quizGroupMemoryLevelAsSource.produceQuizItem(memLevel,
             CurrentPromptNumber(qg)).toStream
       } yield quizItem).headOption
 
     def findAnyUnfinishedQuizItem(qg: QuizGroup, params: NoParams = NoParams()): Option[QuizItem] =
       (for {
         (memLevel, levelIndex) <- qg.levels.zipWithIndex.reverse.tail.toStream
-        quizItem <- produceQuizItemQuizGroupMemoryLevel.findAnyUnfinishedQuizItem(
+        quizItem <- quizGroupMemoryLevelAsSource.findAnyUnfinishedQuizItem(
             memLevel, CurrentPromptNumber(qg))
       } yield quizItem).headOption
   }
 
-  implicit object produceQuizItemQuizGroupMemoryLevel
-      extends ProduceQuizItemBase[QuizGroupMemoryLevel, CurrentPromptNumber, QuizItem] {
+  implicit object quizGroupMemoryLevelAsSource
+      extends QuizItemSourceBase[QuizGroupMemoryLevel, CurrentPromptNumber, QuizItem] {
 
-    def findPresentableQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber):
+    def produceQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber):
         Option[QuizItem] =
       (for {
         quizItem <- qgml.quizItems.toStream
@@ -128,4 +118,14 @@ object ProduceQuizItemForModelComponents extends AppDependencyAccess {
         Option[QuizItem] =
       qgml.quizItems.headOption
   }
+}
+
+trait Params
+case class NoParams() extends Params
+case class CurrentPromptNumber(currentPromptNumber: Int) extends Params
+/**
+ * Provide factory method based on quiz group for CurrentPromptNumber Params.
+ */
+object CurrentPromptNumber {
+  def apply(qg: QuizGroup): CurrentPromptNumber = CurrentPromptNumber(qg.currentPromptNumber)
 }

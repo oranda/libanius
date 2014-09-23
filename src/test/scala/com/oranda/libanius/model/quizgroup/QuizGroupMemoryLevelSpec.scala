@@ -26,7 +26,7 @@ import com.oranda.libanius.model._
 import com.oranda.libanius.model.TestData._
 
 import com.oranda.libanius.model.action._
-import ProduceQuizItemSpec._
+import QuizItemSourceSpec._
 
 import com.oranda.libanius.model.action.wrongchoices._
 import ConstructWrongChoices._

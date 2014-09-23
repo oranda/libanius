@@ -25,8 +25,8 @@ import com.oranda.libanius.util.{StringUtil, Util}
 import scala.annotation.tailrec
 
 import com.oranda.libanius.model.action._
-import ProduceQuizItem._
-import ProduceQuizItemForModelComponents._
+import QuizItemSource._
+import modelComponentsAsQuizItemSources._
 
 /*
  * Run through a whole quiz, simulating the part of the user and checking
@@ -36,25 +36,26 @@ trait Simulation {
 
   private var responsesProcessed: Long = 0
   private var totalMillisForUpdatingWithResponses: Long = 0
-  private var totalMillisToFindPresentableItems: Long = 0
+  private var totalMillisToProduceQuizItems: Long = 0
   private var totalMillisToComputeScore: Long = 0
+
+  private val maxResponses: Int = 300000
 
   protected def testAllQuizItems(quiz: Quiz,
       lastQuizItem: Option[QuizItemViewWithChoices] = None) {
-    val maxResponses = 300000
-    testWithQuizItems(quiz, lastQuizItem)(maxResponses)
-    report(quiz)
+    val quizUpdated = testWithQuizItems(quiz, lastQuizItem)
+    report(quizUpdated)
   }
 
   @tailrec
   private def testWithQuizItems(quiz: Quiz,
-      lastQuizItem: Option[QuizItemViewWithChoices] = None) (implicit maxResponses: Long) {
+      lastQuizItem: Option[QuizItemViewWithChoices] = None): Quiz = {
 
     if (responsesProcessed < maxResponses) {
 
-      val (presentableQuizItem, timeTakenToFindItem) = Util.stopwatch(findPresentableQuizItem(quiz, NoParams()))
-      output("time for findPresentableQuizItem: " + timeTakenToFindItem)
-      if (shouldMeasureTime) totalMillisToFindPresentableItems += timeTakenToFindItem
+      val (presentableQuizItem, timeTakenToFindItem) = Util.stopwatch(produceQuizItem(quiz, NoParams()))
+      output("time for produceQuizItem: " + timeTakenToFindItem)
+      if (shouldMeasureTime) totalMillisToProduceQuizItems += timeTakenToFindItem
 
       presentableQuizItem match {
         case Some(quizItem) =>
@@ -70,14 +71,18 @@ trait Simulation {
             output("Simulated response: " + simulatedResponse)
             val quizAfterResponse = processUserResponse(quiz, simulatedResponse, quizItem)
 
+            output("quizAfterResponse.numCorrectResponses: " + quizAfterResponse.numCorrectResponses)
             responsesProcessed += 1
             testWithQuizItems(quizAfterResponse, Some(quizItem))
-          }
+          } else
+            quiz
         case _ =>
           output("No more questions found! Finished!")
+          quiz
       }
     } else {
       output("Max responses reached for this simulation. Finished!")
+      quiz
     }
   }
 
@@ -120,9 +125,18 @@ trait Simulation {
     output("Average millis for updating quiz with responses: " +
         (totalMillisForUpdatingWithResponses / numResponsesMeasured))
     output("Average millis to find presentable items: " +
-        (totalMillisToFindPresentableItems / numResponsesMeasured))
+        (totalMillisToProduceQuizItems / numResponsesMeasured))
     output("Average millis to compute score: " +
         (totalMillisToComputeScore / numResponsesMeasured))
+
+
+    val qg = quiz.activeQuizGroups.values.iterator.next
+    output("activeQuizGroups.size: " + quiz.activeQuizGroups.values.iterator.next)
+    output("numCorrectResponses: " + qg.numCorrectResponses)
+    output("totalCorrectResponsesRequired: " + quiz.totalCorrectResponsesRequired)
+
+    val score = quiz.scoreSoFar
+    assert(score == 100, "Score was " + score)
   }
 
   // For now, just return the correct Answer

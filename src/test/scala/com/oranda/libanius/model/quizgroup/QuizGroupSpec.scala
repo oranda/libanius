@@ -27,9 +27,9 @@ import com.oranda.libanius.util.Util
 import com.oranda.libanius.model.TestData._
 
 import com.oranda.libanius.model.action._
-import ProduceQuizItem._
-import ProduceQuizItemForModelComponents._
-import ProduceQuizItemSpec._
+import QuizItemSource._
+import modelComponentsAsQuizItemSources._
+import QuizItemSourceSpec._
 
 import com.oranda.libanius.model.action.wrongchoices._
 
@@ -54,7 +54,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "update memory levels on a user response" in {
       qgwhSimple.quizGroup.levels(1).size mustEqual 0
-      val quizItem = findPresentableQuizItem(qgwhSimple.quizGroup, NoParams())
+      val quizItem = produceQuizItem(qgwhSimple.quizGroup, NoParams())
       val qgUpdated = updatedWithUserResponse(qgwhSimple.quizGroup, quizItem.get)
       qgUpdated.levels(1).size mustEqual 1
     }
@@ -74,7 +74,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
 
     "add a new quiz item to the front of its queue" in {
       val qgUpdated = quizGroupSimple + QuizItem("to exchange", "tauschen")
-      val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(qgUpdated, NoParams())
+      val foundQuizItem = QuizItemSource.produceQuizItem(qgUpdated, NoParams())
       foundQuizItem mustEqual Some(QuizItem("to exchange", "tauschen"))
     }
 
@@ -83,7 +83,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val qgUpdated = quizGroup + QuizItem("sweeps", "streicht")
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
-      val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(
+      val foundQuizItem = QuizItemSource.produceQuizItem(
           qgUpdated.levels(0), CurrentPromptNumber(qgUpdated.currentPromptNumber))
       foundQuizItem mustEqual Some(QuizItem("sweeps", "streicht"))
     }
@@ -93,7 +93,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val qgUpdated = quizGroup + QuizItem("on", "zu")
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
-      val foundQuizItem = ProduceQuizItem.findPresentableQuizItem(
+      val foundQuizItem = QuizItemSource.produceQuizItem(
           qgUpdated.levels(0), CurrentPromptNumber(qgUpdated.currentPromptNumber))
       foundQuizItem mustEqual Some(QuizItem("on", "zu"))
     }
