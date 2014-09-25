@@ -34,13 +34,13 @@ import modelComponentsAsQuizItemSources._
  */
 trait Simulation {
 
+  val MAX_RESPONSES: Int = 300000
+  val NUM_WARMUP: Int = 2
+
   private var responsesProcessed: Long = 0
   private var totalMillisForUpdatingWithResponses: Long = 0
   private var totalMillisToProduceQuizItems: Long = 0
   private var totalMillisToComputeScore: Long = 0
-
-  val MAX_RESPONSES: Int = 300000
-  val NUM_WARMUP: Int = 2
 
   protected def testAllQuizItems(quiz: Quiz,
       lastQuizItem: Option[QuizItemViewWithChoices] = None) {
