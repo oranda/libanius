@@ -19,7 +19,7 @@
 package com.oranda.libanius.simulation
 
 import com.oranda.libanius.consoleui.Output._
-import com.oranda.libanius.model.{Quiz}
+import com.oranda.libanius.model.Quiz
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import com.oranda.libanius.util.{StringUtil, Util}
 import scala.annotation.tailrec
@@ -39,7 +39,8 @@ trait Simulation {
   private var totalMillisToProduceQuizItems: Long = 0
   private var totalMillisToComputeScore: Long = 0
 
-  private val maxResponses: Int = 300000
+  val MAX_RESPONSES: Int = 300000
+  val NUM_WARMUP: Int = 2
 
   protected def testAllQuizItems(quiz: Quiz,
       lastQuizItem: Option[QuizItemViewWithChoices] = None) {
@@ -47,22 +48,22 @@ trait Simulation {
     report(quizUpdated)
   }
 
+  private def findQuizItem(quiz: Quiz): Option[QuizItemViewWithChoices] =
+    produceQuizItem(quiz, NoParams()).orElse(findAnyUnfinishedQuizItem(quiz, NoParams()))
+
   @tailrec
   private def testWithQuizItems(quiz: Quiz,
       lastQuizItem: Option[QuizItemViewWithChoices] = None): Quiz = {
 
-    if (responsesProcessed < maxResponses) {
+    if (responsesProcessed < MAX_RESPONSES) {
 
-      val (presentableQuizItem, timeTakenToFindItem) = Util.stopwatch(produceQuizItem(quiz, NoParams()))
-      output("time for produceQuizItem: " + timeTakenToFindItem)
+      val (quizItem, timeTakenToFindItem) = Util.stopwatch(findQuizItem(quiz))
+      output("time for findQuizItem: " + timeTakenToFindItem)
       if (shouldMeasureTime) totalMillisToProduceQuizItems += timeTakenToFindItem
-
-      presentableQuizItem match {
+      quizItem match {
         case Some(quizItem) =>
-          val strChoices =
-            if (quizItem.useMultipleChoice)
-              "\tChoices: " + quizItem.allChoices.mkString(", ")
-            else ""
+          lazy val allChoicesText = "\tChoices: " + quizItem.allChoices.mkString(", ")
+          val strChoices = if (quizItem.useMultipleChoice) allChoicesText else ""
           output(responsesProcessed + ". Prompt: " + quizItem.prompt + strChoices)
           val problem = findProblem(timeTakenToFindItem, quizItem, lastQuizItem, quiz)
           problem.foreach(output(_))
@@ -70,8 +71,8 @@ trait Simulation {
             val simulatedResponse = makeResponse(quizItem, quiz, responsesProcessed)
             output("Simulated response: " + simulatedResponse)
             val quizAfterResponse = processUserResponse(quiz, simulatedResponse, quizItem)
-
-            output("quizAfterResponse.numCorrectResponses: " + quizAfterResponse.numCorrectResponses)
+            output("quizAfterResponse.numCorrectResponses: " +
+                quizAfterResponse.numCorrectResponses)
             responsesProcessed += 1
             testWithQuizItems(quizAfterResponse, Some(quizItem))
           } else
@@ -121,22 +122,16 @@ trait Simulation {
   private def report(quiz: Quiz) {
     output("Responses processed: " + responsesProcessed)
 
-    val numResponsesMeasured = responsesProcessed - 2
-    output("Average millis for updating quiz with responses: " +
-        (totalMillisForUpdatingWithResponses / numResponsesMeasured))
-    output("Average millis to find presentable items: " +
-        (totalMillisToProduceQuizItems / numResponsesMeasured))
-    output("Average millis to compute score: " +
-        (totalMillisToComputeScore / numResponsesMeasured))
-
-
-    val qg = quiz.activeQuizGroups.values.iterator.next
-    output("activeQuizGroups.size: " + quiz.activeQuizGroups.values.iterator.next)
-    output("numCorrectResponses: " + qg.numCorrectResponses)
-    output("totalCorrectResponsesRequired: " + quiz.totalCorrectResponsesRequired)
+    val numResponsesMeasured = responsesProcessed - NUM_WARMUP
+    def outputAverage(str: String, millis: Long) =
+      output("Average millis to " + str + (millis / numResponsesMeasured))
+    outputAverage("update quiz with responses: ", totalMillisForUpdatingWithResponses)
+    outputAverage("find presentable items: ", totalMillisToProduceQuizItems)
+    outputAverage("compute score: ", totalMillisToComputeScore)
 
     val score = quiz.scoreSoFar
-    assert(score == 100, "Score was " + score)
+
+    assert(score == 1.0, "Score was " + score)
   }
 
   // For now, just return the correct Answer
@@ -165,5 +160,5 @@ trait Simulation {
   }
 
   // Don't measure processing times while the system is still "warming up"
-  private def shouldMeasureTime = responsesProcessed > 2
+  private def shouldMeasureTime = responsesProcessed > NUM_WARMUP
 }
