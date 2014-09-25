@@ -121,8 +121,8 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
     }
 
   override def toString =
-    repetitionInterval + ":" + numCorrectResponses + "/" + totalResponses + ": " +
-    quizItems.map(_.prompt)
+    correctResponsesInARow + "(" + repetitionInterval + "):" + numCorrectResponses +
+        "/" + totalResponses + ": " + quizItems.map(_.prompt)
 
   protected[model] def isAtLimit = totalResponses >= QuizGroupMemoryLevel.totalResponsesLimit
 
@@ -135,14 +135,6 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
     else // reset the counters
       copy(totalResponses = 1, numCorrectResponses = numCorrectToAdd)
   }
-
-  protected[model] def wasNotTooRecentlyUsed(currentPromptNum : Int,
-      promptNumInMostRecentResponse: Option[Int]) =
-    promptNumInMostRecentResponse.forall {
-      case promptNumInMostRecentResponse =>
-        val diffInPromptNum = currentPromptNum - promptNumInMostRecentResponse
-        diffInPromptNum >= repetitionInterval
-    }
 
   protected[model] def updatedInterval: Int = {
     def modifyBy(anInt: Int, aReal: Double) =
