@@ -27,15 +27,13 @@ import scala.annotation.tailrec
 import com.oranda.libanius.model.action._
 import QuizItemSource._
 import modelComponentsAsQuizItemSources._
+import Simulation._
 
 /*
  * Run through a whole quiz, simulating the part of the user and checking
  * for irregularities for each quiz item presented.
  */
 trait Simulation {
-
-  val MAX_RESPONSES: Int = 300000
-  val NUM_WARMUP: Int = 2
 
   private var responsesProcessed: Long = 0
   private var totalMillisForUpdatingWithResponses: Long = 0
@@ -64,7 +62,8 @@ trait Simulation {
           lazy val allChoicesText = "\tChoices: " + quizItem.allChoices.mkString(", ")
           val strChoices = if (quizItem.useMultipleChoice) allChoicesText else ""
           output(responsesProcessed + ". Prompt: " + quizItem.prompt + strChoices)
-          findProblem(timeTakenToFindItem, quizItem, lastQuizItem, quiz) match {
+          Problem.find(quiz, timeTakenToFindItem, quizItem, lastQuizItem,
+              responsesProcessed) match {
             case Some(problem: Problem) =>
               problem.report()
               quiz
@@ -83,44 +82,12 @@ trait Simulation {
   }
 
   private def respondToQuizItem(quiz: Quiz, quizItem: QuizItemViewWithChoices): Quiz = {
-      val simulatedResponse = makeResponse(quizItem, quiz, responsesProcessed)
-      output("Simulated response: " + simulatedResponse)
-      val quizAfterResponse = processUserResponse(quiz, simulatedResponse, quizItem)
-      output("quizAfterResponse.numCorrectResponses: " +
-          quizAfterResponse.numCorrectResponses)
-      responsesProcessed += 1
-      quizAfterResponse
-  }
-
-  private def findProblem(timeTakenToFindItem: Long,
-      quizItem: QuizItemViewWithChoices, lastQuizItem: Option[QuizItemViewWithChoices],
-      quiz: Quiz): Option[Problem] =
-    if (timeTakenToFindItem > 500 && responsesProcessed > 3)
-      Some(Problem("time to find a quiz item was too long for " +  quizItem.prompt))
-    else if (quizItemWasRepeated(quizItem, lastQuizItem, quiz))
-      Some(Problem("quiz item was repeated"))
-    else multipleCorrectChoices(quizItem, quiz)
-
-  private def quizItemWasRepeated(quizItem: QuizItemViewWithChoices,
-      lastQuizItem: Option[QuizItemViewWithChoices], quiz: Quiz): Boolean =
-    !quiz.nearTheEnd && lastQuizItem.exists(
-        _.quizItem.samePromptAndResponse(quizItem.quizItem))
-
-
-  /*
-   * If there are multiple correct responses in the quiz item choices, return them
-   * as a String, otherwise None.
-   */
-  private def multipleCorrectChoices(quizItem: QuizItemViewWithChoices, quiz: Quiz):
-      Option[Problem] = {
-    val choices = quizItem.allChoices.toSet
-    val correctResponses = quiz.findResponsesFor(quizItem.prompt.value,
-        quizItem.quizGroupHeader).toSet
-    val correctChoices = choices.intersect(correctResponses)
-
-    if (correctChoices.size == 1) None
-    else Some(Problem("for " + quizItem.prompt + " there were multiple correct choices: " +
-        correctChoices.mkString(", ")))
+    val simulatedResponse = makeResponse(quizItem, quiz, responsesProcessed)
+    output("Simulated response: " + simulatedResponse)
+    val quizAfterResponse = processUserResponse(quiz, simulatedResponse, quizItem)
+    output("quizAfterResponse.numCorrectResponses: " + quizAfterResponse.numCorrectResponses)
+    responsesProcessed += 1
+    quizAfterResponse
   }
 
   private def report(quiz: Quiz) {
@@ -166,6 +133,53 @@ trait Simulation {
   private def shouldMeasureTime = responsesProcessed > NUM_WARMUP
 }
 
-case class Problem(errorMsg: String) {
-  def report() = output(errorMsg)
+object Simulation {
+  val MAX_RESPONSES: Int = 300000
+  val NUM_WARMUP: Int = 2
 }
+
+abstract class Problem {
+  def exists: Boolean
+  def errorMsg: String
+  def report() = output("PROBLEM: " + errorMsg)
+  def retrieve = if (exists) Some(this) else None
+}
+
+object Problem {
+  def find(quiz: Quiz, timeTakenToFindItem: Long, quizItem: QuizItemViewWithChoices,
+      lastQuizItem: Option[QuizItemViewWithChoices], responsesProcessed: Long): Option[Problem] =
+    TimeTooLong(quizItem, timeTakenToFindItem, responsesProcessed).retrieve.orElse(
+        QuizItemRepeated(quiz, quizItem, lastQuizItem).retrieve).orElse(
+        MultipleCorrectChoices(quiz, quizItem).retrieve)
+}
+
+case class TimeTooLong(quizItem: QuizItemViewWithChoices, timeTakenToFindItem: Long,
+    responsesProcessed: Long) extends Problem {
+  def exists = timeTakenToFindItem > 500 && responsesProcessed > NUM_WARMUP
+  def errorMsg = "time to find a quiz item was too long for " + quizItem.prompt
+}
+
+case class MultipleCorrectChoices(quiz: Quiz, quizItem: QuizItemViewWithChoices) extends Problem {
+
+  lazy val correctChoices = {
+    val choices = quizItem.allChoices.toSet
+    val correctResponses = quiz.findResponsesFor(quizItem.prompt.value,
+        quizItem.quizGroupHeader).toSet
+    choices.intersect(correctResponses)
+  }
+
+  def exists = correctChoices.size > 1
+
+  def errorMsg = "for " + quizItem.prompt + " there were multiple correct choices: " +
+    correctChoices.mkString(", ")
+}
+
+case class QuizItemRepeated(quiz: Quiz, quizItem: QuizItemViewWithChoices,
+    lastQuizItem: Option[QuizItemViewWithChoices]) extends Problem {
+
+  def exists: Boolean =
+    !quiz.nearTheEnd && lastQuizItem.exists(_.quizItem.samePromptAndResponse(quizItem.quizItem))
+
+  def errorMsg = "quiz item was repeated: " + quizItem.prompt
+}
+
