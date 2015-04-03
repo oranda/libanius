@@ -142,7 +142,7 @@ abstract class Problem {
   def exists: Boolean
   def errorMsg: String
   def report() = output("PROBLEM: " + errorMsg)
-  def retrieve = if (exists) Some(this) else None
+  def retrieve: Option[Problem] = if (exists) Some(this) else None
 }
 
 object Problem {

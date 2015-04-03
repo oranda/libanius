@@ -112,16 +112,16 @@ object TestData {
       QuizItem("sweeps", "streicht")).toStream)
 
   def makeQgMemLevel1: QuizGroupMemoryLevel = QuizGroupMemoryLevel(1, 5, List(
-    QuizItem("entertain", "unterhalten", List(8), List(2)),
-    QuizItem("winner", "Siegerin", List(5), List(0))).toStream)
+      QuizItem("entertain", "unterhalten", List(8), List(2)),
+      QuizItem("winner", "Siegerin", List(5), List(0))).toStream)
 
   def makeQgMemLevel2: QuizGroupMemoryLevel = QuizGroupMemoryLevel(2, 15, List(
-    QuizItem("against", "wider", List(9, 7), List(6)),
-    QuizItem("teach", "unterrichten", List(4, 3), List(1))).toStream)
+      QuizItem("against", "wider", List(9, 7), List(6)),
+      QuizItem("teach", "unterrichten", List(4, 3), List(1))).toStream)
 
   def makeQuizGroup = QuizGroup(
-    Map(0 -> makeQgMemLevel0, 1-> makeQgMemLevel1, 2-> makeQgMemLevel2),
-    QuizGroupUserData(true, 10), new Dictionary())
+      Map(0 -> makeQgMemLevel0, 1-> makeQgMemLevel1, 2-> makeQgMemLevel2),
+      QuizGroupUserData(true, 10), new Dictionary())
   val quizGroup = makeQuizGroup
 
   def makeSimpleQuizGroup = QuizGroup(Map(0 -> makeQgMemLevel0), QuizGroupUserData(true, 0))
