@@ -1,9 +1,9 @@
-== 0.98
+== 0.98 April 3 2015
 
   * Refactored Simulation code.
 
 
-== 0.973
+== 0.973 September 25 2014
 
   * In the model classes, adopted the Scala idiom of using symbolic names rather than
     descriptive names for method names where operations are purely functional.
