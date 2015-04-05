@@ -18,7 +18,7 @@ libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
                             "com.typesafe.play" %% "play-json" % "2.2.0-RC1"
                            )
 
-seq(ScctPlugin.instrumentSettings : _*)
+//seq(ScctPlugin.instrumentSettings : _*)
     
 unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "config") }
 
