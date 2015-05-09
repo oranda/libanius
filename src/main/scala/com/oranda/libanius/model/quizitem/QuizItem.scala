@@ -21,7 +21,7 @@ package com.oranda.libanius.model.quizitem
 import scala.language.implicitConversions
 import com.oranda.libanius.model.{ModelComponent, UserResponse, UserResponses}
 
-trait QuizItem extends ModelComponent {
+sealed trait QuizItem extends ModelComponent {
   def prompt: TextValue
   def correctResponse: TextValue
   def userResponses: UserResponses
