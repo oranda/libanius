@@ -28,13 +28,13 @@ import com.oranda.libanius.model.quizgroup.QuizGroupHeader
  * contains whatever information is necessary for the view, and for updating the backing data.
  */
 case class QuizItemViewWithChoices(
-    val quizItem: QuizItem,
-    val qgCurrentPromptNumber: Int,
-    val quizGroupHeader: QuizGroupHeader,
-    val falseAnswers: List[String],
-    val numCorrectResponsesInARow: Int,
-    val numCorrectResponsesRequired: Int,
-    val useMultipleChoice: Boolean) {
+    quizItem: QuizItem,
+    qgCurrentPromptNumber: Int,
+    quizGroupHeader: QuizGroupHeader,
+    falseAnswers: List[String],
+    numCorrectResponsesInARow: Int,
+    numCorrectResponsesRequired: Int,
+    useMultipleChoice: Boolean) {
 
   lazy val prompt: TextValue = quizItem.prompt
   lazy val correctResponse: TextValue = quizItem.correctResponse

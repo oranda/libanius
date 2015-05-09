@@ -24,7 +24,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.util.StringUtil
 import StringUtil._
 
-case class TextValue(val value: String) {
+case class TextValue(value: String) {
 
   override def toString = value
 
