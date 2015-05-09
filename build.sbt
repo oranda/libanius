@@ -2,20 +2,22 @@ import sbt._
 
 name := "Libanius"
 
-scalaVersion := "2.10.2"
+scalaVersion := "2.11.6"
 
 scalacOptions += "-deprecation"
 
 resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
                   "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-                  "releases"  at "http://oss.sonatype.org/content/repositories/releases"
+                  "releases"  at "http://oss.sonatype.org/content/repositories/releases",
+                  "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
                  )
 
 libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
-                            "org.specs2" %% "specs2" % "2.1",
-                            "org.scalaz" %% "scalaz-core" % "7.0.3",
+                            "org.specs2" %% "specs2-core" % "2.4.17" % "test",
+                            "org.specs2" %% "specs2-junit" % "2.4.17" % "test",
+                            "org.scalaz" %% "scalaz-core" % "7.1.2",
                             "org.apache.httpcomponents" % "httpclient" % "4.1.2",
-                            "com.typesafe.play" %% "play-json" % "2.2.0-RC1"
+                            "com.typesafe.play" %% "play-json" % "2.4.0-RC1"
                            )
 
 //seq(ScctPlugin.instrumentSettings : _*)
@@ -27,7 +29,7 @@ unmanagedClasspath in Test <+= (baseDirectory) map { bd => Attributed.blank(bd /
 parallelExecution in Test := true
 
 artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
-  artifact.name + "-0.98." + artifact.extension
+  artifact.name + "-0.981." + artifact.extension
 }
 
 scalacOptions += "-feature"

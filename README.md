@@ -22,7 +22,7 @@ Get a copy of `github.com/oranda/libanius` using `git clone`,  From SBT, type:
 
 Pick the option `com.oranda.libanius.consoleui.RunQuiz` and try out a sample quiz.
 
-This has been tested with sbt 0.12 and Scala 2.10.2.
+This has been tested with Scala 2.11.6, Java 8, and sbt 0.13.6.
 
 
 License
