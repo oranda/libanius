@@ -38,7 +38,6 @@ trait QuizItemSourceBase[A <: ModelComponent, B <: Params, C] {
  */
 trait QuizItemSource[A <: ModelComponent, C] extends QuizItemSourceBase[A, NoParams, C]
 
-
 // provides external access to the typeclass, forwarding the call to the appropriate type
 object QuizItemSource {
 
