@@ -34,7 +34,7 @@ case class ChoiceGroup[T](choices: List[T]) {
   }
 
   def getSelectionFromInput: UserConsoleResponse =
-    readLine match {
+    scala.io.StdIn.readLine match {
       case "q" => Quit
       case "quit" => Quit
       case userResponse: String =>

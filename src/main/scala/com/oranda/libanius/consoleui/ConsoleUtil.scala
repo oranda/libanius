@@ -25,7 +25,7 @@ object ConsoleUtil {
    * upgraded to a version (0.13 or greater) that is not incompatible with jline 2.11.
    */
   def readLineUntilNoBackspaces: String = {
-    val s = readLine
+    val s = scala.io.StdIn.readLine
     val extendedCode: (Char) => Boolean = (c:Char) => (c == 127)
     if (!s.exists(extendedCode)) s else {
       println("backspace detected: try again")
