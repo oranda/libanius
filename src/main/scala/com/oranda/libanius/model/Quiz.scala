@@ -235,7 +235,7 @@ object Quiz extends AppDependencyAccess {
     val qgsWithHeader: Iterable[QuizGroupWithHeader] = quizGroupsData.map(
         deserialize[QuizGroupWithHeader, Separator](_, Separator("|")))
     Quiz(qgsWithHeader.map(
-        qgWithHeader => Pair(qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
+        qgWithHeader => (qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }
 
   val memLevelsWithLowIntervals =

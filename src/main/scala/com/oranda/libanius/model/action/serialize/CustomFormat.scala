@@ -330,7 +330,7 @@ object CustomFormatForModelComponents {
       val quizGroupLevels = quizGroupParts.tail
 
       // TODO: move this header parsing code into customFormatQuizGroupMemoryLevel
-      def parseMemLevelText(memLevelText: String): Pair[Int, QuizGroupMemoryLevel] = {
+      def parseMemLevelText(memLevelText: String): Tuple2[Int, QuizGroupMemoryLevel] = {
         val headerLine = memLevelText.takeWhile(_ != '\n')
         val mainMemLevelText = memLevelText.dropWhile(_ != '\n').tail
         val index = StringUtil.parseValue(headerLine,
@@ -339,7 +339,7 @@ object CustomFormatForModelComponents {
             "repetitionInterval=\"", "\"").getOrElse("0").toInt
         val memLevel = customFormatQuizGroupMemoryLevel.from(mainMemLevelText,
             fromParams.withIndexAndRepetitionInterval(index, repetitionInterval))
-        Pair(index, memLevel)
+        (index, memLevel)
       }
 
       val levelsMap = quizGroupLevels.map(parseMemLevelText(_)).toMap

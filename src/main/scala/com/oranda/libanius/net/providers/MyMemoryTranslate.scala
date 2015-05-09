@@ -81,7 +81,7 @@ object MyMemoryTranslate extends AppDependencyAccess {
           List[TranslationMatch]()
     }.get
     // Filter on the quality of the match.
-    matches.filter(_.matchWeight >= 0.5).map(trMatch => Pair(trMatch.segment, trMatch.translation))
+    matches.filter(_.matchWeight >= 0.5).map(trMatch => (trMatch.segment, trMatch.translation))
   }
 
 

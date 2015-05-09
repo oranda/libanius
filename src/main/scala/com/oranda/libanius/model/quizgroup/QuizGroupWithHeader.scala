@@ -32,7 +32,7 @@ import CustomFormatForModelComponents._
  */
 case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
     extends ModelComponent {
-  def toPair = Pair(header, quizGroup)
+  def toPair = (header, quizGroup)
   def toCustomFormat = serialize(this, new StringBuilder, new NoParams).toString
 }
 
