@@ -57,7 +57,7 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
 object QuizGroupHeader extends AppDependencyAccess {
 
   def apply(headerLine: String): QuizGroupHeader =
-      deserialize[QuizGroupHeader, NoParams](headerLine, NoParams())
+    deserialize[QuizGroupHeader, NoParams](headerLine, NoParams())
 }
 
 abstract class QuizGroupType
