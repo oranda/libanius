@@ -27,7 +27,7 @@ import scala.collection.immutable.Set
 import scala.util.Try
 import com.oranda.libanius.io.{DefaultIO, PlatformIO}
 import com.oranda.libanius.model.wordmapping.Dictionary
-import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup}
+import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup, QuizGroupType}
 
 class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
@@ -40,6 +40,13 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
       case e: Exception => l.log("Error reading quiz: " + e.getMessage)
                            Set[QuizGroupHeader]()
     }.get
+  }
+
+  def findQuizGroupHeader(promptType: String, responseType: String, quizGroupType: QuizGroupType):
+      Option[QuizGroupHeader] = {
+    val availableQuizGroups = findAvailableQuizGroups
+    availableQuizGroups.find(qgh => qgh.promptType == promptType &&
+        qgh.responseType == responseType && qgh.quizGroupType == quizGroupType)
   }
 
   def loadQuizGroup(header: QuizGroupHeader): QuizGroup = {
@@ -118,7 +125,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
   def loadAllQuizGroupsFromFilesDir: Map[QuizGroupHeader, QuizGroup] = {
     val qgHeaders: Set[QuizGroupHeader] = findAvailableFileQuizGroups
-    qgHeaders.map(qgh => Pair(qgh, loadQuizGroupCore(qgh))).toMap
+    qgHeaders.map(qgh => Tuple2(qgh, loadQuizGroupCore(qgh))).toMap
   }
 
   private def findAvailableResQuizGroups: Set[QuizGroupHeader] = {
