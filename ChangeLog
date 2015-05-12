@@ -1,3 +1,8 @@
+== 0.982 May 13 2015
+
+  * Initial support for multiple users: added a userToken to some DataStore methods.
+
+
 == 0.981 May 9 2015
 
   * Upgraded from Scala 2.10.2 to Scala 2.11.6, updating dependency versions.

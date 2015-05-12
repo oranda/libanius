@@ -49,6 +49,12 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
         qgh.responseType == responseType && qgh.quizGroupType == quizGroupType)
   }
 
+  def findQuizGroupHeader(promptType: String, responseType: String): Option[QuizGroupHeader] = {
+    val availableQuizGroups = findAvailableQuizGroups
+    availableQuizGroups.find(qgh => qgh.promptType == promptType &&
+        qgh.responseType == responseType)
+  }
+
   def loadQuizGroup(header: QuizGroupHeader): QuizGroup = {
     l.log("DataStore.loadQuizGroup " + header)
     val quizGroup = loadQuizGroupCore(header)
@@ -71,34 +77,37 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
       case Some(qgFileName) =>
         Util.stopwatch(readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup()),
             "reading quiz group from file " + qgFileName)
-      case _ =>
-        findQuizGroupInResources(header) match {
-          case Some(qgResName) =>
-            val qgText = Util.stopwatch(io.readResource(qgResName).get,
-                "reading quiz group resource " + qgResName)
-            Util.stopwatch(header.createQuizGroup(qgText), "creating quiz group by parsing text")
-          case _ =>
-            l.logError("failed to load quiz group " + header)
-            QuizGroup()
-        }
+      case _ => initQuizGroup(header)
     }
 
     if (quizGroup.isEmpty) l.logError("No quiz items loaded for " + header)
     quizGroup
   }
 
-  def saveQuiz(quiz: Quiz, path: String = "") {
+  def initQuizGroup(header: QuizGroupHeader): QuizGroup = {
+    findQuizGroupInResources(header) match {
+      case Some(qgResName) =>
+        val qgText = Util.stopwatch(io.readResource(qgResName).get,
+          "reading quiz group resource " + qgResName)
+        Util.stopwatch(header.createQuizGroup(qgText), "creating quiz group by parsing text")
+      case _ =>
+        l.logError("failed to load quiz group " + header)
+        QuizGroup()
+    }
+  }
 
-    def saveToFile(header: QuizGroupHeader, quizGroup: QuizGroup) = {
+  def saveQuiz(quiz: Quiz, path: String = "", userToken: String = "") {
+
+    def saveToFile(header: QuizGroupHeader, quizGroup: QuizGroup, userToken: String) = {
       val fileName = header.makeQgFileName
       val qgwh = QuizGroupWithHeader(header, quizGroup)
       val serialized = qgwh.toCustomFormat
 
       l.log("Saving quiz group " + header.promptType + ", quiz group has promptNumber " +
           quizGroup.currentPromptNumber + " to " + fileName)
-      io.writeToFile(path + fileName, serialized)
+      io.writeToFile(path + userToken + "-" + fileName, serialized)
     }
-    quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg) }
+    quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg, userToken) }
   }
 
   private def readQuizGroupFromFilesDir(qgFileName: String):
