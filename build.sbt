@@ -12,15 +12,15 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
                   "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
                  )
 
+val scalazVersion = "7.1.2"
+
 libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
                             "org.specs2" %% "specs2-core" % "2.4.17" % "test",
                             "org.specs2" %% "specs2-junit" % "2.4.17" % "test",
-                            "org.scalaz" %% "scalaz-core" % "7.1.2",
+                            "org.scalaz" %% "scalaz-core" % scalazVersion,
                             "org.apache.httpcomponents" % "httpclient" % "4.1.2",
                             "com.typesafe.play" %% "play-json" % "2.4.0-RC1"
                            )
-
-//seq(ScctPlugin.instrumentSettings : _*)
     
 unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "config") }
 

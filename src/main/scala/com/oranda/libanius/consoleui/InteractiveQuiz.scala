@@ -31,6 +31,8 @@ import com.oranda.libanius.model.action._
 import QuizItemSource._
 import modelComponentsAsQuizItemSources._
 
+import scalaz._
+
 trait InteractiveQuiz extends App with AppDependencyAccess {
 
   def userQuizGroupSelection(quizGroupHeaders: List[QuizGroupHeader]):
@@ -56,14 +58,15 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   }
 
   def keepShowingQuizItems(quiz: Quiz, quizItem: QuizItemViewWithChoices) {
-    showQuizItemAndProcessResponse(quiz, quizItem) match {
-      case (Invalid, updatedQuiz) =>
+    val (updatedQuiz, response) = showQuizItemAndProcessResponse(quizItem).run(quiz)
+    response match {
+      case Invalid =>
         output("Invalid input\n")
         keepShowingQuizItems(updatedQuiz, quizItem)
-      case (Quit, updatedQuiz) =>
+      case Quit =>
         output("Exiting... .")
         saveQuiz(updatedQuiz)
-      case (_, updatedQuiz) =>
+      case _ =>
         testUserWithQuizItem(updatedQuiz)
     }
   }
@@ -78,8 +81,8 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
     output("Score: " + formattedScore)
   }
 
-  def showQuizItemAndProcessResponse(quiz: Quiz, quizItem: QuizItemViewWithChoices):
-      (UserConsoleResponse, Quiz) = {
+  def showQuizItemAndProcessResponse(quizItem: QuizItemViewWithChoices):
+      State[Quiz, UserConsoleResponse] = {
     val wordText = ": what is the " + quizItem.responseType + " for this " +
         quizItem.promptType + "?"
     val answeredText = " (correctly answered " + quizItem.numCorrectResponsesInARow + " times)"
@@ -88,45 +91,46 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
         (if (quizItem.numCorrectResponsesInARow > 0) answeredText else "")
     output(questionText + "\n")
 
-    if (quizItem.useMultipleChoice) showChoicesAndProcessResponse(quiz, quizItem)
-    else getTextResponseAndProcess(quiz, quizItem)
+    if (quizItem.useMultipleChoice) showChoicesAndProcessResponse(quizItem)
+    else getTextResponseAndProcess(quizItem)
   }
 
-  def showChoicesAndProcessResponse(quiz: Quiz, quizItem: QuizItemViewWithChoices):
-      (UserConsoleResponse, Quiz) = {
+  def showChoicesAndProcessResponse(quizItem: QuizItemViewWithChoices):
+      State[Quiz, UserConsoleResponse] = {
     val choices = ChoiceGroup[String](quizItem.allChoices)
     choices.show()
 
     Try(choices.getSelectionFromInput).recover {
       case e: Exception => Invalid
-    }.map(userResponse => processAnswer(quiz, userResponse, quizItem)).get
+    }.map(userResponse => processAnswer(userResponse, quizItem)).get
   }
 
-  def getTextResponseAndProcess(quiz: Quiz, quizItem: QuizItemViewWithChoices):
-      (UserConsoleResponse, Quiz) = {
+  def getTextResponseAndProcess(quizItem: QuizItemViewWithChoices):
+      State[Quiz, UserConsoleResponse] = {
     output("(Not multiple choice. Type it in.)")
     Try(getAnswerFromInput).recover {
       case e: Exception => Invalid
-    }.map(userResponse => processAnswer(quiz, userResponse, quizItem)).get
+    }.map(userResponse => processAnswer(userResponse, quizItem)).get
   }
 
-  def processAnswer(quiz: Quiz, userResponse: UserConsoleResponse,
-      quizItem: QuizItemViewWithChoices): (UserConsoleResponse, Quiz) = {
-    val updatedQuiz = userResponse match {
+  def processAnswer(userResponse: UserConsoleResponse,
+      quizItem: QuizItemViewWithChoices): State[Quiz, UserConsoleResponse] = for {
+    quiz <- State.get[Quiz]
+    _ <- State.put(userResponse match {
       case answer: Answer => processUserAnswer(quiz, answer.text, quizItem)
       case _ => quiz
-    }
-    (userResponse, updatedQuiz)
-  }
+    })
+  } yield userResponse
 
-  def processUserAnswer(quiz: Quiz, userResponse: String,
-      quizItem: QuizItemViewWithChoices): Quiz = {
+  def processUserAnswer(quiz: Quiz, userResponse: String, quizItem: QuizItemViewWithChoices): Quiz = {
 
     val isCorrect = quiz.isCorrect(quizItem.quizGroupHeader, quizItem.prompt.value, userResponse)
-    if (isCorrect) output("\nCorrect!\n") else output("\nWrong! It's " +
-        quizItem.correctResponse + "\n")
+    if (isCorrect) output("\nCorrect!\n")
+    else output("\nWrong! It's " + quizItem.correctResponse + "\n")
 
-    Util.stopwatch(quiz.updateWithUserResponse(isCorrect, quizItem.quizGroupHeader,
+    Util.stopwatch(quiz.updateWithUserResponse(
+        isCorrect,
+        quizItem.quizGroupHeader,
         quizItem.quizItem), "updateQuiz")
   }
 
