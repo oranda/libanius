@@ -4,7 +4,7 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation, either version 3 of tfhe License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -109,6 +109,18 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     }
     quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg, userToken) }
   }
+
+  /*
+   * Assumes the Quiz holds a single quiz group -- this is true only for some clients.
+   * TODO: should return Stream[String] for Spray
+   */
+  def quizStream(quiz: Quiz, userToken: String): Stream[Char] =
+    quiz.activeQuizGroups.toList.lift(0) match {
+      case Some(Tuple2(header, quizGroup)) =>
+        val qgwh = QuizGroupWithHeader(header, quizGroup)
+        qgwh.toCustomFormat.toStream
+      case None => Stream.empty
+    }
 
   private def readQuizGroupFromFilesDir(qgFileName: String):
       Option[QuizGroup] = {
