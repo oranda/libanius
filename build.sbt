@@ -20,7 +20,6 @@ libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
                             "org.scalaz" %% "scalaz-core" % scalazVersion,
                             "org.apache.httpcomponents" % "httpclient" % "4.1.2",
                             "com.typesafe.play" %% "play-json" % "2.4.0-RC1",
-                            "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
                             "com.lihaoyi" %% "fastparse" % "0.3.7"
                            )
 
