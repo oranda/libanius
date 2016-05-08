@@ -1,3 +1,8 @@
+== 0.983 May 8 2016
+
+  * Changed deserialization of quiz text to use parser combinators. Specifically: FastParse.
+
+
 == 0.982 May 13 2015
 
   * Initial support for multiple users: added a userToken to some DataStore methods.
