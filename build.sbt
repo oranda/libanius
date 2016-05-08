@@ -19,12 +19,14 @@ libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
                             "org.specs2" %% "specs2-junit" % "2.4.17" % "test",
                             "org.scalaz" %% "scalaz-core" % scalazVersion,
                             "org.apache.httpcomponents" % "httpclient" % "4.1.2",
-                            "com.typesafe.play" %% "play-json" % "2.4.0-RC1"
+                            "com.typesafe.play" %% "play-json" % "2.4.0-RC1",
+                            "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
+                            "com.lihaoyi" %% "fastparse" % "0.3.7"
                            )
-    
-unmanagedClasspath in Runtime <+= (baseDirectory) map { bd => Attributed.blank(bd / "config") }
 
-unmanagedClasspath in Test <+= (baseDirectory) map { bd => Attributed.blank(bd / "config") }
+unmanagedClasspath in Runtime <+= baseDirectory map { bd => Attributed.blank(bd / "config") }
+
+unmanagedClasspath in Test <+= baseDirectory map { bd => Attributed.blank(bd / "config") }
 
 parallelExecution in Test := true
 

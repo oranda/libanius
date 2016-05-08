@@ -19,12 +19,12 @@
 package com.oranda.libanius.model.quizitem
 
 import scala.language.implicitConversions
-import com.oranda.libanius.model.{ModelComponent, UserResponse, UserResponses}
+import com.oranda.libanius.model.{UserResponsesAll, ModelComponent, UserResponse}
 
 sealed trait QuizItem extends ModelComponent {
   def prompt: TextValue
   def correctResponse: TextValue
-  def userResponses: UserResponses
+  def userResponses: UserResponsesAll
 
   def promptNumInMostRecentAnswer: Option[Int]
   def numCorrectResponsesInARow: Int
@@ -53,7 +53,7 @@ sealed trait QuizItem extends ModelComponent {
  *  2. a QuizItem for a question and an answer
  */
 case class QuizItemConcrete(prompt: TextValue, correctResponse: TextValue,
-    userResponses: UserResponses = new UserResponses())
+    userResponses: UserResponsesAll = new UserResponsesAll())
   extends QuizItem {
 
   def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
@@ -85,18 +85,18 @@ case class QuizItemConcrete(prompt: TextValue, correctResponse: TextValue,
 object QuizItem {
 
   def apply(prompt: TextValue, response: TextValue,
-      userResponses: UserResponses = new UserResponses()): QuizItem =
+      userResponses: UserResponsesAll = new UserResponsesAll()): QuizItem =
     QuizItemConcrete(prompt, response, userResponses)
 
   def apply(prompt: String, response: String): QuizItem =
     QuizItemConcrete(TextValue(prompt), TextValue(response))
 
-  def apply(prompt: String, response: String, userResponses: UserResponses): QuizItem =
+  def apply(prompt: String, response: String, userResponses: UserResponsesAll): QuizItem =
     QuizItemConcrete(TextValue(prompt), TextValue(response), userResponses)
 
   def apply(prompt: String, response: String, correctResponses: List[Int],
       incorrectResponses: List[Int]): QuizItem =
     QuizItemConcrete(TextValue(prompt), TextValue(response),
-        new UserResponses(correctResponses.map(UserResponse(_)),
-        incorrectResponses.map(UserResponse(_))))
+        new UserResponsesAll(correctResponses.map(UserResponse),
+        incorrectResponses.map(UserResponse)))
 }

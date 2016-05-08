@@ -18,6 +18,9 @@
 
 package com.oranda.libanius.model
 
+import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
+import fastparse.all.Parsed
+
 import scala.collection.immutable._
 
 import scala.language.postfixOps
@@ -26,12 +29,8 @@ import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.wordmapping.Dictionary
 
-import com.oranda.libanius.model.action.serialize._
-import CustomFormat._
-import CustomFormatForModelComponents._
-
 import scalaz._
-import Scalaz._, PLens._
+import PLens._
 import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup}
 import scala.collection.immutable.Nil
 import scala.collection.immutable.List
@@ -47,7 +46,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
   // By default, reading of data accesses the activeQuizGroups
   def activeQuizGroups: Map[QuizGroupHeader, QuizGroup] = quizGroups.filter(_._2.isActive)
-  def activeQuizGroupHeaders: Set[QuizGroupHeader] = activeQuizGroups.map(_._1).toSet
+  def activeQuizGroupHeaders: Set[QuizGroupHeader] = activeQuizGroups.keySet
 
   def numActiveGroups = activeQuizGroups.size
   def numPrompts = (0 /: activeQuizGroups.values)(_ + _.numPrompts)
@@ -232,8 +231,11 @@ object Quiz extends AppDependencyAccess {
 
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
-    val qgsWithHeader: Iterable[QuizGroupWithHeader] = quizGroupsData.map(
-        deserialize[QuizGroupWithHeader, Separator](_, Separator("|")))
+    val qgsWithHeader: Iterable[QuizGroupWithHeader] = quizGroupsData.map { qgwh =>
+      val Parsed.Success(qgh, _) = quizGroupWithHeader.parse(qgwh)
+      qgh
+    }
+
     Quiz(qgsWithHeader.map(
         qgWithHeader => (qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }
@@ -249,7 +251,7 @@ object Quiz extends AppDependencyAccess {
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
 
-    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
+    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
     "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
     "en route|unterwegs\n" +
     "contract|Vertrag\n" +
@@ -258,7 +260,7 @@ object Quiz extends AppDependencyAccess {
     "entertain|unterhalten\n" +
     memLevelsWithLowIntervals,
 
-    "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" currentPromptNumber=\"0\" isActive=\"true\"\n" +
+    "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
     "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
     "unterwegs|en route\n" +
     "Vertrag|contract\n" +

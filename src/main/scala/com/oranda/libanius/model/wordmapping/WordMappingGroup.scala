@@ -19,9 +19,10 @@
 package com.oranda.libanius.model.wordmapping
 
 import com.oranda.libanius.model._
+import com.oranda.libanius.model.action.serialize.Separator
 import scala.collection.immutable.{Stream, Iterable}
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.util.{GroupByOrderedImplicit}
+import com.oranda.libanius.util.GroupByOrderedImplicit
 import scala.collection.mutable
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import scala.language.implicitConversions
@@ -39,9 +40,9 @@ case class WordMappingGroup(header: QuizGroupHeader,
     def makeQuizItems(wmPair: WordMappingPair): Iterable[QuizItem] =
       wmPair.valueSet.values.map(value =>
         QuizItem(wmPair.key, value.value,
-            UserResponses(value.correctAnswersInARow, value.incorrectAnswers)))
+            UserResponsesAll(value.correctAnswersInARow, value.incorrectAnswers)))
 
-    val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems(_))
+    val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems)
 
     QuizGroup.fromQuizItems(quizItems, userData)
   }
@@ -54,17 +55,17 @@ object WordMappingGroup extends AppDependencyAccess {
     WordMappingGroup(header, wordMappingPairs, quizGroup.userData)
   }
 
-  def quizItemsToWordMappingPairs(quizItems: Stream[QuizItem], mainSeparator: String):
+  def quizItemsToWordMappingPairs(quizItems: Stream[QuizItem], sep: Separator):
       Stream[WordMappingPair] = {
     // Get access to the groupByOrdered functor
     implicit def traversableToGroupByOrderedImplicit[A](t: Traversable[A]):
         GroupByOrderedImplicit[A] =
       new GroupByOrderedImplicit[A](t)
 
-    (quizItems.groupByOrdered(_.prompt).map {
+    quizItems.groupByOrdered(_.prompt).map {
         case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
           WordMappingPair(prompt.value,
-            WordMappingValueSet.createFromQuizItems(quizItems.toList, mainSeparator))
-    }).toStream
+            WordMappingValueSet.createFromQuizItems(quizItems.toList, sep.toString))
+    }.toStream
   }
 }

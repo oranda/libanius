@@ -18,6 +18,8 @@
 
 package com.oranda.libanius.model.wordmapping
 
+import com.oranda.libanius.model.action.serialize.Separator
+
 import scala.collection.JavaConversions.mapAsScalaMap
 
 import scala.collection.immutable.Stream
@@ -65,7 +67,7 @@ object Dictionary {
 
   def fromQuizItems(quizItems: Stream[QuizItem]) =
     new Dictionary() {
-      val wordMappingsStream = WordMappingGroup.quizItemsToWordMappingPairs(quizItems, "|")
+      val wordMappingsStream = WordMappingGroup.quizItemsToWordMappingPairs(quizItems, Separator("|"))
       wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
     }
 
@@ -79,5 +81,5 @@ object Dictionary {
   def searchFunction(param: => List[SearchResult]) = () => param
 
   def tryUntilResults(functionsToTry: List[() => List[SearchResult]]): List[SearchResult] =
-    functionsToTry.find(!_.apply.isEmpty).map(_.apply).getOrElse(Nil)
+    functionsToTry.find(_.apply.nonEmpty).map(_.apply).getOrElse(Nil)
 }

@@ -18,20 +18,23 @@
 
 package com.oranda.libanius.model.quizgroup
 
+import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
+import fastparse.all._
+
 import scalaz._
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.ModelComponent
 import com.oranda.libanius.model.action.serialize._
-import CustomFormat._
-import CustomFormatForModelComponents._
 
 case class QuizGroupUserData(isActive: Boolean = false, currentPromptNumber: Int = 0)
     extends ModelComponent
 
 object QuizGroupUserData extends AppDependencyAccess {
 
-  def apply(headerLine: String): QuizGroupUserData =
-    deserialize[QuizGroupUserData, NoParams](headerLine, NoParams())
+  def apply(headerLine: String): QuizGroupUserData = {
+    val Parsed.Success(qgud, _) = quizGroupUserData.parse(headerLine)
+    qgud
+  }
 
   val activeLens: Lens[QuizGroupUserData, Boolean] = Lens.lensu(
       get = (_: QuizGroupUserData).isActive,

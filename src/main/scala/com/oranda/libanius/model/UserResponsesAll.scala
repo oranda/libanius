@@ -22,23 +22,23 @@ import java.lang.StringBuilder
 
 import scalaz._
 
-case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
+case class UserResponsesAll(correctResponsesInARow: List[UserResponse] = Nil,
     incorrectResponses: List[UserResponse] = Nil) extends ModelComponent {
 
   def updated(value: String, correctResponsesInARow: List[UserResponse],
-      incorrectResponses: List[UserResponse]): UserResponses =
-    new UserResponses(correctResponsesInARow, incorrectResponses)
+      incorrectResponses: List[UserResponse]): UserResponsesAll =
+    new UserResponsesAll(correctResponsesInARow, incorrectResponses)
 
   def userResponses = correctResponsesInARow ++ incorrectResponses
 
-  def add(userResponse: UserResponse, wasCorrect: Boolean): UserResponses =
+  def add(userResponse: UserResponse, wasCorrect: Boolean): UserResponsesAll =
     if (wasCorrect)
-      UserResponses.userResponsesCorrectResponsesLens.set(this,
+      UserResponsesAll.userResponsesCorrectResponsesLens.set(this,
           userResponse :: correctResponsesInARow)
     else {
       // on an incorrect answer, old correct answers are discarded
-      val ur = UserResponses.userResponsesCorrectResponsesLens.set(this, Nil)
-      UserResponses.userResponsesIncorrectResponsesLens.set(ur, userResponse :: incorrectResponses)
+      val ur = UserResponsesAll.userResponsesCorrectResponsesLens.set(this, Nil)
+      UserResponsesAll.userResponsesIncorrectResponsesLens.set(ur, userResponse :: incorrectResponses)
     }
 
   /*
@@ -63,21 +63,21 @@ case class UserResponses(correctResponsesInARow: List[UserResponse] = Nil,
         map(_.promptNumber)
 
   def updated(correctResponsesInARow: List[UserResponse], incorrectResponses: List[UserResponse]):
-      UserResponses =
-    UserResponses(correctResponsesInARow, incorrectResponses)
+      UserResponsesAll =
+    UserResponsesAll(correctResponsesInARow, incorrectResponses)
 
   def responsePromptNumber(strBuilder: StringBuilder, response: UserResponse) =
     strBuilder.append(response.promptNumber)
 
 }
 
-object UserResponses {
+object UserResponsesAll {
 
   val userResponsesCorrectResponsesLens = Lens.lensu(
-      get = (_: UserResponses).correctResponsesInARow,
-      set = (ur: UserResponses, urs: List[UserResponse]) => ur.copy(correctResponsesInARow = urs))
+      get = (_: UserResponsesAll).correctResponsesInARow,
+      set = (ur: UserResponsesAll, urs: List[UserResponse]) => ur.copy(correctResponsesInARow = urs))
 
   val userResponsesIncorrectResponsesLens = Lens.lensu(
-      get = (_: UserResponses).incorrectResponses,
-      set = (ur: UserResponses, urs: List[UserResponse]) => ur.copy(incorrectResponses = urs))
+      get = (_: UserResponsesAll).incorrectResponses,
+      set = (ur: UserResponsesAll, urs: List[UserResponse]) => ur.copy(incorrectResponses = urs))
 }

@@ -21,13 +21,12 @@ package com.oranda.libanius.model.quizgroup
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import com.oranda.libanius.model._
+import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
 import com.oranda.libanius.model.action.serialize._
-import CustomFormat._
-import CustomFormatForModelComponents._
-
+import fastparse.all._
 
 case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
-    responseType: String, mainSeparator: String, useMultipleChoiceUntil: Int)
+    responseType: String, mainSeparator: Separator, useMultipleChoiceUntil: Int)
   extends ModelComponent {
   // promptType example: "English word"
   // responseType example: "German word"
@@ -44,11 +43,7 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
       useMultipleChoiceUntil)
 
   def createQuizGroup(text: String): QuizGroup = {
-
-    import CustomFormatForModelComponents._
-
-    val qgh: QuizGroupWithHeader =
-        deserialize[QuizGroupWithHeader, Separator](text, Separator("|"))
+    val Parsed.Success(qgh, _) = quizGroupWithHeader.parse(text)
     qgh.quizGroup
   }
 
@@ -56,8 +51,14 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
 
 object QuizGroupHeader extends AppDependencyAccess {
 
-  def apply(headerLine: String): QuizGroupHeader =
-    deserialize[QuizGroupHeader, NoParams](headerLine, NoParams())
+  def apply(headerLine: String): QuizGroupHeader = {
+    val Parsed.Success(qgh, _) = quizGroupHeader.parse(headerLine)
+    qgh
+  }
+
+  def apply(quizGroupType: QuizGroupType, promptType: String,
+      responseType: String, sep: String, useMultipleChoiceUntil: Int): QuizGroupHeader =
+    QuizGroupHeader(quizGroupType, promptType, responseType, Separator(sep), useMultipleChoiceUntil)
 }
 
 abstract class QuizGroupType

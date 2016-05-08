@@ -24,6 +24,10 @@ import com.oranda.libanius.model.quizgroup._
 
 object TestData {
 
+  val userResponse = "796"
+  val userResponses = "9,7"
+  val userResponsesAllText = "9,7;6"
+
   // word-mapping value
   val wmvCustomFormat = "nachlösen|9,7;6"
   val wmv: WordMappingValue = WordMappingValue("nachlösen",
@@ -42,8 +46,8 @@ object TestData {
   // QuizItem data
   val correctAnswersInARow = List(UserResponse(9), UserResponse(7))
   val incorrectAnswers = List(UserResponse(6))
-  val userResponses = UserResponses(correctAnswersInARow, incorrectAnswers)
-  val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponses)
+  val userResponsesAll = UserResponsesAll(correctAnswersInARow, incorrectAnswers)
+  val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponsesAll)
 
   // Memory level
   /*
@@ -72,12 +76,19 @@ object TestData {
   val qgMemLevel = makeQgMemLevel
   val qgMemLevelSimple = makeQgMemLevelSimple
 
+  val eol = sys.props("line.separator")
   val qgMemLevelSimpleCustomFormat =
-      "against|wider|\n" +
-      "entertain|unterhalten|\n"
+      "against|wider|" + eol +
+      "entertain|unterhalten|" + eol
 
-  val qgCustomFormat =
-    "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
+  val qgMemLevelHeaderCustomFormat =
+    "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n"
+
+  val qgMemLevelWithHeaderCustomFormat =
+    qgMemLevelHeaderCustomFormat + qgMemLevelSimpleCustomFormat
+
+  val qgBodyCustomFormat =
+    qgMemLevelHeaderCustomFormat +
         "en route|unterwegs|\n" +
         "full|satt|\n" +
         "full|voll|\n" +
@@ -97,9 +108,15 @@ object TestData {
         "#quizGroupPartition numCorrectResponsesInARow=\"5\" repetitionInterval=\"600\"\n" +
         "#quizGroupPartition numCorrectResponsesInARow=\"6\" repetitionInterval=\"0\"\n"
 
-  val qgwhCustomFormat =
-      "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" useMultipleChoiceUntil=\"4\" currentPromptNumber=\"10\" isActive=\"true\"\n" +
-      qgCustomFormat
+  val qgudCustomFormat = "isActive=\"true\" currentPromptNumber=\"10\""
+  val qghCustomFormat =
+    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" useMultipleChoiceUntil=\"4\" isActive=\"true\" currentPromptNumber=\"10\"\n"
+  val qghCustomFormatNoSeparator =
+    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" useMultipleChoiceUntil=\"4\" isActive=\"true\" currentPromptNumber=\"10\"\n"
+  val qghCustomFormatNoUseMultipleChoiceUntil =
+    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"10\"\n"
+
+  val qgwhCustomFormat = qghCustomFormat + qgBodyCustomFormat
 
   def makeQgMemLevel0: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, 0, List(
       QuizItem("en route", "unterwegs"),
@@ -121,10 +138,11 @@ object TestData {
 
   def makeQuizGroup = QuizGroup(
       Map(0 -> makeQgMemLevel0, 1-> makeQgMemLevel1, 2-> makeQgMemLevel2),
-      QuizGroupUserData(true, 10), new Dictionary())
+      QuizGroupUserData(isActive = true, 10), new Dictionary())
   val quizGroup = makeQuizGroup
 
-  def makeSimpleQuizGroup = QuizGroup(Map(0 -> makeQgMemLevel0), QuizGroupUserData(true, 0))
+  def makeSimpleQuizGroup =
+    QuizGroup(Map(0 -> makeQgMemLevel0), QuizGroupUserData(isActive = true, 0))
   val quizGroupSimple = makeSimpleQuizGroup
 
   def makeQgwh(quizGroup: QuizGroup): QuizGroupWithHeader = {
@@ -141,29 +159,28 @@ object TestData {
   // defaults for read-only
   val qgWithHeader = makeQgWithHeader
 
-
   val quizData = List(
 
     "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
       "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-      "against|wider\n" +
-      "entertain|unterhalten\n" +
-      "teach|unterrichten\n" +
-      "winner|Siegerin\n" +
-      "en route|unterwegs\n" +
-      "full|satt\n" +
-      "full|voll\n" +
-      "interrupted|unterbrochen\n" +
-      "contract|Vertrag\n" +
-      "rides|reitet\n" +
-      "on|auf\n" +
-      "the|der\n" +
+      "against|wider|\n" +
+      "entertain|unterhalten|\n" +
+      "teach|unterrichten|\n" +
+      "winner|Siegerin|\n" +
+      "en route|unterwegs|\n" +
+      "full|satt|\n" +
+      "full|voll|\n" +
+      "interrupted|unterbrochen|\n" +
+      "contract|Vertrag|\n" +
+      "rides|reitet|\n" +
+      "on|auf|\n" +
+      "the|der|\n" +
       "#quizGroupPartition numCorrectResponsesInARow=\"3\" repetitionInterval=\"15\"\n" +
       "sweeps|streicht|100,200,300;405\n",
 
     "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
       "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-      "unterwegs|en route\n" +
+      "unterwegs|en route|\n" +
       "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"5\"\n" +
       "Vertrag|treaty|796;798\n" +
       "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"15\"\n" +

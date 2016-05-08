@@ -27,7 +27,7 @@ import CustomFormat._
 import CustomFormatForModelComponents._
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.wordmapping.{WordMappingValueSet, WordMappingValue}
-import com.oranda.libanius.model.quizgroup.QuizGroupWithHeader
+import com.oranda.libanius.model.quizgroup.{QuizGroupHeader, QuizGroupWithHeader}
 import com.oranda.libanius.model.TestData._
 
 class CustomFormatSpec extends Specification with AppDependencyAccess {
@@ -36,7 +36,7 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
   def paramsWithSeparator = Separator("|")
   def paramsWithSeparatorAndIndex = SeparatorAndIndex("|", 0)
 
-  val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponses)
+  val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponsesAll)
   val quizItemCustomFormat = "solve|nachlösen|9,7;6"
 
   "the custom-format functionality " should {
@@ -65,7 +65,7 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
 
     "serialize a quiz group" in {
       val customFormat = serialize(qgWithHeader.quizGroup, new StringBuilder, paramsWithSeparator)
-      customFormat.toString mustEqual qgCustomFormat
+      customFormat.toString mustEqual qgBodyCustomFormat
     }
 
     "serialize a quiz group with header" in {
@@ -111,6 +111,11 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
       qgml.numQuizItems mustEqual 2
     }
 
+    "deserialize a QuizGroup header" in {
+      val qgh = deserialize[QuizGroupHeader, NoParams](qghCustomFormat, NoParams())
+      qgh.promptType mustEqual "English word"
+      qgh.responseType mustEqual "German word"
+    }
 
     "deserialize a QuizGroupWithHeader" in {
       val qgwh = deserialize[QuizGroupWithHeader, Separator](qgwhCustomFormat, Separator("|"))

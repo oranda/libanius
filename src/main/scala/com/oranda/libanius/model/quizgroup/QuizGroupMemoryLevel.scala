@@ -62,7 +62,7 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
     QuizGroupMemoryLevel.itemsLens.set(this, newQuizItems)
 
   protected[model] def updatedWithUserAnswer(prompt: TextValue, response: TextValue,
-      wasCorrect: Boolean, userResponses: UserResponses, userAnswer: UserResponse):
+      wasCorrect: Boolean, userResponses: UserResponsesAll, userAnswer: UserResponse):
       QuizGroupMemoryLevel = {
     val userResponseUpdated = userResponses.add(userAnswer, wasCorrect)
     this + QuizItem(prompt, response, userResponseUpdated)
@@ -96,13 +96,13 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
    * Low usage expected. Slow because we are not using a Map for quizItems.
    */
   protected[quizgroup] def findResponsesFor(prompt: String): List[String] =
-    quizItems.filter(_.prompt.matches(prompt)).map(_.correctResponse.value).toList
+    quizItems.filter(_.prompt.matches(prompt)).map(_.correctResponse.value)
 
   /*
    * Low usage expected. Slow because we are not using a Map for quizItems.
    */
   protected[quizgroup] def findPromptsFor(response: String): List[String] =
-    quizItems.filter(_.correctResponse.matches(response)).map(_.prompt.value).toList
+    quizItems.filter(_.correctResponse.matches(response)).map(_.prompt.value)
 
   /*
    * Low usage expected. Slow because we are not using a Map for quizItems.

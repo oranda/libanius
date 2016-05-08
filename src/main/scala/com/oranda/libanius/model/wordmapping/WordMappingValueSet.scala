@@ -18,16 +18,16 @@
 
 package com.oranda.libanius.model.wordmapping
 
+import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
 import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model._
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import fastparse.all._
 
 import scala.language.implicitConversions
 import com.oranda.libanius.model.ValueSet
 
 import com.oranda.libanius.model.action.serialize._
-import CustomFormat._
-import CustomFormatForModelComponents._
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
@@ -71,7 +71,7 @@ object WordMappingValueSet extends AppDependencyAccess {
     WordMappingValueSet(values.map(WordMappingValue(_)).toList)
 
   def createFromQuizItems(quizItems: List[QuizItem], mainSeparator: String): WordMappingValueSet =
-    WordMappingValueSet(quizItems.map(WordMappingValue(_)).toList)
+    WordMappingValueSet(quizItems.map(WordMappingValue(_)))
 
   def combineValueSets(valueSets: Iterable[WordMappingValueSet]): List[WordMappingValue] =
     valueSets.flatMap(_.values).toList
@@ -96,8 +96,11 @@ object WordMappingValueSetWrapperBase {
 case class WordMappingValueSetLazyProxy(strValues: String, mainSeparator: String)
     extends WordMappingValueSetWrapperBase {
 
-  lazy val wmvs: WordMappingValueSet =
-      deserialize[WordMappingValueSet, Separator](strValues, Separator("|"))
+  lazy val wmvs: WordMappingValueSet = {
+    implicit val separator = Separator(mainSeparator)
+    val Parsed.Success(wmvs, _) = wordMappingValueSet(separator).parse(strValues)
+    wmvs
+  }
 }
 
 /*
@@ -109,7 +112,7 @@ case class WordMappingValueSetWrapper(wmvs: WordMappingValueSet, mainSeparator: 
 
 object WordMappingValueSetWrapper {
   def apply(values: List[String], mainSeparator: String): WordMappingValueSetWrapper = {
-    val wmvs = values.map(WordMappingValue(_)).toList
+    val wmvs = values.map(WordMappingValue(_))
     WordMappingValueSetWrapper(WordMappingValueSet(wmvs), mainSeparator)
   }
 }

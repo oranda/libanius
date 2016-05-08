@@ -73,9 +73,9 @@ object MyMemoryTranslate extends AppDependencyAccess {
    * This method is prone to throwing exceptions. As suggested by the name, it should be guarded.
    */
   private[this] def translateOrError(word: String, mmCode: String): List[(String, String)] = {
-
-    val translationRaw = Rest.query("http://api.mymemory.translated.net/get?q=" +
-        urlEncode(word) + "&de=" + conf.email + "&langpair=" + urlEncode(mmCode))
+    val restQuery = "http://api.mymemory.translated.net/get?q=" +
+        urlEncode(word) + "&de=" + conf.email + "&langpair=" + urlEncode(mmCode)
+    val translationRaw = Rest.query(restQuery)
     val matches = Try(findMatchesInJson(translationRaw)).recover {
       case t: Throwable => l.logError("Could not parse JSON text: " + translationRaw, t)
           List[TranslationMatch]()

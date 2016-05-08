@@ -18,7 +18,7 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.model.{ModelComponent, UserResponse}
+import com.oranda.libanius.model.{UserResponsesAll, ModelComponent, UserResponse}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.QuizItem
 
@@ -57,7 +57,14 @@ case class WordMappingValue(value: String,
 object WordMappingValue extends AppDependencyAccess {
 
   def apply(quizItem: QuizItem): WordMappingValue =
-    WordMappingValue(quizItem.correctResponse.toString,
+    WordMappingValue(
+        quizItem.correctResponse.toString,
         quizItem.userResponses.correctResponsesInARow,
         quizItem.userResponses.incorrectResponses)
+
+  def apply(value: String, userResponsesAll: UserResponsesAll): WordMappingValue =
+    WordMappingValue(
+        value,
+        userResponsesAll.correctResponsesInARow,
+        userResponsesAll.incorrectResponses)
 }

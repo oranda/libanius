@@ -24,8 +24,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.TestData._
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
 import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupWithHeader, QuizGroupMemoryLevel}
-import com.oranda.libanius.model.UserResponses
-import com.oranda.libanius.model.UserResponse
+import com.oranda.libanius.model.{UserResponsesAll, UserResponse}
 
 
 import QuizItemSource._
@@ -108,7 +107,7 @@ object QuizItemSourceSpec {
     assert(quizItem.isDefined)
     // Each time a quiz item is pulled, a user answer must be set
     val qgmlUpdated1 = qgml.updatedWithUserAnswer(quizItem.get.prompt,
-      quizItem.get.correctResponse, true, UserResponses(), new UserResponse(0))
+      quizItem.get.correctResponse, wasCorrect = true, UserResponsesAll(), new UserResponse(0))
     val qgmlUpdated2 = qgmlUpdated1 - quizItem.get
     (qgmlUpdated2, (quizItem.get.prompt.value, quizItem.get.correctResponse.value))
   }
@@ -141,7 +140,7 @@ object QuizItemSourceSpec {
   def updateWithUserAnswer(qgml: QuizGroupMemoryLevel, quizItem: QuizItem,
       currentPromptNumber: Int): QuizGroupMemoryLevel = {
     val userAnswer = new UserResponse(currentPromptNumber)
-    qgml.updatedWithUserAnswer(quizItem.prompt, quizItem.correctResponse, true,
-      UserResponses(), userAnswer)
+    qgml.updatedWithUserAnswer(quizItem.prompt, quizItem.correctResponse, wasCorrect = true,
+      UserResponsesAll(), userAnswer)
   }
 }

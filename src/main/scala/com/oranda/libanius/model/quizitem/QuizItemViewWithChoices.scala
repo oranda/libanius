@@ -20,7 +20,7 @@ package com.oranda.libanius.model.quizitem
 
 import scala.language.implicitConversions
 import scala.util.Random
-import com.oranda.libanius.model.{UserResponse, UserResponses}
+import com.oranda.libanius.model.UserResponsesAll
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
 /**
@@ -46,7 +46,7 @@ case class QuizItemViewWithChoices(
 
   def isComplete = numCorrectResponsesInARow >= numCorrectResponsesRequired
 
-  def choicesInRandomOrder(quizValue: UserResponses, otherChoices: List[String]): List[String] = {
+  def choicesInRandomOrder(quizValue: UserResponsesAll, otherChoices: List[String]): List[String] = {
     val allChoices = quizItem.correctResponse.value :: otherChoices
     Random.shuffle(allChoices)
   }
