@@ -60,16 +60,18 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
      */
     "construct a full set of wrong choices" in {
 
-      val demoGroupHeader = "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"21\"\n"
+      val demoGroupHeader = """#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="21"""" + "\n"
       val demoGroupText = demoGroupHeader +
-          "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-          "entertain|unterhalten|\n" +
-          "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"5\"\n" +
-          "against|wider|13;\n" +
-          "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"15\"\n" +
-          "treaty|Vertrag|11,5;\n" +
-          "contract|Vertrag|9,3;\n" +
-          "en route|unterwegs|7,1;\n"
+          """#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+            |entertain|unterhalten|
+            |#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="5"
+            |against|wider|13;
+            |#quizGroupPartition numCorrectResponsesInARow="2" repetitionInterval="15"
+            |treaty|Vertrag|11,5;
+            |contract|Vertrag|9,3;
+            |en route|unterwegs|7,1;
+            |""".stripMargin
+
 
       import com.oranda.libanius.model.action.serialize._
       import CustomFormat._

@@ -78,43 +78,47 @@ object TestData {
 
   val eol = sys.props("line.separator")
   val qgMemLevelSimpleCustomFormat =
-      "against|wider|" + eol +
-      "entertain|unterhalten|" + eol
+    """against|wider|
+      |entertain|unterhalten|
+      |""".stripMargin
 
   val qgMemLevelHeaderCustomFormat =
-    "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n"
+    """#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+      |""".stripMargin
+
 
   val qgMemLevelWithHeaderCustomFormat =
     qgMemLevelHeaderCustomFormat + qgMemLevelSimpleCustomFormat
 
   val qgBodyCustomFormat =
     qgMemLevelHeaderCustomFormat +
-        "en route|unterwegs|\n" +
-        "full|satt|\n" +
-        "full|voll|\n" +
-        "interrupted|unterbrochen|\n" +
-        "contract|Vertrag|\n" +
-        "rides|reitet|\n" +
-        "on|auf|\n" +
-        "sweeps|streicht|\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"5\"\n" +
-        "entertain|unterhalten|8;2\n" +
-        "winner|Siegerin|5;0\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"15\"\n" +
-        "against|wider|9,7;6\n" +
-        "teach|unterrichten|4,3;1\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"3\" repetitionInterval=\"15\"\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"4\" repetitionInterval=\"60\"\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"5\" repetitionInterval=\"600\"\n" +
-        "#quizGroupPartition numCorrectResponsesInARow=\"6\" repetitionInterval=\"0\"\n"
+      """en route|unterwegs|
+        |full|satt|
+        |full|voll|
+        |interrupted|unterbrochen|
+        |contract|Vertrag|
+        |rides|reitet|
+        |on|auf|
+        |sweeps|streicht|
+        |#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="5"
+        |entertain|unterhalten|8;2
+        |winner|Siegerin|5;0
+        |#quizGroupPartition numCorrectResponsesInARow="2" repetitionInterval="15"
+        |against|wider|9,7;6
+        |teach|unterrichten|4,3;1
+        |#quizGroupPartition numCorrectResponsesInARow="3" repetitionInterval="15"
+        |#quizGroupPartition numCorrectResponsesInARow="4" repetitionInterval="60"
+        |#quizGroupPartition numCorrectResponsesInARow="5" repetitionInterval="600"
+        |#quizGroupPartition numCorrectResponsesInARow="6" repetitionInterval="0"
+        |""".stripMargin
 
-  val qgudCustomFormat = "isActive=\"true\" currentPromptNumber=\"10\""
+  val qgudCustomFormat = """isActive="true" currentPromptNumber="10""""
   val qghCustomFormat =
-    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" useMultipleChoiceUntil=\"4\" isActive=\"true\" currentPromptNumber=\"10\"\n"
+    """#quizGroup type="WordMapping" promptType="English word" responseType="German word" mainSeparator="|" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"
   val qghCustomFormatNoSeparator =
-    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" useMultipleChoiceUntil=\"4\" isActive=\"true\" currentPromptNumber=\"10\"\n"
+    """#quizGroup type="WordMapping" promptType="English word" responseType="German word" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"
   val qghCustomFormatNoUseMultipleChoiceUntil =
-    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"10\"\n"
+    """#quizGroup type="WordMapping" promptType="English word" responseType="German word" isActive="true" currentPromptNumber="10"""" + "\n"
 
   val qgwhCustomFormat = qghCustomFormat + qgBodyCustomFormat
 
@@ -161,30 +165,32 @@ object TestData {
 
   val quizData = List(
 
-    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
-      "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-      "against|wider|\n" +
-      "entertain|unterhalten|\n" +
-      "teach|unterrichten|\n" +
-      "winner|Siegerin|\n" +
-      "en route|unterwegs|\n" +
-      "full|satt|\n" +
-      "full|voll|\n" +
-      "interrupted|unterbrochen|\n" +
-      "contract|Vertrag|\n" +
-      "rides|reitet|\n" +
-      "on|auf|\n" +
-      "the|der|\n" +
-      "#quizGroupPartition numCorrectResponsesInARow=\"3\" repetitionInterval=\"15\"\n" +
-      "sweeps|streicht|100,200,300;405\n",
+    """#quizGroup type="WordMapping" promptType="English word" responseType="German word" isActive="true" currentPromptNumber="0"
+      |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+      |against|wider|
+      |entertain|unterhalten|
+      |teach|unterrichten|
+      |winner|Siegerin|
+      |en route|unterwegs|
+      |full|satt|
+      |full|voll|
+      |interrupted|unterbrochen|
+      |contract|Vertrag|
+      |rides|reitet|
+      |on|auf|
+      |the|der|
+      |#quizGroupPartition numCorrectResponsesInARow="3" repetitionInterval="15"
+      |sweeps|streicht|100,200,300;405
+      |""".stripMargin,
 
-    "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
-      "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-      "unterwegs|en route|\n" +
-      "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"5\"\n" +
-      "Vertrag|treaty|796;798\n" +
-      "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"15\"\n" +
-      "Vertrag|contract|697,696;698\n"
+    """#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="0"
+      |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+      |unterwegs|en route|
+      |#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="5"
+      |Vertrag|treaty|796;798
+      |#quizGroupPartition numCorrectResponsesInARow="2" repetitionInterval="15"
+      |Vertrag|contract|697,696;698
+      |""".stripMargin
   )
 
   val quiz = Quiz.demoQuiz(quizData)

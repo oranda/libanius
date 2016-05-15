@@ -24,7 +24,7 @@ class StringUtilSpec extends Specification {
 
   "a string should " should {
     "allow a substring to be extracted based on enclosing substrings specified" in {
-      val str = "promptType=\"English word\" responseType=\"German word\" mainSeparator=\"|\" currentPromptNumber=\"10\" isActive=\"true\""
+      val str = """promptType="English word" responseType="German word" mainSeparator="|" currentPromptNumber="10" isActive="true""""
       val substr = StringUtil.parseValue(str, "isActive=\"", "\"")
       substr mustEqual Some("true")
     }

@@ -241,33 +241,33 @@ object Quiz extends AppDependencyAccess {
   }
 
   val memLevelsWithLowIntervals =
-      "#quizGroupPartition numCorrectResponsesInARow=\"1\" repetitionInterval=\"2\"\n" +
-      "#quizGroupPartition numCorrectResponsesInARow=\"2\" repetitionInterval=\"2\"\n" +
-      "#quizGroupPartition numCorrectResponsesInARow=\"3\" repetitionInterval=\"2\"\n" +
-      "#quizGroupPartition numCorrectResponsesInARow=\"4\" repetitionInterval=\"2\"\n" +
-      "#quizGroupPartition numCorrectResponsesInARow=\"5\" repetitionInterval=\"2\"\n" +
-      "#quizGroupPartition numCorrectResponsesInARow=\"6\" repetitionInterval=\"2\"\n"
+    """#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="2"
+      |#quizGroupPartition numCorrectResponsesInARow="2" repetitionInterval="2"
+      |#quizGroupPartition numCorrectResponsesInARow="3" repetitionInterval="2"
+      |#quizGroupPartition numCorrectResponsesInARow="4" repetitionInterval="2"
+      |#quizGroupPartition numCorrectResponsesInARow="5" repetitionInterval="2"
+      |#quizGroupPartition numCorrectResponsesInARow="6" repetitionInterval="2"""".stripMargin
 
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
 
-    "#quizGroup type=\"WordMapping\" promptType=\"English word\" responseType=\"German word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
-    "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-    "en route|unterwegs\n" +
-    "contract|Vertrag\n" +
-    "treaty|Vertrag\n" +
-    "against|wider\n" +
-    "entertain|unterhalten\n" +
-    memLevelsWithLowIntervals,
+    """#quizGroup type="WordMapping" promptType="English word" responseType="German word" isActive="true" currentPromptNumber="0"
+      |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+      |en route|unterwegs
+      |contract|Vertrag
+      |treaty|Vertrag
+      |against|wider
+      |entertain|unterhalten""".stripMargin +
+      memLevelsWithLowIntervals,
 
-    "#quizGroup type=\"WordMapping\" promptType=\"German word\" responseType=\"English word\" isActive=\"true\" currentPromptNumber=\"0\"\n" +
-    "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-    "unterwegs|en route\n" +
-    "Vertrag|contract\n" +
-    "Vertrag|treaty\n" +
-    "wider|against\n" +
-    "unterhalten|entertain" +
-    memLevelsWithLowIntervals
+    """#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="0"
+      |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+      |unterwegs|en route
+      |Vertrag|contract
+      |Vertrag|treaty
+      |wider|against
+      |unterhalten|entertain""".stripMargin +
+      memLevelsWithLowIntervals
   )
 
 }
