@@ -251,23 +251,25 @@ object Quiz extends AppDependencyAccess {
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
 
-    """#quizGroup type="WordMapping" promptType="English word" responseType="German word" isActive="true" currentPromptNumber="0"
+    s"""#quizGroup type="WordMapping" promptType="English word" responseType="German word" isActive="true" currentPromptNumber="0"
       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
       |en route|unterwegs
       |contract|Vertrag
       |treaty|Vertrag
       |against|wider
-      |entertain|unterhalten""".stripMargin +
-      memLevelsWithLowIntervals,
+      |entertain|unterhalten
+      |$memLevelsWithLowIntervals""".stripMargin
+      ,
 
-    """#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="0"
+    s"""#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="0"
       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
       |unterwegs|en route
       |Vertrag|contract
       |Vertrag|treaty
       |wider|against
-      |unterhalten|entertain""".stripMargin +
-      memLevelsWithLowIntervals
+      |unterhalten|entertain
+      |$memLevelsWithLowIntervals""".stripMargin
+
   )
 
 }

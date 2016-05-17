@@ -83,16 +83,14 @@ object TestData {
       |""".stripMargin
 
   val qgMemLevelHeaderCustomFormat =
-    """#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
-      |""".stripMargin
-
+    """#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0""""
 
   val qgMemLevelWithHeaderCustomFormat =
-    qgMemLevelHeaderCustomFormat + qgMemLevelSimpleCustomFormat
+    s"""$qgMemLevelHeaderCustomFormat\n$qgMemLevelSimpleCustomFormat"""
 
   val qgBodyCustomFormat =
-    qgMemLevelHeaderCustomFormat +
-      """en route|unterwegs|
+      s"""$qgMemLevelHeaderCustomFormat
+        |en route|unterwegs|
         |full|satt|
         |full|voll|
         |interrupted|unterbrochen|

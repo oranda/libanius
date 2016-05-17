@@ -163,11 +163,11 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
   private def readDictionary(fileName: String): Option[Dictionary] = {
     val fileText = Util.stopwatch(io.readFile(fileName), "reading dictionary " + fileName)
     val dictionary: Option[Dictionary] =
-        Util.stopwatch(fileText.map(
-            deserialize[Dictionary, NoParams](_, NoParams())),
-            "parsing dictionary")
-    l.log("Finished reading " + dictionary.map(_.numKeyWords).getOrElse(0) +
-        " dictionary prompt words")
+      Util.stopwatch(
+          fileText.map(deserialize[Dictionary, NoParams](_, NoParams())),
+          "parsing dictionary")
+    val dictionaryNumKeyWords =  dictionary.map(_.numKeyWords).getOrElse(0)
+    l.log(s"Finished reading $dictionaryNumKeyWords dictionary prompt words")
     dictionary
   }
 }

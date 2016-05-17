@@ -120,9 +120,12 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
       quizItems.slice(randomStart, randomStart + sliceSize)
     }
 
-  override def toString =
-    s"$correctResponsesInARow($repetitionInterval):$numCorrectResponses/$totalResponses: " +
-        quizItems.map(_.prompt)
+  override def toString = {
+    val quizItemPrompts = quizItems.map(_.prompt)
+    val averageCorrectResponses = numCorrectResponses/totalResponses
+    s"$correctResponsesInARow($repetitionInterval):$averageCorrectResponses: $quizItemPrompts"
+  }
+
 
   protected[model] def isAtLimit = totalResponses >= QuizGroupMemoryLevel.totalResponsesLimit
 

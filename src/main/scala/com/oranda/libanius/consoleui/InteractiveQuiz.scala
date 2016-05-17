@@ -84,11 +84,13 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   def showQuizItemAndProcessResponse(quizItem: QuizItemViewWithChoices):
       State[Quiz, UserConsoleResponse] = {
     val wordText = s": what is the ${quizItem.responseType} for this ${quizItem.promptType}?"
+    val wordTextToShow =
+      if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else ""
     val answeredText = s" (correctly answered ${quizItem.numCorrectResponsesInARow} times)"
-    val questionText = quizItem.qgCurrentPromptNumber + ": " + quizItem.prompt +
-        (if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else "") +
-        (if (quizItem.numCorrectResponsesInARow > 0) answeredText else "")
-    output(questionText + "\n")
+    val answeredTextToShow = if (quizItem.numCorrectResponsesInARow > 0) answeredText else ""
+    val questionText = quizItem.qgCurrentPromptNumber + ": " + quizItem.prompt
+    val fullQuestionText = questionText + wordTextToShow + answeredTextToShow
+    output(s"$fullQuestionText\n")
 
     if (quizItem.useMultipleChoice) showChoicesAndProcessResponse(quizItem)
     else getTextResponseAndProcess(quizItem)

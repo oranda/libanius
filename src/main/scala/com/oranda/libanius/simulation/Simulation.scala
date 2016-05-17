@@ -170,8 +170,8 @@ case class MultipleCorrectChoices(quiz: Quiz, quizItem: QuizItemViewWithChoices)
 
   def exists = correctChoices.size > 1
 
-  def errorMsg = s"for ${quizItem.prompt} there were multiple correct choices: " +
-      correctChoices.mkString(", ")
+  def errorMsg =
+    s"for ${quizItem.prompt} there were multiple correct choices: ${correctChoices.mkString(", ")}"
 }
 
 case class QuizItemRepeated(quiz: Quiz, quizItem: QuizItemViewWithChoices,

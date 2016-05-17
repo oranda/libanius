@@ -66,12 +66,13 @@ object ConstructWrongChoices extends AppDependencyAccess {
       if (numCorrectResponsesSoFar % 2 == 1) TextValue.sameStart else TextValue.sameEnd
 
     implicit val cwc = ConstructWrongChoicesForModelComponents.cwcQuizGroup
-    val falseResponses: List[String] =
-      constructWrongChoicesSimilar(quizGroup, itemCorrect, numWrongChoicesRequired,
-          correctResponses, similarityPredicate) ++
-      constructWrongChoicesRandom(quizGroup, itemCorrect, numWrongChoicesRequired,
-          correctResponses) ++
-      constructWrongChoicesDummy(numWrongChoicesRequired)
+    val badChoicesSimilar = constructWrongChoicesSimilar(quizGroup, itemCorrect,
+        numWrongChoicesRequired, correctResponses, similarityPredicate)
+    val badChoicesRandom = constructWrongChoicesRandom(quizGroup, itemCorrect,
+        numWrongChoicesRequired, correctResponses)
+    val badChoicesDummy = constructWrongChoicesDummy(numWrongChoicesRequired)
+    val falseResponses: List[String] = badChoicesSimilar ++ badChoicesRandom ++ badChoicesDummy
+
     falseResponses.distinct.take(numWrongChoicesRequired)
   }
 

@@ -58,9 +58,8 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
 
     "serialize a quiz group memory level" in {
       val customFormat = serialize(qgMemLevelSimple, new StringBuilder, paramsWithSeparatorAndIndex)
-      customFormat.toString mustEqual
-        "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n" +
-            qgMemLevelSimpleCustomFormat
+      val qgpHeader = "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n"
+      customFormat.toString mustEqual qgpHeader + qgMemLevelSimpleCustomFormat
     }
 
     "serialize a quiz group" in {

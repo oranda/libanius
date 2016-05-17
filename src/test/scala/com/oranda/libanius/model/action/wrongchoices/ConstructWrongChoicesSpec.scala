@@ -60,9 +60,10 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
      */
     "construct a full set of wrong choices" in {
 
-      val demoGroupHeader = """#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="21"""" + "\n"
-      val demoGroupText = demoGroupHeader +
-          """#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+      val demoGroupHeader = """#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="21""""
+      val demoGroupText =
+          s"""$demoGroupHeader
+            |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
             |entertain|unterhalten|
             |#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="5"
             |against|wider|13;

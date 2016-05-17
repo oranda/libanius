@@ -4,6 +4,8 @@
 
   * Added support for creating "fat jars" using sbt assembly.
 
+  * Formatting changes, including the use of String Interpolation where it makes sense.
+
 
 == 0.983 May 8 2016
 
