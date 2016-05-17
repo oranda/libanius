@@ -37,7 +37,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
     Try(Quiz.metadataFromCustomFormat(readRawMetadata)).recover {
       // for absent data files, security access exceptions or anything else unexpected
-      case e: Exception => l.log("Error reading quiz: " + e.getMessage)
+      case e: Exception => l.log(s"Error reading quiz: ${e.getMessage}")
                            Set[QuizGroupHeader]()
     }.get
   }
@@ -56,17 +56,17 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
   }
 
   def loadQuizGroup(header: QuizGroupHeader): QuizGroup = {
-    l.log("DataStore.loadQuizGroup " + header)
+    l.log(s"DataStore.loadQuizGroup $header")
     val quizGroup = loadQuizGroupCore(header)
-    Util.stopwatch(loadDictionary(header, quizGroup), "preparing dictionary for " + header)
+    Util.stopwatch(loadDictionary(header, quizGroup), s"preparing dictionary for $header")
   }
 
   private def loadDictionary(header: QuizGroupHeader, qg: QuizGroup): QuizGroup = {
     val dictFileName = header.makeDictFileName
     readDictionary(conf.filesDir + dictFileName) match {
       case Some(dictionary) => qg.updatedDictionary(dictionary)
-      case _ => l.logError("Could not find dictionary on filesystem for " +
-              header.toString + ", so creating dictionary from the quizGroup")
+      case _ => l.logError(s"Could not find dictionary on filesystem for $header.toString, " +
+          "so creating dictionary from the quizGroup")
           qg.updatedDictionary(Dictionary.fromQuizGroup(qg))
     }
   }
@@ -76,11 +76,11 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     val quizGroup = findQuizGroupInFilesDir(header) match {
       case Some(qgFileName) =>
         Util.stopwatch(readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup()),
-            "reading quiz group from file " + qgFileName)
+            s"reading quiz group from file $qgFileName")
       case _ => initQuizGroup(header)
     }
 
-    if (quizGroup.isEmpty) l.logError("No quiz items loaded for " + header)
+    if (quizGroup.isEmpty) l.logError(s"No quiz items loaded for $header")
     quizGroup
   }
 
@@ -88,10 +88,10 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     findQuizGroupInResources(header) match {
       case Some(qgResName) =>
         val qgText = Util.stopwatch(io.readResource(qgResName).get,
-          "reading quiz group resource " + qgResName)
+          s"reading quiz group resource $qgResName")
         Util.stopwatch(header.createQuizGroup(qgText), "creating quiz group by parsing text")
       case _ =>
-        l.logError("failed to load quiz group " + header)
+        l.logError(s"failed to load quiz group $header")
         QuizGroup()
     }
   }
@@ -103,8 +103,8 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
       val qgwh = QuizGroupWithHeader(header, quizGroup)
       val serialized = qgwh.toCustomFormat
 
-      l.log("Saving quiz group " + header.promptType + ", quiz group has promptNumber " +
-          quizGroup.currentPromptNumber + " to " + fileName)
+      l.log(s"Saving quiz group $header.promptType , quiz group has promptNumber " +
+          s"quizGroup.currentPromptNumber to $fileName")
       io.writeToFile(path + userToken + "-" + fileName, serialized)
     }
     quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg, userToken) }

@@ -78,14 +78,13 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   def showScore(quiz: Quiz) {
     val score: BigDecimal = Util.stopwatch(quiz.scoreSoFar, "scoreSoFar")
     val formattedScore = StringUtil.formatScore(score)
-    output("Score: " + formattedScore)
+    output(s"Score: $formattedScore")
   }
 
   def showQuizItemAndProcessResponse(quizItem: QuizItemViewWithChoices):
       State[Quiz, UserConsoleResponse] = {
-    val wordText = ": what is the " + quizItem.responseType + " for this " +
-        quizItem.promptType + "?"
-    val answeredText = " (correctly answered " + quizItem.numCorrectResponsesInARow + " times)"
+    val wordText = s": what is the ${quizItem.responseType} for this ${quizItem.promptType}?"
+    val answeredText = s" (correctly answered ${quizItem.numCorrectResponsesInARow} times)"
     val questionText = quizItem.qgCurrentPromptNumber + ": " + quizItem.prompt +
         (if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else "") +
         (if (quizItem.numCorrectResponsesInARow > 0) answeredText else "")

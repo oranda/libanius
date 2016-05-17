@@ -34,7 +34,7 @@ class DefaultIO extends PlatformIO {
     if (theFile.exists)
       Some(Source.fromFile(theFile).mkString)
     else {
-      l.logError("File not found: " + fileName)
+      l.logError(s"File not found: $fileName")
       None
     }
   }    
@@ -61,10 +61,10 @@ class DefaultIO extends PlatformIO {
   private def readQgMetadata(qgPath: String): Option[QuizGroupHeader] = {
     val file = new File(qgPath)
     if (file.exists) {
-      l.log("readQgMetadata: reading file " + qgPath)
+      l.log(s"readQgMetadata: reading file $qgPath")
       readQgMetadata(new FileInputStream(file))
     } else {
-      l.logError("File not found: " + qgPath)
+      l.logError(s"File not found: $qgPath")
       None
     }
   }

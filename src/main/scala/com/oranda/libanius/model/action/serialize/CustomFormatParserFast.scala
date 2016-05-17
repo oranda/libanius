@@ -122,7 +122,7 @@ object CustomFormatParserFast extends AppDependencyAccess {
             case Parsed.Success(qi, _) =>
               Stream.cons(qi, parseQuizItems(lineSplitter))
             case _ => // shouldn't happen
-              l.logError("Could not parse quiz item " + quizItemText)
+              l.logError(s"Could not parse quiz item $quizItemText")
               parseQuizItems(lineSplitter) // continue with the next
           }
         } else

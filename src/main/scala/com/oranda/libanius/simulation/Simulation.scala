@@ -55,13 +55,13 @@ trait Simulation {
 
     if (responsesProcessed < MAX_RESPONSES) {
       val (quizItem, timeTakenToFindItem) = Util.stopwatch(findQuizItem(quiz))
-      output("time for findQuizItem: " + timeTakenToFindItem)
+      output(s"time for findQuizItem: $timeTakenToFindItem")
       if (shouldMeasureTime) totalMillisToProduceQuizItems += timeTakenToFindItem
       quizItem match {
         case Some(quizItem) =>
           lazy val allChoicesText = "\tChoices: " + quizItem.allChoices.mkString(", ")
           val strChoices = if (quizItem.useMultipleChoice) allChoicesText else ""
-          output(responsesProcessed + ". Prompt: " + quizItem.prompt + strChoices)
+          output(s"$responsesProcessed. Prompt: ${quizItem.prompt}$strChoices")
           Problem.find(quiz, timeTakenToFindItem, quizItem, lastQuizItem,
               responsesProcessed) match {
             case Some(problem: Problem) =>
@@ -83,15 +83,15 @@ trait Simulation {
 
   private def respondToQuizItem(quiz: Quiz, quizItem: QuizItemViewWithChoices): Quiz = {
     val simulatedResponse = makeResponse(quizItem, quiz, responsesProcessed)
-    output("Simulated response: " + simulatedResponse)
+    output(s"Simulated response: $simulatedResponse")
     val quizAfterResponse = processUserResponse(quiz, simulatedResponse, quizItem)
-    output("quizAfterResponse.numCorrectResponses: " + quizAfterResponse.numCorrectResponses)
+    output(s"quizAfterResponse.numCorrectResponses: ${quizAfterResponse.numCorrectResponses}")
     responsesProcessed += 1
     quizAfterResponse
   }
 
   private def report(quiz: Quiz) {
-    output("Responses processed: " + responsesProcessed)
+    output(s"Responses processed: $responsesProcessed")
 
     val numResponsesMeasured = responsesProcessed - NUM_WARMUP
     def outputAverage(str: String, millis: Long) =
@@ -101,7 +101,7 @@ trait Simulation {
     outputAverage("compute score: ", totalMillisToComputeScore)
 
     val score = quiz.scoreSoFar
-    assert(score == 1.0, "Score was " + score)
+    assert(score == 1.0, s"Score was $score")
   }
 
   // For now, just return the correct Answer
@@ -113,7 +113,7 @@ trait Simulation {
       quizItem: QuizItemViewWithChoices): Quiz = {
     val correctAnswer = quizItem.correctResponse
     val isCorrect = correctAnswer.looselyMatches(userResponseTxt)
-    if (isCorrect) output("Correct!") else output("Wrong! It's " + correctAnswer)
+    if (isCorrect) output("Correct!") else output(s"Wrong! It's $correctAnswer")
     showScore(quiz)
     val (quizUpdated, timeTaken) = Util.stopwatch(quiz.updateWithUserResponse(
         isCorrect, quizItem.quizGroupHeader, quizItem.quizItem))
@@ -126,7 +126,7 @@ trait Simulation {
     val (score: BigDecimal, timeTaken) = Util.stopwatch(quiz.scoreSoFar)
     if (shouldMeasureTime) totalMillisToComputeScore += timeTaken
     val formattedScore = StringUtil.formatScore(score)
-    output("Score: " + formattedScore + "\n")
+    output(s"Score: $formattedScore\n")
   }
 
   // Don't measure processing times while the system is still "warming up"
@@ -141,7 +141,7 @@ object Simulation {
 abstract class Problem {
   def exists: Boolean
   def errorMsg: String
-  def report() = output("PROBLEM: " + errorMsg)
+  def report() = output(s"PROBLEM: $errorMsg")
   def retrieve: Option[Problem] = if (exists) Some(this) else None
 }
 
@@ -156,7 +156,7 @@ object Problem {
 case class TimeTooLong(quizItem: QuizItemViewWithChoices, timeTakenToFindItem: Long,
     responsesProcessed: Long) extends Problem {
   def exists = timeTakenToFindItem > 500 && responsesProcessed > NUM_WARMUP
-  def errorMsg = "time to find a quiz item was too long for " + quizItem.prompt
+  def errorMsg = s"time to find a quiz item was too long for ${quizItem.prompt}"
 }
 
 case class MultipleCorrectChoices(quiz: Quiz, quizItem: QuizItemViewWithChoices) extends Problem {
@@ -170,8 +170,8 @@ case class MultipleCorrectChoices(quiz: Quiz, quizItem: QuizItemViewWithChoices)
 
   def exists = correctChoices.size > 1
 
-  def errorMsg = "for " + quizItem.prompt + " there were multiple correct choices: " +
-    correctChoices.mkString(", ")
+  def errorMsg = s"for ${quizItem.prompt} there were multiple correct choices: " +
+      correctChoices.mkString(", ")
 }
 
 case class QuizItemRepeated(quiz: Quiz, quizItem: QuizItemViewWithChoices,
@@ -180,6 +180,6 @@ case class QuizItemRepeated(quiz: Quiz, quizItem: QuizItemViewWithChoices,
   def exists: Boolean =
     !quiz.nearTheEnd && lastQuizItem.exists(_.quizItem.samePromptAndResponse(quizItem.quizItem))
 
-  def errorMsg = "quiz item was repeated: " + quizItem.prompt
+  def errorMsg = s"quiz item was repeated: ${quizItem.prompt}"
 }
 

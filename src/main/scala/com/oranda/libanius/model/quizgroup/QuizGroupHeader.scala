@@ -31,13 +31,13 @@ case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
   // promptType example: "English word"
   // responseType example: "German word"
 
-  override def toString = quizGroupType + ": " + promptType + "-" + responseType
+  override def toString = s"$quizGroupType: $promptType-$responseType"
 
   def matches(other: QuizGroupHeader) =
     promptType == other.promptType && responseType == other.responseType
 
-  def makeQgFileName = promptType + "-" + responseType + ".qgr"
-  def makeDictFileName = promptType + "-" + responseType + ".dct"
+  def makeQgFileName = s"$promptType-$responseType.qgr"
+  def makeDictFileName = s"$promptType-$responseType.dct"
 
   def reverse = QuizGroupHeader(quizGroupType, responseType, promptType, mainSeparator,
       useMultipleChoiceUntil)

@@ -29,5 +29,5 @@ case class SearchResult(quizGroupHeader: QuizGroupHeader, wmp: SearchResultPair)
   // It may be desired to filter out trivial search results where this is true
   def keyWordMatchesValue = valueSet.size == 1 && keyWord == valueSet.values(0)
 
-  override def toString = keyWord + ": " + valueSet.toString
+  override def toString = s"$keyWord: ${valueSet.toString}"
 }

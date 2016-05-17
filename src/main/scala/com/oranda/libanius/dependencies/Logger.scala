@@ -25,7 +25,7 @@ abstract class Logger extends AppDependencyAccess {
   }
 
   def logError(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
-    log("ERROR: " + message, module, t)
+    log(s"ERROR: $message", module, t)
   }
 
   def log(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
@@ -38,7 +38,7 @@ abstract class Logger extends AppDependencyAccess {
 
 class LoggerDefault extends Logger {
   override def logImpl(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
-    println(module + ": " + message)
+    println(s"$module: $message")
     t.foreach(_.printStackTrace())
   }
 }

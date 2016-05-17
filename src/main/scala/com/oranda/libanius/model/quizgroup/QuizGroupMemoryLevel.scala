@@ -121,8 +121,8 @@ case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval:
     }
 
   override def toString =
-    correctResponsesInARow + "(" + repetitionInterval + "):" + numCorrectResponses +
-        "/" + totalResponses + ": " + quizItems.map(_.prompt)
+    s"$correctResponsesInARow($repetitionInterval):$numCorrectResponses/$totalResponses: " +
+        quizItems.map(_.prompt)
 
   protected[model] def isAtLimit = totalResponses >= QuizGroupMemoryLevel.totalResponsesLimit
 

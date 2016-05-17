@@ -156,8 +156,8 @@ case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
           QuizGroup.levelsListLens(memoryLevel)
       val mlsUpdated = mlsIntervalLens.mod(Int => get(memoryLevel).updatedInterval, this)
       def strIntervals(qg: QuizGroup) = qg.levels.map(_.repetitionInterval)
-      l.log("Updating memory intervals from " + strIntervals(this) + " to " +
-          strIntervals(mlsUpdated) + ", numCorrectResponses: " + numCorrectResponses(memoryLevel))
+      l.log(s"Updating memory intervals from ${strIntervals(this)} to " +
+          s"${strIntervals(mlsUpdated)}, $numCorrectResponses ${numCorrectResponses(memoryLevel)}")
       mlsUpdated
     } else
       this

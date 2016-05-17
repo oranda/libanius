@@ -24,7 +24,7 @@ object Util extends AppDependencyAccess {
 
   def stopwatch[X](fn: => X, actionDescription: String): X = {
     val (result, timeTaken) = stopwatch(fn)
-    l.log("time taken for " + actionDescription + " was " + timeTaken + "ms")
+    l.log(s"time taken for $actionDescription was ${timeTaken}ms")
     result
   }
 

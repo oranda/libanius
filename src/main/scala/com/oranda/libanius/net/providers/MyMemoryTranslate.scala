@@ -72,7 +72,7 @@ object MyMemoryTranslate extends AppDependencyAccess {
         urlEncode(word) + "&de=" + conf.email + "&langpair=" + urlEncode(mmCode)
     val translationRaw = Rest.query(restQuery)
     val matches = Try(findMatchesInJson(translationRaw)).recover {
-      case t: Throwable => l.logError("Could not parse JSON text: " + translationRaw, t)
+      case t: Throwable => l.logError(s"Could not parse JSON text: $translationRaw", t)
           List[TranslationMatch]()
     }.get
     // Filter on the quality of the match.
