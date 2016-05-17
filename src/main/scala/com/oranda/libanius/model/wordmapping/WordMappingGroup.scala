@@ -22,11 +22,11 @@ import com.oranda.libanius.model._
 import com.oranda.libanius.model.action.serialize.Separator
 import scala.collection.immutable.{Stream, Iterable}
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.util.GroupByOrderedImplicit
 import scala.collection.mutable
 import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import scala.language.implicitConversions
 import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, QuizGroupHeader, QuizGroup}
+import com.oranda.libanius.util.CollectionHelpers.GroupByOrderedImplicit
 
 /*
  * An intermediate data structure used to persist a "WordMapping" type of quiz group
@@ -56,16 +56,11 @@ object WordMappingGroup extends AppDependencyAccess {
   }
 
   def quizItemsToWordMappingPairs(quizItems: Stream[QuizItem], sep: Separator):
-      Stream[WordMappingPair] = {
-    // Get access to the groupByOrdered functor
-    implicit def traversableToGroupByOrderedImplicit[A](t: Traversable[A]):
-        GroupByOrderedImplicit[A] =
-      new GroupByOrderedImplicit[A](t)
-
+      Stream[WordMappingPair] =
     quizItems.groupByOrdered(_.prompt).map {
         case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
           WordMappingPair(prompt.value,
             WordMappingValueSet.createFromQuizItems(quizItems.toList, sep.toString))
     }.toStream
-  }
+
 }

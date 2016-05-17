@@ -19,10 +19,8 @@
 package com.oranda.libanius.net.providers
 
 import java.net.URLEncoder
-import play.api.libs.json
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import com.oranda.libanius.util.GroupByOrderedImplicit
 
 import scala.language.implicitConversions
 import com.oranda.libanius.net.Rest
@@ -33,6 +31,7 @@ import scala.util.Try
 import com.oranda.libanius.model.ValueSet
 import com.oranda.libanius.model.SearchResultPair
 import com.oranda.libanius.model.SearchResult
+import com.oranda.libanius.util.CollectionHelpers.GroupByOrderedImplicit
 
 /*
  * Use the free online service mymemory.translated.net to translate strings.
@@ -54,10 +53,6 @@ object MyMemoryTranslate extends AppDependencyAccess {
 
     val matches: List[(String, String)] =
       mmCode(header).toList.flatMap(translateOrError(word, _))
-
-    // Get access to the groupByOrdered functor
-    implicit def traversableToGroupByOrderedImplicit[A](t: Traversable[A]):
-        GroupByOrderedImplicit[A] = new GroupByOrderedImplicit[A](t)
 
     // Group by key so as to go from (key, value) to (key, values)
     val groupedMatches = matches.groupByOrdered(_._1).map {
