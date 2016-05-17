@@ -1,6 +1,8 @@
 import sbt._
 
-name := "Libanius"
+name := "libanius"
+
+version := "0.984"
 
 scalaVersion := "2.11.6"
 
@@ -14,7 +16,7 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
 
 val scalazVersion = "7.1.2"
 
-libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
+libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0" % "provided",
                             "org.specs2" %% "specs2-core" % "2.4.17" % "test",
                             "org.specs2" %% "specs2-junit" % "2.4.17" % "test",
                             "org.scalaz" %% "scalaz-core" % scalazVersion,
@@ -30,8 +32,14 @@ unmanagedClasspath in Test <+= baseDirectory map { bd => Attributed.blank(bd / "
 parallelExecution in Test := true
 
 artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
-  artifact.name + "-0.983." + artifact.extension
+  artifact.name + "-" + version + "." + artifact.extension
 }
+
+assemblyJarName in assembly := s"${name.value}-${version.value}-fat.jar"
+
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
+
+test in assembly := {}
 
 scalacOptions += "-feature"
 

@@ -1,3 +1,10 @@
+== 0.984 May ?
+
+  * Changed application.conf to reference.conf as Libanius Core is usually part of a greater system.
+
+  * Added support for creating "fat jars" using sbt assembly.
+
+
 == 0.983 May 8 2016
 
   * Changed deserialization of quiz text to use parser combinators. Specifically: FastParse.
