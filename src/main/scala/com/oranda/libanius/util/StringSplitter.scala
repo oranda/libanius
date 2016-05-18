@@ -34,7 +34,7 @@ class StringSplitterDefault(separator: Character) extends StringSplitter(separat
 
   private var iter: Iterator[String] = _
   
-  override def setString(str: String) {
+  override def setString(str: String): Unit = {
     iter = str.split("\\" + separator.toString).filter(_ != "").iterator
   }
   

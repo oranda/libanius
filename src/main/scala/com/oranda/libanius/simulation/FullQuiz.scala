@@ -29,7 +29,7 @@ object FullQuiz extends App with Simulation with AppDependencyAccess {
 
   runQuiz()
 
-  private def runQuiz() {
+  private def runQuiz(): Unit = {
 
     output("Running quiz...")
 

@@ -49,7 +49,7 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
     selectedQuizGroupHeaders.map(header => (header, dataStore.loadQuizGroupCore(header))).toMap
   }
 
-  def testUserWithQuizItem(quiz: Quiz) {
+  def testUserWithQuizItem(quiz: Quiz): Unit = {
     showScore(quiz)
     Util.stopwatch(produceQuizItem(quiz, NoParams()), "find quiz items") match {
       case Some(quizItem) => keepShowingQuizItems(quiz, quizItem)
@@ -57,7 +57,7 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
     }
   }
 
-  def keepShowingQuizItems(quiz: Quiz, quizItem: QuizItemViewWithChoices) {
+  def keepShowingQuizItems(quiz: Quiz, quizItem: QuizItemViewWithChoices): Unit = {
     val (updatedQuiz, response) = showQuizItemAndProcessResponse(quizItem).run(quiz)
     response match {
       case Invalid =>
@@ -71,11 +71,11 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
     }
   }
 
-  def saveQuiz(quiz: Quiz) {
+  def saveQuiz(quiz: Quiz): Unit = {
     dataStore.saveQuiz(quiz, path = conf.filesDir)
   }
 
-  def showScore(quiz: Quiz) {
+  def showScore(quiz: Quiz): Unit = {
     val score: BigDecimal = Util.stopwatch(quiz.scoreSoFar, "scoreSoFar")
     val formattedScore = StringUtil.formatScore(score)
     output(s"Score: $formattedScore")

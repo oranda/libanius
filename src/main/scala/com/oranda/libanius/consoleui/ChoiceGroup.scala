@@ -27,11 +27,10 @@ import scala.util.Try
 case class ChoiceGroup[T](choices: List[T]) {
   val choicesWithIndex = choices.zipWithIndex
 
-  def show() {
+  def show(): Unit =
     choicesWithIndex.foreach {
       case (header, index) => output((index + 1).toString + ". " + header.toString)
     }
-  }
 
   def getSelectionFromInput: UserConsoleResponse =
     scala.io.StdIn.readLine match {

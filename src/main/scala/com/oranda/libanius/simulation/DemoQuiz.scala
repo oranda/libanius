@@ -23,8 +23,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 
 trait DemoQuiz extends Simulation {
 
-  protected def runQuiz() {
-
+  protected def runQuiz(): Unit = {
     val quiz = Quiz.demoQuiz()
     testAllQuizItems(quiz)
   }

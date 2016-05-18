@@ -96,7 +96,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     }
   }
 
-  def saveQuiz(quiz: Quiz, path: String = "", userToken: String = "") {
+  def saveQuiz(quiz: Quiz, path: String = "", userToken: String = ""): Unit = {
 
     def saveToFile(header: QuizGroupHeader, quizGroup: QuizGroup, userToken: String) = {
       val fileName = header.makeQgFileName

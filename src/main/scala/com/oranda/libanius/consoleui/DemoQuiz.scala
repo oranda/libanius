@@ -25,7 +25,7 @@ object DemoQuiz extends InteractiveQuiz {
 
   runQuiz()
 
-  def runQuiz() {
+  def runQuiz(): Unit = {
 
     output("Running demo quiz...")
     val quiz = Quiz.demoQuiz()
@@ -34,5 +34,5 @@ object DemoQuiz extends InteractiveQuiz {
   }
 
   // Don't save the small demo quiz. It should be completed in one sitting if at all.
-  override def saveQuiz(quiz: Quiz) {}
+  override def saveQuiz(quiz: Quiz): Unit = {}
 }

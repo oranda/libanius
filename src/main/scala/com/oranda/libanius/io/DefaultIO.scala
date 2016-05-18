@@ -39,9 +39,8 @@ class DefaultIO extends PlatformIO {
     }
   }    
   
-  def save(fileName: String, strToSave: String) {
+  def save(fileName: String, strToSave: String): Unit =
     writeToFile(fileName, strToSave)
-  }
   
   def writeToFile(fileName: String, data: String) = 
     using (new FileWriter(fileName)) (_.write(data))

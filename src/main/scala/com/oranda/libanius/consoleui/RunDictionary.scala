@@ -28,7 +28,7 @@ object RunDictionary extends App with AppDependencyAccess {
 
   runDictionary()
 
-  private[this] def runDictionary() {
+  private[this] def runDictionary(): Unit = {
 
     output("Loading dictionaries...")
 
@@ -58,7 +58,7 @@ object RunDictionary extends App with AppDependencyAccess {
     selectedQuizGroupHeaders.map(header => (header, dataStore.loadQuizGroup(header))).toMap
   }
 
-  private[this] def serveUserRequest(quiz: Quiz) {
+  private[this] def serveUserRequest(quiz: Quiz): Unit = {
     output("Word to search for: ")
     getWordQueryFromInput match {
       case Quit =>

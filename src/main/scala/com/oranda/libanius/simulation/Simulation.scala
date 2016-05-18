@@ -90,7 +90,7 @@ trait Simulation {
     quizAfterResponse
   }
 
-  private def report(quiz: Quiz) {
+  private def report(quiz: Quiz): Unit = {
     output(s"Responses processed: $responsesProcessed")
 
     val numResponsesMeasured = responsesProcessed - NUM_WARMUP
@@ -122,7 +122,7 @@ trait Simulation {
     quizUpdated
   }
 
-  private def showScore(quiz: Quiz) {
+  private def showScore(quiz: Quiz): Unit = {
     val (score: BigDecimal, timeTaken) = Util.stopwatch(quiz.scoreSoFar)
     if (shouldMeasureTime) totalMillisToComputeScore += timeTaken
     val formattedScore = StringUtil.formatScore(score)

@@ -25,7 +25,7 @@ object RunQuiz extends InteractiveQuiz {
 
   runQuiz()
 
-  def runQuiz() {
+  def runQuiz(): Unit = {
 
     output("Running quiz...")
 

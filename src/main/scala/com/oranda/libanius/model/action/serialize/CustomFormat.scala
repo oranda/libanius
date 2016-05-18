@@ -218,7 +218,7 @@ object CustomFormatForModelComponents {
       val values = new ListBuffer[WordMappingValue]()
 
       val wmvsSplitter = stringSplitterFactory.getSplitter('/')
-      def parseFromCustomFormat() {
+      def parseFromCustomFormat(): Unit = {
         wmvsSplitter.setString(str)
         while (wmvsSplitter.hasNext) {
           val nextVal = wmvsSplitter.next
@@ -471,7 +471,7 @@ object CustomFormatForModelComponents {
       val splitterLineBreak = stringSplitterFactory.getSplitter('\n')
       val wordMappingsMutable = new ListBuffer[WordMappingPair]()
 
-      def parseQuizGroup() {
+      def parseQuizGroup(): Unit = {
         splitterLineBreak.setString(str)
         splitterLineBreak.next // skip the first line, which has already been parsed
 

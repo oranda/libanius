@@ -20,24 +20,23 @@ package com.oranda.libanius.dependencies
 
 abstract class Logger extends AppDependencyAccess {
 
-  def logError(message: String, t: Throwable) {
+  def logError(message: String, t: Throwable): Unit =
     logError(message, "Libanius", Some(t))
-  }
 
-  def logError(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
+  def logError(message: String, module: String = "Libanius", t: Option[Throwable] = None): Unit =
     log(s"ERROR: $message", module, t)
-  }
 
-  def log(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
+  def log(message: String, module: String = "Libanius", t: Option[Throwable] = None): Unit =
     if (conf.enableLogging)
       logImpl(message, module, t)
-  }
+
 
   def logImpl(message: String, module: String = "Libanius", t: Option[Throwable] = None)
 }
 
 class LoggerDefault extends Logger {
-  override def logImpl(message: String, module: String = "Libanius", t: Option[Throwable] = None) {
+  override def logImpl(message: String, module: String = "Libanius", t: Option[Throwable] = None):
+      Unit = {
     println(s"$module: $message")
     t.foreach(_.printStackTrace())
   }
