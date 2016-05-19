@@ -70,7 +70,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
       case Some(dictionary) => qg.updatedDictionary(dictionary)
       case _ =>
         l.logError(s"Could not find dictionary on filesystem for $header.toString, " +
-            "so creating dictionary from the quizGroup")
+          "so creating dictionary from the quizGroup")
         qg.updatedDictionary(Dictionary.fromQuizGroup(qg))
     }
   }
@@ -109,7 +109,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
       val serialized = qgwh.toCustomFormat
 
       l.log(s"Saving quiz group $header.promptType , quiz group has promptNumber " +
-          s"quizGroup.currentPromptNumber to $fileName")
+        s"quizGroup.currentPromptNumber to $fileName")
       io.writeToFile(path + userToken + "-" + fileName, serialized)
     }
     quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg, userToken) }

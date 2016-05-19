@@ -208,8 +208,8 @@ object CustomFormatForModelComponents {
     def from(strPromptResponse: String, fromParams: Separator): QuizItem = {
       val i = strPromptResponse.indexOf(fromParams.mainSeparator)
       val strPrompt = strPromptResponse.substring(0, i).trim
-      val strResponseAndUserInfo = strPromptResponse.substring(i +
-          fromParams.mainSeparator.length)
+      val separatorLength = fromParams.mainSeparator.length
+      val strResponseAndUserInfo = strPromptResponse.substring(i + separatorLength)
 
       val wmv = customFormatWordMappingValue.from(strResponseAndUserInfo, fromParams)
       val userResponses = UserResponsesAll(wmv.correctAnswersInARow, wmv.incorrectAnswers)
@@ -402,7 +402,7 @@ object CustomFormatForModelComponents {
             Separator(fromParams.separator.toString)))).recover {
           case e: Exception =>
             l.logError("could not parse quiz item with text " +
-                s"$strPromptResponse using separator ${fromParams.separator.toString}")
+              s"$strPromptResponse using separator ${fromParams.separator.toString}")
             None
         }.get
       }
@@ -508,8 +508,9 @@ object CustomFormatForModelComponents {
 
             val i = strPromptResponse.indexOf(fromParams.mainSeparator)
             val strPrompt = strPromptResponse.substring(0, i).trim
-            val strResponseAndUserInfo = strPromptResponse.substring(i +
-                fromParams.mainSeparator.length)
+            val separatorLength = fromParams.mainSeparator.length
+            val strResponseAndUserInfo = strPromptResponse.substring(i + separatorLength)
+
             wordMappingsMutable += WordMappingPair(strPrompt,
                 WordMappingValueSetLazyProxy(strResponseAndUserInfo, fromParams.mainSeparator))
           }
