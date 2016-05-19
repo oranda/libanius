@@ -96,7 +96,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
 
       quiz.numCorrectResponses(qghEngGer, 0) mustEqual 0
       val quizItem = QuizItem("against", "wider")
-      val quizUpdated = quiz.updateWithUserResponse(true, qghEngGer, quizItem)
+      val quizUpdated = quiz.updateWithUserResponse(isCorrect = true, qghEngGer, quizItem)
       quizUpdated.numCorrectResponses mustEqual 7
       quizUpdated.numCorrectResponses(qghEngGer, 0) mustEqual 1
     }
