@@ -37,8 +37,11 @@ case class ChoiceGroup[T](choices: List[T]) {
       case "q" => Quit
       case "quit" => Quit
       case userResponse: String =>
-        Try(ChosenOptions(userResponse.split(",").map(_.toInt - 1).map(choices(_)).toList)).recover {
-          case e: Exception => Invalid
-        }.get
+        Try(
+          ChosenOptions(userResponse.split(",")
+            .map(_.toInt - 1)
+            .map(choices(_)).toList))
+          .recover { case e: Exception => Invalid }
+          .get
     }
 }

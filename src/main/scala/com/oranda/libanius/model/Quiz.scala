@@ -239,9 +239,7 @@ object Quiz extends AppDependencyAccess {
       val Parsed.Success(qgh, _) = quizGroupWithHeader.parse(qgwh)
       qgh
     }
-
-    Quiz(qgsWithHeader.map(
-        qgWithHeader => (qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
+    Quiz(qgsWithHeader.map(qgWithHeader => (qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }
 
   val memLevelsWithLowIntervals =

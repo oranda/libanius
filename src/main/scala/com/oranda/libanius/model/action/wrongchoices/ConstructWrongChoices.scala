@@ -173,8 +173,8 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
         randomItem.filter(!correctResponses.contains(_))
       }
 
-      (0 until numWrongChoicesRequired).map(
-        sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toList
+      (0 until numWrongChoicesRequired)
+        .map(sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toList
     }
   }
 }

@@ -37,8 +37,9 @@ object FullQuiz extends App with Simulation with AppDependencyAccess {
     if (availableQuizGroupHeaders.isEmpty)
       output("Tried to load quiz groups but none found!\n")
     else {
-      val availableQuizGroups = List(availableQuizGroupHeaders.iterator.next).map(
-          header => (header, dataStore.loadQuizGroupCore(header))).toMap
+      val availableQuizGroups =
+        List(availableQuizGroupHeaders.iterator.next)
+          .map(header => (header, dataStore.loadQuizGroupCore(header))).toMap
       val quiz = Quiz(availableQuizGroups)
       testAllQuizItems(quiz)
     }
