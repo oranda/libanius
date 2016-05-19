@@ -135,12 +135,13 @@ object CustomFormatParserFast extends AppDependencyAccess {
 
   protected[serialize] def quizGroupMemoryLevel(implicit sep: Separator): P[QuizGroupMemoryLevel] =
     P( quizGroupMemoryLevelHeader ~ "\n" ~ quizGroupMemoryLevelBody).map {
-      case (responsesInARow, repInterval, qgmlBody) => QuizGroupMemoryLevel(
-          correctResponsesInARow = responsesInARow,
-          repetitionInterval = repInterval,
-          quizItemStream = qgmlBody.toStream,
-          totalResponses = 0,
-          numCorrectResponses = 0)
+      case (responsesInARow, repInterval, qgmlBody) =>
+        QuizGroupMemoryLevel(
+            correctResponsesInARow = responsesInARow,
+            repetitionInterval = repInterval,
+            quizItemStream = qgmlBody.toStream,
+            totalResponses = 0,
+            numCorrectResponses = 0)
     }
 
   // Example input: isActive="true" currentPromptNumber="10"
@@ -176,8 +177,7 @@ object CustomFormatParserFast extends AppDependencyAccess {
   protected[serialize] def quizGroupBody(implicit sep: Separator): P[QuizGroupBody] =
     P( quizGroupMemoryLevel.rep ).map {
       case (qgmls: Seq[QuizGroupMemoryLevel]) =>
-        val levelsMap: QuizGroupBody =
-          qgmls.map(qgml => (qgml.correctResponsesInARow, qgml)).toMap
+        val levelsMap: QuizGroupBody = qgmls.map(qgml => (qgml.correctResponsesInARow, qgml)).toMap
         levelsMap
     }
 

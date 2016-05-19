@@ -36,8 +36,11 @@ object StringUtil {
    * The normal Scala mkString is too slow, so this is used instead.
    * It's necessary to pass in an existing StringBuilder.
    */
-  def mkString[S <: StringBuilder, T](str: S, iterable: Iterable[T], 
-      fn: (S, T) => StringBuilder, separator: Character): S = {
+  def mkString[S <: StringBuilder, T](
+      str: S,
+      iterable: Iterable[T],
+      fn: (S, T) => StringBuilder,
+      separator: Character): S = {
     val iter = iterable.iterator
     while (iter.hasNext) {      
       fn(str, iter.next)

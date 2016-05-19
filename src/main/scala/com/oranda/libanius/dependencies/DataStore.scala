@@ -77,7 +77,8 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
     val quizGroup = findQuizGroupInFilesDir(header) match {
       case Some(qgFileName) =>
-        Util.stopwatch(readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup()),
+        Util.stopwatch(
+            readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup()),
             s"reading quiz group from file $qgFileName")
       case _ => initQuizGroup(header)
     }

@@ -59,8 +59,9 @@ object WordMappingGroup extends AppDependencyAccess {
       Stream[WordMappingPair] =
     quizItems.groupByOrdered(_.prompt).map {
         case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
-          WordMappingPair(prompt.value,
-            WordMappingValueSet.createFromQuizItems(quizItems.toList, sep.toString))
+          WordMappingPair(
+              prompt.value,
+              WordMappingValueSet.createFromQuizItems(quizItems.toList, sep.toString))
     }.toStream
 
 }

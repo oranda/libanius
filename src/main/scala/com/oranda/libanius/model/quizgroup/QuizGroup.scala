@@ -221,7 +221,7 @@ object QuizGroup extends AppDependencyAccess {
   val levelsLens: Lens[QuizGroup, List[QuizGroupMemoryLevel]] = Lens.lensu(
     get = (_: QuizGroup).levels,
     set = (qGroup: QuizGroup,
-        qLevels: List[QuizGroupMemoryLevel]) => qGroup.copy(levels = qLevels))
+      qLevels: List[QuizGroupMemoryLevel]) => qGroup.copy(levels = qLevels))
 
   protected[quizgroup] def levelsListLens(memoryLevel: Int) =
     listNthPLens(memoryLevel) compose levelsLens.partial

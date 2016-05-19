@@ -56,8 +56,8 @@ object MyMemoryTranslate extends AppDependencyAccess {
 
     // Group by key so as to go from (key, value) to (key, values)
     val groupedMatches = matches.groupByOrdered(_._1).map {
-      case (key, valueSet) => SearchResult(header,
-          SearchResultPair(key, ValueSet(valueSet.map(_._2).toList)))
+      case (key, valueSet) =>
+        SearchResult(header, SearchResultPair(key, ValueSet(valueSet.map(_._2).toList)))
     }
     groupedMatches.filterNot(_.keyWordMatchesValue).toList
   }
@@ -72,8 +72,9 @@ object MyMemoryTranslate extends AppDependencyAccess {
     val restQuery = "http://api.mymemory.translated.net/get?" + queryArgs
     val translationRaw = Rest.query(restQuery)
     val matches = Try(findMatchesInJson(translationRaw)).recover {
-      case t: Throwable => l.logError(s"Could not parse JSON text: $translationRaw", t)
-          List[TranslationMatch]()
+      case t: Throwable =>
+        l.logError(s"Could not parse JSON text: $translationRaw", t)
+        List[TranslationMatch]()
     }.get
     // Filter on the quality of the match.
     matches.filter(_.matchWeight >= 0.5).map(trMatch => (trMatch.segment, trMatch.translation))

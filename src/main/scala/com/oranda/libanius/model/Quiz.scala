@@ -68,14 +68,18 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
   def resultsBeginningWith(input: String): List[SearchResult] =
     activeQuizGroups.flatMap {
-      case (header, quizGroup) => Dictionary.convertToSearchResults(
-          quizGroup.dictionary.mappingsForKeysBeginningWith(input), header)
+      case (header, quizGroup) =>
+        Dictionary.convertToSearchResults(
+            quizGroup.dictionary.mappingsForKeysBeginningWith(input),
+            header)
     }.toList
 
   def resultsContaining(input: String): List[SearchResult] =
     activeQuizGroups.flatMap {
-      case (header, quizGroup) => Dictionary.convertToSearchResults(
-        quizGroup.dictionary.mappingsForKeysContaining(input), header)
+      case (header, quizGroup) =>
+        Dictionary.convertToSearchResults(
+        quizGroup.dictionary.mappingsForKeysContaining(input),
+        header)
     }.toList
 
   def isCorrect(quizGroupHeader: QuizGroupHeader, prompt: String, userResponse: String):

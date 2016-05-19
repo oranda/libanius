@@ -165,7 +165,7 @@ object QuizGroupMemoryLevel extends AppDependencyAccess {
   val itemsLens: Lens[QuizGroupMemoryLevel, List[QuizItem]] = Lens.lensu(
     get = (_: QuizGroupMemoryLevel).quizItems,
     set = (qgp: QuizGroupMemoryLevel,
-           qItems: List[QuizItem]) => qgp.copy(quizItemStream = qItems.toStream))
+      qItems: List[QuizItem]) => qgp.copy(quizItemStream = qItems.toStream))
 
   val totalResponsesLimit = 10
 

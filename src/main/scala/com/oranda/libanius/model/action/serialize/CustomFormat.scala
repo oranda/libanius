@@ -127,7 +127,8 @@ object CustomFormatForModelComponents {
       str match {
         case "WordMapping" => WordMapping
         case "QuestionAndAnswer" => QuestionAndAnswer
-        case _ => l.logError(s"QuizGroupType $str not recognized")
+        case _ =>
+          l.logError(s"QuizGroupType $str not recognized")
           QuestionAndAnswer
       }
 
@@ -154,13 +155,15 @@ object CustomFormatForModelComponents {
 
     private def parseIsActive(str: String): Boolean =
       Try(StringUtil.parseValue(str, "isActive=\"", "\"").get.toBoolean).recover {
-        case e: Exception => l.logError(s"Could not parse isActive from $str")
+        case e: Exception =>
+          l.logError(s"Could not parse isActive from $str")
           false
       }.get
 
     private def parseCurrentPromptNumber(str: String): Int =
       Try(StringUtil.parseValue(str, "currentPromptNumber=\"", "\"").get.toInt).recover {
-        case e: Exception => l.logError(s"Could not parse prompt number from $str")
+        case e: Exception =>
+          l.logError(s"Could not parse prompt number from $str")
           0
       }.get
   }
@@ -397,8 +400,9 @@ object CustomFormatForModelComponents {
       def parseQuizItem(strPromptResponse: String): Option[QuizItem] = {
         Try(Some(customFormatQuizItem.from(strPromptResponse,
             Separator(fromParams.separator.toString)))).recover {
-          case e: Exception => l.logError("could not parse quiz item with text " +
-              s"$strPromptResponse using separator ${fromParams.separator.toString}")
+          case e: Exception =>
+            l.logError("could not parse quiz item with text " +
+                s"$strPromptResponse using separator ${fromParams.separator.toString}")
             None
         }.get
       }
@@ -464,7 +468,8 @@ object CustomFormatForModelComponents {
         }
 
         Try(parseCustomFormat) recover {
-          case e: Exception => l.logError(s"Could not parse dictionary: ${e.getMessage}", e)
+          case e: Exception =>
+            l.logError(s"Could not parse dictionary: ${e.getMessage}", e)
             None
         }
       }
