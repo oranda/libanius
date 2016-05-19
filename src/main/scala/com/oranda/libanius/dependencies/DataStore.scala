@@ -37,8 +37,9 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
     Try(Quiz.metadataFromCustomFormat(readRawMetadata)).recover {
       // for absent data files, security access exceptions or anything else unexpected
-      case e: Exception => l.log(s"Error reading quiz: ${e.getMessage}")
-                           Set[QuizGroupHeader]()
+      case e: Exception =>
+        l.log(s"Error reading quiz: ${e.getMessage}")
+        Set[QuizGroupHeader]()
     }.get
   }
 
@@ -67,9 +68,10 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     val dictFileName = header.makeDictFileName
     readDictionary(conf.filesDir + dictFileName) match {
       case Some(dictionary) => qg.updatedDictionary(dictionary)
-      case _ => l.logError(s"Could not find dictionary on filesystem for $header.toString, " +
-          "so creating dictionary from the quizGroup")
-          qg.updatedDictionary(Dictionary.fromQuizGroup(qg))
+      case _ =>
+        l.logError(s"Could not find dictionary on filesystem for $header.toString, " +
+            "so creating dictionary from the quizGroup")
+        qg.updatedDictionary(Dictionary.fromQuizGroup(qg))
     }
   }
 
