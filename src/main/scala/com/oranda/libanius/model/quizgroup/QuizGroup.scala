@@ -147,8 +147,11 @@ case class QuizGroup private(
   protected[model] def findValuesFor(prompt: String): List[String] =
     dictionary.findValuesFor(prompt).values.map(_.value)
 
-  def incrementResponsesCorrect(memoryLevel: Int) = incrementResponses(memoryLevel, true)
-  def incrementResponsesIncorrect(memoryLevel: Int) = incrementResponses(memoryLevel, false)
+  def incrementResponsesCorrect(memoryLevel: Int) =
+    incrementResponses(memoryLevel, isCorrect = true)
+
+  def incrementResponsesIncorrect(memoryLevel: Int) =
+    incrementResponses(memoryLevel, isCorrect = false)
 
   def incrementResponses(memoryLevel: Int, isCorrect: Boolean): QuizGroup =
     QuizGroup.levelsListLens(memoryLevel).mod((_: QuizGroupMemoryLevel).inc(isCorrect), this)
@@ -193,12 +196,12 @@ object QuizGroup extends AppDependencyAccess {
    * Form a QuizGroup from quiz items with no user responses.
    */
   def fromQuizItems(quizItems: Stream[QuizItem] = Stream.empty,
-      userData: QuizGroupUserData = QuizGroupUserData(true),
+      userData: QuizGroupUserData = QuizGroupUserData(isActive = true),
       dictionary: Dictionary = new Dictionary()): QuizGroup =
     QuizGroup(Map(0 -> QuizGroupMemoryLevel(0, 0, quizItems)), userData, dictionary)
 
   def apply(memLevelMap: Map[Int, QuizGroupMemoryLevel] = Map(),
-      userData: QuizGroupUserData = QuizGroupUserData(true),
+      userData: QuizGroupUserData = QuizGroupUserData(isActive = true),
       dictionary: Dictionary = new Dictionary()): QuizGroup =
     QuizGroup(toMemLevelList(memLevelMap), userData, dictionary)
 
