@@ -53,11 +53,11 @@ object TextValue {
 
   def hasSameStart(value: String, otherValue: String): Int => Boolean =
     (numOfLetters: Int) => otherValue != value &&
-        value.take(numOfLetters) == otherValue.take(numOfLetters)
+      value.take(numOfLetters) == otherValue.take(numOfLetters)
 
   def hasSameEnd(value: String, otherValue: String): Int => Boolean =
     (numOfLetters: Int) => otherValue != value &&
-        value.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
+      value.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
 
   // Forward calls to String where necessary.
   implicit def textValue2String(textValue: TextValue): String = textValue.value

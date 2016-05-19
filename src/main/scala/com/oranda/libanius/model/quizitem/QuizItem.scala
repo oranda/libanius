@@ -74,7 +74,7 @@ case class QuizItemConcrete(
 
   def isValid: Boolean =
     !prompt.isEmpty && !correctResponse.isEmpty &&
-        !(prompt.toLowerCase == correctResponse.toLowerCase)
+      !(prompt.toLowerCase == correctResponse.toLowerCase)
 
   def updatedWithUserResponse(
       response: TextValue,

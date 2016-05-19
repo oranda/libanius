@@ -49,13 +49,13 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
       quizGroupType: QuizGroupType): Option[QuizGroupHeader] = {
     val availableQuizGroups = findAvailableQuizGroups
     availableQuizGroups.find(qgh => qgh.promptType == promptType &&
-        qgh.responseType == responseType && qgh.quizGroupType == quizGroupType)
+      qgh.responseType == responseType && qgh.quizGroupType == quizGroupType)
   }
 
   def findQuizGroupHeader(promptType: String, responseType: String): Option[QuizGroupHeader] = {
     val availableQuizGroups = findAvailableQuizGroups
-    availableQuizGroups.find(qgh => qgh.promptType == promptType &&
-        qgh.responseType == responseType)
+    availableQuizGroups.find(qgh => qgh.promptType == promptType
+      && qgh.responseType == responseType)
   }
 
   def loadQuizGroup(header: QuizGroupHeader): QuizGroup = {

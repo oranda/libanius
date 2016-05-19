@@ -107,7 +107,7 @@ case class QuizGroup private(
    */
   protected[model] def findQuizItem(prompt: String, response: String): Option[QuizItem] =
     quizItems.find(quizItem => quizItem.prompt.matches(prompt) &&
-        quizItem.correctResponse.matches(response))
+      quizItem.correctResponse.matches(response))
 
   protected[model] def findQuizItem(prompt: String): Option[QuizItem] =
     quizItems.find(quizItem => quizItem.prompt.matches(prompt))
