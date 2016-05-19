@@ -38,7 +38,8 @@ case class UserResponsesAll(correctResponsesInARow: List[UserResponse] = Nil,
     else {
       // on an incorrect answer, old correct answers are discarded
       val ur = UserResponsesAll.userResponsesCorrectResponsesLens.set(this, Nil)
-      UserResponsesAll.userResponsesIncorrectResponsesLens.set(ur, userResponse :: incorrectResponses)
+      val newIncorrectResponses = userResponse :: incorrectResponses
+      UserResponsesAll.userResponsesIncorrectResponsesLens.set(ur, newIncorrectResponses)
     }
 
   /*
@@ -46,10 +47,12 @@ case class UserResponsesAll(correctResponsesInARow: List[UserResponse] = Nil,
    * (Intended to be called over many quiz items until one fits.)
    */
   protected[model] def isPresentable(currentPromptNum: Int, repetitionInterval: Int): Boolean =
-      wasNotTooRecentlyUsed(currentPromptNum, promptNumInMostRecentResponse, repetitionInterval)
+    wasNotTooRecentlyUsed(currentPromptNum, promptNumInMostRecentResponse, repetitionInterval)
 
-  def wasNotTooRecentlyUsed(currentPromptNum: Int,
-      promptNumInMostRecentResponse: Option[Int], repetitionInterval: Int) =
+  def wasNotTooRecentlyUsed(
+      currentPromptNum: Int,
+      promptNumInMostRecentResponse: Option[Int],
+      repetitionInterval: Int): Boolean =
     promptNumInMostRecentResponse.forall {
       case promptNumInMostRecentResponse =>
         val diffInPromptNum = currentPromptNum - promptNumInMostRecentResponse

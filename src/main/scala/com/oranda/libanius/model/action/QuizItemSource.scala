@@ -41,11 +41,13 @@ trait QuizItemSource[A <: ModelComponent, C] extends QuizItemSourceBase[A, NoPar
 // provides external access to the typeclass, forwarding the call to the appropriate type
 object QuizItemSource {
 
-  def produceQuizItem[A <: ModelComponent, B <: Params, C](component: A, params: B)
+  def produceQuizItem[A <: ModelComponent, B <: Params, C]
+      (component: A, params: B)
       (implicit qis: QuizItemSourceBase[A, B, C], c: C => QuizItem): Option[C] =
     qis.produceQuizItem(component, params)
 
-  def findAnyUnfinishedQuizItem[A <: ModelComponent, B <: Params, C](component: A, params: B)
+  def findAnyUnfinishedQuizItem[A <: ModelComponent, B <: Params, C]
+      (component: A, params: B)
       (implicit qis: QuizItemSourceBase[A, B, C], c: C => QuizItem): Option[C] =
     qis.findAnyUnfinishedQuizItem(component, params)
 }
@@ -58,8 +60,9 @@ object modelComponentsAsQuizItemSources extends AppDependencyAccess {
      * Find the first available "presentable" quiz item.
      * Return a quiz item view and the associated quiz group header.
      */
-    def produceQuizItem(quiz: Quiz, params: NoParams = NoParams()):
-        Option[QuizItemViewWithChoices] =
+    def produceQuizItem(
+        quiz: Quiz,
+        params: NoParams = NoParams()): Option[QuizItemViewWithChoices] =
       (for {
         (header, quizGroup) <- quiz.activeQuizGroups.toStream
         quizItem <- quizGroupAsSource.produceQuizItem(quizGroup).toStream
@@ -71,8 +74,9 @@ object modelComponentsAsQuizItemSources extends AppDependencyAccess {
      * normal criteria, because the last correct response was recent. However, they do need
      * to be presented in order for the quiz to finish, so this method is called as a last try.
      */
-    def findAnyUnfinishedQuizItem(quiz: Quiz, params: NoParams = NoParams()):
-        Option[QuizItemViewWithChoices] = {
+    def findAnyUnfinishedQuizItem(
+        quiz: Quiz,
+        params: NoParams = NoParams()): Option[QuizItemViewWithChoices] = {
       l.log("calling Quiz.findAnyUnfinishedQuizItem")
       (for {
         (header, quizGroup) <- quiz.activeQuizGroups
@@ -104,7 +108,7 @@ object modelComponentsAsQuizItemSources extends AppDependencyAccess {
   }
 
   implicit object quizGroupMemoryLevelAsSource
-      extends QuizItemSourceBase[QuizGroupMemoryLevel, CurrentPromptNumber, QuizItem] {
+    extends QuizItemSourceBase[QuizGroupMemoryLevel, CurrentPromptNumber, QuizItem] {
 
     def produceQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber):
         Option[QuizItem] =

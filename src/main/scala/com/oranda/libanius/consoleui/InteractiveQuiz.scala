@@ -35,8 +35,8 @@ import scalaz._
 
 trait InteractiveQuiz extends App with AppDependencyAccess {
 
-  def userQuizGroupSelection(quizGroupHeaders: List[QuizGroupHeader]):
-      Map[QuizGroupHeader, QuizGroup] = {
+  def userQuizGroupSelection(
+      quizGroupHeaders: List[QuizGroupHeader]): Map[QuizGroupHeader, QuizGroup] = {
     output("Choose quiz group(s). For more than one, separate with commas, e.g. 1,2,3")
     val choices = ChoiceGroup[QuizGroupHeader](quizGroupHeaders)
     choices.show()
@@ -81,8 +81,8 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
     output(s"Score: $formattedScore")
   }
 
-  def showQuizItemAndProcessResponse(quizItem: QuizItemViewWithChoices):
-      State[Quiz, UserConsoleResponse] = {
+  def showQuizItemAndProcessResponse(
+      quizItem: QuizItemViewWithChoices): State[Quiz, UserConsoleResponse] = {
     val wordText = s": what is the ${quizItem.responseType} for this ${quizItem.promptType}?"
     val wordTextToShow =
       if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else ""
@@ -96,8 +96,8 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
     else getTextResponseAndProcess(quizItem)
   }
 
-  def showChoicesAndProcessResponse(quizItem: QuizItemViewWithChoices):
-      State[Quiz, UserConsoleResponse] = {
+  def showChoicesAndProcessResponse(
+      quizItem: QuizItemViewWithChoices): State[Quiz, UserConsoleResponse] = {
     val choices = ChoiceGroup[String](quizItem.allChoices)
     choices.show()
 
@@ -123,8 +123,9 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
     })
   } yield userResponse
 
-  def processUserAnswer(quiz: Quiz, userResponse: String, quizItem: QuizItemViewWithChoices): Quiz = {
-
+  def processUserAnswer(
+      quiz: Quiz, userResponse: String,
+      quizItem: QuizItemViewWithChoices): Quiz = {
     val isCorrect = quiz.isCorrect(quizItem.quizGroupHeader, quizItem.prompt.value, userResponse)
     if (isCorrect) output("\nCorrect!\n")
     else output("\nWrong! It's " + quizItem.correctResponse + "\n")

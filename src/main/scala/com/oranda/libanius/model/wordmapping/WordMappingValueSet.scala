@@ -32,8 +32,7 @@ import com.oranda.libanius.model.action.serialize._
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
  */
-case class WordMappingValueSet(values: List[WordMappingValue] = Nil)
-    extends ModelComponent {
+case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends ModelComponent {
 
   def updated(values: List[WordMappingValue]) = WordMappingValueSet(values)
 
@@ -94,7 +93,7 @@ object WordMappingValueSetWrapperBase {
  * supports lazy initialization.
  */
 case class WordMappingValueSetLazyProxy(strValues: String, mainSeparator: String)
-    extends WordMappingValueSetWrapperBase {
+  extends WordMappingValueSetWrapperBase {
 
   lazy val wmvs: WordMappingValueSet = {
     implicit val separator = Separator(mainSeparator)
@@ -108,7 +107,7 @@ case class WordMappingValueSetLazyProxy(strValues: String, mainSeparator: String
  * wrapped in order to have a type compatible with the original WordMappingValueSetLazyProxy.
  */
 case class WordMappingValueSetWrapper(wmvs: WordMappingValueSet, mainSeparator: String)
-    extends WordMappingValueSetWrapperBase
+  extends WordMappingValueSetWrapperBase
 
 object WordMappingValueSetWrapper {
   def apply(values: List[String], mainSeparator: String): WordMappingValueSetWrapper = {

@@ -41,29 +41,37 @@ import com.oranda.libanius.model.UserResponse
  * (A ListMap was formerly used to store quiz items but this was found to be too
  * slow for bulk insert. Currently a Stream is used.)
  */
-case class QuizGroupMemoryLevel(correctResponsesInARow: Int, repetitionInterval: Int,
-    quizItemStream: Stream[QuizItem] = Stream.empty, totalResponses: Int = 0,
-    numCorrectResponses: Int = 0) extends ModelComponent {
+case class QuizGroupMemoryLevel(
+    correctResponsesInARow: Int,
+    repetitionInterval: Int,
+    quizItemStream: Stream[QuizItem] = Stream.empty,
+    totalResponses: Int = 0,
+    numCorrectResponses: Int = 0)
+  extends ModelComponent {
 
   lazy val quizItems = quizItemStream.toList
-
-  protected[model] def contains(quizItem: QuizItem): Boolean =
-      quizItems.exists(_.samePromptAndResponse(quizItem))
-  protected[model] def contains(prompt: TextValue): Boolean =
-      quizItems.exists(_.prompt == prompt)
-  protected[model] def contains(prompt: String): Boolean = contains(TextValue(prompt))
   protected[model] def numQuizItems = quizItems.size
   protected[model] def size = numQuizItems
   protected[model] def isEmpty = quizItems.isEmpty
   protected[model] def numPrompts = size
   protected[model] def numResponses = size
 
+  protected[model] def contains(quizItem: QuizItem): Boolean =
+      quizItems.exists(_.samePromptAndResponse(quizItem))
+  protected[model] def contains(prompt: TextValue): Boolean =
+      quizItems.exists(_.prompt == prompt)
+  protected[model] def contains(prompt: String): Boolean = contains(TextValue(prompt))
+
+
   protected[model] def updatedQuizItems(newQuizItems: List[QuizItem]): QuizGroupMemoryLevel =
     QuizGroupMemoryLevel.itemsLens.set(this, newQuizItems)
 
-  protected[model] def updatedWithUserAnswer(prompt: TextValue, response: TextValue,
-      wasCorrect: Boolean, userResponses: UserResponsesAll, userAnswer: UserResponse):
-      QuizGroupMemoryLevel = {
+  protected[model] def updatedWithUserAnswer(
+      prompt: TextValue,
+      response: TextValue,
+      wasCorrect: Boolean,
+      userResponses: UserResponsesAll,
+      userAnswer: UserResponse): QuizGroupMemoryLevel = {
     val userResponseUpdated = userResponses.add(userAnswer, wasCorrect)
     this + QuizItem(prompt, response, userResponseUpdated)
   }

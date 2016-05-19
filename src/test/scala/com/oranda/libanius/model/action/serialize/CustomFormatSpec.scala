@@ -39,36 +39,38 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
   val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponsesAll)
   val quizItemCustomFormat = "solve|nachlösen|9,7;6"
 
+  def strBuilder = new StringBuilder
+
   "the custom-format functionality " should {
 
     "serialize a word mapping value" in {
-      val customFormat = serialize(wmv, new StringBuilder, paramsWithSeparator).toString
+      val customFormat = serialize(wmv, strBuilder, paramsWithSeparator).toString
       customFormat mustEqual wmvCustomFormat
     }
 
     "serialize a word mapping value set" in {
-      val customFormat = serialize(wmvs, new StringBuilder, paramsWithSeparator)
+      val customFormat = serialize(wmvs, strBuilder, paramsWithSeparator)
       customFormat.toString mustEqual wmvsCustomFormat
     }
 
     "serialize a quiz item" in {
-      val customFormat = serialize(quizItem, new StringBuilder, paramsWithSeparator)
+      val customFormat = serialize(quizItem, strBuilder, paramsWithSeparator)
       customFormat.toString mustEqual quizItemCustomFormat
     }
 
     "serialize a quiz group memory level" in {
-      val customFormat = serialize(qgMemLevelSimple, new StringBuilder, paramsWithSeparatorAndIndex)
+      val customFormat = serialize(qgMemLevelSimple, strBuilder, paramsWithSeparatorAndIndex)
       val qgpHeader = "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n"
       customFormat.toString mustEqual qgpHeader + qgMemLevelSimpleCustomFormat
     }
 
     "serialize a quiz group" in {
-      val customFormat = serialize(qgWithHeader.quizGroup, new StringBuilder, paramsWithSeparator)
+      val customFormat = serialize(qgWithHeader.quizGroup, strBuilder, paramsWithSeparator)
       customFormat.toString mustEqual qgBodyCustomFormat
     }
 
     "serialize a quiz group with header" in {
-      val customFormat = serialize(qgWithHeader, new StringBuilder, paramsDefault)
+      val customFormat = serialize(qgWithHeader, strBuilder, paramsDefault)
       customFormat.toString mustEqual qgwhCustomFormat
     }
 

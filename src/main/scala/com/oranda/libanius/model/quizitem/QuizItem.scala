@@ -37,8 +37,10 @@ sealed trait QuizItem extends ModelComponent {
 
   def isValid: Boolean
 
-  def updatedWithUserResponse(response: TextValue, wasCorrect: Boolean,
-                              userResponse: UserResponse): QuizItem
+  def updatedWithUserResponse(
+      response: TextValue,
+      wasCorrect: Boolean,
+      userResponse: UserResponse): QuizItem
 }
 
 /*
@@ -52,7 +54,9 @@ sealed trait QuizItem extends ModelComponent {
  *  1. a QuizItem for a word and a translation
  *  2. a QuizItem for a question and an answer
  */
-case class QuizItemConcrete(prompt: TextValue, correctResponse: TextValue,
+case class QuizItemConcrete(
+    prompt: TextValue,
+    correctResponse: TextValue,
     userResponses: UserResponsesAll = new UserResponsesAll())
   extends QuizItem {
 
@@ -72,7 +76,9 @@ case class QuizItemConcrete(prompt: TextValue, correctResponse: TextValue,
     !prompt.isEmpty && !correctResponse.isEmpty &&
         !(prompt.toLowerCase == correctResponse.toLowerCase)
 
-  def updatedWithUserResponse(response: TextValue, wasCorrect: Boolean,
+  def updatedWithUserResponse(
+      response: TextValue,
+      wasCorrect: Boolean,
       userResponse: UserResponse): QuizItem = {
     val userResponsesUpdated = userResponses.add(userResponse, wasCorrect)
     QuizItemConcrete(prompt, response, userResponsesUpdated)
@@ -84,7 +90,9 @@ case class QuizItemConcrete(prompt: TextValue, correctResponse: TextValue,
  */
 object QuizItem {
 
-  def apply(prompt: TextValue, response: TextValue,
+  def apply(
+      prompt: TextValue,
+      response: TextValue,
       userResponses: UserResponsesAll = new UserResponsesAll()): QuizItem =
     QuizItemConcrete(prompt, response, userResponses)
 
@@ -94,7 +102,10 @@ object QuizItem {
   def apply(prompt: String, response: String, userResponses: UserResponsesAll): QuizItem =
     QuizItemConcrete(TextValue(prompt), TextValue(response), userResponses)
 
-  def apply(prompt: String, response: String, correctResponses: List[Int],
+  def apply(
+      prompt: String,
+      response: String,
+      correctResponses: List[Int],
       incorrectResponses: List[Int]): QuizItem =
     QuizItemConcrete(TextValue(prompt), TextValue(response),
         new UserResponsesAll(correctResponses.map(UserResponse),

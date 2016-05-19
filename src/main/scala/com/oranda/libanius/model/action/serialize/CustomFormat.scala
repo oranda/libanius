@@ -63,12 +63,17 @@ case class SeparatorAndIndex(mainSeparator: String, index: Int) extends ToParams
   def withoutIndex = Separator(mainSeparator)
 }
 
-case class SeparatorIndexAndRepetitionInterval(separator: Separator, index: Int,
+case class SeparatorIndexAndRepetitionInterval(
+    separator: Separator,
+    index: Int,
     repetitionInterval: Int)
   extends FromParams
 
 object SeparatorIndexAndRepetitionInterval {
-  def apply(separator: String, index: Int, repetitionInterval: Int): SeparatorIndexAndRepetitionInterval =
+  def apply(
+      separator: String,
+      index: Int,
+      repetitionInterval: Int): SeparatorIndexAndRepetitionInterval =
     SeparatorIndexAndRepetitionInterval(Separator(separator), index, repetitionInterval)
 }
 
@@ -76,20 +81,24 @@ object SeparatorIndexAndRepetitionInterval {
 // provides external access to the typeclass, forwarding the call to the appropriate type
 object CustomFormat {
 
-  def serialize[A <: ModelComponent, B <: ToParams](component: A,
-      strBuilder: StringBuilder, params: B)
+  def serialize[A <: ModelComponent, B <: ToParams](
+      component: A,
+      strBuilder: StringBuilder,
+      params: B)
       (implicit customFormat: ToCustomFormat[A, B]): StringBuilder =
     customFormat.to(component, strBuilder, params)
 
-  def deserialize[A <: ModelComponent, B <: FromParams](str: String,
-      fromParams: B)(implicit customFormat: FromCustomFormat[A, B]): A =
+  def deserialize[A <: ModelComponent, B <: FromParams](
+      str: String,
+      fromParams: B)
+      (implicit customFormat: FromCustomFormat[A, B]): A =
     customFormat.from(str, fromParams)
 }
 
 object CustomFormatForModelComponents {
 
   implicit object customFormatQuizGroupHeader
-      extends CustomFormat[QuizGroupHeader, NoParams, NoParams] with AppDependencyAccess {
+    extends CustomFormat[QuizGroupHeader, NoParams, NoParams] with AppDependencyAccess {
 
     /**
      * StringBuilder holds mutable state, but the serialization needs to be
@@ -104,8 +113,11 @@ object CustomFormatForModelComponents {
           append("\"")
 
     def from(str: String, params: NoParams) =
-      QuizGroupHeader(parseQuizGroupType(str), parsePromptType(str),
-          parseResponseType(str), Separator(parseMainSeparator(str)),
+      QuizGroupHeader(
+          parseQuizGroupType(str),
+          parsePromptType(str),
+          parseResponseType(str),
+          Separator(parseMainSeparator(str)),
           parseUseMultipleChoiceUntil(str))
 
     private def parseQuizGroupType(str: String): QuizGroupType =
@@ -154,7 +166,8 @@ object CustomFormatForModelComponents {
   }
 
   implicit object customFormatQuizGroupWithHeader
-      extends CustomFormat[QuizGroupWithHeader, NoParams, Separator] {
+    extends CustomFormat[QuizGroupWithHeader, NoParams, Separator] {
+
     /*
      * Example of custom format:
      *
@@ -162,8 +175,10 @@ object CustomFormatForModelComponents {
      *    against|wider
      *    entertain|unterhalten
      */
-    def to(qgwh: QuizGroupWithHeader, strBuilder: StringBuilder, extraParams: NoParams):
-        StringBuilder = {
+    def to(
+        qgwh: QuizGroupWithHeader,
+        strBuilder: StringBuilder,
+        extraParams: NoParams): StringBuilder = {
       customFormatQuizGroupHeader.to(qgwh.header, strBuilder, extraParams)
       customFormatQuizGroupUserData.to(qgwh.quizGroup.userData, strBuilder, extraParams)
       strBuilder.append('\n')
@@ -181,8 +196,7 @@ object CustomFormatForModelComponents {
 
   implicit object customFormatQuizItem
       extends CustomFormat[QuizItem, Separator, Separator] {
-    def to(qi: QuizItem, strBuilder: StringBuilder, extraParams: Separator):
-        StringBuilder = {
+    def to(qi: QuizItem, strBuilder: StringBuilder, extraParams: Separator): StringBuilder = {
       strBuilder.append(qi.prompt).append(extraParams.mainSeparator).
           append(qi.correctResponse).append(extraParams.mainSeparator)
       customFormatUserResponses.to(qi.userResponses, strBuilder, NoParams())
@@ -202,9 +216,12 @@ object CustomFormatForModelComponents {
 
   // Example: contract:696,697;698/treaty:796;798
   implicit object customFormatWordMappingValueSet
-      extends CustomFormat[WordMappingValueSet, Separator, Separator]
-      with AppDependencyAccess {
-    def to(wmvs: WordMappingValueSet, strBuilder: StringBuilder,
+    extends CustomFormat[WordMappingValueSet, Separator, Separator]
+    with AppDependencyAccess {
+
+    def to(
+        wmvs: WordMappingValueSet,
+        strBuilder: StringBuilder,
         extraParams: Separator): StringBuilder = {
       def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue):
           StringBuilder =
@@ -216,8 +233,8 @@ object CustomFormatForModelComponents {
     // Example: contract:696,697;698/treaty:796;798
     def from(str: String, fromParams: Separator): WordMappingValueSet = {
       val values = new ListBuffer[WordMappingValue]()
-
       val wmvsSplitter = stringSplitterFactory.getSplitter('/')
+
       def parseFromCustomFormat(): Unit = {
         wmvsSplitter.setString(str)
         while (wmvsSplitter.hasNext) {
@@ -234,9 +251,12 @@ object CustomFormatForModelComponents {
 
   // Example: nachlösen:1,7,9;6
   implicit object customFormatWordMappingValue
-      extends CustomFormat[WordMappingValue, Separator, Separator]
-      with AppDependencyAccess {
-    def to(wmv: WordMappingValue, strBuilder: StringBuilder,
+    extends CustomFormat[WordMappingValue, Separator, Separator]
+    with AppDependencyAccess {
+
+    def to(
+        wmv: WordMappingValue,
+        strBuilder: StringBuilder,
         extraParams: Separator): StringBuilder = {
       strBuilder.append(wmv.value)
 
@@ -293,15 +313,17 @@ object CustomFormatForModelComponents {
 
   // Example: 1,7,9;6
   implicit object customFormatUserResponses
-      extends CustomFormat[UserResponsesAll, NoParams, Separator] {
+    extends CustomFormat[UserResponsesAll, NoParams, Separator] {
 
     def from(str: String, fromParams: Separator): UserResponsesAll = {
       val wmv = customFormatWordMappingValue.from(str, fromParams)
       UserResponsesAll(wmv.correctAnswersInARow, wmv.incorrectAnswers)
     }
 
-    def to(ur: UserResponsesAll, strBuilder: StringBuilder, extraParams: NoParams):
-        StringBuilder = {
+    def to(
+        ur: UserResponsesAll,
+        strBuilder: StringBuilder,
+        extraParams: NoParams): StringBuilder = {
       if (ur.correctResponsesInARow.nonEmpty)
         StringUtil.mkString(strBuilder, ur.correctResponsesInARow, ur.responsePromptNumber, ',')
       if (ur.incorrectResponses.nonEmpty) {
@@ -312,11 +334,9 @@ object CustomFormatForModelComponents {
     }
   }
 
-  implicit object customFormatQuizGroup
-      extends CustomFormat[QuizGroup, Separator, Separator] {
+  implicit object customFormatQuizGroup extends CustomFormat[QuizGroup, Separator, Separator] {
 
-    def to(qg: QuizGroup, strBuilder: StringBuilder, extraParams: Separator):
-        StringBuilder = {
+    def to(qg: QuizGroup, strBuilder: StringBuilder, extraParams: Separator): StringBuilder = {
       for (memLevel <- qg.levels.zipWithIndex.toStream)
         customFormatQuizGroupMemoryLevel.to(memLevel._1, strBuilder,
             extraParams.withIndex(memLevel._2))
@@ -352,8 +372,9 @@ object CustomFormatForModelComponents {
   }
 
   implicit object customFormatQuizGroupMemoryLevel
-      extends CustomFormat[QuizGroupMemoryLevel, SeparatorAndIndex, SeparatorIndexAndRepetitionInterval]
-      with AppDependencyAccess {
+    extends CustomFormat[QuizGroupMemoryLevel, SeparatorAndIndex, SeparatorIndexAndRepetitionInterval]
+    with AppDependencyAccess {
+
     def to(qgml: QuizGroupMemoryLevel, strBuilder: StringBuilder,
         extraParams: SeparatorAndIndex) = {
       strBuilder.append("#quizGroupPartition numCorrectResponsesInARow=\"" +
@@ -369,8 +390,9 @@ object CustomFormatForModelComponents {
     /*
      * Text does not include header line
      */
-    def from(text: String, fromParams: SeparatorIndexAndRepetitionInterval):
-        QuizGroupMemoryLevel = {
+    def from(
+        text: String,
+        fromParams: SeparatorIndexAndRepetitionInterval): QuizGroupMemoryLevel = {
 
       def parseQuizItem(strPromptResponse: String): Option[QuizItem] = {
         Try(Some(customFormatQuizItem.from(strPromptResponse,
@@ -399,8 +421,7 @@ object CustomFormatForModelComponents {
     }
   }
 
-  implicit object customFormatDictionary
-      extends CustomFormat[Dictionary, Separator, NoParams] {
+  implicit object customFormatDictionary extends CustomFormat[Dictionary, Separator, NoParams] {
 
     /*
      * Currently, dictionaries are written by external scripts, and are read-only within
@@ -450,8 +471,8 @@ object CustomFormatForModelComponents {
     }
 
   implicit object customFormatWordMappingGroup
-      extends CustomFormat[WordMappingGroup, Separator, Separator]
-      with AppDependencyAccess {
+    extends CustomFormat[WordMappingGroup, Separator, Separator]
+    with AppDependencyAccess {
 
     /*
      * Not used, as WordMappingGroup is only used within Dictionary, which is not written to.

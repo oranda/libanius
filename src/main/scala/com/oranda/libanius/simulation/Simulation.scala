@@ -105,11 +105,15 @@ trait Simulation {
   }
 
   // For now, just return the correct Answer
-  protected def makeResponse(quizItem: QuizItemViewWithChoices, quiz: Quiz,
+  protected def makeResponse(
+      quizItem: QuizItemViewWithChoices,
+      quiz: Quiz,
       responsesProcessed: Long): String =
     quizItem.correctResponse.value
 
-  private def processUserResponse(quiz: Quiz, userResponseTxt: String,
+  private def processUserResponse(
+      quiz: Quiz,
+      userResponseTxt: String,
       quizItem: QuizItemViewWithChoices): Quiz = {
     val correctAnswer = quizItem.correctResponse
     val isCorrect = correctAnswer.looselyMatches(userResponseTxt)
@@ -146,8 +150,11 @@ abstract class Problem {
 }
 
 object Problem {
-  def find(quiz: Quiz, timeTakenToFindItem: Long, quizItem: QuizItemViewWithChoices,
-      lastQuizItem: Option[QuizItemViewWithChoices], responsesProcessed: Long): Option[Problem] =
+  def find(
+      quiz: Quiz, timeTakenToFindItem: Long,
+      quizItem: QuizItemViewWithChoices,
+      lastQuizItem: Option[QuizItemViewWithChoices],
+      responsesProcessed: Long): Option[Problem] =
     TimeTooLong(quizItem, timeTakenToFindItem, responsesProcessed).retrieve.orElse(
         QuizItemRepeated(quiz, quizItem, lastQuizItem).retrieve).orElse(
         MultipleCorrectChoices(quiz, quizItem).retrieve)
@@ -174,8 +181,11 @@ case class MultipleCorrectChoices(quiz: Quiz, quizItem: QuizItemViewWithChoices)
     s"for ${quizItem.prompt} there were multiple correct choices: ${correctChoices.mkString(", ")}"
 }
 
-case class QuizItemRepeated(quiz: Quiz, quizItem: QuizItemViewWithChoices,
-    lastQuizItem: Option[QuizItemViewWithChoices]) extends Problem {
+case class QuizItemRepeated(
+    quiz: Quiz,
+    quizItem: QuizItemViewWithChoices,
+    lastQuizItem: Option[QuizItemViewWithChoices])
+  extends Problem {
 
   def exists: Boolean =
     !quiz.nearTheEnd && lastQuizItem.exists(_.quizItem.samePromptAndResponse(quizItem.quizItem))

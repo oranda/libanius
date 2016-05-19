@@ -30,32 +30,46 @@ import com.oranda.libanius.util.Util
  * Type class definition for finding quiz items in model entities.
  */
 trait ConstructWrongChoices[A <: ModelComponent] {
-  def constructWrongChoicesSimilar(component: A, itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int, correctResponses: List[String],
+  def constructWrongChoicesSimilar(
+      component: A,
+      itemCorrect: QuizItem,
+      numWrongChoicesRequired: Int,
+      correctResponses: List[String],
       similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String]
 
-  def constructWrongChoicesRandom(component: A, itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int, correctResponses: List[String]): List[String]
+  def constructWrongChoicesRandom(
+      component: A,
+      itemCorrect: QuizItem,
+      numWrongChoicesRequired: Int,
+      correctResponses: List[String]): List[String]
 }
 
 // provides external access to the typeclass
 object ConstructWrongChoices extends AppDependencyAccess {
 
-  def constructWrongChoicesSimilar[A <: ModelComponent](component: A,
-      itemCorrect: QuizItem, numWrongChoicesRequired: Int, correctResponses: List[String],
+  def constructWrongChoicesSimilar[A <: ModelComponent](
+      component: A,
+      itemCorrect: QuizItem,
+      numWrongChoicesRequired: Int,
+      correctResponses: List[String],
       similarityPredicate: (TextValue, TextValue) => Int => Boolean)
       (implicit cwc: ConstructWrongChoices[A]): List[String] =
     cwc.constructWrongChoicesSimilar(component, itemCorrect, numWrongChoicesRequired,
         correctResponses, similarityPredicate)
 
-  def constructWrongChoicesRandom[A <: ModelComponent](component: A,
-      itemCorrect: QuizItem, numWrongChoicesRequired: Int, correctResponses: List[String])
+  def constructWrongChoicesRandom[A <: ModelComponent](
+      component: A,
+      itemCorrect: QuizItem,
+      numWrongChoicesRequired: Int,
+      correctResponses: List[String])
       (implicit cwc: ConstructWrongChoices[A]): List[String] =
     cwc.constructWrongChoicesRandom(component, itemCorrect, numWrongChoicesRequired,
         correctResponses)
 
 
-  protected[model] def execute(quizGroup: QuizGroup, itemCorrect: QuizItem,
+  protected[model] def execute(
+      quizGroup: QuizGroup,
+      itemCorrect: QuizItem,
       numWrongChoicesRequired: Int = 2): List[String] = {
 
     val correctResponses = Util.stopwatch(
@@ -94,15 +108,21 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
      * If the user has already been having success with this item, first try to
      * find responses that look similar to the correct one.
      */
-    def constructWrongChoicesSimilar(quizGroup: QuizGroup, itemCorrect: QuizItem,
-        numWrongChoicesRequired: Int, correctResponses: List[String],
+    def constructWrongChoicesSimilar(
+        quizGroup: QuizGroup,
+        itemCorrect: QuizItem,
+        numWrongChoicesRequired: Int,
+        correctResponses: List[String],
         similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String] =
       if (itemCorrect.numCorrectResponsesInARow == 0) Nil
       else quizGroup.levels.flatMap(cwcQuizGroupMemoryLevel.constructWrongChoicesSimilar(
           _, itemCorrect, numWrongChoicesRequired, correctResponses, similarityPredicate))
 
-    def constructWrongChoicesRandom(quizGroup: QuizGroup, itemCorrect: QuizItem,
-        numWrongChoicesRequired: Int, correctResponses: List[String]): List[String] =
+    def constructWrongChoicesRandom(
+        quizGroup: QuizGroup,
+        itemCorrect: QuizItem,
+        numWrongChoicesRequired: Int,
+        correctResponses: List[String]): List[String] =
       quizGroup.levels.filterNot(_.isEmpty).flatMap(
         cwcQuizGroupMemoryLevel.constructWrongChoicesRandom(_, itemCorrect,
               numWrongChoicesRequired, correctResponses))
@@ -110,8 +130,11 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
 
   implicit object cwcQuizGroupMemoryLevel extends ConstructWrongChoices[QuizGroupMemoryLevel] {
 
-    def constructWrongChoicesSimilar(qgml: QuizGroupMemoryLevel, itemCorrect: QuizItem,
-        numWrongResponsesRequired: Int, correctResponses: List[String],
+    def constructWrongChoicesSimilar(
+        qgml: QuizGroupMemoryLevel,
+        itemCorrect: QuizItem,
+        numWrongResponsesRequired: Int,
+        correctResponses: List[String],
         similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String] = {
 
       var similarWords = new HashSet[String]
@@ -133,8 +156,11 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
       similarWords.toList
     }
 
-    def constructWrongChoicesRandom(qgml: QuizGroupMemoryLevel, itemCorrect: QuizItem,
-        numWrongChoicesRequired: Int, correctResponses: List[String]): List[String] = {
+    def constructWrongChoicesRandom(
+        qgml: QuizGroupMemoryLevel,
+        itemCorrect: QuizItem,
+        numWrongChoicesRequired: Int,
+        correctResponses: List[String]): List[String] = {
 
       def randomFalseWordValue(sliceIndex: Int): Option[String] = {
         val sliceSize = (qgml.numQuizItems / numWrongChoicesRequired)

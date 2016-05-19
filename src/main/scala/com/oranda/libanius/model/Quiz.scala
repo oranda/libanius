@@ -39,7 +39,7 @@ import com.oranda.libanius.net.providers.MyMemoryTranslate
 import scala.util.Try
 
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
-    extends ModelComponent {
+  extends ModelComponent {
 
   def hasQuizGroup(header: QuizGroupHeader): Boolean = quizGroups.contains(header)
   def isActive(header: QuizGroupHeader): Boolean = quizGroups.get(header).exists(_.isActive)

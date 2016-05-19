@@ -46,7 +46,9 @@ case class QuizItemViewWithChoices(
 
   def isComplete = numCorrectResponsesInARow >= numCorrectResponsesRequired
 
-  def choicesInRandomOrder(quizValue: UserResponsesAll, otherChoices: List[String]): List[String] = {
+  def choicesInRandomOrder(
+      quizValue: UserResponsesAll,
+      otherChoices: List[String]): List[String] = {
     val allChoices = quizItem.correctResponse.value :: otherChoices
     Random.shuffle(allChoices)
   }

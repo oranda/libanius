@@ -27,7 +27,7 @@ import com.oranda.libanius.model.ModelComponent
 import com.oranda.libanius.model.action.serialize._
 
 case class QuizGroupUserData(isActive: Boolean = false, currentPromptNumber: Int = 0)
-    extends ModelComponent
+  extends ModelComponent
 
 object QuizGroupUserData extends AppDependencyAccess {
 

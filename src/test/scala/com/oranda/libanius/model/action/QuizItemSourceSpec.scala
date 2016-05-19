@@ -113,14 +113,14 @@ object QuizItemSourceSpec {
   }
 
 
-  def pullQuizItemAndAnswerCorrectly(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int):
-      QuizGroupMemoryLevel = {
+  def pullQuizItemAndAnswerCorrectly(
+      qgml: QuizGroupMemoryLevel,
+      currentPromptNumber: Int): QuizGroupMemoryLevel = {
     val quizItem = produceQuizItem(qgml, CurrentPromptNumber(currentPromptNumber)).get
     updateWithUserAnswer(qgml, quizItem, currentPromptNumber)
   }
 
   def pullQuizItemAndAnswerCorrectly(qgwh: QuizGroupWithHeader): QuizGroupWithHeader = {
-
     val quizItem = produceQuizItem(qgwh.quizGroup, NoParams()).get
     QuizGroupWithHeader(qgwh.header, updatedWithUserResponse(qgwh.quizGroup, quizItem))
   }
@@ -137,7 +137,9 @@ object QuizItemSourceSpec {
   }
 
   // updatedWithUserResponse for QuizGroupMemoryLevel
-  def updateWithUserAnswer(qgml: QuizGroupMemoryLevel, quizItem: QuizItem,
+  def updateWithUserAnswer(
+      qgml: QuizGroupMemoryLevel,
+      quizItem: QuizItem,
       currentPromptNumber: Int): QuizGroupMemoryLevel = {
     val userAnswer = new UserResponse(currentPromptNumber)
     qgml.updatedWithUserAnswer(quizItem.prompt, quizItem.correctResponse, wasCorrect = true,

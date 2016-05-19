@@ -30,13 +30,14 @@ abstract class Logger extends AppDependencyAccess {
     if (conf.enableLogging)
       logImpl(message, module, t)
 
-
   def logImpl(message: String, module: String = "Libanius", t: Option[Throwable] = None)
 }
 
 class LoggerDefault extends Logger {
-  override def logImpl(message: String, module: String = "Libanius", t: Option[Throwable] = None):
-      Unit = {
+  override def logImpl(
+      message: String,
+      module: String = "Libanius",
+      t: Option[Throwable] = None): Unit = {
     println(s"$module: $message")
     t.foreach(_.printStackTrace())
   }

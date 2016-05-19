@@ -44,8 +44,8 @@ object RunDictionary extends App with AppDependencyAccess {
     serveUserRequest(quiz)
   }
 
-  private[this] def userQuizGroupSelection(quizGroupHeaders: List[QuizGroupHeader]):
-      Map[QuizGroupHeader, QuizGroup] = {
+  private[this] def userQuizGroupSelection(
+      quizGroupHeaders: List[QuizGroupHeader]): Map[QuizGroupHeader, QuizGroup] = {
     output("Choose quiz group(s). For more than one, separate with commas, e.g. 1,2,3")
     val choices = ChoiceGroup[QuizGroupHeader](quizGroupHeaders)
     choices.show()

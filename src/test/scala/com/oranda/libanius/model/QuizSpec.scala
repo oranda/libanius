@@ -108,7 +108,10 @@ class QuizSpec extends Specification with AppDependencyAccess {
       def quizItemFor(prompt: String) = quizUpdated.findQuizItem(qgHeader, prompt).get
 
       quizPrompts.foreach { quizPrompt =>
-        quizUpdated = quizUpdated.updateWithUserResponse(wasCorrect, qgHeader, quizItemFor(quizPrompt))
+        quizUpdated = quizUpdated.updateWithUserResponse(
+          wasCorrect,
+          qgHeader,
+          quizItemFor(quizPrompt))
       }
       quizUpdated
     }
@@ -123,20 +126,32 @@ class QuizSpec extends Specification with AppDependencyAccess {
 
       demoQuizWith1stMemoryLevelIntervalOf5.memoryLevelInterval(qghEngGer, 1) mustEqual 5
 
-      val quizUpdated1 = updateWithResponsesFor(demoQuizWith1stMemoryLevelIntervalOf5,
-          wasCorrect = true, qghEngGer, quizPromptsFor11Items)
-      val quizUpdated2 = updateWithResponsesFor(quizUpdated1,
-          wasCorrect = false, qghEngGer, quizPromptsFor11Items)
+      val quizUpdated1 = updateWithResponsesFor(
+        demoQuizWith1stMemoryLevelIntervalOf5,
+        wasCorrect = true,
+        qghEngGer,
+        quizPromptsFor11Items)
+      val quizUpdated2 = updateWithResponsesFor(
+        quizUpdated1,
+        wasCorrect = false,
+        qghEngGer,
+        quizPromptsFor11Items)
       quizUpdated2.memoryLevelInterval(qghEngGer, 1) mustEqual 4
     }
 
     "widen a repetition interval after good user performance" in {
       demoQuizWith1stMemoryLevelIntervalOf5.memoryLevelInterval(qghEngGer, 1) mustEqual 5
 
-      val quizUpdated1 = updateWithResponsesFor(demoQuizWith1stMemoryLevelIntervalOf5,
-          wasCorrect = true, qghEngGer, quizPromptsFor11Items)
-      val quizUpdated2 = updateWithResponsesFor(quizUpdated1,
-          wasCorrect = true, qghEngGer, quizPromptsFor11Items)
+      val quizUpdated1 = updateWithResponsesFor(
+        demoQuizWith1stMemoryLevelIntervalOf5,
+        wasCorrect = true,
+        qghEngGer,
+        quizPromptsFor11Items)
+      val quizUpdated2 = updateWithResponsesFor(
+        quizUpdated1,
+        wasCorrect = true,
+        qghEngGer,
+        quizPromptsFor11Items)
       quizUpdated2.memoryLevelInterval(qghEngGer, 1) mustEqual 6
     }
   }

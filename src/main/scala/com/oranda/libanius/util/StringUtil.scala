@@ -24,7 +24,6 @@ import java.lang.StringBuilder
 object StringUtil {
     
   def parseValue(str: String, beginStr: String, endStr: String): Option[String] = {
-
     val beginIndex = str.optionalIndex(beginStr)
     beginIndex.flatMap { case beginIndex =>
       val beginTextIndex: Int = beginIndex + beginStr.length

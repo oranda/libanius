@@ -108,10 +108,9 @@ object MyMemoryTranslate extends AppDependencyAccess {
     case "Spanish word" => "spa"
   }
 
-  private[this] def mmCode(promptType: String, responseType: String): Option[String] = {
+  private[this] def mmCode(promptType: String, responseType: String): Option[String] =
     if (mmCode.isDefinedAt(promptType) && mmCode.isDefinedAt(responseType))
       Some(mmCode.apply(promptType) + "|" + mmCode.apply(responseType))
     else
       None
-  }
 }

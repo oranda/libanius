@@ -34,7 +34,7 @@ import scala.util.Try
  */
 trait AppDependencyAccess {
 
-  def companion[T](name : String)(implicit man: Manifest[T]) : Try[T] =
+  def companion[T](name : String)(implicit man: Manifest[T]): Try[T] =
     Try(Class.forName(name + "$").getField("MODULE$").get(man.runtimeClass).asInstanceOf[T])
 
   val fqcnDependenciesOverride = "com.oranda.libanius.dependencies.AppDependenciesOverride"

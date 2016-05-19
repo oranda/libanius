@@ -36,9 +36,11 @@ object TestData {
 
   // word-mapping value set
   val wmvsCustomFormat = "contract|698,696;697/treaty|796;798"
-  val wmvs: WordMappingValueSet = WordMappingValueSet(List(
-        WordMappingValue("contract",
-        List(UserResponse(698), UserResponse(696)), List(UserResponse(697))),
+  val wmvs: WordMappingValueSet = WordMappingValueSet(
+    List(
+      WordMappingValue("contract",
+      List(
+        UserResponse(698), UserResponse(696)), List(UserResponse(697))),
         WordMappingValue("treaty",
         List(UserResponse(796)), List(UserResponse(798)))
   ))
@@ -53,23 +55,29 @@ object TestData {
   /*
    * Construct a quiz group partition.
    */
-  def makeQgMemLevel: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, 0, List(
-      QuizItem("against", "wider"),
-      QuizItem("entertain", "unterhalten"),
-      QuizItem("teach", "unterrichten"),
-      QuizItem("winner", "Siegerin"),
-      QuizItem("en route", "unterwegs"),
-      QuizItem("full", "satt"),
-      QuizItem("full", "voll"),
-      QuizItem("interrupted", "unterbrochen"),
-      QuizItem("contract", "Vertrag"),
-      QuizItem("rides", "reitet"),
-      QuizItem("on", "auf"),
-      QuizItem("sweeps", "streicht")).toStream)
+  def makeQgMemLevel: QuizGroupMemoryLevel =
+    QuizGroupMemoryLevel(
+      0,
+      0,
+      List(
+        QuizItem("against", "wider"),
+        QuizItem("entertain", "unterhalten"),
+        QuizItem("teach", "unterrichten"),
+        QuizItem("winner", "Siegerin"),
+        QuizItem("en route", "unterwegs"),
+        QuizItem("full", "satt"),
+        QuizItem("full", "voll"),
+        QuizItem("interrupted", "unterbrochen"),
+        QuizItem("contract", "Vertrag"),
+        QuizItem("rides", "reitet"),
+        QuizItem("on", "auf"),
+        QuizItem("sweeps", "streicht")).toStream)
 
-  def makeQgMemLevelSimple: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, 0, List(
-      QuizItem("against", "wider"),
-      QuizItem("entertain", "unterhalten")).toStream)
+  def makeQgMemLevelSimple: QuizGroupMemoryLevel =
+    QuizGroupMemoryLevel(
+      0,
+      0,
+      List(QuizItem("against", "wider"), QuizItem("entertain", "unterhalten")).toStream)
 
 
   // defaults for read-only
@@ -120,27 +128,42 @@ object TestData {
 
   val qgwhCustomFormat = qghCustomFormat + qgBodyCustomFormat
 
-  def makeQgMemLevel0: QuizGroupMemoryLevel = QuizGroupMemoryLevel(0, 0, List(
-      QuizItem("en route", "unterwegs"),
-      QuizItem("full", "satt"),
-      QuizItem("full", "voll"),
-      QuizItem("interrupted", "unterbrochen"),
-      QuizItem("contract", "Vertrag"),
-      QuizItem("rides", "reitet"),
-      QuizItem("on", "auf"),
-      QuizItem("sweeps", "streicht")).toStream)
+  def makeQgMemLevel0: QuizGroupMemoryLevel =
+    QuizGroupMemoryLevel(
+      0,
+      0,
+      List(
+        QuizItem("en route", "unterwegs"),
+        QuizItem("full", "satt"),
+        QuizItem("full", "voll"),
+        QuizItem("interrupted", "unterbrochen"),
+        QuizItem("contract", "Vertrag"),
+        QuizItem("rides", "reitet"),
+        QuizItem("on", "auf"),
+        QuizItem("sweeps", "streicht")).toStream)
 
-  def makeQgMemLevel1: QuizGroupMemoryLevel = QuizGroupMemoryLevel(1, 5, List(
-      QuizItem("entertain", "unterhalten", List(8), List(2)),
-      QuizItem("winner", "Siegerin", List(5), List(0))).toStream)
+  def makeQgMemLevel1: QuizGroupMemoryLevel =
+    QuizGroupMemoryLevel(
+      1,
+      5,
+      List(
+        QuizItem("entertain", "unterhalten", List(8), List(2)),
+        QuizItem("winner", "Siegerin", List(5), List(0))).toStream)
 
-  def makeQgMemLevel2: QuizGroupMemoryLevel = QuizGroupMemoryLevel(2, 15, List(
-      QuizItem("against", "wider", List(9, 7), List(6)),
-      QuizItem("teach", "unterrichten", List(4, 3), List(1))).toStream)
+  def makeQgMemLevel2: QuizGroupMemoryLevel =
+    QuizGroupMemoryLevel(
+      2,
+      15,
+      List(
+        QuizItem("against", "wider", List(9, 7), List(6)),
+        QuizItem("teach", "unterrichten", List(4, 3), List(1))).toStream)
 
-  def makeQuizGroup = QuizGroup(
+  def makeQuizGroup =
+    QuizGroup(
       Map(0 -> makeQgMemLevel0, 1-> makeQgMemLevel1, 2-> makeQgMemLevel2),
-      QuizGroupUserData(isActive = true, 10), new Dictionary())
+      QuizGroupUserData(isActive = true, 10),
+      new Dictionary())
+
   val quizGroup = makeQuizGroup
 
   def makeSimpleQuizGroup =
@@ -162,7 +185,6 @@ object TestData {
   val qgWithHeader = makeQgWithHeader
 
   val quizData = List(
-
     """#quizGroup type="WordMapping" promptType="English word" responseType="German word" isActive="true" currentPromptNumber="0"
       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
       |against|wider|
@@ -180,7 +202,6 @@ object TestData {
       |#quizGroupPartition numCorrectResponsesInARow="3" repetitionInterval="15"
       |sweeps|streicht|100,200,300;405
       |""".stripMargin,
-
     """#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="0"
       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
       |unterwegs|en route|

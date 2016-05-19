@@ -42,8 +42,10 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     }.get
   }
 
-  def findQuizGroupHeader(promptType: String, responseType: String, quizGroupType: QuizGroupType):
-      Option[QuizGroupHeader] = {
+  def findQuizGroupHeader(
+      promptType: String,
+      responseType: String,
+      quizGroupType: QuizGroupType): Option[QuizGroupHeader] = {
     val availableQuizGroups = findAvailableQuizGroups
     availableQuizGroups.find(qgh => qgh.promptType == promptType &&
         qgh.responseType == responseType && qgh.quizGroupType == quizGroupType)
@@ -122,8 +124,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
       case None => Stream.empty
     }
 
-  private def readQuizGroupFromFilesDir(qgFileName: String):
-      Option[QuizGroup] = {
+  private def readQuizGroupFromFilesDir(qgFileName: String): Option[QuizGroup] = {
     val qgPath = conf.filesDir + qgFileName
     l.log("reading quiz group from file " + qgPath)
     for {

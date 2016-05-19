@@ -42,8 +42,11 @@ import ConstructWrongChoicesForModelComponents._
  * is an example of a "disjoint set" or "union find" data structure.) The index in the
  * List of partitions matches correctResponseInARow.
  */
-case class QuizGroup private(levels: List[QuizGroupMemoryLevel],
-    userData: QuizGroupUserData, dictionary: Dictionary) extends ModelComponent {
+case class QuizGroup private(
+    levels: List[QuizGroupMemoryLevel],
+    userData: QuizGroupUserData,
+    dictionary: Dictionary)
+  extends ModelComponent {
 
   lazy val currentPromptNumber = userData.currentPromptNumber
   lazy val isActive = userData.isActive

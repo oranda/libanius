@@ -25,8 +25,12 @@ import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
 import com.oranda.libanius.model.action.serialize._
 import fastparse.all._
 
-case class QuizGroupHeader(quizGroupType: QuizGroupType, promptType: String,
-    responseType: String, mainSeparator: Separator, useMultipleChoiceUntil: Int)
+case class QuizGroupHeader(
+    quizGroupType: QuizGroupType,
+    promptType: String,
+    responseType: String,
+    mainSeparator: Separator,
+    useMultipleChoiceUntil: Int)
   extends ModelComponent {
   // promptType example: "English word"
   // responseType example: "German word"
