@@ -74,7 +74,7 @@ case class DesiredResponse(value: String) {
 
   def matchesParts(userResponse: String) =
     userResponse == value ||
-        containsPartsIn(standardized2(userResponse), standardized2(value).takeWhile(c => c != '/'))
+      containsPartsIn(standardized2(userResponse), standardized2(value).takeWhile(c => c != '/'))
 }
 
 object DesiredResponse extends AppDependencyAccess {
