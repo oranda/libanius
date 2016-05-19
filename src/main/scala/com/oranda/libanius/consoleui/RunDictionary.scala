@@ -67,6 +67,8 @@ object RunDictionary extends App with AppDependencyAccess {
       case WordQuery(text) =>
         searchAndDisplayResults(text, quiz)
         serveUserRequest(quiz)
+      case _ =>
+        serveUserRequest(quiz)
     }
   }
 

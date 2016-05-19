@@ -65,6 +65,6 @@ object QuizGroupHeader extends AppDependencyAccess {
     QuizGroupHeader(quizGroupType, promptType, responseType, Separator(sep), useMultipleChoiceUntil)
 }
 
-abstract class QuizGroupType
+sealed trait QuizGroupType
 case object WordMapping extends QuizGroupType
 case object QuestionAndAnswer extends QuizGroupType
