@@ -18,6 +18,8 @@
 
 package com.oranda.libanius.consoleui
 
+import com.oranda.libanius.model.quizgroup.QuizGroupHeader
+
 sealed trait UserConsoleResponse
 sealed trait TextInput extends UserConsoleResponse {
   def text: String
@@ -25,8 +27,9 @@ sealed trait TextInput extends UserConsoleResponse {
 case class WordQuery(text: String) extends TextInput
 sealed trait Answer extends TextInput
 case class TextAnswer(text: String) extends Answer
-case class ChosenOptions(chosenOptions: List[_]) extends Answer {
+case class ChosenOptions[T](chosenOptions: List[T]) extends Answer {
   override def text = chosenOptions.iterator.next.toString
 }
-case object Invalid extends UserConsoleResponse
-case object Quit extends UserConsoleResponse
+sealed trait NoProcessResponse extends UserConsoleResponse
+case object Invalid extends NoProcessResponse
+case object Quit extends NoProcessResponse

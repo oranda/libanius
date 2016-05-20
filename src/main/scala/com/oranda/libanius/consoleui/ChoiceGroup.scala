@@ -19,12 +19,13 @@
 package com.oranda.libanius.consoleui
 
 import Output._
+import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 import scala.util.Try
 
 /*
  * A list of choices in a console UI.
  */
-case class ChoiceGroup[T](choices: List[T]) {
+abstract class ChoiceGroup[T](choices: List[T]) {
   val choicesWithIndex = choices.zipWithIndex
 
   def show(): Unit =
@@ -32,16 +33,23 @@ case class ChoiceGroup[T](choices: List[T]) {
       case (header, index) => output((index + 1).toString + ". " + header.toString)
     }
 
-  def getSelectionFromInput: UserConsoleResponse =
+  def getSelectionFromInput: Either[NoProcessResponse, ChosenOptions[T]] =
     scala.io.StdIn.readLine match {
-      case "q" => Quit
-      case "quit" => Quit
+      case "q" => Left(Quit)
+      case "quit" => Left(Quit)
       case userResponse: String =>
         Try(
-          ChosenOptions(userResponse.split(",")
-            .map(_.toInt - 1)
-            .map(choices(_)).toList))
-          .recover { case e: Exception => Invalid }
+          Right(ChosenOptions[T](
+            userResponse.split(",")
+              .map(_.toInt - 1)
+              .map(choices(_)).toList)))
+          .recover { case e: Exception => Left(Invalid) }
           .get
     }
 }
+
+case class ChoiceGroupStrings(choices: List[String])
+  extends ChoiceGroup[String](choices)
+
+case class ChoiceGroupQgHeaders(choices: List[QuizGroupHeader])
+  extends ChoiceGroup[QuizGroupHeader](choices)

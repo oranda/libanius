@@ -47,12 +47,12 @@ object RunDictionary extends App with AppDependencyAccess {
   private[this] def userQuizGroupSelection(
       quizGroupHeaders: List[QuizGroupHeader]): Map[QuizGroupHeader, QuizGroup] = {
     output("Choose quiz group(s). For more than one, separate with commas, e.g. 1,2,3")
-    val choices = ChoiceGroup[QuizGroupHeader](quizGroupHeaders)
+    val choices = ChoiceGroupQgHeaders(quizGroupHeaders)
     choices.show()
 
     def selectedQuizGroupHeaders = choices.getSelectionFromInput match {
-      case ChosenOptions(selectedChoices) => selectedChoices.asInstanceOf[List[QuizGroupHeader]]
-      case _ => List[QuizGroupHeader]()
+      case Right(ChosenOptions(selectedChoices)) => selectedChoices
+      case _ => Nil
     }
 
     selectedQuizGroupHeaders.map(header => (header, dataStore.loadQuizGroup(header))).toMap

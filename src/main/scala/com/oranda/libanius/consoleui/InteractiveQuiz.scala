@@ -38,12 +38,12 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   def userQuizGroupSelection(
       quizGroupHeaders: List[QuizGroupHeader]): Map[QuizGroupHeader, QuizGroup] = {
     output("Choose quiz group(s). For more than one, separate with commas, e.g. 1,2,3")
-    val choices = ChoiceGroup[QuizGroupHeader](quizGroupHeaders)
+    val choices = ChoiceGroupQgHeaders(quizGroupHeaders)
     choices.show()
 
-    def selectedQuizGroupHeaders = choices.getSelectionFromInput match {
-      case ChosenOptions(selectedChoices) => selectedChoices.asInstanceOf[List[QuizGroupHeader]]
-      case _ => List[QuizGroupHeader]()
+    def selectedQuizGroupHeaders: List[QuizGroupHeader] = choices.getSelectionFromInput match {
+      case Right(ChosenOptions(selectedChoices)) => selectedChoices
+      case _ => Nil
     }
 
     selectedQuizGroupHeaders.map(header => (header, dataStore.loadQuizGroupCore(header))).toMap
@@ -98,12 +98,13 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
 
   def showChoicesAndProcessResponse(
       quizItem: QuizItemViewWithChoices): State[Quiz, UserConsoleResponse] = {
-    val choices = ChoiceGroup[String](quizItem.allChoices)
+    val choices = ChoiceGroupStrings(quizItem.allChoices)
     choices.show()
-
-    Try(choices.getSelectionFromInput).recover {
-      case e: Exception => Invalid
-    }.map(userResponse => processAnswer(userResponse, quizItem)).get
+    val userResponse = choices.getSelectionFromInput match {
+      case Right(chosenOptions) => chosenOptions
+      case Left(noProcessResponse) => noProcessResponse
+    }
+    processAnswer(userResponse, quizItem)
   }
 
   def getTextResponseAndProcess(quizItem: QuizItemViewWithChoices):
