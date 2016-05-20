@@ -340,9 +340,9 @@ object CustomFormatForModelComponents {
   implicit object customFormatQuizGroup extends CustomFormat[QuizGroup, Separator, Separator] {
 
     def to(qg: QuizGroup, strBuilder: StringBuilder, extraParams: Separator): StringBuilder = {
-      for (memLevel <- qg.levels.zipWithIndex.toStream)
-        customFormatQuizGroupMemoryLevel.to(memLevel._1, strBuilder,
-            extraParams.withIndex(memLevel._2))
+      qg.levels.zipWithIndex.toStream.foreach { case (level, idx) =>
+        customFormatQuizGroupMemoryLevel.to(level, strBuilder, extraParams.withIndex(idx))
+      }
       strBuilder
     }
 

@@ -41,11 +41,14 @@ import scala.util.Try
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
   extends ModelComponent {
 
+  def quizGroupIterator = quizGroups.valuesIterator
+
   def hasQuizGroup(header: QuizGroupHeader): Boolean = quizGroups.contains(header)
   def isActive(header: QuizGroupHeader): Boolean = quizGroups.get(header).exists(_.isActive)
 
   // By default, reading of data accesses the activeQuizGroups
-  def activeQuizGroups: Map[QuizGroupHeader, QuizGroup] = quizGroups.filter(_._2.isActive)
+  def activeQuizGroups: Map[QuizGroupHeader, QuizGroup] =
+    quizGroups.filter { case (_, quizGroup) => quizGroup.isActive }
   def activeQuizGroupHeaders: Set[QuizGroupHeader] = activeQuizGroups.keySet
 
   def numActiveGroups = activeQuizGroups.size
@@ -189,8 +192,8 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
       case _ => this
     }
 
-  def nearTheEnd = quizGroups.exists(qgwh =>
-      (qgwh._2.numPrompts - qgwh._2.currentPromptNumber) < qgwh._2.maxDiffInPromptNumMinimum)
+  def nearTheEnd = quizGroupIterator.exists(qg =>
+      (qg.numPrompts - qg.currentPromptNumber) < qg.maxDiffInPromptNumMinimum)
 
   def searchLocalDictionary(searchInput: String): Try[List[SearchResult]] = {
     import Dictionary._  // make special search utilities available

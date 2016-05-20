@@ -62,7 +62,7 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
     "add a new quiz item to the front of its queue" in {
       val qgUpdated = qgMemLevel.addNewQuizItem("to exchange", "tauschen")
-      pullQuizItem(qgUpdated, 0)._2 mustEqual ("to exchange", "tauschen")
+      pullQuizItem(qgUpdated, 0).promptAndResponse mustEqual ("to exchange", "tauschen")
     }
 
     "move an existing quiz pair to the front of its queue" in {
@@ -70,7 +70,7 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
       val qgUpdated = qgMemLevel + QuizItem("sweeps", "streicht")
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
-      pullQuizItem(qgUpdated, 0)._2 mustEqual ("sweeps", "streicht")
+      pullQuizItem(qgUpdated, 0).promptAndResponse mustEqual ("sweeps", "streicht")
     }
 
     "move a quiz pair to the front of its queue where only the prompt already exists" in {
@@ -78,15 +78,15 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
       val qgUpdated = qgMemLevel + QuizItem("entertain", "bewirten")
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
-      pullQuizItem(qgUpdated, 0)._2 mustEqual ("entertain", "bewirten")
+      pullQuizItem(qgUpdated, 0).promptAndResponse mustEqual ("entertain", "bewirten")
     }
 
     "add more than one new quiz pair to the front of its queue" in {
       val qgUpdated1 = qgMemLevel + QuizItem("to exchange", "tauschen")
       val qgUpdated2 = qgUpdated1 + QuizItem("whole", "ganz")
-      val (qgUnrolled, (keyWord, value)) = pullQuizItem(qgUpdated2, 0)
-      (keyWord, value) mustEqual ("whole", "ganz")
-      pullQuizItem(qgUnrolled, 1)._2 mustEqual ("to exchange", "tauschen")
+      val QgmlWithQuizItem(qgml, prompt, response) = pullQuizItem(qgUpdated2, 0)
+      (prompt, response) mustEqual ("whole", "ganz")
+      pullQuizItem(qgml, 1).promptAndResponse mustEqual ("to exchange", "tauschen")
     }
 
   }

@@ -76,7 +76,9 @@ object Dictionary {
   // Useful functions for search:
 
   def convertToSearchResults(pairs: List[(String, WordMappingValueSet)], header: QuizGroupHeader) =
-    pairs.map(pair => SearchResult(header, SearchResultPair(pair._1, pair._2.toValueSet)))
+    pairs.map {
+      case (key, values) => SearchResult(header, SearchResultPair(key, values.toValueSet))
+    }
 
   def searchFunction(param: => List[SearchResult]) = () => param
 

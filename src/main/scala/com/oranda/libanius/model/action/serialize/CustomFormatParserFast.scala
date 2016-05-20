@@ -40,7 +40,10 @@ object CustomFormatParserFast extends AppDependencyAccess {
 
   // Example input: 1,7,9;6
   protected[serialize] def userResponsesAll: P[UserResponsesAll] =
-    P( userResponses ~ (";".? ~ userResponses) ).map(ur => UserResponsesAll(ur._1, ur._2))
+    P( userResponses ~ (";".? ~ userResponses) ).map {
+      case (correctResponsesInARow, incorrectResponses) =>
+        UserResponsesAll(correctResponsesInARow, incorrectResponses)
+    }
 
   // An optimized but verbose version of userResponsesAll
   protected[serialize] def userResponsesAllFast: P[UserResponsesAll] =

@@ -147,34 +147,36 @@ class CustomFormatParserFastSpec extends Specification with AppDependencyAccess 
   }
 
   "deserialize quiz group header with user data" in {
-    val Parsed.Success(qghAndUd, _) = quizGroupHeaderAndUserData.parse(qghCustomFormat)
-    qghAndUd._1.quizGroupType mustEqual WordMapping
-    qghAndUd._1.promptType mustEqual "English word"
-    qghAndUd._1.responseType mustEqual "German word"
-    qghAndUd._1.mainSeparator mustEqual Separator("|")
-    qghAndUd._2.isActive mustEqual true
-    qghAndUd._2.currentPromptNumber mustEqual 10
+    val Parsed.Success((quizGroupHeader, userData), _) =
+      quizGroupHeaderAndUserData.parse(qghCustomFormat)
+    quizGroupHeader.quizGroupType mustEqual WordMapping
+    quizGroupHeader.promptType mustEqual "English word"
+    quizGroupHeader.responseType mustEqual "German word"
+    quizGroupHeader.mainSeparator mustEqual Separator("|")
+    userData.isActive mustEqual true
+    userData.currentPromptNumber mustEqual 10
   }
 
   "deserialize quiz group header with user data and no separator" in {
-    val Parsed.Success(qghAndUd, _) = quizGroupHeaderAndUserData.parse(qghCustomFormatNoSeparator)
-    qghAndUd._1.quizGroupType mustEqual WordMapping
-    qghAndUd._1.promptType mustEqual "English word"
-    qghAndUd._1.responseType mustEqual "German word"
-    qghAndUd._1.mainSeparator mustEqual Separator("|")
-    qghAndUd._2.isActive mustEqual true
-    qghAndUd._2.currentPromptNumber mustEqual 10
+    val Parsed.Success((quizGroupHeader, userData), _) =
+      quizGroupHeaderAndUserData.parse(qghCustomFormatNoSeparator)
+    quizGroupHeader.quizGroupType mustEqual WordMapping
+    quizGroupHeader.promptType mustEqual "English word"
+    quizGroupHeader.responseType mustEqual "German word"
+    quizGroupHeader.mainSeparator mustEqual Separator("|")
+    userData.isActive mustEqual true
+    userData.currentPromptNumber mustEqual 10
   }
 
   "deserialize quiz group header with user data and no useMultipleChoiceUntil field" in {
-    val Parsed.Success(qghAndUd, _) =
+    val Parsed.Success((quizGroupHeader, userData), _) =
       quizGroupHeaderAndUserData.parse(qghCustomFormatNoUseMultipleChoiceUntil)
-    qghAndUd._1.quizGroupType mustEqual WordMapping
-    qghAndUd._1.promptType mustEqual "English word"
-    qghAndUd._1.responseType mustEqual "German word"
-    qghAndUd._1.mainSeparator mustEqual Separator("|")
-    qghAndUd._2.isActive mustEqual true
-    qghAndUd._2.currentPromptNumber mustEqual 10
+    quizGroupHeader.quizGroupType mustEqual WordMapping
+    quizGroupHeader.promptType mustEqual "English word"
+    quizGroupHeader.responseType mustEqual "German word"
+    quizGroupHeader.mainSeparator mustEqual Separator("|")
+    userData.isActive mustEqual true
+    userData.currentPromptNumber mustEqual 10
   }
 
   "deserialize a QuizGroup" in {

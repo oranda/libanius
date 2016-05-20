@@ -54,7 +54,7 @@ class QuizItemSourceSpec extends Specification with AppDependencyAccess {
     }
 
     "find a presentable quiz item from a quiz group" in {
-      pullQuizItem(qgWithHeader)._2 mustEqual ("winner", "Siegerin")
+      pullQuizItem(qgWithHeader).promptAndResponse mustEqual ("winner", "Siegerin")
     }
 
     /*
@@ -75,7 +75,7 @@ class QuizItemSourceSpec extends Specification with AppDependencyAccess {
     }
 
     "find a presentable quiz item from a memory level" in {
-      pullQuizItem(qgMemLevel, 0)._2 mustEqual ("against", "wider")
+      pullQuizItem(qgMemLevel, 0).promptAndResponse mustEqual ("against", "wider")
     }
   }
 
@@ -83,35 +83,41 @@ class QuizItemSourceSpec extends Specification with AppDependencyAccess {
 
 object QuizItemSourceSpec {
 
+  case class QuizGroupWithQuizItem(quizGroup: QuizGroup, prompt: String, response: String) {
+    def promptAndResponse = (prompt, response)
+  }
+
+  case class QgmlWithQuizItem(qgml: QuizGroupMemoryLevel, prompt: String, response: String) {
+    def promptAndResponse = (prompt, response)
+  }
+
   // pullQuizItem for QuizGroupWithHeader
-  def pullQuizItem(qgwh: QuizGroupWithHeader): (QuizGroup, (String, String)) =
+  def pullQuizItem(qgwh: QuizGroupWithHeader): QuizGroupWithQuizItem =
     pullQuizItem(qgwh.quizGroup)
 
   // pullQuizItem for QuizGroup
-  def pullQuizItem(qg: QuizGroup): (QuizGroup, (String, String)) = {
+  def pullQuizItem(qg: QuizGroup): QuizGroupWithQuizItem = {
     val quizItemOpt = produceQuizItem(qg, NoParams())
     assert(quizItemOpt.isDefined)
     val quizItem = quizItemOpt.get
     // Each time a quiz item is pulled, a user answer must be set
     val qgUpdated = updatedWithUserResponse(qg, quizItem)
-    (qgUpdated, (quizItem.prompt.value, quizItem.correctResponse.value))
+    QuizGroupWithQuizItem(qgUpdated, quizItem.prompt.value, quizItem.correctResponse.value)
   }
 
   // pullQuizItem for QuizGroupMemoryLevel
-  def pullQuizItem(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int):
-      (QuizGroupMemoryLevel, (String, String)) = {
+  def pullQuizItem(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int): QgmlWithQuizItem = {
 
-    val quizItem: Option[QuizItem] = produceQuizItem(qgml,
-        CurrentPromptNumber(currentPromptNumber))
+    val quizItem: Option[QuizItem] =
+      produceQuizItem(qgml, CurrentPromptNumber(currentPromptNumber))
 
     assert(quizItem.isDefined)
     // Each time a quiz item is pulled, a user answer must be set
     val qgmlUpdated1 = qgml.updatedWithUserAnswer(quizItem.get.prompt,
       quizItem.get.correctResponse, wasCorrect = true, UserResponsesAll(), new UserResponse(0))
     val qgmlUpdated2 = qgmlUpdated1 - quizItem.get
-    (qgmlUpdated2, (quizItem.get.prompt.value, quizItem.get.correctResponse.value))
+    QgmlWithQuizItem(qgmlUpdated2, quizItem.get.prompt.value, quizItem.get.correctResponse.value)
   }
-
 
   def pullQuizItemAndAnswerCorrectly(
       qgml: QuizGroupMemoryLevel,

@@ -29,7 +29,7 @@ import com.oranda.libanius.model.TestData._
 import com.oranda.libanius.model.action._
 import QuizItemSource._
 import modelComponentsAsQuizItemSources._
-import QuizItemSourceSpec._
+import com.oranda.libanius.model.action.QuizItemSourceSpec._
 
 import com.oranda.libanius.model.action.wrongchoices._
 
@@ -102,9 +102,9 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val qgSimple = makeSimpleQuizGroup
       val qgUpdated1 = qgSimple + QuizItem("to exchange", "tauschen")
       val qgUpdated2 = qgUpdated1 + QuizItem("whole", "ganz")
-      val (qgUnrolled, (keyWord, value)) = pullQuizItem(qgUpdated2)
-      (keyWord, value) mustEqual ("whole", "ganz")
-      pullQuizItem(qgUnrolled)._2 mustEqual ("to exchange", "tauschen")
+      val QuizGroupWithQuizItem(qg, prompt, response) = pullQuizItem(qgUpdated2)
+      (prompt, response) mustEqual ("whole", "ganz")
+      pullQuizItem(qg).promptAndResponse mustEqual ("to exchange", "tauschen")
     }
 
     val memLevel2 = QuizGroupMemoryLevel(correctResponsesInARow = 2,
