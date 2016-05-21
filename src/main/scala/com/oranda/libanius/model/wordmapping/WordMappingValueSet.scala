@@ -23,6 +23,7 @@ import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model._
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import fastparse.all._
+import fastparse.core.Parsed
 
 import scala.language.implicitConversions
 import com.oranda.libanius.model.ValueSet

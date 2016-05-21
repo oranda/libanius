@@ -20,6 +20,7 @@ package com.oranda.libanius.model.quizgroup
 
 import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
 import fastparse.all._
+import fastparse.core.Parsed
 
 import scalaz._
 import com.oranda.libanius.dependencies.AppDependencyAccess

@@ -33,6 +33,7 @@ import com.oranda.libanius.model.quizgroup.WordMapping
 import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.{UserResponsesAll, TestData, UserResponse}
 import fastparse.all._
+import fastparse.core.Parsed
 import org.specs2.mutable.Specification
 
 import CustomFormatParserFast._

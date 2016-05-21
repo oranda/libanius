@@ -25,6 +25,7 @@ import com.oranda.libanius.model.quizitem.{QuizItemConcrete, QuizItem, TextValue
 import com.oranda.libanius.model.wordmapping.{WordMappingValueSet, WordMappingValue}
 import com.oranda.libanius.util.StringSplitter
 import fastparse.all._
+import fastparse.core.Parsed
 
 import scala.collection.immutable.Stream
 

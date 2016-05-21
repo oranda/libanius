@@ -19,7 +19,7 @@
 package com.oranda.libanius.model
 
 import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
-import fastparse.all.Parsed
+import fastparse.core.Parsed
 
 import scala.collection.immutable._
 

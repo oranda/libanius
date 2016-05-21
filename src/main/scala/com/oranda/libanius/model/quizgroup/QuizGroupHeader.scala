@@ -24,6 +24,7 @@ import com.oranda.libanius.model._
 import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
 import com.oranda.libanius.model.action.serialize._
 import fastparse.all._
+import fastparse.core.Parsed
 
 case class QuizGroupHeader(
     quizGroupType: QuizGroupType,
