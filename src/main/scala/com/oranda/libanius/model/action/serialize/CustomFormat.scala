@@ -155,7 +155,7 @@ object CustomFormatForModelComponents {
       strBuilder.append(" isActive=\"").append(qgud.isActive).append("\"").
           append(" currentPromptNumber=\"").append(qgud.currentPromptNumber).append("\"")
 
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
+    //TODO: @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(str: String, fromParams: NoParams) =
       QuizGroupUserData(parseIsActive(str), parseCurrentPromptNumber(str))
 
