@@ -177,7 +177,7 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
         val sliceStartIndex = sliceIndex * sliceSize
         val randomOffset = Random.nextInt(math.max(sliceSize, 1))
         val randomIndex = math.min(sliceStartIndex + randomOffset, qgml.numQuizItems - 1)
-        val randomItem = Some(qgml.quizItems(randomIndex).correctResponse.value)
+        val randomItem = Option(qgml.quizItems(randomIndex).correctResponse.value)
         randomItem.filter(!correctResponses.contains(_))
       }
 

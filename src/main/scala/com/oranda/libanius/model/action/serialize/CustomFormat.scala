@@ -398,7 +398,7 @@ object CustomFormatForModelComponents {
         fromParams: SeparatorIndexAndRepetitionInterval): QuizGroupMemoryLevel = {
 
       def parseQuizItem(strPromptResponse: String): Option[QuizItem] = {
-        Try(Some(customFormatQuizItem.from(strPromptResponse,
+        Try(Option(customFormatQuizItem.from(strPromptResponse,
             Separator(fromParams.separator.toString)))).recover {
           case e: Exception =>
             l.logError("could not parse quiz item with text " +

@@ -69,7 +69,7 @@ trait Simulation {
               quiz
             case None =>
               val quizAfterResponse = respondToQuizItem(quiz, quizItem)
-              testWithQuizItems(quizAfterResponse, Some(quizItem))
+              testWithQuizItems(quizAfterResponse, Option(quizItem))
           }
         case _ =>
           output("No more questions found! Finished!")

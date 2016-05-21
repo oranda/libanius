@@ -139,12 +139,12 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
   private def findQuizGroupInFilesDir(header: QuizGroupHeader): Option[String] = {
     val fileNames = io.findQgFileNamesFromFilesDir
-    fileNames.find(io.readQgMetadataFromFile(_) == Some(header))
+    fileNames.find(io.readQgMetadataFromFile(_) == Option(header))
   }
 
   private def findQuizGroupInResources(header: QuizGroupHeader): Option[String] = {
     val fileNames = io.findQgFileNamesFromResources
-    fileNames.find(io.readQgMetadataFromResource(_) == Some(header))
+    fileNames.find(io.readQgMetadataFromResource(_) == Option(header))
   }
 
   def findAvailableQuizGroups: Set[QuizGroupHeader] =

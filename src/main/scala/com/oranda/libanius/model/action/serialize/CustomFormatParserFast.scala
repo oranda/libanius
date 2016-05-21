@@ -32,7 +32,7 @@ object CustomFormatParserFast extends AppDependencyAccess {
 
   // Example input: 9
   protected[serialize] val userResponse: P[Option[UserResponse]] =
-    P ( CharIn('0'to'9').rep.! ).map (s => if (s.isEmpty) None else Some(UserResponse(s.toInt)))
+    P ( CharIn('0'to'9').rep.! ).map (s => if (s.isEmpty) None else Option(UserResponse(s.toInt)))
 
   // Example input: 9,7
   protected[serialize] val userResponses: P[List[UserResponse]] =

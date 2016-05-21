@@ -32,7 +32,7 @@ class DefaultIO extends PlatformIO {
   def readFile(fileName: String): Option[String] = {
     val theFile = new File(fileName)
     if (theFile.exists)
-      Some(Source.fromFile(theFile).mkString)
+      Option(Source.fromFile(theFile).mkString)
     else {
       l.logError(s"File not found: $fileName")
       None

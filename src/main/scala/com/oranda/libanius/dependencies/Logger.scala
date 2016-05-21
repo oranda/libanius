@@ -21,7 +21,7 @@ package com.oranda.libanius.dependencies
 abstract class Logger extends AppDependencyAccess {
 
   def logError(message: String, t: Throwable): Unit =
-    logError(message, "Libanius", Some(t))
+    logError(message, "Libanius", Option(t))
 
   def logError(message: String, module: String = "Libanius", t: Option[Throwable] = None): Unit =
     log(s"ERROR: $message", module, t)
