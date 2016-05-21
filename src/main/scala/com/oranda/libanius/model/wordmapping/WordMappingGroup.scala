@@ -40,9 +40,9 @@ case class WordMappingGroup(header: QuizGroupHeader,
     def makeQuizItems(wmPair: WordMappingPair): Iterable[QuizItem] =
       wmPair.valueSet.values.map(value =>
         QuizItem(
-            wmPair.key,
-            value.value,
-            UserResponsesAll(value.correctAnswersInARow, value.incorrectAnswers)))
+          wmPair.key,
+          value.value,
+          UserResponsesAll(value.correctAnswersInARow, value.incorrectAnswers)))
 
     val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems)
 
@@ -62,8 +62,8 @@ object WordMappingGroup extends AppDependencyAccess {
     quizItems.groupByOrdered(_.prompt).map {
         case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
           WordMappingPair(
-              prompt.value,
-              WordMappingValueSet.createFromQuizItems(quizItems.toList, sep.toString))
+            prompt.value,
+            WordMappingValueSet.createFromQuizItems(quizItems.toList, sep.toString))
     }.toStream
 
 }

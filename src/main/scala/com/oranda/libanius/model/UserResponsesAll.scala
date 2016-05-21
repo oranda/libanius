@@ -77,10 +77,10 @@ case class UserResponsesAll(correctResponsesInARow: List[UserResponse] = Nil,
 object UserResponsesAll {
 
   val userResponsesCorrectResponsesLens = Lens.lensu(
-      get = (_: UserResponsesAll).correctResponsesInARow,
-      set = (ur: UserResponsesAll, urs: List[UserResponse]) => ur.copy(correctResponsesInARow = urs))
+    get = (_: UserResponsesAll).correctResponsesInARow,
+    set = (ur: UserResponsesAll, urs: List[UserResponse]) => ur.copy(correctResponsesInARow = urs))
 
   val userResponsesIncorrectResponsesLens = Lens.lensu(
-      get = (_: UserResponsesAll).incorrectResponses,
-      set = (ur: UserResponsesAll, urs: List[UserResponse]) => ur.copy(incorrectResponses = urs))
+    get = (_: UserResponsesAll).incorrectResponses,
+    set = (ur: UserResponsesAll, urs: List[UserResponse]) => ur.copy(incorrectResponses = urs))
 }

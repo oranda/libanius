@@ -37,10 +37,10 @@ object QuizGroupUserData extends AppDependencyAccess {
   }
 
   val activeLens: Lens[QuizGroupUserData, Boolean] = Lens.lensu(
-      get = (_: QuizGroupUserData).isActive,
-      set = (qgud: QuizGroupUserData, active: Boolean) => qgud.copy(isActive = active))
+    get = (_: QuizGroupUserData).isActive,
+    set = (qgud: QuizGroupUserData, active: Boolean) => qgud.copy(isActive = active))
 
   val promptNumberLens: Lens[QuizGroupUserData, Int] = Lens.lensu(
-      get = (_: QuizGroupUserData).currentPromptNumber,
-      set = (q: QuizGroupUserData, promptNum: Int) => q.copy(currentPromptNumber = promptNum))
+    get = (_: QuizGroupUserData).currentPromptNumber,
+    set = (q: QuizGroupUserData, promptNum: Int) => q.copy(currentPromptNumber = promptNum))
 }

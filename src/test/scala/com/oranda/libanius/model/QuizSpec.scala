@@ -59,8 +59,8 @@ class QuizSpec extends Specification with AppDependencyAccess {
       def translationsOfVertrag(quiz: Quiz) = quiz.findResponsesFor(prompt = "Vertrag", qghGerEng)
       translationsOfVertrag(quizBefore).contains("contract") mustEqual true
 
-      val (quizAfter, wasRemoved) = quizBefore.removeQuizItem(
-          prompt = "Vertrag", response = "contract", qghGerEng)
+      val (quizAfter, wasRemoved) =
+        quizBefore.removeQuizItem(prompt = "Vertrag", response = "contract", qghGerEng)
 
       wasRemoved mustEqual true
       val translationsOfVertragAfter = translationsOfVertrag(quizAfter)

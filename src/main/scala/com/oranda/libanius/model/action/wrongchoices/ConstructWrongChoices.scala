@@ -73,7 +73,8 @@ object ConstructWrongChoices extends AppDependencyAccess {
       numWrongChoicesRequired: Int = 2): List[String] = {
 
     val correctResponses = Util.stopwatch(
-        quizGroup.findResponsesFor(itemCorrect.prompt.value), "findResponsesFor")
+        quizGroup.findResponsesFor(itemCorrect.prompt.value),
+        "findResponsesFor")
     val numCorrectResponsesSoFar = itemCorrect.userResponses.numCorrectResponsesInARow
 
     val similarityPredicate =
@@ -116,16 +117,23 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
         similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String] =
       if (itemCorrect.numCorrectResponsesInARow == 0) Nil
       else quizGroup.levels.flatMap(cwcQuizGroupMemoryLevel.constructWrongChoicesSimilar(
-          _, itemCorrect, numWrongChoicesRequired, correctResponses, similarityPredicate))
+        _,
+        itemCorrect,
+        numWrongChoicesRequired,
+        correctResponses,
+        similarityPredicate))
 
     def constructWrongChoicesRandom(
         quizGroup: QuizGroup,
         itemCorrect: QuizItem,
         numWrongChoicesRequired: Int,
         correctResponses: List[String]): List[String] =
-      quizGroup.levels.filterNot(_.isEmpty).flatMap(
-        cwcQuizGroupMemoryLevel.constructWrongChoicesRandom(_, itemCorrect,
-              numWrongChoicesRequired, correctResponses))
+      quizGroup.levels.filterNot(_.isEmpty).flatMap(level =>
+        cwcQuizGroupMemoryLevel.constructWrongChoicesRandom(
+          level,
+          itemCorrect,
+          numWrongChoicesRequired,
+          correctResponses))
   }
 
   implicit object cwcQuizGroupMemoryLevel extends ConstructWrongChoices[QuizGroupMemoryLevel] {

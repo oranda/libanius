@@ -227,12 +227,12 @@ object QuizGroup extends AppDependencyAccess {
     listNthPLens(memoryLevel) compose levelsLens.partial
 
   val dictionaryLens: Lens[QuizGroup, Dictionary] = Lens.lensu(
-      get = (_: QuizGroup).dictionary,
-      set = (qGroup: QuizGroup, d: Dictionary) => qGroup.copy(dictionary = d))
+    get = (_: QuizGroup).dictionary,
+    set = (qGroup: QuizGroup, d: Dictionary) => qGroup.copy(dictionary = d))
 
   val userDataLens = Lens.lensu(
-      get = (_: QuizGroup).userData,
-      set = (qg: QuizGroup, ud: QuizGroupUserData) => qg.copy(userData = ud))
+    get = (_: QuizGroup).userData,
+    set = (qg: QuizGroup, ud: QuizGroupUserData) => qg.copy(userData = ud))
 
   val activeLens: Lens[QuizGroup, Boolean] =
     QuizGroupUserData.activeLens compose userDataLens

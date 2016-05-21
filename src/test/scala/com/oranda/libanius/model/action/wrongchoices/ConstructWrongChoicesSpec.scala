@@ -45,11 +45,13 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
     }
 
     "construct wrong choices" in {
-      val quizItemCorrect: QuizItem = qgWithHeader.quizGroup.quizItems.find(
-        _.prompt.value == "entertain").get
+      val quizItemCorrect: QuizItem =
+        qgWithHeader.quizGroup.quizItems.find(_.prompt.value == "entertain").get
 
       val (falseAnswers, timeTaken) = Util.stopwatch(ConstructWrongChoices.execute(
-          qgWithHeader.quizGroup, quizItemCorrect, numWrongChoicesRequired = 2))
+        qgWithHeader.quizGroup,
+        quizItemCorrect,
+        numWrongChoicesRequired = 2))
 
       falseAnswers.contains("unterbrochen") mustEqual true
       timeTaken must be lessThan 200

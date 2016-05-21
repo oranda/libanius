@@ -219,8 +219,8 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 object Quiz extends AppDependencyAccess {
 
   val quizGroupsLens: Lens[Quiz, Map[QuizGroupHeader, QuizGroup]] = Lens.lensu(
-      get = (_: Quiz).quizGroups,
-      set = (q: Quiz, qgs: Map[QuizGroupHeader, QuizGroup]) => q.copy(quizGroups = qgs))
+    get = (_: Quiz).quizGroups,
+    set = (q: Quiz, qgs: Map[QuizGroupHeader, QuizGroup]) => q.copy(quizGroups = qgs))
 
   def quizGroupMapLens[QuizGroupHeader, QuizGroup](header: QuizGroupHeader):
       Lens[Map[QuizGroupHeader, QuizGroup], Option[QuizGroup]] =

@@ -58,13 +58,13 @@ object WordMappingValue extends AppDependencyAccess {
 
   def apply(quizItem: QuizItem): WordMappingValue =
     WordMappingValue(
-        quizItem.correctResponse.toString,
-        quizItem.userResponses.correctResponsesInARow,
-        quizItem.userResponses.incorrectResponses)
+      quizItem.correctResponse.toString,
+      quizItem.userResponses.correctResponsesInARow,
+      quizItem.userResponses.incorrectResponses)
 
   def apply(value: String, userResponsesAll: UserResponsesAll): WordMappingValue =
     WordMappingValue(
-        value,
-        userResponsesAll.correctResponsesInARow,
-        userResponsesAll.incorrectResponses)
+      value,
+      userResponsesAll.correctResponsesInARow,
+      userResponsesAll.incorrectResponses)
 }
