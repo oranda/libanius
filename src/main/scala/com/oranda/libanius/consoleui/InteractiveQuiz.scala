@@ -41,12 +41,17 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
     val choices = ChoiceGroupQgHeaders(quizGroupHeaders)
     choices.show()
 
-    def selectedQuizGroupHeaders: List[QuizGroupHeader] = choices.getSelectionFromInput match {
+    val selectedQuizGroupHeaders: List[QuizGroupHeader] = choices.getSelectionFromInput match {
       case Right(ChosenOptions(selectedChoices)) => selectedChoices
       case _ => Nil
     }
 
-    selectedQuizGroupHeaders.map(header => (header, dataStore.loadQuizGroupCore(header))).toMap
+    if (selectedQuizGroupHeaders.isEmpty) {
+      output("Unrecognized option")
+      userQuizGroupSelection(quizGroupHeaders)
+    }
+    else
+      selectedQuizGroupHeaders.map(header => (header, dataStore.loadQuizGroupCore(header))).toMap
   }
 
   def testUserWithQuizItem(quiz: Quiz): Unit = {
