@@ -89,17 +89,19 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
     quizGroup
   }
 
-  def initQuizGroup(header: QuizGroupHeader): QuizGroup = {
-    findQuizGroupInResources(header) match {
-      case Some(qgResName) =>
-        val qgText = Util.stopwatch(io.readResource(qgResName).get,
-          s"reading quiz group resource $qgResName")
+  def initQuizGroup(header: QuizGroupHeader): QuizGroup =
+    (for {
+      qgResName <- findQuizGroupInResources(header)
+      qgText <- Util.stopwatch(
+        io.readResource(qgResName),
+        s"reading quiz group resource $qgResName")
+    } yield qgText) match {
+      case Some(qgText) =>
         Util.stopwatch(header.createQuizGroup(qgText), "creating quiz group by parsing text")
       case _ =>
         l.logError(s"failed to load quiz group $header")
         QuizGroup()
     }
-  }
 
   def saveQuiz(quiz: Quiz, path: String = "", userToken: String = ""): Unit = {
 
@@ -170,7 +172,7 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
       Util.stopwatch(
           fileText.map(deserialize[Dictionary, NoParams](_, NoParams())),
           "parsing dictionary")
-    val dictionaryNumKeyWords =  dictionary.map(_.numKeyWords).getOrElse(0)
+    val dictionaryNumKeyWords = dictionary.map(_.numKeyWords).getOrElse(0)
     l.log(s"Finished reading $dictionaryNumKeyWords dictionary prompt words")
     dictionary
   }
