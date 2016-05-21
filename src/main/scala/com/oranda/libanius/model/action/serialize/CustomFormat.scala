@@ -20,7 +20,7 @@ package com.oranda.libanius.model.action.serialize
 
 import com.oranda.libanius.model.quizgroup._
 import java.lang.StringBuilder
-import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
 import com.oranda.libanius.model.wordmapping._
 import com.oranda.libanius.util.{StringSplitter, Util, StringUtil}
 import scala.util.Try
@@ -88,7 +88,7 @@ object CustomFormat {
       (implicit customFormat: ToCustomFormat[A, B]): StringBuilder =
     customFormat.to(component, strBuilder, params)
 
-  @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
+  //TODO: @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
   def deserialize[A <: ModelComponent, B <: FromParams](
       str: String,
       fromParams: B)
@@ -155,7 +155,7 @@ object CustomFormatForModelComponents {
       strBuilder.append(" isActive=\"").append(qgud.isActive).append("\"").
           append(" currentPromptNumber=\"").append(qgud.currentPromptNumber).append("\"")
 
-    //TODO: @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
+    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(str: String, fromParams: NoParams) =
       QuizGroupUserData(parseIsActive(str), parseCurrentPromptNumber(str))
 
@@ -221,7 +221,7 @@ object CustomFormatForModelComponents {
 
       val wmv = customFormatWordMappingValue.from(strResponseAndUserInfo, fromParams)
       val userResponses = UserResponsesAll(wmv.correctAnswersInARow, wmv.incorrectAnswers)
-      QuizItem(strPrompt, wmv.value, userResponses)
+      QuizItem(TextValue(strPrompt), TextValue(wmv.value), userResponses)
     }
   }
 
