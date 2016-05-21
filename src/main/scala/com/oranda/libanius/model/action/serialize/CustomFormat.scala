@@ -88,6 +88,7 @@ object CustomFormat {
       (implicit customFormat: ToCustomFormat[A, B]): StringBuilder =
     customFormat.to(component, strBuilder, params)
 
+  @deprecated("Use CustomFormatParserFast for deserialization")
   def deserialize[A <: ModelComponent, B <: FromParams](
       str: String,
       fromParams: B)
@@ -112,6 +113,7 @@ object CustomFormatForModelComponents {
           append("\" useMultipleChoiceUntil=\"").append(qgh.useMultipleChoiceUntil).
           append("\"")
 
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(str: String, params: NoParams) =
       QuizGroupHeader(
           parseQuizGroupType(str),
@@ -150,6 +152,7 @@ object CustomFormatForModelComponents {
       strBuilder.append(" isActive=\"").append(qgud.isActive).append("\"").
           append(" currentPromptNumber=\"").append(qgud.currentPromptNumber).append("\"")
 
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(str: String, fromParams: NoParams) =
       QuizGroupUserData(parseIsActive(str), parseCurrentPromptNumber(str))
 
@@ -188,6 +191,7 @@ object CustomFormatForModelComponents {
       customFormatQuizGroup.to(qgwh.quizGroup, strBuilder, qgwh.header.mainSeparator)
     }
 
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(text: String, fromParams: Separator): QuizGroupWithHeader = {
       val headerLine = text.takeWhile(_ != '\n')
       val qgHeader = QuizGroupHeader(headerLine)
@@ -205,6 +209,7 @@ object CustomFormatForModelComponents {
       customFormatUserResponses.to(qi.userResponses, strBuilder, NoParams())
     }
 
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(strPromptResponse: String, fromParams: Separator): QuizItem = {
       val i = strPromptResponse.indexOf(fromParams.mainSeparator)
       val strPrompt = strPromptResponse.substring(0, i).trim
@@ -234,6 +239,7 @@ object CustomFormatForModelComponents {
     }
 
     // Example: contract:696,697;698/treaty:796;798
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(str: String, fromParams: Separator): WordMappingValueSet = {
       val values = new ListBuffer[WordMappingValue]()
       val wmvsSplitter = stringSplitterFactory.getSplitter('/')
@@ -275,6 +281,7 @@ object CustomFormatForModelComponents {
     }
 
     // Example: text = "nachlösen|1,7,9;6"
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(str: String, fromParams: Separator): WordMappingValue = {
 
       import com.oranda.libanius.util.StringUtil.RichString
@@ -318,6 +325,7 @@ object CustomFormatForModelComponents {
   implicit object customFormatUserResponses
     extends CustomFormat[UserResponsesAll, NoParams, Separator] {
 
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(str: String, fromParams: Separator): UserResponsesAll = {
       val wmv = customFormatWordMappingValue.from(str, fromParams)
       UserResponsesAll(wmv.correctAnswersInARow, wmv.incorrectAnswers)
@@ -349,6 +357,7 @@ object CustomFormatForModelComponents {
     /*
      * Text includes header line
      */
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(text: String, fromParams: Separator): QuizGroup = {
 
       val quizGroupParts = text.split("#quizGroupPartition ")
@@ -392,6 +401,7 @@ object CustomFormatForModelComponents {
     /*
      * Text does not include header line
      */
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(
         text: String,
         fromParams: SeparatorIndexAndRepetitionInterval): QuizGroupMemoryLevel = {
@@ -440,6 +450,7 @@ object CustomFormatForModelComponents {
      *    against|wider
      *    entertain|unterhalten
      */
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(str: String, fromParams: NoParams): Dictionary =
 
       new Dictionary() {
@@ -491,6 +502,7 @@ object CustomFormatForModelComponents {
      *     against|wider
      *     entertain|unterhalten
      */
+    @deprecated("Use CustomFormatParserFast for deserialization")
     def from(str: String, fromParams: Separator): WordMappingGroup = {
 
       val splitterLineBreak = stringSplitterFactory.getSplitter('\n')
