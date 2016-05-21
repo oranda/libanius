@@ -355,7 +355,6 @@ object CustomFormatForModelComponents {
       val headerLine = quizGroupParts.head
       val quizGroupLevels = quizGroupParts.tail
 
-      // TODO: move this header parsing code into customFormatQuizGroupMemoryLevel
       def parseMemLevelText(memLevelText: String): Tuple2[Int, QuizGroupMemoryLevel] = {
         val headerLine = memLevelText.takeWhile(_ != '\n')
         val mainMemLevelText = memLevelText.dropWhile(_ != '\n').tail
