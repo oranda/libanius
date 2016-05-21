@@ -157,12 +157,12 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
 
   private def findAvailableResQuizGroups: Set[QuizGroupHeader] = {
     val qgResNames = io.findQgFileNamesFromResources
-    qgResNames.flatMap(io.readQgMetadataFromResource(_)).toSet
+    qgResNames.flatMap(io.readQgMetadataFromResource).toSet
   }
 
   private def findAvailableFileQuizGroups: Set[QuizGroupHeader] = {
     val qgFileNames = io.findQgFileNamesFromFilesDir
-    qgFileNames.flatMap(io.readQgMetadataFromFile(_)).toSet
+    qgFileNames.flatMap(io.readQgMetadataFromFile).toSet
   }
 
   // return None if the specified fileName is not found on disk

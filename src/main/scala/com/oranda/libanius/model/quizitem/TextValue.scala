@@ -103,7 +103,7 @@ object DesiredResponse extends AppDependencyAccess {
 
   private def allPartsArePresentAndInTheRightOrder(requiredParts: List[String],
       userResponse: String): Boolean = {
-    val indexes = requiredParts.map(userResponse.indexOf(_))
+    val indexes = requiredParts.map(userResponse.indexOf)
     !indexes.contains(-1) && indexes.sortWith(_<_) == indexes
   }
 }

@@ -42,7 +42,7 @@ abstract class ChoiceGroup[T](choices: List[T]) {
           Right(ChosenOptions[T](
             userResponse.split(",")
               .map(_.toInt - 1)
-              .map(choices(_)).toList)))
+              .map(choices).toList)))
           .recover { case e: Exception => Left(Invalid) }
           .get
     }
