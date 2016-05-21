@@ -20,13 +20,17 @@ package com.oranda.libanius.consoleui
 
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
-sealed trait UserConsoleResponse
-sealed trait TextInput extends UserConsoleResponse {
+sealed trait UserConsoleResponse extends Any
+
+sealed trait TextInput extends Any with UserConsoleResponse {
   def text: String
 }
-case class WordQuery(text: String) extends TextInput
-sealed trait Answer extends TextInput
-case class TextAnswer(text: String) extends Answer
+
+case class WordQuery(text: String) extends AnyVal with TextInput
+
+sealed trait Answer extends Any with TextInput
+
+case class TextAnswer(text: String) extends AnyVal with Answer
 case class ChosenOptions[T](chosenOptions: List[T]) extends Answer {
   override def text = chosenOptions.iterator.next.toString
 }
