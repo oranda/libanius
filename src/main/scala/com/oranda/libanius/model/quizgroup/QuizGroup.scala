@@ -57,8 +57,8 @@ case class QuizGroup private(
   def deactivate = QuizGroup.activeLens.set(this, false)
 
   def contains(quizItem: QuizItem): Boolean = levels.exists(_.contains(quizItem))
-  def hasPrompt(prompt: String): Boolean = contains(prompt)
-  def contains(prompt: String): Boolean = contains(TextValue(prompt))
+
+  def hasPrompt(prompt: String): Boolean = contains(TextValue(prompt))
   def contains(prompt: TextValue): Boolean = levels.exists(_.contains(prompt))
   def numQuizItems = levels.view.map(_.numQuizItems).sum
 
@@ -71,8 +71,8 @@ case class QuizGroup private(
 
   // Because memLevel index corresponds to numCorrectAnswersInARow, score computation is fast
   def numCorrectResponses: Int = levels.zipWithIndex.foldLeft(0) {
-      case (accum, (level, index)) => accum + level.size * index
-    }
+    case (accum, (level, index)) => accum + level.size * index
+  }
 
   def maxDiffInPromptNumMinimum = levels.foldLeft(0)(_ max _.repetitionInterval)
 
@@ -189,7 +189,6 @@ case class QuizGroup private(
   }
 }
 
-import com.oranda.libanius.model.UserResponse
 object QuizGroup extends AppDependencyAccess {
 
   /*

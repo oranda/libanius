@@ -43,9 +43,9 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
     }
 
     "accept the addition of a new word-mapping" in {
-      qgMemLevel.contains("good") mustEqual false
+      qgMemLevel.contains(TextValue("good")) mustEqual false
       val qgUpdated = qgMemLevel.addNewQuizItem("good", "gut")
-      qgUpdated.contains("good") mustEqual true
+      qgUpdated.contains(TextValue("good")) mustEqual true
     }
 
     "accept new values for an existing word-mapping" in {
@@ -57,7 +57,7 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
     "remove a quiz pair" in {
       val qgUpdated = qgMemLevel - QuizItem("against", "wider")
-      qgUpdated.contains("against") mustEqual false
+      qgUpdated.contains(TextValue("against")) mustEqual false
     }
 
     "add a new quiz item to the front of its queue" in {

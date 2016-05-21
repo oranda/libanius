@@ -99,9 +99,6 @@ object QuizItem {
   def apply(prompt: String, response: String): QuizItem =
     QuizItemConcrete(TextValue(prompt), TextValue(response))
 
-  def apply(prompt: String, response: String, userResponses: UserResponsesAll): QuizItem =
-    QuizItemConcrete(TextValue(prompt), TextValue(response), userResponses)
-
   def apply(
       prompt: String,
       response: String,

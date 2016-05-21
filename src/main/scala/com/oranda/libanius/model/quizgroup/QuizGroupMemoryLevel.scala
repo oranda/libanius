@@ -57,11 +57,10 @@ case class QuizGroupMemoryLevel(
   protected[model] def numResponses = size
 
   protected[model] def contains(quizItem: QuizItem): Boolean =
-      quizItems.exists(_.samePromptAndResponse(quizItem))
+    quizItems.exists(_.samePromptAndResponse(quizItem))
+
   protected[model] def contains(prompt: TextValue): Boolean =
       quizItems.exists(_.prompt == prompt)
-  protected[model] def contains(prompt: String): Boolean = contains(TextValue(prompt))
-
 
   protected[model] def updatedQuizItems(newQuizItems: List[QuizItem]): QuizGroupMemoryLevel =
     QuizGroupMemoryLevel.itemsLens.set(this, newQuizItems)
