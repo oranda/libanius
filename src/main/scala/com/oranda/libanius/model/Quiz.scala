@@ -52,12 +52,12 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def activeQuizGroupHeaders: Set[QuizGroupHeader] = activeQuizGroups.keySet
 
   def numActiveGroups = activeQuizGroups.size
-  def numPrompts = (0 /: activeQuizGroups.values)(_ + _.numPrompts)
-  def numResponses = (0 /: activeQuizGroups.values)(_ + _.numResponses)
-  def numQuizItems = (0 /: activeQuizGroups.values)(_ + _.size)
-  def numCorrectResponses = (0 /: activeQuizGroups.values)(_ + _.numCorrectResponses)
+  def numPrompts = activeQuizGroups.values.view.map(_.numPrompts).sum
+  def numResponses = activeQuizGroups.values.view.map(_.numResponses).sum
+  def numQuizItems = activeQuizGroups.values.view.map(_.size).sum
+  def numCorrectResponses = activeQuizGroups.values.view.map(_.numCorrectResponses).sum
   def totalCorrectResponsesRequired =
-    (0 /: activeQuizGroups.values)(_ + _.totalCorrectResponsesRequired)
+    activeQuizGroups.values.view.map(_.totalCorrectResponsesRequired).sum
   def scoreSoFar: BigDecimal =  // out of 1.0
     numCorrectResponses.toDouble / totalCorrectResponsesRequired.toDouble
 

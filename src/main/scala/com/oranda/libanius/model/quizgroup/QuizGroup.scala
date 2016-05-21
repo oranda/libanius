@@ -60,7 +60,7 @@ case class QuizGroup private(
   def hasPrompt(prompt: String): Boolean = contains(prompt)
   def contains(prompt: String): Boolean = contains(TextValue(prompt))
   def contains(prompt: TextValue): Boolean = levels.exists(_.contains(prompt))
-  def numQuizItems = (0 /: levels)(_ + _.numQuizItems)
+  def numQuizItems = levels.view.map(_.numQuizItems).sum
 
   def isEmpty = levels.forall(_.isEmpty)
   def size = numQuizItems
@@ -74,7 +74,7 @@ case class QuizGroup private(
       case (accum, (level, index)) => accum + level.size * index
     }
 
-  def maxDiffInPromptNumMinimum = (0 /: levels)(_ max _.repetitionInterval)
+  def maxDiffInPromptNumMinimum = levels.foldLeft(0)(_ max _.repetitionInterval)
 
   def totalCorrectResponsesRequired = numQuizItems * numCorrectResponsesRequired
 
