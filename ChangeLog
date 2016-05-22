@@ -1,10 +1,14 @@
-== 0.984 May ?
+== 0.984 May 22
 
   * Changed application.conf to reference.conf as Libanius Core is usually part of a greater system.
 
   * Added support for creating "fat jars" using sbt assembly.
 
+  * Introduced value classes, e.g. for TextValue, to improve efficiency.
+
   * Improved code formatting, including the use of String Interpolation where it makes sense.
+
+  * Many small stylistic improvements.
 
 
 == 0.983 May 8 2016
