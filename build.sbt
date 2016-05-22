@@ -6,7 +6,7 @@ version := "0.984"
 
 scalaVersion := "2.11.6"
 
-scalacOptions += "-deprecation"
+scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
                   "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
