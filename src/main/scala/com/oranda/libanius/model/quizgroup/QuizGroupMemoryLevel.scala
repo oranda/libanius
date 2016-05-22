@@ -18,10 +18,12 @@
 
 package com.oranda.libanius.model.quizgroup
 
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
+
 import scala.language.postfixOps
 import scala.util.Random
 
-import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
+import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import scalaz._

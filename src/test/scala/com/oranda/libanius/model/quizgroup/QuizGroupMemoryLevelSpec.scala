@@ -20,7 +20,7 @@ package com.oranda.libanius.model.quizgroup
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.quizitem.{QuizItem, TextValue}
+import com.oranda.libanius.model.quizitem.{QuizItem}
 
 import com.oranda.libanius.model._
 import com.oranda.libanius.model.TestData._
@@ -43,21 +43,21 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
     }
 
     "accept the addition of a new word-mapping" in {
-      qgMemLevel.contains(TextValue("good")) mustEqual false
+      qgMemLevel.contains("good") mustEqual false
       val qgUpdated = qgMemLevel.addNewQuizItem("good", "gut")
-      qgUpdated.contains(TextValue("good")) mustEqual true
+      qgUpdated.contains("good") mustEqual true
     }
 
     "accept new values for an existing word-mapping" in {
       val valuesForAgainst = qgMemLevel.findResponsesFor("against")
       valuesForAgainst.size mustEqual 1
-      val qgUpdated = qgMemLevel + QuizItem(TextValue("against"), TextValue("gegen"))
+      val qgUpdated = qgMemLevel + QuizItem("against", "gegen")
       qgUpdated.findResponsesFor("against").size mustEqual 2
     }
 
     "remove a quiz pair" in {
       val qgUpdated = qgMemLevel - QuizItem("against", "wider")
-      qgUpdated.contains(TextValue("against")) mustEqual false
+      qgUpdated.contains("against") mustEqual false
     }
 
     "add a new quiz item to the front of its queue" in {

@@ -47,7 +47,7 @@ class QuizItemSpec extends Specification with AppDependencyAccess {
     }
 
     "be matchable even if there is a 'to ' at the front" in {
-      val quizItem = QuizItem(TextValue("leiden"), TextValue("to suffer"))
+      val quizItem = QuizItem("leiden", "to suffer")
       quizItem.looselyMatches("suffer") mustEqual true
     }
   }

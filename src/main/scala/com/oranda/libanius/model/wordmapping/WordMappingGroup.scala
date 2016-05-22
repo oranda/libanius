@@ -20,10 +20,11 @@ package com.oranda.libanius.model.wordmapping
 
 import com.oranda.libanius.model._
 import com.oranda.libanius.model.action.serialize.Separator
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
 import scala.collection.immutable.{Stream, Iterable}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import scala.collection.mutable
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.QuizItem
 import scala.language.implicitConversions
 import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, QuizGroupHeader, QuizGroup}
 import com.oranda.libanius.util.CollectionHelpers.GroupByOrderedImplicit
@@ -40,8 +41,8 @@ case class WordMappingGroup(header: QuizGroupHeader,
     def makeQuizItems(wmPair: WordMappingPair): Iterable[QuizItem] =
       wmPair.valueSet.values.map(value =>
         QuizItem(
-          TextValue(wmPair.key),
-          TextValue(value.value),
+          wmPair.key,
+          value.value,
           UserResponsesAll(value.correctAnswersInARow, value.incorrectAnswers)))
 
     val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems)

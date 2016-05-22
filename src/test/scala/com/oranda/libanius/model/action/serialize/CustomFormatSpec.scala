@@ -25,7 +25,7 @@ import java.lang.StringBuilder
 import com.oranda.libanius.model.action.serialize._
 import CustomFormat._
 import CustomFormatForModelComponents._
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.wordmapping.{WordMappingValueSet, WordMappingValue}
 import com.oranda.libanius.model.quizgroup.{QuizGroupHeader, QuizGroupWithHeader}
 import com.oranda.libanius.model.TestData._
@@ -36,7 +36,7 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
   def paramsWithSeparator = Separator("|")
   def paramsWithSeparatorAndIndex = SeparatorAndIndex("|", 0)
 
-  val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponsesAll)
+  val quizItem = QuizItem("solve", "nachlösen", userResponsesAll)
   val quizItemCustomFormat = "solve|nachlösen|9,7;6"
 
   def strBuilder = new StringBuilder

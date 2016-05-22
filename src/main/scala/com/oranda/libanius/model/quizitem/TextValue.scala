@@ -24,27 +24,27 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.util.StringUtil
 import StringUtil._
 
-case class TextValue(value: String) extends AnyVal {
+object TextValueOps {
 
-  override def toString = value
+  implicit class TextValue(val value: String) extends AnyVal {
 
-  def matches(otherText: String) = value == otherText
+    override def toString = value
 
-  /*
-   * This is useful when the current value is a correct response with bracketed
-   * expressions that are optional.
-   */
-  def looselyMatches(userResponse: String): Boolean =
-    DesiredResponse(value).matches(userResponse)
+    def matches(otherText: String) = value == otherText
 
-  def hasSameStart(otherValue: String): Int => Boolean =
-    TextValue.hasSameStart(value, otherValue)
-  def hasSameEnd(otherValue: String): Int => Boolean =
-    TextValue.hasSameEnd(value, otherValue)
+    /*
+     * This is useful when the current value is a correct response with bracketed
+     * expressions that are optional.
+     */
+    def looselyMatches(userResponse: String): Boolean =
+      DesiredResponse(value).matches(userResponse)
 
-}
+    def hasSameStart(otherValue: String): Int => Boolean =
+      TextValueOps.hasSameStart(value, otherValue)
 
-object TextValue {
+    def hasSameEnd(otherValue: String): Int => Boolean =
+      TextValueOps.hasSameEnd(value, otherValue)
+  }
 
   def sameStart = (value1: TextValue, value2: TextValue) => hasSameStart(value1, value2)
 
@@ -58,7 +58,7 @@ object TextValue {
     (numOfLetters: Int) => otherValue != value &&
       value.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
 
-  // Forward calls to String where necessary.
+  // Forward calls, TextValue -> String. The "implicit class" functionality works the other way.
   implicit def textValue2String(textValue: TextValue): String = textValue.value
 }
 

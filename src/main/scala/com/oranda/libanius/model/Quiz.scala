@@ -19,6 +19,7 @@
 package com.oranda.libanius.model
 
 import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
 import fastparse.core.Parsed
 
 import scala.collection.immutable._
@@ -26,7 +27,7 @@ import scala.collection.immutable._
 import scala.language.postfixOps
 import scala.math.BigDecimal.double2bigDecimal
 import com.oranda.libanius.dependencies._
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.wordmapping.Dictionary
 
 import scalaz._
@@ -88,7 +89,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def isCorrect(quizGroupHeader: QuizGroupHeader, prompt: String, userResponse: String):
       Boolean = {
     val responses = findResponsesFor(prompt, quizGroupHeader)
-    responses.exists(TextValue(_).looselyMatches(userResponse))
+    responses.exists(_.looselyMatches(userResponse))
   }
 
   /*

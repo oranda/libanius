@@ -25,7 +25,7 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoices._
 import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoicesForModelComponents._
 import com.oranda.libanius.model.TestData._
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.{TextValueOps, QuizItem}
 import com.oranda.libanius.util.Util
 
 
@@ -39,7 +39,7 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
           itemCorrect = QuizItem("entertain", "unterhalten"),
           correctResponses = List("unterhalten"),
           numWrongChoicesRequired = 5,
-          similarityPredicate = TextValue.sameEnd)
+        similarityPredicate = TextValueOps.sameEnd)
 
       falseAnswers.contains("unterrichten") mustEqual true
     }

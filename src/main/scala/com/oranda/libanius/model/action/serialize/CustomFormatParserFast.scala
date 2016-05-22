@@ -21,7 +21,8 @@ package com.oranda.libanius.model.action.serialize
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model._
 import com.oranda.libanius.model.quizgroup._
-import com.oranda.libanius.model.quizitem.{QuizItemConcrete, QuizItem, TextValue}
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
+import com.oranda.libanius.model.quizitem.{QuizItemConcrete, QuizItem}
 import com.oranda.libanius.model.wordmapping.{WordMappingValueSet, WordMappingValue}
 import com.oranda.libanius.util.StringSplitter
 import fastparse.all._
@@ -83,7 +84,7 @@ object CustomFormatParserFast extends AppDependencyAccess {
 
   protected[serialize] def promptAndResponse(implicit sep: Separator): P[(TextValue, TextValue)] =
     P( prompt ~ sep.toString ~ response ).map {
-      case (prompt, correctResponse) => (TextValue(prompt.trim), TextValue(correctResponse.trim))
+      case (prompt, correctResponse) => (prompt.trim, correctResponse.trim)
     }
 
   // Example input: Vertrag|treaty|796;798

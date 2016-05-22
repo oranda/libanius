@@ -20,7 +20,8 @@ package com.oranda.libanius.model.action.serialize
 
 import com.oranda.libanius.model.quizgroup._
 import java.lang.StringBuilder
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
 import com.oranda.libanius.model.wordmapping._
 import com.oranda.libanius.util.{StringSplitter, Util, StringUtil}
 import scala.util.Try
@@ -221,7 +222,7 @@ object CustomFormatForModelComponents {
 
       val wmv = customFormatWordMappingValue.from(strResponseAndUserInfo, fromParams)
       val userResponses = UserResponsesAll(wmv.correctAnswersInARow, wmv.incorrectAnswers)
-      QuizItem(TextValue(strPrompt), TextValue(wmv.value), userResponses)
+      QuizItem(strPrompt, wmv.value, userResponses)
     }
   }
 

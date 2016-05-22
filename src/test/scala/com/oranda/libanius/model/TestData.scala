@@ -18,7 +18,7 @@
 
 package com.oranda.libanius.model
 
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.wordmapping.{WordMappingValue, WordMappingValueSet, Dictionary}
 import com.oranda.libanius.model.quizgroup._
 
@@ -49,7 +49,7 @@ object TestData {
   val correctAnswersInARow = List(UserResponse(9), UserResponse(7))
   val incorrectAnswers = List(UserResponse(6))
   val userResponsesAll = UserResponsesAll(correctAnswersInARow, incorrectAnswers)
-  val quizItem = QuizItem(TextValue("solve"), TextValue("nachlösen"), userResponsesAll)
+  val quizItem = QuizItem("solve", "nachlösen", userResponsesAll)
 
   // Memory level
   /*

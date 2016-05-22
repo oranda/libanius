@@ -18,10 +18,12 @@
 
 package com.oranda.libanius.model.quizgroup
 
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
+
 import scala.language.postfixOps
 
 import com.oranda.libanius.model.wordmapping._
-import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, QuizItem, TextValue}
+import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, QuizItem}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
 import scalaz._
@@ -58,7 +60,7 @@ case class QuizGroup private(
 
   def contains(quizItem: QuizItem): Boolean = levels.exists(_.contains(quizItem))
 
-  def hasPrompt(prompt: String): Boolean = contains(TextValue(prompt))
+  def hasPrompt(prompt: String): Boolean = contains(prompt)
   def contains(prompt: TextValue): Boolean = levels.exists(_.contains(prompt))
   def numQuizItems = levels.view.map(_.numQuizItems).sum
 

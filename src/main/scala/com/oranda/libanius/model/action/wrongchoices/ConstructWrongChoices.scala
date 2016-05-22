@@ -18,8 +18,9 @@
 
 package com.oranda.libanius.model.action.wrongchoices
 
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
 import com.oranda.libanius.model.{ModelComponent}
-import com.oranda.libanius.model.quizitem.{TextValue, QuizItem}
+import com.oranda.libanius.model.quizitem.{TextValueOps, QuizItem}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizgroup.{QuizGroupMemoryLevel, QuizGroup}
 import scala.collection.immutable.{List, HashSet}
@@ -78,7 +79,7 @@ object ConstructWrongChoices extends AppDependencyAccess {
     val numCorrectResponsesSoFar = itemCorrect.userResponses.numCorrectResponsesInARow
 
     val similarityPredicate =
-      if (numCorrectResponsesSoFar % 2 == 1) TextValue.sameStart else TextValue.sameEnd
+      if (numCorrectResponsesSoFar % 2 == 1) TextValueOps.sameStart else TextValueOps.sameEnd
 
     implicit val cwc = ConstructWrongChoicesForModelComponents.cwcQuizGroup
     val badChoicesSimilar = constructWrongChoicesSimilar(quizGroup, itemCorrect,

@@ -18,6 +18,8 @@
 
 package com.oranda.libanius.model.quizitem
 
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
+
 import scala.language.implicitConversions
 import scala.util.Random
 import com.oranda.libanius.model.UserResponsesAll

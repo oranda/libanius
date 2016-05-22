@@ -18,6 +18,8 @@
 
 package com.oranda.libanius.model.quizitem
 
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
+
 import scala.language.implicitConversions
 import com.oranda.libanius.model.{UserResponsesAll, ModelComponent, UserResponse}
 
@@ -97,14 +99,14 @@ object QuizItem {
     QuizItemConcrete(prompt, response, userResponses)
 
   def apply(prompt: String, response: String): QuizItem =
-    QuizItemConcrete(TextValue(prompt), TextValue(response))
+    QuizItemConcrete(prompt, response)
 
   def apply(
       prompt: String,
       response: String,
       correctResponses: List[Int],
       incorrectResponses: List[Int]): QuizItem =
-    QuizItemConcrete(TextValue(prompt), TextValue(response),
+    QuizItemConcrete(prompt, response,
         new UserResponsesAll(correctResponses.map(UserResponse),
         incorrectResponses.map(UserResponse)))
 }
