@@ -104,7 +104,7 @@ trait Simulation {
     assert(score == 1.0, s"Score was $score")
   }
 
-  // For now, just return the correct Answer
+  // For now, just return the correct Answer. Intended to be overridden.
   protected def makeResponse(
       quizItem: QuizItemViewWithChoices,
       quiz: Quiz,
