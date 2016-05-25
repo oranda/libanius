@@ -37,14 +37,14 @@ class DefaultIO extends PlatformIO {
       l.logError(s"File not found: $fileName")
       None
     }
-  }    
-  
+  }
+
   def save(fileName: String, strToSave: String): Unit =
     writeToFile(fileName, strToSave)
-  
-  def writeToFile(fileName: String, data: String) = 
+
+  def writeToFile(fileName: String, data: String) =
     using (new FileWriter(fileName)) (_.write(data))
-  
+
   private def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
 	  try { f(param) } finally { param.close() }
 

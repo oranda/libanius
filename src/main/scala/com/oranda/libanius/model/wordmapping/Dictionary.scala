@@ -37,23 +37,23 @@ case class Dictionary(wordMappings: java.util.LinkedHashMap[String, WordMappingV
     new java.util.LinkedHashMap[String, WordMappingValueSet]) extends ModelComponent {
 
   def numKeyWords = wordMappings.size
-  
+
   def mappingsForKeysBeginningWith(keyStart: String): List[(String, WordMappingValueSet)] = {
     val matchingKeys = wordMappings.keys.filter(_.toLowerCase.startsWith(keyStart.toLowerCase))
     pairListForKeys(matchingKeys, 5)
-  }  
-   
+  }
+
   def mappingsForKeysContaining(keyPart: String): List[(String, WordMappingValueSet)] = {
     val matchingKeys = wordMappings.keys.filter(_.toLowerCase.contains(keyPart.toLowerCase))
     pairListForKeys(matchingKeys, 5)
   }
-  
+
   def pairListForKeys(keys: Iterable[String], size: Int):
       List[(String, WordMappingValueSet)] = {
     val keysSubset = keys.toList.sorted.slice(0, size)
     keysSubset.map(key => (key, wordMappings.get(key)))
   }
-  
+
   def findValuesFor(keyWord: String): WordMappingValueSet = wordMappings.get(keyWord)
 }
 

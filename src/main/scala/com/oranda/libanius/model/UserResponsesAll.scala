@@ -60,7 +60,7 @@ case class UserResponsesAll(correctResponsesInARow: List[UserResponse] = Nil,
     }
 
   def numCorrectResponsesInARow = correctResponsesInARow.length
-  
+
   def promptNumInMostRecentResponse: Option[Int] =
     correctResponsesInARow.headOption.orElse(incorrectResponses.headOption).orElse(None).
         map(_.promptNumber)

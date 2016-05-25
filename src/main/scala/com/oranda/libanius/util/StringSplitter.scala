@@ -21,8 +21,9 @@ package com.oranda.libanius.util
 import java.lang.Character
 
 abstract class StringSplitter(separator: Character) extends Iterator[String] {
-  override def hasNext: Boolean 
-  override def next: String 
+  override def hasNext: Boolean
+
+  override def next: String
   def setString(str: String)
 }
 
@@ -33,11 +34,12 @@ abstract class StringSplitter(separator: Character) extends Iterator[String] {
 class StringSplitterDefault(separator: Character) extends StringSplitter(separator) {
 
   private var iter: Iterator[String] = _
-  
+
   override def setString(str: String): Unit = {
     iter = str.split("\\" + separator.toString).filter(_ != "").iterator
   }
-  
+
   override def hasNext: Boolean = iter.hasNext
-  override def next: String = iter.next  
+
+  override def next: String = iter.next
 }

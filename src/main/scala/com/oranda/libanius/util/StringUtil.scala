@@ -22,7 +22,7 @@ import java.lang.Character
 import java.lang.StringBuilder
 
 object StringUtil {
-    
+
   def parseValue(str: String, beginStr: String, endStr: String): Option[String] = {
     val beginIndex = str.optionalIndex(beginStr)
     beginIndex.flatMap { case beginIndex =>
@@ -31,7 +31,7 @@ object StringUtil {
       endTextIndex.map(str.substring(beginTextIndex, _))
     }
   }
-  
+
   /*
    * The normal Scala mkString is too slow, so this is used instead.
    * It's necessary to pass in an existing StringBuilder.
@@ -42,7 +42,7 @@ object StringUtil {
       fn: (S, T) => StringBuilder,
       separator: Character): S = {
     val iter = iterable.iterator
-    while (iter.hasNext) {      
+    while (iter.hasNext) {
       fn(str, iter.next)
       if (iter.hasNext)
         str.append(separator)
