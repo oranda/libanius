@@ -6,6 +6,8 @@ resolvers ++= Seq("snapshots" at "http://oss.sonatype.org/content/repositories/s
                   Classpaths.typesafeResolver
                  )
 
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
+
 //addSbtPlugin("reaktor" % "sbt-scct" % "0.2-SNAPSHOT")
 
 
