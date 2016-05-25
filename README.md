@@ -5,7 +5,7 @@ Libanius is an app to aid learning. Basically it presents "quiz items" to the us
 
 The core use is as a vocabulary builder in a new language, but it is designed to be flexible enough to present questions and answers of all types.
 
-The implementation is in Scala. The primary target platform is Android.
+The implementation is in Scala. The main target platforms are the Web and Android.
 
 Suggestions for new features and code improvements will be happily received by:
 
