@@ -52,8 +52,11 @@ fork := false
 javaOptions in run += "-XX:+UseConcMarkSweepGC"
 
 javaOptions in run += "-XX:+CMSClassUnloadingEnabled"
- 
-javaOptions in run += "-XX:PermSize=512M" 
+
+javaOptions in run += "-XX:PermSize=512M"
 
 javaOptions in run += "-XX:MaxPermSize=512M"
+
+//addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.14")
+
 
