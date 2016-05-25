@@ -25,10 +25,6 @@ import scalaz._
 case class UserResponsesAll(correctResponsesInARow: List[UserResponse] = Nil,
     incorrectResponses: List[UserResponse] = Nil) extends ModelComponent {
 
-  def updated(value: String, correctResponsesInARow: List[UserResponse],
-      incorrectResponses: List[UserResponse]): UserResponsesAll =
-    new UserResponsesAll(correctResponsesInARow, incorrectResponses)
-
   def userResponses = correctResponsesInARow ++ incorrectResponses
 
   def add(userResponse: UserResponse, wasCorrect: Boolean): UserResponsesAll =
