@@ -82,7 +82,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val numPromptsAfter = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
       val foundQuizItem = QuizItemSource.produceQuizItem(
-          qgUpdated.levels(0),
+        qgUpdated.levels.head,
           CurrentPromptNumber(qgUpdated.currentPromptNumber))
       foundQuizItem mustEqual Some(QuizItem("sweeps", "streicht"))
     }
@@ -93,7 +93,7 @@ class QuizGroupSpec extends Specification with AppDependencyAccess {
       val sizeAfter = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
       val foundQuizItem = QuizItemSource.produceQuizItem(
-          qgUpdated.levels(0), CurrentPromptNumber(qgUpdated.currentPromptNumber))
+        qgUpdated.levels.head, CurrentPromptNumber(qgUpdated.currentPromptNumber))
       foundQuizItem mustEqual Some(QuizItem("on", "zu"))
     }
 

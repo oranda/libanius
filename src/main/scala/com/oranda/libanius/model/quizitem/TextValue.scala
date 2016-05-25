@@ -99,7 +99,7 @@ object DesiredResponse extends AppDependencyAccess {
   private def partsOutsideBrackets(desiredResponse: String): List[String] = {
     val pattern = new Regex("""([\s|\w]+)(\(|\z)""")
     val matchIter = pattern.findAllIn(desiredResponse)
-    matchIter.matchData.toList map { m => m.subgroups(0).trim() }
+    matchIter.matchData.toList map { m => m.subgroups.head.trim() }
   }
 
   private def allPartsArePresentAndInTheRightOrder(requiredParts: List[String],

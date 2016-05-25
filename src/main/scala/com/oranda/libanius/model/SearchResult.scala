@@ -27,7 +27,7 @@ case class SearchResult(quizGroupHeader: QuizGroupHeader, wmp: SearchResultPair)
   lazy val valueSet = wmp.valueSet
 
   // It may be desired to filter out trivial search results where this is true
-  def keyWordMatchesValue = valueSet.size == 1 && keyWord == valueSet.values(0)
+  def keyWordMatchesValue = valueSet.size == 1 && keyWord == valueSet.values.head
 
   override def toString = s"$keyWord: ${valueSet.toString}"
 }
