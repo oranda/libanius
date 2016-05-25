@@ -67,7 +67,7 @@ object Dictionary {
 
   def fromQuizItems(quizItems: Stream[QuizItem]) =
     new Dictionary() {
-      val wMappingsStream = WordMappingGroup.quizItemsToWordMappingPairs(quizItems, Separator("|"))
+      val wMappingsStream = WordMappingGroup.quizItemsToWordMappingPairs(quizItems)
       wMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
     }
 

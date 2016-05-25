@@ -54,11 +54,11 @@ case class WordMappingGroup(header: QuizGroupHeader,
 object WordMappingGroup extends AppDependencyAccess {
 
   def fromQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup): WordMappingGroup = {
-    val wordMappingPairs = quizItemsToWordMappingPairs(quizGroup.quizItems, header.mainSeparator)
+    val wordMappingPairs = quizItemsToWordMappingPairs(quizGroup.quizItems)
     WordMappingGroup(header, wordMappingPairs, quizGroup.userData)
   }
 
-  def quizItemsToWordMappingPairs(quizItems: Stream[QuizItem], sep: Separator):
+  def quizItemsToWordMappingPairs(quizItems: Stream[QuizItem]):
       Stream[WordMappingPair] =
     quizItems.groupByOrdered(_.prompt).map {
         case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
