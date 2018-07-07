@@ -1,6 +1,6 @@
 /*
  * Libanius
- * Copyright (C) 2012-2016 James McCabe <james@oranda.com>
+ * Copyright (C) 2012-2018 James McCabe <james@oranda.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -26,7 +26,7 @@ import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, QuizGroupHeader, 
 import TestData._
 
 class QuizSpec extends Specification with AppDependencyAccess {
-  
+
   "a quiz" should {
 
     "have a certain number of active groups" in {
@@ -40,8 +40,8 @@ class QuizSpec extends Specification with AppDependencyAccess {
     "find values for a prompt" in {
       quiz.findResponsesFor("on", qghEngGer) mustEqual List("auf")
     }
-    
-    "offer translations for a word, given the group of the word" in { 
+
+    "offer translations for a word, given the group of the word" in {
       val translations = quiz.findResponsesFor(prompt = "Vertrag", qghGerEng).toSet[String]
       translations.contains("contract") mustEqual true
       translations.contains("treaty") mustEqual true

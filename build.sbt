@@ -57,6 +57,9 @@ javaOptions in run += "-XX:PermSize=512M"
 
 javaOptions in run += "-XX:MaxPermSize=512M"
 
-//addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.14")
+
+import sbt._
+
+addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.14")
 
 

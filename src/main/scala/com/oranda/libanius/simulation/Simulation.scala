@@ -1,6 +1,6 @@
 /*
  * Libanius
- * Copyright (C) 2012-2016 James McCabe <james@oranda.com>
+ * Copyright (C) 2012-2018 James McCabe <james@oranda.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -135,6 +135,10 @@ trait Simulation {
 
   // Don't measure processing times while the system is still "warming up"
   private def shouldMeasureTime = responsesProcessed > NUM_WARMUP
+
+  def testLinter(x: Int): Unit = {
+    println("x is not used")
+  }
 }
 
 object Simulation {
