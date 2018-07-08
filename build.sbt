@@ -2,9 +2,9 @@ import sbt._
 
 name := "libanius"
 
-version := "0.984"
+version := "0.985"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.12.6"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
@@ -14,20 +14,19 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
                   "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
                  )
 
-val scalazVersion = "7.1.2"
-
 libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0" % "provided",
-                            "org.specs2" %% "specs2-core" % "2.4.17" % "test",
-                            "org.specs2" %% "specs2-junit" % "2.4.17" % "test",
-                            "org.scalaz" %% "scalaz-core" % scalazVersion,
+  "org.specs2" %% "specs2-core" % "4.2.0" % "test",
+  "org.specs2" %% "specs2-junit" % "4.2.0" % "test",
+  "org.scalaz" %% "scalaz-core" % "7.2.25",
                             "org.apache.httpcomponents" % "httpclient" % "4.1.2",
-                            "com.typesafe.play" %% "play-json" % "2.4.0-RC1",
-                            "com.lihaoyi" %% "fastparse" % "0.3.7"
+  "com.typesafe.play" %% "play-json" % "2.6.7",
+  "com.lihaoyi" %% "fastparse" % "1.0.0",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
                            )
 
-unmanagedClasspath in Runtime <+= baseDirectory map { bd => Attributed.blank(bd / "config") }
+unmanagedClasspath in Runtime += (baseDirectory map { bd => Attributed.blank(bd / "config") }).value
 
-unmanagedClasspath in Test <+= baseDirectory map { bd => Attributed.blank(bd / "config") }
+unmanagedClasspath in Test += (baseDirectory map { bd => Attributed.blank(bd / "config") }).value
 
 parallelExecution in Test := true
 
@@ -60,6 +59,6 @@ javaOptions in run += "-XX:MaxPermSize=512M"
 
 import sbt._
 
-addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.14")
+addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.17")
 
 
