@@ -29,7 +29,9 @@ import com.oranda.libanius.io.{DefaultIO, PlatformIO}
 import com.oranda.libanius.model.wordmapping.Dictionary
 import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup, QuizGroupType}
 
-class DataStore(io: PlatformIO) extends AppDependencyAccess {
+trait DataStore extends AppDependencyAccess {
+
+  val io: PlatformIO
 
   def readQuizMetadata: Set[QuizGroupHeader] = {
     def readRawMetadata: String =
@@ -178,4 +180,6 @@ class DataStore(io: PlatformIO) extends AppDependencyAccess {
   }
 }
 
-class DataStoreDefault(io: PlatformIO) extends DataStore(new DefaultIO)
+class DataStoreDefault extends DataStore {
+  val io = new DefaultIO
+}

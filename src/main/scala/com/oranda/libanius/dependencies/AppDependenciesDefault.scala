@@ -28,7 +28,6 @@ object AppDependenciesDefault extends AppDependencies {
 
   lazy val l: Logger            = new LoggerDefault
   lazy val c: ConfigProvider    = new ConfigProviderDefault
-  lazy val io: PlatformIO       = new DefaultIO
-  lazy val dataStore: DataStore = new DataStoreDefault(io)
+  lazy val dataStore: DataStore = new DataStoreDefault
   lazy val stringSplitterFactory: StringSplitterFactory = new StringSplitterFactoryDefault
 }

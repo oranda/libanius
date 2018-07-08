@@ -43,7 +43,6 @@ trait AppDependencyAccess {
 
   lazy val l = appDependenciesObject.l
   lazy val conf = appDependenciesObject.conf
-  lazy val io = appDependenciesObject.io
   lazy val dataStore = appDependenciesObject.dataStore
   lazy val stringSplitterFactory = appDependenciesObject.stringSplitterFactory
 }

@@ -24,7 +24,6 @@ import com.oranda.libanius.util.StringSplitterFactory
 trait AppDependencies {
   val l: Logger
   val c: ConfigProvider
-  val io: PlatformIO
   val dataStore: DataStore
   val stringSplitterFactory: StringSplitterFactory
 
