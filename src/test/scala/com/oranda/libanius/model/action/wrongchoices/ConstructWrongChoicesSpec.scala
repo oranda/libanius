@@ -25,7 +25,8 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoices._
 import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoicesForModelComponents._
 import com.oranda.libanius.model.TestData._
-import com.oranda.libanius.model.quizitem.{TextValueOps, QuizItem}
+import com.oranda.libanius.model.quizgroup.QuizGroupMemoryLevel
+import com.oranda.libanius.model.quizitem.{QuizItem, TextValueOps}
 import com.oranda.libanius.util.Util
 
 
@@ -44,6 +45,20 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
       falseAnswers.contains("unterrichten") mustEqual true
     }
 
+    "generate false answers similar to a correct answer, not including the correct answer" in {
+      val quizItem1 = QuizItem("teach", "unterrichten")
+      val quizItem2 = QuizItem("entertain", "unterhalten")
+      val smallQuizGroupLevel = QuizGroupMemoryLevel(0, 0, List(quizItem1, quizItem2).toStream)
+
+      val falseAnswers = constructWrongChoicesSimilar(smallQuizGroupLevel,
+        itemCorrect = QuizItem("entertain", "unterhalten"),
+        correctResponses = List("unterhalten"),
+        numWrongChoicesRequired = 2,
+        similarityPredicate = TextValueOps.sameEnd)
+
+      falseAnswers.contains("unterhalten") mustEqual false
+    }
+
     "construct wrong choices" in {
       val quizItemCorrect: QuizItem =
         qgWithHeader.quizGroup.quizItems.find(_.prompt.value == "entertain").get
@@ -60,6 +75,7 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
     /**
      * This reproduces a (former) bug, where only one wrong choice was being produced.
      */
+
     "construct a full set of wrong choices" in {
 
       val demoGroupHeader = """#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="21""""
