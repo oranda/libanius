@@ -86,8 +86,7 @@ object RunDictionary extends App with AppDependencyAccess {
 
   private[this] def getWordQueryFromInput: UserConsoleResponse =
     ConsoleUtil.readLineUntilNoBackspaces match {
-      case "q" => Quit
-      case "quit" => Quit
+      case "q" | "quit" => Quit
       case input: String => WordQuery(input)
     }
 }

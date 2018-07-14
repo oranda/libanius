@@ -35,8 +35,7 @@ abstract class ChoiceGroup[T](choices: List[T]) {
 
   def getSelectionFromInput: Either[NoProcessResponse, ChosenOptions[T]] =
     scala.io.StdIn.readLine match {
-      case "q" => Left(Quit)
-      case "quit" => Left(Quit)
+      case "q" | "quit" => Left(Quit)
       case userResponse: String =>
         Try(
           Right(ChosenOptions[T](

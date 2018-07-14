@@ -18,11 +18,9 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.model.action.serialize.Separator
-
-import scala.collection.JavaConversions.mapAsScalaMap
-
+import scala.collection.JavaConverters._
 import scala.collection.immutable.Stream
+
 import com.oranda.libanius.model.{SearchResultPair, ModelComponent, SearchResult}
 import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader}
 import com.oranda.libanius.model.quizitem.QuizItem
@@ -39,12 +37,12 @@ case class Dictionary(wordMappings: java.util.LinkedHashMap[String, WordMappingV
   def numKeyWords = wordMappings.size
 
   def mappingsForKeysBeginningWith(keyStart: String): List[(String, WordMappingValueSet)] = {
-    val matchingKeys = wordMappings.keys.filter(_.toLowerCase.startsWith(keyStart.toLowerCase))
+    val matchingKeys = wordMappings.asScala.keys.filter(_.toLowerCase.startsWith(keyStart.toLowerCase))
     pairListForKeys(matchingKeys, 5)
   }
 
   def mappingsForKeysContaining(keyPart: String): List[(String, WordMappingValueSet)] = {
-    val matchingKeys = wordMappings.keys.filter(_.toLowerCase.contains(keyPart.toLowerCase))
+    val matchingKeys = wordMappings.asScala.keys.filter(_.toLowerCase.contains(keyPart.toLowerCase))
     pairListForKeys(matchingKeys, 5)
   }
 

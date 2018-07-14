@@ -121,9 +121,9 @@ trait DataStore extends AppDependencyAccess {
 
   /*
    * Assumes the Quiz holds a single quiz group -- this is true only for some clients.
-   * TODO: should return Stream[String] for Spray
+   * TODO: should return Stream[String] for Akka Http
    */
-  def quizStream(quiz: Quiz, userToken: String): Stream[Char] =
+  def quizStream(quiz: Quiz): Stream[Char] =
     quiz.activeQuizGroups.toList.lift(0) match {
       case Some(Tuple2(header, quizGroup)) =>
         val qgwh = QuizGroupWithHeader(header, quizGroup)

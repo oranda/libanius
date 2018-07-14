@@ -31,9 +31,12 @@ class DefaultIO extends PlatformIO {
 
   def readFile(fileName: String): Option[String] = {
     val theFile = new File(fileName)
-    if (theFile.exists)
-      Option(Source.fromFile(theFile).mkString)
-    else {
+    if (theFile.exists) {
+      val fileStream = Source.fromFile(theFile)
+      val str = fileStream.mkString
+      fileStream.close()
+      Option(str)
+    } else {
       l.logError(s"File not found: $fileName")
       None
     }

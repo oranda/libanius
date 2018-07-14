@@ -144,8 +144,7 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
 
   def getAnswerFromInput: UserConsoleResponse =
     readLineUntilNoBackspaces match {
-      case "q" => Quit
-      case "quit" => Quit
+      case "q" | "quit" => Quit
       case input: String => TextAnswer(input)
     }
 }

@@ -156,7 +156,7 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
         foreach(quizItem => {
           numValueSetsSearched = numValueSetsSearched + 1
           // Avoid selecting values belonging to the "correct" correctResponse set
-          if (!correctResponses.contains(quizItem.correctResponse)) {
+          if (!correctResponses.contains(quizItem.correctResponse.toString)) {
             val correctResponse = quizItem.correctResponse
             val areSimilar =
               similarityPredicate(correctResponse, correctValue)(numSimilarLettersRequired)

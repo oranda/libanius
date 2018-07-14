@@ -144,7 +144,7 @@ object CustomFormatParserFast extends AppDependencyAccess {
         QuizGroupMemoryLevel(
             correctResponsesInARow = responsesInARow,
             repetitionInterval = repInterval,
-            quizItemStream = qgmlBody.toStream,
+          quizItemStream = qgmlBody,
             totalResponses = 0,
             numCorrectResponses = 0)
     }

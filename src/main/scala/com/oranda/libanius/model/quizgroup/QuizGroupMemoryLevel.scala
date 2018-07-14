@@ -123,7 +123,7 @@ case class QuizGroupMemoryLevel(
     randomSliceOfQuizItems(sliceSize).map(_.correctResponse).toList
 
   protected[quizgroup] def randomSliceOfQuizItems(sliceSize: Int): Iterable[QuizItem] =
-    if (sliceSize >= size) quizItems.toList
+    if (sliceSize >= size) quizItems
     else {
       val randomStart = Random.nextInt(size - sliceSize)
       quizItems.slice(randomStart, randomStart + sliceSize)

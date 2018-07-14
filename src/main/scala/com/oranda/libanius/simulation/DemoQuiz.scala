@@ -19,7 +19,6 @@
 package com.oranda.libanius.simulation
 
 import com.oranda.libanius.model.Quiz
-import com.oranda.libanius.dependencies.AppDependencyAccess
 
 trait DemoQuiz extends Simulation {
 

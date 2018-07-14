@@ -124,7 +124,7 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
       qgwh.promptType mustEqual "English word"
       qgwh.responseType mustEqual "German word"
 
-      qgwh.levels(0).numQuizItems mustEqual 8
+      qgwh.levels.head.numQuizItems mustEqual 8
       qgwh.levels(1).numQuizItems mustEqual 2
       qgwh.levels(2).numQuizItems mustEqual 2
     }

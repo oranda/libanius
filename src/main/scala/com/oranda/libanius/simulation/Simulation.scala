@@ -101,7 +101,7 @@ trait Simulation {
     outputAverage("compute score: ", totalMillisToComputeScore)
 
     val score = quiz.scoreSoFar
-    assert(score == 1.0, s"Score was $score")
+    assert(score == BigDecimal(1.0), s"Score was $score")
   }
 
   // For now, just return the correct Answer. Intended to be overridden.
@@ -135,10 +135,6 @@ trait Simulation {
 
   // Don't measure processing times while the system is still "warming up"
   private def shouldMeasureTime = responsesProcessed > NUM_WARMUP
-
-  def testLinter(x: Int): Unit = {
-    println("x is not used")
-  }
 }
 
 object Simulation {
