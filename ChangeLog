@@ -1,13 +1,13 @@
-== 0.9851 July 14 2018
+== 0.9.8.5.1 July 14 2018
 
   * Cleared up compiler/lint warnings.
 
 
-== 0.985 July 8 2018
+== 0.9.8.5 July 8 2018
 
   * Upgraded from Scala 2.11.6 to 2.12.6, including dependencies.
 
-== 0.984 May 22 2016
+== 0.9.8.4 May 22 2016
 
   * Changed application.conf to reference.conf as Libanius Core is usually part of a greater system.
 
@@ -20,17 +20,17 @@
   * Many small stylistic improvements.
 
 
-== 0.983 May 8 2016
+== 0.9.8.3 May 8 2016
 
   * Changed deserialization of quiz text to use parser combinators. Specifically: FastParse.
 
 
-== 0.982 May 13 2015
+== 0.9.8.2 May 13 2015
 
   * Initial support for multiple users: added a userToken to some DataStore methods.
 
 
-== 0.981 May 9 2015
+== 0.9.8.1 May 9 2015
 
   * Upgraded from Scala 2.10.2 to Scala 2.11.6, updating dependency versions.
 
@@ -39,35 +39,35 @@
   * Added findQuizGroupHeader function to DataStore
 
 
-== 0.98 April 3 2015
+== 0.9.8 April 3 2015
 
   * Refactored Simulation code.
 
 
-== 0.973 September 25 2014
+== 0.9.7.3 September 25 2014
 
   * In the model classes, adopted the Scala idiom of using symbolic names rather than
     descriptive names for method names where operations are purely functional.
 
 
-== 0.972 September 10 2014
+== 0.9.7.2 September 10 2014
 
   * Refactored code for finding quiz items and constructing wrong choices into new typeclasses.
 
 
-== 0.971 August 10 2014
+== 0.9.7.1 August 10 2014
 
   * Decoupled serialization/deserialization from the model with the new CustomFormat typeclass.
 
 
-== 0.97 June 13 2014
+== 0.9.7 June 13 2014
 
   * Memory Levels will now adapt their intervals based on user performance.
 
   * Moved useMultipleChoiceUntil from global configuration to be tied to individual quiz groups.
 
 
-== 0.96 March 2 2014
+== 0.9.6 March 2 2014
 
   * Removed SearchResultsContainer in favour of just returning a Try.
 
@@ -76,21 +76,21 @@
   * Changed spaced intervals and started keeping track of response success at each "memory level".
 
 
-== 0.951 February 2 2014
+== 0.9.5.1 February 2 2014
 
   * Fine-tuned the use of Streams to avoid OutOfMemoryErrors.
 
   * Made the simulation tail-recursive to avoid StackOverflowErrors.
 
 
-== 0.95 January 26 2014
+== 0.9.5 January 26 2014
 
   * Added remote dictionary search, i.e. REST querying of mymemory.translated.net.
 
   * Added RunDictionary script and fixed dictionary bugs.
 
 
-== 0.94 January 10 2014
+== 0.9.4 January 10 2014
 
   * The internal partitioning of QuizGroup's is now reflected in the file format.
 
@@ -99,19 +99,19 @@
   * Added scct for test coverage monitoring.
 
 
-== 0.93 January 08 2014
+== 0.9.3 January 08 2014
 
   * Little incremental improvements supporting the Android and Play views.
 
 
-== 0.92 December 18 2013
+== 0.9.2 December 18 2013
 
   * Made constructWrongChoicesRandom() at least ten times more efficient.
 
   * Cleaned data of duplicates.
 
 
-== 0.91 December 16 2013
+== 0.9.1 December 16 2013
 
   * Simplification: QuizGroup is persisted directly rather than going through WordMappingGroup.
 
@@ -129,7 +129,7 @@
   * Introduced some basic simulations for testing performance.
 
 
-== 0.89 September 30 2013
+== 0.8.9 September 30 2013
 
   * Introduced Scalaz lenses to help update the persistent data structure.
 
@@ -137,19 +137,19 @@
     unnecessary to persist Quiz metadata.
 
 
-== 0.88 September 9 2013
+== 0.8.8 September 9 2013
 
   * Implemented minimal Dependency Injection scheme.
 
   * Miscellaneous code clarity fixes, including changes to false answer generation.
 
 
-== 0.87 September 3 2013
+== 0.8.7 September 3 2013
 
   * Miscellaneous little fixes, ensuring it works with libanius-android.
 
 
-== 0.86 September 1 2013
+== 0.8.6 September 1 2013
 
   * Changes to QuizPair, resulting in tweaks throughout the codebase:
 
@@ -160,7 +160,7 @@
     5. prompt and response are contained in Value objects, rather than being simple Strings.
 
 
-== 0.85 August 31 2013
+== 0.8.5 August 31 2013
 
   * Restructured the data model for clarity and performance
 
@@ -180,22 +180,22 @@
    libanius-android - Android UI, using libanius as a library JAR
 
 
-== 0.741 August 10 2013
+== 0.7.4.1 August 10 2013
 
   * Eliminated some mutable state (Dictionary) that was causing a problem.
 
 
-== 0.74 August 10 2013
+== 0.7.4 August 10 2013
 
   * Fix bugs around range search updating.
 
 
-== 0.73 August 6 2013
+== 0.7.3 August 6 2013
 
   * Cleanup, including improved error handling with Try.
 
 
-== 0.72 August 4 2013
+== 0.7.2 August 4 2013
 
   * Dictionary feature re-introduced in the OptionsScreen.
 
@@ -207,14 +207,14 @@
   * Dictionary feature temporarily suppressed.
 
 
-== 0.65 July 18 2013
+== 0.6.5 July 18 2013
 
   * Split serialized quiz into separate .wmg files to allow parallel access and hybrid quizzes.
 
   * Bugfixes and removal of mutable state.
 
 
-== 0.62 July 11 2013
+== 0.6.2 July 11 2013
 
   * Moved development from Scala 2.9.2 to 2.10.2.
 
@@ -233,7 +233,7 @@
   * Changed static properties to a configuration object using com.typesafe.config.
 
 
-== 0.51  May 29 2013
+== 0.5.1  May 29 2013
 
  * Cleaned up the data a bit, and set the minimum Android API level to Ice Cream Sandwich.
 

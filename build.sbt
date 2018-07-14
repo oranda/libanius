@@ -2,7 +2,7 @@ import sbt._
 
 name := "libanius"
 
-version := "0.985"
+version := "0.9.8.5.1"
 
 scalaVersion := "2.12.6"
 
