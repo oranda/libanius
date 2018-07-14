@@ -18,11 +18,11 @@ libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0" % "provid
   "org.specs2" %% "specs2-core" % "4.2.0" % "test",
   "org.specs2" %% "specs2-junit" % "4.2.0" % "test",
   "org.scalaz" %% "scalaz-core" % "7.2.25",
-                            "org.apache.httpcomponents" % "httpclient" % "4.1.2",
+  "org.apache.httpcomponents" % "httpclient" % "4.1.2",
   "com.typesafe.play" %% "play-json" % "2.6.7",
   "com.lihaoyi" %% "fastparse" % "1.0.0",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
-                           )
+)
 
 unmanagedClasspath in Runtime += (baseDirectory map { bd => Attributed.blank(bd / "config") }).value
 
