@@ -92,7 +92,8 @@ object MyMemoryTranslate extends AppDependencyAccess {
     )(TranslationMatch)
 
     val translationJson: JsValue = Json.parse(jsonRaw)
-    (translationJson \ "matches").as[List[TranslationMatch]]
+    val matches = (translationJson \ "matches").as[List[TranslationMatch]]
+    matches.map(m => m.copy(translation = m.translation.replaceAll("""[\p{Punct}]""", "")))
   }
 
 

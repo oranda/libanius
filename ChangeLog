@@ -1,4 +1,13 @@
-== 0.984 May 22
+== 0.9851 July 14 2018
+
+  * Cleared up compiler/lint warnings.
+
+
+== 0.985 July 8 2018
+
+  * Upgraded from Scala 2.11.6 to 2.12.6, including dependencies.
+
+== 0.984 May 22 2016
 
   * Changed application.conf to reference.conf as Libanius Core is usually part of a greater system.
 
@@ -231,18 +240,18 @@
 
 == 0.5  July 20 2012
 
- * Added a dictionary screen, so that words can be looked up and added to the 
+ * Added a dictionary screen, so that words can be looked up and added to the
   (front of the) quiz by the user.
- 
- 
+
+
 == 0.4  June 4 2012
 
- * Removed performance bottlenecks, allowing Libanius to work comfortably with 20,000 quiz items, 
+ * Removed performance bottlenecks, allowing Libanius to work comfortably with 20,000 quiz items,
   not just 1,000:
 
-  1. Experimented with various collections to find the fastest ones. E.g. the Java HashMap 
-    is faster than the Scala mutable HashMap 
-  2. For persistence, moved from using XML (very slow on Android) to a custom format. 
+  1. Experimented with various collections to find the fastest ones. E.g. the Java HashMap
+    is faster than the Scala mutable HashMap
+  2. For persistence, moved from using XML (very slow on Android) to a custom format.
     (Also considered using SQLite, but the paradigm shift for this app would be too great.)
   3. Parsing the custom format uses Android's own StringSplitter rather than the slow String.split()
   4. The writing of the custom format uses a single StringBuilder which is passed to all model objects.
