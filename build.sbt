@@ -14,7 +14,7 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
                   "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
                  )
 
-libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0" % "provided",
+libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
   "org.specs2" %% "specs2-core" % "4.2.0" % "test",
   "org.specs2" %% "specs2-junit" % "4.2.0" % "test",
   "org.scalaz" %% "scalaz-core" % "7.2.25",
