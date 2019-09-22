@@ -20,17 +20,12 @@ package com.oranda.libanius.consoleui
 
 import Output._
 import com.oranda.libanius.model._
-import com.typesafe.config.ConfigFactory
 
 object DemoQuiz extends InteractiveQuiz {
 
   runQuiz()
 
   def runQuiz(): Unit = {
-
-    val c = ConfigFactory.load()
-    println("a")
-    println("config..."  + c.entrySet().toString)
 
     output("Running demo quiz...")
     val quiz = Quiz.demoQuiz()
