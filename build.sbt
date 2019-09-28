@@ -14,7 +14,9 @@ resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/re
                   "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
                  )
 
-libraryDependencies ++= Seq("com.typesafe.config" % "config" % "0.3.0",
+val typesafeConfigVersion = "0.3.0"
+
+libraryDependencies ++= Seq("com.typesafe.config" % "config" % typesafeConfigVersion,
   "org.specs2" %% "specs2-core" % "4.2.0" % "test",
   "org.specs2" %% "specs2-junit" % "4.2.0" % "test",
   "org.scalaz" %% "scalaz-core" % "7.2.25",
@@ -37,6 +39,13 @@ artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
 assemblyJarName in assembly := s"${name.value}-${version.value}-fat.jar"
 
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
+
+// Exclude the config jar from the fat jar. Ideally the config jar would be excluded
+// from the classpath using Provided scope, but this spoils the run task, so instead:
+assemblyExcludedJars in assembly := {
+  val cp = (fullClasspath in assembly).value
+  cp filter {_.data.getName == s"config-$typesafeConfigVersion.jar"}
+}
 
 test in assembly := {}
 
