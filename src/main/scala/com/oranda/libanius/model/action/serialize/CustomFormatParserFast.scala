@@ -155,10 +155,8 @@ object CustomFormatParserFast extends AppDependencyAccess {
       case (isActive, currentPromptNumber) => QuizGroupUserData(isActive, currentPromptNumber)
     }
 
-  protected[serialize] def qgType: Parser[QuizGroupType] = nvpString("type").map {
-    case "WordMapping" => WordMapping
-    case "QuestionAndAnswer" => QuestionAndAnswer
-  }
+  protected[serialize] def qgType: Parser[QuizGroupType] =
+    nvpString("type").map(QuizGroupType.fromString)
 
   // Example input:
   // #quizGroup type="WordMapping" promptType="English word" responseType="German word" mainSeparator="|" useMultipleChoiceUntil="4" currentPromptNumber="0" isActive="true"
@@ -182,8 +180,7 @@ object CustomFormatParserFast extends AppDependencyAccess {
   protected[serialize] def quizGroupBody(implicit sep: Separator): P[QuizGroupBody] =
     P( quizGroupMemoryLevel.rep ).map {
       case (qgmls: Seq[QuizGroupMemoryLevel]) =>
-        val levelsMap: QuizGroupBody = qgmls.map(qgml => (qgml.correctResponsesInARow, qgml)).toMap
-        levelsMap
+        qgmls.map(qgml => (qgml.correctResponsesInARow, qgml)).toMap
     }
 
   // Entry point for this parser.

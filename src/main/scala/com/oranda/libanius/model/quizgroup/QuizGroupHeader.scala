@@ -66,6 +66,14 @@ object QuizGroupHeader extends AppDependencyAccess {
     QuizGroupHeader(quizGroupType, promptType, responseType, Separator(sep), useMultipleChoiceUntil)
 }
 
-sealed trait QuizGroupType
-case object WordMapping extends QuizGroupType
-case object QuestionAndAnswer extends QuizGroupType
+sealed abstract class QuizGroupType(val str: String)
+case object WordMapping extends QuizGroupType("WordMapping")
+case object QuestionAndAnswer extends QuizGroupType("QuestionAndAnswer")
+
+object QuizGroupType {
+  def fromString(qgType: String): QuizGroupType = qgType match {
+    case "WordMapping" => WordMapping
+    case "QuestionAndAnswer" => QuestionAndAnswer
+  }
+}
+
