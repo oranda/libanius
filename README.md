@@ -1,6 +1,8 @@
 Libanius
 ========
 
+**DEPRECATED: Use https://github.com/oranda/libanius-akka** 
+
 This is the core library for Libanius. The purpose of Libanius is to aid learning. Basically it presents "quiz items" to the user, and for each one the user must select the correct answer option. Quiz items are presented at random according to a certain algorithm based on [spaced repetition](http://en.wikipedia.org/wiki/Spaced_repetition). An item has to be answered correctly several times before it is considered learnt.
 
 The core use is as a vocabulary builder in a new language, but it is designed to be flexible enough to present questions and answers of all types.
