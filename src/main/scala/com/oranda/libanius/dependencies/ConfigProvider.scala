@@ -33,6 +33,8 @@ class ConfigProviderDefault extends ConfigProvider {
     new Conf(
       enableLogging = config.getBoolean("libanius.enableLogging"),
       email = config.getString("libanius.email"),
+      defaultPromptType = config.getString("libanius.defaultPromptType"),
+      defaultResponseType = config.getString("libanius.defaultResponseType"),
       fileQuizRoot = config.getString("libanius.file.quizRoot"),
       filesDir = config.getString("libanius.file.filesDir"),
       resourcesDir = config.getString("libanius.file.resourcesDir"),
@@ -48,6 +50,8 @@ class ConfigProviderMock extends ConfigProvider {
     new Conf(
       enableLogging = false,
       email = "",
+      defaultPromptType = "",
+      defaultResponseType = "",
       fileQuizRoot = "",
       filesDir = "",
       resourcesDir = "",

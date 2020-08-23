@@ -27,6 +27,8 @@ object Conf {
     new Conf(
       enableLogging = config.getBoolean("libanius.enableLogging"),
       email = config.getString("libanius.email"),
+      defaultPromptType = config.getString("defaultPromptType"),
+      defaultResponseType = config.getString("defaultResponseType"),
       fileQuizRoot = config.getString("libanius.file.quizRoot"),
       filesDir = config.getString("libanius.file.filesDir"),
       resourcesDir = config.getString("libanius.file.resourcesDir"),
@@ -39,6 +41,8 @@ object Conf {
     new Conf(
       enableLogging = false,
       email = "",
+      defaultPromptType = "",
+      defaultResponseType = "",
       fileQuizRoot = "",
       filesDir = "",
       resourcesDir = "",
@@ -51,6 +55,8 @@ object Conf {
     new Conf(
       enableLogging = true,
       email = "",
+      defaultPromptType = "",
+      defaultResponseType = "",
       fileQuizRoot,
       filesDir = "",
       resourcesDir = "",
@@ -65,6 +71,8 @@ object Conf {
 class Conf(
     val enableLogging: Boolean,
     val email: String,
+    val defaultPromptType: String,
+    val defaultResponseType: String,
     val fileQuizRoot: String,
     val filesDir: String,
     val resourcesDir: String,

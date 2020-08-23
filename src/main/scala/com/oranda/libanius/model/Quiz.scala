@@ -32,7 +32,7 @@ import com.oranda.libanius.model.wordmapping.Dictionary
 
 import scalaz._
 import PLens._
-import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup}
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupWithHeader, WordMapping}
 import scala.collection.immutable.Nil
 import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
@@ -236,6 +236,16 @@ object Quiz extends AppDependencyAccess {
     val quizGroupHeadings = str.split("quizGroup").tail
     quizGroupHeadings.map(QuizGroupHeader(_)).toSet
   }
+
+  def getDefaultQuiz = getQuizWithOneGroup(conf.defaultPromptType, conf.defaultResponseType)
+
+  def getQuizWithOneGroup(promptType: String, responseType: String) =
+    dataStore.findQuizGroupHeader(promptType, responseType, WordMapping) match {
+      case Some(initQgh) =>
+        val quizGroup = dataStore.initQuizGroup(initQgh)
+        Quiz(Map(initQgh -> quizGroup))
+      case _ => Quiz.demoQuiz()
+    }
 
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
