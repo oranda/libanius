@@ -21,4 +21,6 @@ local.properties
 /.idea/
 *.iml
 
+# Shell scripts
+*.sh
 
