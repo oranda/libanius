@@ -19,11 +19,12 @@
 package com.oranda.libanius.model.action.wrongchoices
 
 import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
-import com.oranda.libanius.model.{ModelComponent}
-import com.oranda.libanius.model.quizitem.{TextValueOps, QuizItem}
+import com.oranda.libanius.model.ModelComponent
+import com.oranda.libanius.model.quizitem.{QuizItem, TextValueOps}
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.quizgroup.{QuizGroupMemoryLevel, QuizGroup}
-import scala.collection.immutable.{List, HashSet}
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupMemoryLevel}
+
+import scala.collection.immutable.{HashSet, List}
 import scala.util.Random
 import com.oranda.libanius.util.Util
 
@@ -150,6 +151,15 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
       var numValueSetsSearched = 0
       val numSimilarLettersRequired = 2
 
+      def similarityPred(response: String, correctAnswer: String) = {
+        l.log(s"similarityPred: response $response, correctAnswer $correctAnswer")
+        if (correctAnswer.length <= 3) {
+          l.log(s"similarityPred for correctAnswer.length ${correctAnswer.length} is: response.length == correctAnswer.length")
+          response.length == correctAnswer.length
+        } else
+          similarityPredicate(response, correctAnswer)(numSimilarLettersRequired)
+      }
+
       val correctValue = itemCorrect.correctResponse
 
       qgml.quizItems.iterator.takeWhile(_ => similarWords.size < numWrongResponsesRequired).
@@ -158,8 +168,7 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
           // Avoid selecting values belonging to the "correct" correctResponse set
           if (!correctResponses.contains(quizItem.correctResponse.toString)) {
             val correctResponse = quizItem.correctResponse
-            val areSimilar =
-              similarityPredicate(correctResponse, correctValue)(numSimilarLettersRequired)
+            val areSimilar = similarityPred(correctResponse, correctValue)
             if (similarWords.size < numWrongResponsesRequired && areSimilar)
               similarWords += quizItem.correctResponse.value
           }
