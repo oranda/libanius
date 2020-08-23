@@ -16,6 +16,8 @@ gen/
 local.properties
 
 /project/target/
+/target/
+/project/project/
 
 # IntelliJ
 /.idea/
