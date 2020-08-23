@@ -1,8 +1,6 @@
 Libanius
 ========
 
-**DEPRECATED: Use https://github.com/oranda/libanius-akka** 
-
 This is the core library for Libanius. The purpose of Libanius is to aid learning. Basically it presents "quiz items" to the user, and for each one the user must select the correct answer option. Quiz items are presented at random according to a certain algorithm based on [spaced repetition](http://en.wikipedia.org/wiki/Spaced_repetition). An item has to be answered correctly several times before it is considered learnt.
 
 The core use is as a vocabulary builder in a new language, but it is designed to be flexible enough to present questions and answers of all types.
@@ -11,7 +9,7 @@ The implementation is in Scala. The main target platforms are the Web and Androi
 
 Suggestions for new features and code improvements will be happily received by:
 
-James McCabe <james@oranda.com>
+James McCabe <jjtmccabe@gmail.com>
 
 
 Usage
@@ -25,6 +23,8 @@ Get a copy of `github.com/oranda/libanius` using `git clone`,  From SBT, type:
 Pick the option `com.oranda.libanius.consoleui.RunQuiz` and try out a sample quiz.
 
 This has been tested with Scala 2.12.6, Java 8, and sbt 1.1.2.
+
+A better standalone CLI is available at https://github.com/oranda/libanius-cli-zio.
 
 
 License
