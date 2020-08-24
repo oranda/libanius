@@ -1,4 +1,4 @@
-#quizGroup type="QuestionAndAnswer" promptType="ChildrensQuizQuestion" responseType="Answer" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="0"
+#quizGroup promptType="ChildrensQuizQuestion" responseType="Answer" type="QuestionAndAnswer" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="0"
 #quizGroupPartition numCorrectResponsesInARow="0"
 What are the two basic chemical elements that combine to make water?|Hydrogen (and) oxygen
 What piece of clothing is worn on the head?|Hat

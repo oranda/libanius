@@ -23,11 +23,12 @@ import com.oranda.libanius.model.action.serialize._
 import CustomFormat._
 import CustomFormatForModelComponents._
 import com.oranda.libanius.util.Util
+
 import scala.collection.immutable.Set
 import scala.util.Try
 import com.oranda.libanius.io.{DefaultIO, PlatformIO}
 import com.oranda.libanius.model.wordmapping.Dictionary
-import com.oranda.libanius.model.quizgroup.{QuizGroupWithHeader, QuizGroupHeader, QuizGroup, QuizGroupType}
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupKey, QuizGroupType, QuizGroupWithHeader}
 
 trait DataStore extends AppDependencyAccess {
 
@@ -59,6 +60,9 @@ trait DataStore extends AppDependencyAccess {
     availableQuizGroups.find(qgh => qgh.promptType == promptType
       && qgh.responseType == responseType)
   }
+
+  def findQuizGroupHeader(quizGroupKey: QuizGroupKey): Option[QuizGroupHeader] =
+    findAvailableQuizGroups.find(_.quizGroupKey == quizGroupKey)
 
   def loadQuizGroup(header: QuizGroupHeader): QuizGroup = {
     l.log(s"DataStore.loadQuizGroup $header")

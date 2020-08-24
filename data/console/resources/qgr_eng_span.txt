@@ -1,4 +1,4 @@
-#quizGroup type="WordMapping" promptType="English word" responseType="Spanish word" mainSeparator="|" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="0"
+#quizGroup promptType="English word" responseType="Spanish word" type="WordMapping" mainSeparator="|" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="0"
 #quizGroupPartition numCorrectResponsesInARow="0"
 that|que|
 of|de|

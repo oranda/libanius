@@ -107,21 +107,23 @@ object CustomFormatForModelComponents {
      * highly efficient on Android for large quiz files.
      */
     def to(qgh: QuizGroupHeader, strBuilder: StringBuilder, params: NoParams) =
-      strBuilder.append("#quizGroup type=\"").append(qgh.quizGroupType).
-          append("\" promptType=\""). append(qgh.promptType).
-          append("\" responseType=\"").append(qgh.responseType).
-          append("\" mainSeparator=\"").append(qgh.mainSeparator).
-          append("\" useMultipleChoiceUntil=\"").append(qgh.useMultipleChoiceUntil).
-          append("\"")
+      strBuilder
+        .append("#quizGroup promptType=\"").append(qgh.promptType)
+        .append("\" responseType=\"").append(qgh.responseType)
+        .append("\" type=\"").append(qgh.quizGroupType)
+        .append("\" mainSeparator=\"").append(qgh.mainSeparator)
+        .append("\" useMultipleChoiceUntil=\"").append(qgh.useMultipleChoiceUntil)
+        .append("\"")
 
     @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(str: String, params: NoParams) =
       QuizGroupHeader(
-          parseQuizGroupType(str),
-          parsePromptType(str),
-          parseResponseType(str),
-          Separator(parseMainSeparator(str)),
-          parseUseMultipleChoiceUntil(str))
+        parsePromptType(str),
+        parseResponseType(str),
+        parseQuizGroupType(str),
+        parseMainSeparator(str),
+        parseUseMultipleChoiceUntil(str)
+      )
 
     private[this] def parseQuizGroupType(str: String): QuizGroupType =
       quizGroupType(StringUtil.parseValue(str, "type=\"", "\"").getOrElse(""))

@@ -120,11 +120,11 @@ object TestData {
 
   val qgudCustomFormat = """isActive="true" currentPromptNumber="10""""
   val qghCustomFormat =
-    """#quizGroup type="WordMapping" promptType="English word" responseType="German word" mainSeparator="|" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"
+    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" mainSeparator="|" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"
   val qghCustomFormatNoSeparator =
-    """#quizGroup type="WordMapping" promptType="English word" responseType="German word" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"
+    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"
   val qghCustomFormatNoUseMultipleChoiceUntil =
-    """#quizGroup type="WordMapping" promptType="English word" responseType="German word" isActive="true" currentPromptNumber="10"""" + "\n"
+    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" isActive="true" currentPromptNumber="10"""" + "\n"
 
   val qgwhCustomFormat = qghCustomFormat + qgBodyCustomFormat
 
@@ -171,7 +171,7 @@ object TestData {
   val quizGroupSimple = makeSimpleQuizGroup
 
   def makeQgwh(quizGroup: QuizGroup): QuizGroupWithHeader = {
-    val header = QuizGroupHeader(WordMapping, "English word", "German word", "|", 4)
+    val header = QuizGroupHeader("English word", "German word", WordMapping, "|", 4)
     QuizGroupWithHeader(header, quizGroup)
   }
   val qgwh: QuizGroupWithHeader = makeQgwh(quizGroup)
@@ -185,7 +185,7 @@ object TestData {
   val qgWithHeader = makeQgWithHeader
 
   val quizData = List(
-    """#quizGroup type="WordMapping" promptType="English word" responseType="German word" isActive="true" currentPromptNumber="0"
+    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" isActive="true" currentPromptNumber="0"
       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
       |against|wider|
       |entertain|unterhalten|
@@ -202,7 +202,7 @@ object TestData {
       |#quizGroupPartition numCorrectResponsesInARow="3" repetitionInterval="15"
       |sweeps|streicht|100,200,300;405
       |""".stripMargin,
-    """#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="0"
+    """#quizGroup promptType="German word" responseType="English word" type="WordMapping" isActive="true" currentPromptNumber="0"
       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
       |unterwegs|en route|
       |#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="5"
@@ -213,6 +213,6 @@ object TestData {
   )
 
   val quiz = Quiz.demoQuiz(quizData)
-  val qghEngGer = QuizGroupHeader(WordMapping, "English word", "German word", "|", 4)
-  val qghGerEng = QuizGroupHeader(WordMapping, "German word", "English word", "|", 4)
+  val qghEngGer = QuizGroupHeader("English word", "German word", WordMapping, "|", 4)
+  val qghGerEng = QuizGroupHeader("German word", "English word", WordMapping, "|", 4)
 }

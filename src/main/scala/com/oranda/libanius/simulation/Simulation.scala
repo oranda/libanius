@@ -170,8 +170,8 @@ case class MultipleCorrectChoices(quiz: Quiz, quizItem: QuizItemViewWithChoices)
 
   lazy val correctChoices = {
     val choices = quizItem.allChoices.toSet
-    val correctResponses = quiz.findResponsesFor(quizItem.prompt.value,
-        quizItem.quizGroupHeader).toSet
+    val qgKey = quizItem.quizGroupKey
+    val correctResponses = quiz.findResponsesFor(quizItem.prompt.value, qgKey).toSet
     choices.intersect(correctResponses)
   }
 

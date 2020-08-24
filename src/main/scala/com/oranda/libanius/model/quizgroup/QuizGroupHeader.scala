@@ -26,26 +26,32 @@ import com.oranda.libanius.model.action.serialize._
 import fastparse.all._
 import fastparse.core.Parsed
 
+case class QuizGroupKey(promptType: String, responseType: String, quizGroupType: QuizGroupType) {
+  override def toString = s"$quizGroupType: $promptType-$responseType"
+  def reverse = QuizGroupKey(responseType, promptType, quizGroupType)
+}
+
 case class QuizGroupHeader(
-    quizGroupType: QuizGroupType,
-    promptType: String,
-    responseType: String,
-    mainSeparator: Separator,
-    useMultipleChoiceUntil: Int)
-  extends ModelComponent {
+  quizGroupKey: QuizGroupKey,
+  mainSeparator: Separator,
+  useMultipleChoiceUntil: Int
+) extends ModelComponent {
   // promptType example: "English word"
   // responseType example: "German word"
 
-  override def toString = s"$quizGroupType: $promptType-$responseType"
+  override def toString = quizGroupKey.toString
 
-  def matches(other: QuizGroupHeader) =
+  def promptType = quizGroupKey.promptType
+  def responseType = quizGroupKey.responseType
+  def quizGroupType = quizGroupKey.quizGroupType
+
+  def matches(other: QuizGroupKey) =
     promptType == other.promptType && responseType == other.responseType
 
   def makeQgFileName = s"$promptType-$responseType.qgr"
   def makeDictFileName = s"$promptType-$responseType.dct"
 
-  def reverse = QuizGroupHeader(quizGroupType, responseType, promptType, mainSeparator,
-      useMultipleChoiceUntil)
+  def reverse = QuizGroupHeader(quizGroupKey.reverse, mainSeparator, useMultipleChoiceUntil)
 
   def createQuizGroup(text: String): QuizGroup = {
     val Parsed.Success(qgh, _) = quizGroupWithHeader.parse(text)
@@ -61,9 +67,17 @@ object QuizGroupHeader extends AppDependencyAccess {
     qgh
   }
 
-  def apply(quizGroupType: QuizGroupType, promptType: String,
-      responseType: String, sep: String, useMultipleChoiceUntil: Int): QuizGroupHeader =
-    QuizGroupHeader(quizGroupType, promptType, responseType, Separator(sep), useMultipleChoiceUntil)
+  def apply(
+    promptType: String,
+    responseType: String,
+    quizGroupType: QuizGroupType,
+    mainSeparator: String,
+    useMultipleChoiceUntil: Int
+  ): QuizGroupHeader = QuizGroupHeader(
+    QuizGroupKey(promptType, responseType, quizGroupType),
+    Separator(mainSeparator),
+    useMultipleChoiceUntil
+  )
 }
 
 sealed abstract class QuizGroupType(val str: String)

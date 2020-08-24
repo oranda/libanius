@@ -23,20 +23,20 @@ import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
 import fastparse.core.Parsed
 
 import scala.collection.immutable._
-
 import scala.language.postfixOps
 import scala.math.BigDecimal.double2bigDecimal
 import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.wordmapping.Dictionary
-
 import scalaz._
 import PLens._
-import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupWithHeader, WordMapping}
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupKey, QuizGroupWithHeader, WordMapping}
+
 import scala.collection.immutable.Nil
 import scala.collection.immutable.List
 import scala.collection.immutable.Iterable
 import com.oranda.libanius.net.providers.MyMemoryTranslate
+
 import scala.util.Try
 
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
@@ -70,6 +70,12 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
   def numDictionaryKeyWords(qgh: QuizGroupHeader) = quizGroups(qgh).numDictionaryKeyWords
 
+  def findQuizGroupHeader(quizGroupKey: QuizGroupKey): Option[QuizGroupHeader] =
+    quizGroups.keys.find(_.quizGroupKey == quizGroupKey)
+
+  def findQuizGroup(quizGroupKey: QuizGroupKey): Option[QuizGroup] =
+    findQuizGroupHeader(quizGroupKey).flatMap(activeQuizGroups.get(_))
+
   def resultsBeginningWith(input: String): List[SearchResult] =
     activeQuizGroups.flatMap {
       case (header, quizGroup) =>
@@ -86,26 +92,38 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
         header)
     }.toList
 
-  def isCorrect(quizGroupHeader: QuizGroupHeader, prompt: String, userResponse: String):
-      Boolean = {
-    val responses = findResponsesFor(prompt, quizGroupHeader)
+  def isCorrect(qgKey: QuizGroupKey, prompt: String, userResponse: String): Boolean = {
+    val responses = findResponsesFor(prompt, qgKey)
     responses.exists(_.looselyMatches(userResponse))
   }
 
   /*
    * Do not call in a loop: not fast.
    */
-  def findResponsesFor(prompt: String, header: QuizGroupHeader): List[String] =
-    activeQuizGroups.get(header).map(_.findResponsesFor(prompt)).getOrElse(Nil)
+  def findResponsesFor(prompt: String, qgKey: QuizGroupKey): List[String] =
+    findQuizGroup(qgKey).map(_.findResponsesFor(prompt)).getOrElse(Nil)
 
   /*
    *  Do not call in a loop: not fast.
    */
-  def findPromptsFor(response: String, header: QuizGroupHeader): List[String] =
-    activeQuizGroups.get(header).map(_.findPromptsFor(response)).getOrElse(Nil)
+  def findPromptsFor(response: String, qgKey: QuizGroupKey): List[String] =
+    findQuizGroup(qgKey).map(_.findPromptsFor(response)).getOrElse(Nil)
 
   def updatedQuizGroups(quizGroups: Map[QuizGroupHeader, QuizGroup]): Quiz =
     Quiz.quizGroupsLens.set(this, quizGroups)
+
+  def loadQuizGroup(quizGroupKey: QuizGroupKey): (Quiz, Option[QuizGroupHeader]) =
+    findQuizGroupHeader(quizGroupKey) match {
+      case Some(qgh) => (this, Some(qgh))
+      case None =>
+        dataStore.findQuizGroupHeader(quizGroupKey) match {
+          case Some(qgh) =>
+            (addQuizGroup(qgh, dataStore.initQuizGroup(qgh)), Some(qgh))
+          case None =>
+            l.logError(s"Could not find quiz group $quizGroupKey in the data store")
+          (this, None)
+        }
+    }
 
   def activate(header: QuizGroupHeader): Quiz =
     Quiz.quizGroupsLens.set(this, mapVPLens(header) mod ((_: QuizGroup).activate, quizGroups))
@@ -266,8 +284,7 @@ object Quiz extends AppDependencyAccess {
 
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
-
-    s"""#quizGroup type="WordMapping" promptType="English word" responseType="German word" isActive="true" currentPromptNumber="0"
+    s"""#quizGroup promptType="English word" responseType="German word" type="WordMapping" isActive="true" currentPromptNumber="0"
       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
       |en route|unterwegs
       |contract|Vertrag
@@ -277,7 +294,7 @@ object Quiz extends AppDependencyAccess {
       |$memLevelsWithLowIntervals""".stripMargin
       ,
 
-    s"""#quizGroup type="WordMapping" promptType="German word" responseType="English word" isActive="true" currentPromptNumber="0"
+    s"""#quizGroup promptType="German word" responseType="English word" type="WordMapping" isActive="true" currentPromptNumber="0"
       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
       |unterwegs|en route
       |Vertrag|contract

@@ -22,7 +22,6 @@ import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
 
 import scala.language.implicitConversions
 import scala.util.Random
-import com.oranda.libanius.model.UserResponsesAll
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
 /**
@@ -43,6 +42,7 @@ case class QuizItemViewWithChoices(
   lazy val userResponses = quizItem.userResponses
   lazy val promptType = quizGroupHeader.promptType
   lazy val responseType = quizGroupHeader.responseType
+  lazy val quizGroupKey = quizGroupHeader.quizGroupKey
 
   lazy val allChoices: List[String] = choicesInRandomOrder(falseAnswers)
 
