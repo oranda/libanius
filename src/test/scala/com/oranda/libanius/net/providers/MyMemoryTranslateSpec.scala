@@ -21,7 +21,8 @@ package com.oranda.libanius.net.providers
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.SearchResult
-import com.oranda.libanius.model.quizgroup.{WordMapping, QuizGroupHeader}
+import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
+import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
 
 class MyMemoryTranslateSpec extends Specification with AppDependencyAccess {

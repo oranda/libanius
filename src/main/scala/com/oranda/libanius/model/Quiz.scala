@@ -30,7 +30,8 @@ import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.wordmapping.Dictionary
 import scalaz._
 import PLens._
-import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupKey, QuizGroupWithHeader, WordMapping}
+import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupKey, QuizGroupWithHeader}
 
 import scala.collection.immutable.Nil
 import scala.collection.immutable.List

@@ -29,14 +29,13 @@ import com.oranda.libanius.model.action.serialize.CustomFormatParserFast.userRes
 import com.oranda.libanius.model.action.serialize.CustomFormatParserFast.userResponsesAll
 import com.oranda.libanius.model.action.serialize.CustomFormatParserFast.wordMappingValue
 import com.oranda.libanius.model.action.serialize.CustomFormatParserFast.wordMappingValueSet
-import com.oranda.libanius.model.quizgroup.WordMapping
 import com.oranda.libanius.model.quizitem.QuizItem
-import com.oranda.libanius.model.{UserResponsesAll, TestData, UserResponse}
-import fastparse.all._
+import com.oranda.libanius.model.{TestData, UserResponse, UserResponsesAll}
+import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
+import CustomFormatParserFast._
+
 import fastparse.core.Parsed
 import org.specs2.mutable.Specification
-
-import CustomFormatParserFast._
 
 import scala.collection.immutable.List
 

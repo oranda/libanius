@@ -80,11 +80,15 @@ object QuizGroupHeader extends AppDependencyAccess {
   )
 }
 
-sealed abstract class QuizGroupType(val str: String)
-case object WordMapping extends QuizGroupType("WordMapping")
-case object QuestionAndAnswer extends QuizGroupType("QuestionAndAnswer")
+sealed abstract class QuizGroupType(val str: String) {
+  // a default constructor is needed for serialization
+  def this() = this("WordMapping")
+}
 
 object QuizGroupType {
+  case object WordMapping extends QuizGroupType("WordMapping")
+  case object QuestionAndAnswer extends QuizGroupType("QuestionAndAnswer")
+
   def fromString(qgType: String): QuizGroupType = qgType match {
     case "WordMapping" => WordMapping
     case "QuestionAndAnswer" => QuestionAndAnswer

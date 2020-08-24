@@ -19,18 +19,17 @@
 package com.oranda.libanius.consoleui
 
 import scala.util.Try
-import com.oranda.libanius.util.{Util, StringUtil}
+import com.oranda.libanius.util.{StringUtil, Util}
 import Output._
 import ConsoleUtil._
 import com.oranda.libanius.model._
 import com.oranda.libanius.dependencies._
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
-import com.oranda.libanius.model.quizgroup.{WordMapping, QuizGroupHeader, QuizGroup}
-
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader}
 import com.oranda.libanius.model.action._
 import QuizItemSource._
+import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
 import modelComponentsAsQuizItemSources._
-
 import scalaz._
 
 trait InteractiveQuiz extends App with AppDependencyAccess {
