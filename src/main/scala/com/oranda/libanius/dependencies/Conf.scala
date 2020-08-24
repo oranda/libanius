@@ -29,7 +29,6 @@ object Conf {
       email = config.getString("libanius.email"),
       defaultPromptType = config.getString("defaultPromptType"),
       defaultResponseType = config.getString("defaultResponseType"),
-      fileQuizRoot = config.getString("libanius.file.quizRoot"),
       filesDir = config.getString("libanius.file.filesDir"),
       resourcesDir = config.getString("libanius.file.resourcesDir"),
       resQuizPublic = config.getString("libanius.res.quizPublic")
@@ -43,7 +42,6 @@ object Conf {
       email = "",
       defaultPromptType = "",
       defaultResponseType = "",
-      fileQuizRoot = "",
       filesDir = "",
       resourcesDir = "",
       resQuizPublic = ""
@@ -51,13 +49,12 @@ object Conf {
   }
 
   // Configuration for preparing data files before the app is deployed
-  def setUpForParsing(fileQuizRoot: String) = {
+  def setUpForParsing = {
     new Conf(
       enableLogging = true,
       email = "",
       defaultPromptType = "",
       defaultResponseType = "",
-      fileQuizRoot,
       filesDir = "",
       resourcesDir = "",
       resQuizPublic = ""
@@ -73,12 +70,7 @@ class Conf(
     val email: String,
     val defaultPromptType: String,
     val defaultResponseType: String,
-    val fileQuizRoot: String,
     val filesDir: String,
     val resourcesDir: String,
-    val resQuizPublic: String) {
-
-  lazy val fileQuiz = fileQuizRoot + ".qui"
-  lazy val fileQuizLastBackup = fileQuizRoot + "Backup" + ".qui"
-}
+    val resQuizPublic: String)
 

@@ -35,7 +35,6 @@ class ConfigProviderDefault extends ConfigProvider {
       email = config.getString("libanius.email"),
       defaultPromptType = config.getString("libanius.defaultPromptType"),
       defaultResponseType = config.getString("libanius.defaultResponseType"),
-      fileQuizRoot = config.getString("libanius.file.quizRoot"),
       filesDir = config.getString("libanius.file.filesDir"),
       resourcesDir = config.getString("libanius.file.resourcesDir"),
       resQuizPublic = config.getString("libanius.res.quizPublic")
@@ -52,7 +51,6 @@ class ConfigProviderMock extends ConfigProvider {
       email = "",
       defaultPromptType = "",
       defaultResponseType = "",
-      fileQuizRoot = "",
       filesDir = "",
       resourcesDir = "",
       resQuizPublic = ""

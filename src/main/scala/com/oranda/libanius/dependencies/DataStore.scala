@@ -25,26 +25,12 @@ import CustomFormatForModelComponents._
 import com.oranda.libanius.util.Util
 
 import scala.collection.immutable.Set
-import scala.util.Try
 import com.oranda.libanius.io.{DefaultIO, PlatformIO}
 import com.oranda.libanius.model.wordmapping.Dictionary
 import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupKey, QuizGroupType, QuizGroupWithHeader}
 
 trait DataStore extends AppDependencyAccess {
-
   val io: PlatformIO
-
-  def readQuizMetadata: Set[QuizGroupHeader] = {
-    def readRawMetadata: String =
-      io.readFile(conf.fileQuiz).getOrElse(io.readResource(conf.resQuizPublic).get)
-
-    Try(Quiz.metadataFromCustomFormat(readRawMetadata)).recover {
-      // for absent data files, security access exceptions or anything else unexpected
-      case e: Exception =>
-        l.log(s"Error reading quiz: ${e.getMessage}")
-        Set[QuizGroupHeader]()
-    }.get
-  }
 
   def findQuizGroupHeader(
       promptType: String,
