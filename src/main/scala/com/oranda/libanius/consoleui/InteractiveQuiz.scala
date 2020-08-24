@@ -131,7 +131,8 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   def processUserAnswer(
       quiz: Quiz, userResponse: String,
       quizItem: QuizItemViewWithChoices): Quiz = {
-    val isCorrect = quiz.isCorrect(quizItem.quizGroupKey, quizItem.prompt.value, userResponse)
+    val (quizGroupKey, prompt) = (quizItem.quizGroupKey, quizItem.prompt.value)
+    val isCorrect = quiz.isCorrect(quizGroupKey, prompt, userResponse) == Correct
     if (isCorrect) output("\nCorrect!\n")
     else output("\nWrong! It's " + quizItem.correctResponse + "\n")
 

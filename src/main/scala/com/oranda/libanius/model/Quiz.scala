@@ -31,7 +31,7 @@ import com.oranda.libanius.model.wordmapping.Dictionary
 import scalaz._
 import PLens._
 import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
-import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupKey, QuizGroupWithHeader}
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupKey, QuizGroupType, QuizGroupWithHeader}
 
 import scala.collection.immutable.Nil
 import scala.collection.immutable.List
@@ -93,9 +93,13 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
         header)
     }.toList
 
-  def isCorrect(qgKey: QuizGroupKey, prompt: String, userResponse: String): Boolean = {
+  def isCorrect(qgKey: QuizGroupKey, prompt: String, userResponse: String): ResponseCorrectness = {
     val responses = findResponsesFor(prompt, qgKey)
-    responses.exists(_.looselyMatches(userResponse))
+    responses match {
+      case Nil => ItemNotFound
+      case responses: List[String]  =>
+        if (responses.exists(_.looselyMatches(userResponse))) Correct else Incorrect
+    }
   }
 
   /*
@@ -259,7 +263,7 @@ object Quiz extends AppDependencyAccess {
   def getDefaultQuiz = getQuizWithOneGroup(conf.defaultPromptType, conf.defaultResponseType)
 
   def getQuizWithOneGroup(promptType: String, responseType: String) =
-    dataStore.findQuizGroupHeader(promptType, responseType, WordMapping) match {
+    dataStore.findQuizGroupHeader(promptType, responseType, QuizGroupType.WordMapping) match {
       case Some(initQgh) =>
         val quizGroup = dataStore.initQuizGroup(initQgh)
         Quiz(Map(initQgh -> quizGroup))
