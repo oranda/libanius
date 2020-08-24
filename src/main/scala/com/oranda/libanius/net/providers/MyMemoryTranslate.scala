@@ -93,7 +93,11 @@ object MyMemoryTranslate extends AppDependencyAccess {
 
     val translationJson: JsValue = Json.parse(jsonRaw)
     val matches = (translationJson \ "matches").as[List[TranslationMatch]]
-    matches.map(m => m.copy(translation = m.translation.replaceAll("""[\p{Punct}]""", "")))
+    // In the event of failed matches, MyMemory may return $string or $array in the output
+    matches
+      .filterNot(_.translation.contains("$string"))
+      .filterNot(_.translation.contains("$array"))
+      .map(m => m.copy(translation = m.translation.replaceAll("""[\p{Punct}]""", "")))
   }
 
 

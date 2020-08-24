@@ -33,12 +33,12 @@ class MyMemoryTranslateSpec extends Specification with AppDependencyAccess {
 
     "translate a word successfully" in {
       val results: List[SearchResult] = MyMemoryTranslate.translateQgh("Bett", qghGerEng)
-      results.head.valueSet.containsValue("Bed") mustEqual true
+      results.head.valueSet.containsValue("Bed") must beTrue
     }
 
     "return an empty list if there is a problem translating a word" in {
       val results: List[SearchResult] = MyMemoryTranslate.translateQgh("abcdef", qghGerEng)
-      results.isEmpty mustEqual true
+      results.isEmpty must beTrue
     }
   }
 }
