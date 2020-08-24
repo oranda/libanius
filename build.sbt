@@ -26,10 +26,6 @@ libraryDependencies ++= Seq("com.typesafe.config" % "config" % typesafeConfigVer
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
 )
 
-unmanagedClasspath in Runtime += (baseDirectory map { bd => Attributed.blank(bd / "config") }).value
-
-unmanagedClasspath in Test += (baseDirectory map { bd => Attributed.blank(bd / "config") }).value
-
 parallelExecution in Test := true
 
 artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
