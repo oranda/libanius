@@ -1,3 +1,18 @@
+== 0.9.8.6 Aug 4 2020
+
+ * Many modest improvements that were already put in libanius-akka.
+
+   * This library can now (finally!) be used as a managed dependency.
+
+   * There's a new QuizGroupKey class, to be used in many places where QuizGroupHeader was.
+
+   * There's a small breaking change to the format of the header of data files.
+
+   * The return value for isCorrect is now a tri-valued ResponseCorrectness.
+
+   * The MyMemory code has been updated to deal with changes in the remote API.
+
+
 == 0.9.8.5.3 Sep 28 2019
 
  * Minor fixes to allow libanius-scalajs-react to run properly.
