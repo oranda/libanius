@@ -1,16 +1,43 @@
 import sbt._
 
+organization := "com.github.oranda"
 name := "libanius"
 
 version := "0.9.8.5.3"
 
 scalaVersion := "2.12.6"
 
+homepage := Some(url("http://github.com/oranda/libanius"))
+
+licenses += ("GNU Affero General Public License", url("https://www.gnu.org/licenses/agpl-3.0.en.html"))
+
+scmInfo := Some(ScmInfo(
+  url("https://github.com/oranda/libanius"),
+  "scm:git:git@github.com/oranda/libanius.git",
+  Some("scm:git:git@github.com/oranda/libanius.git")))
+
+developers := List(
+  Developer(
+    id = "oranda",
+    name = "James McCabe",
+    email = "jjtmccabe@gmail.com",
+    url = url("https://github.com/oranda")
+  )
+)
+
+publishMavenStyle := true
+
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
+
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-                  "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-                  "releases"  at "http://oss.sonatype.org/content/repositories/releases",
                   "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
                  )
 
@@ -32,8 +59,8 @@ artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
   artifact.name + "-" + version + "." + artifact.extension
 }
 
+// an unmanaged dependency is no longer used, but these settings are retained in case it is needed
 assemblyJarName in assembly := s"${name.value}-${version.value}-fat.jar"
-
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
 
 // Exclude the config jar from the fat jar. Ideally the config jar would be excluded
