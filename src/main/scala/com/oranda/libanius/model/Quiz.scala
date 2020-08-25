@@ -136,6 +136,8 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def deactivate(header: QuizGroupHeader): Quiz =
     Quiz.quizGroupsLens.set(this, mapVPLens(header) mod ((_: QuizGroup).deactivate, quizGroups))
 
+  def deactivateAll: Quiz = quizGroups.keys.foldLeft(this)((quiz, qgh) => quiz.deactivate(qgh))
+
   /*
    * Will not replace existing quiz groups.
    */
