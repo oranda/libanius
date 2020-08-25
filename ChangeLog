@@ -1,6 +1,9 @@
 == 0.9.8.6 Aug 4 2020
 
- * Many modest improvements that were already put in libanius-akka.
+ * For multiple-choice, if the right answer is short, wrong choices will now have
+  the same number of characters.
+
+ * Many modest improvements that were already put in libanius-akka:
 
    * This library can now (finally!) be used as a managed dependency.
 
@@ -11,6 +14,8 @@
    * The return value for isCorrect is now a tri-valued ResponseCorrectness.
 
    * The MyMemory code has been updated to deal with changes in the remote API.
+
+   * It's now possible to retrieve a default quiz with just one quiz group.
 
 
 == 0.9.8.5.3 Sep 28 2019
