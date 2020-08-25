@@ -41,18 +41,35 @@ class QuizSpec extends Specification with AppDependencyAccess {
     }
 
     "confirm a response is correct" in {
-      val quizGroupKey = QuizGroupKey("English word", "German word", QuizGroupType.WordMapping)
-      quiz.isCorrect(quizGroupKey, "en route", "unterwegs") mustEqual Correct
+      quiz.isCorrect(quizGroupKeyEngGer, "en route", "unterwegs") mustEqual Correct
     }
 
     "confirm a response is incorrect" in {
-      val quizGroupKey = QuizGroupKey("English word", "German word", QuizGroupType.WordMapping)
-      quiz.isCorrect(quizGroupKey, "en route", "unterschrift") mustEqual Incorrect
+      quiz.isCorrect(quizGroupKeyEngGer, "en route", "unterschrift") mustEqual Incorrect
     }
 
     "return NotFound for an isCorrect call on a nonexistent item" in {
-      val quizGroupKey = QuizGroupKey("English word", "German word", QuizGroupType.WordMapping)
-      quiz.isCorrect(quizGroupKey, "nonexistent-prompt", "unterschrift") mustEqual ItemNotFound
+      quiz.isCorrect(quizGroupKeyEngGer, "nonexistent-prompt", "unterschrift") mustEqual ItemNotFound
+    }
+
+    "find the quiz group header for a key" in {
+      quiz.findQuizGroupHeader(quizGroupKeyEngGer) mustEqual Some(qghEngGer)
+    }
+
+    "find the quiz group for a key" in {
+      quiz.findQuizGroup(quizGroupKeyEngGer).isDefined mustEqual true
+    }
+
+    "find the quiz group header for a prompt and response type" in {
+      quiz.findQuizGroupHeader(quizGroupKeyEngGer) mustEqual Some(qghEngGer)
+    }
+
+    "find correct responses for a prompt" in {
+      quiz.findResponsesFor("full", quizGroupKeyEngGer) mustEqual List("satt", "voll")
+    }
+
+    "find prompts corresponding to a response" in {
+      quiz.findPromptsFor("satt", quizGroupKeyEngGer) mustEqual List("full")
     }
 
     "offer translations for a word, given the group of the word" in {
@@ -104,6 +121,27 @@ class QuizSpec extends Specification with AppDependencyAccess {
       quizAfterDeactivation.isActive(qghEngGer) mustEqual false
       val quizAfterReactivation = quizAfterDeactivation.activate(qghEngGer)
       quizAfterReactivation.isActive(qghEngGer) mustEqual true
+    }
+
+    "deactivate all quiz groups" in {
+      quiz.isActive(qghEngGer) mustEqual true
+      quiz.isActive(qghGerEng) mustEqual true
+
+      val quizAfterDeactivation = quiz.deactivateAll
+
+      quizAfterDeactivation.isActive(qghEngGer) mustEqual false
+      quizAfterDeactivation.isActive(qghGerEng) mustEqual false
+    }
+
+    "get a quiz with one group" in {
+      val quiz = Quiz.getQuizWithOneGroup("English word", "German word")
+      quiz.numActiveGroups mustEqual 1
+    }
+
+    "get a default quiz" in {
+      val quiz = Quiz.getDefaultQuiz
+      quiz.numActiveGroups mustEqual 1
+      quiz.findQuizGroupHeader(quizGroupKeyEngGer) mustEqual Some(qghEngGer)
     }
 
     "update a quiz with a user response" in {

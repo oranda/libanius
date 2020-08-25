@@ -216,4 +216,6 @@ object TestData {
   val quiz = Quiz.demoQuiz(quizData)
   val qghEngGer = QuizGroupHeader("English word", "German word", WordMapping, "|", 4)
   val qghGerEng = QuizGroupHeader("German word", "English word", WordMapping, "|", 4)
+
+  val quizGroupKeyEngGer = QuizGroupKey("English word", "German word", QuizGroupType.WordMapping)
 }
