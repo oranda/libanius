@@ -1,4 +1,11 @@
-== 0.9.8.6 Aug 4 2020
+== 0.9.8.6.1 Aug 28 2020
+
+ * Fixed a bug where an empty memory level would cause the parser to miss subsequent memory levels
+
+ * Fixed a bug in the CLI where unfinished quiz items weren't being found at the end of the quiz
+
+
+== 0.9.8.6 Aug 25 2020
 
  * For multiple-choice, if the right answer is short, wrong choices will now have
   the same number of characters.
