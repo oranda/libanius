@@ -23,6 +23,7 @@ import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
 import scala.language.implicitConversions
 import scala.util.Random
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
+import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
 
 /**
  * Quiz item data holder:
@@ -45,6 +46,8 @@ case class QuizItemViewWithChoices(
   lazy val quizGroupKey = quizGroupHeader.quizGroupKey
 
   lazy val allChoices: List[String] = choicesInRandomOrder(falseAnswers)
+
+  def isWordMapping = quizGroupHeader.quizGroupType == WordMapping
 
   def isComplete = numCorrectResponsesInARow >= numCorrectResponsesRequired
 
