@@ -119,6 +119,13 @@ object TestData {
         |#quizGroupPartition numCorrectResponsesInARow="6" repetitionInterval="0"
         |""".stripMargin
 
+  val qgBodySmallCustomFormat =
+    s"""$qgMemLevelHeaderCustomFormat
+       |#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="5"
+       |entertain|unterhalten|8;2
+       |winner|Siegerin|5;0
+       |""".stripMargin
+
   val qgudCustomFormat = """isActive="true" currentPromptNumber="10""""
   val qghCustomFormat =
     """#quizGroup promptType="English word" responseType="German word" type="WordMapping" mainSeparator="|" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"

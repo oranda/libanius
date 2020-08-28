@@ -139,12 +139,12 @@ object CustomFormatParserFast extends AppDependencyAccess {
     }
 
   protected[serialize] def quizGroupMemoryLevel(implicit sep: Separator): P[QuizGroupMemoryLevel] =
-    P( quizGroupMemoryLevelHeader ~ "\n" ~ quizGroupMemoryLevelBody).map {
+    P( quizGroupMemoryLevelHeader ~ quizGroupMemoryLevelBody).map {
       case (responsesInARow, repInterval, qgmlBody) =>
         QuizGroupMemoryLevel(
             correctResponsesInARow = responsesInARow,
             repetitionInterval = repInterval,
-          quizItemStream = qgmlBody,
+            quizItemStream = qgmlBody,
             totalResponses = 0,
             numCorrectResponses = 0)
     }

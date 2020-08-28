@@ -158,6 +158,12 @@ class CustomFormatParserFastSpec extends Specification with AppDependencyAccess 
     qgml.numQuizItems mustEqual 2
   }
 
+  "deserialize an empty quiz group memory level body" in {
+    implicit val sep = Separator("|")
+    val Parsed.Success(body, _) = quizGroupMemoryLevelBody.parse("\n")
+    body.size mustEqual 0
+  }
+
   "deserialize quiz group user data" in {
     val Parsed.Success(qgud, _) = quizGroupUserData.parse(qgudCustomFormat)
     qgud.isActive mustEqual true
@@ -205,6 +211,15 @@ class CustomFormatParserFastSpec extends Specification with AppDependencyAccess 
     qgwh(2).numQuizItems mustEqual 2
   }
 
+  // reproduces a former bug
+  "deserialize a QuizGroup without data in the initial partition" in {
+    println(s"qgBodySmallCustomFormat:\n\n$qgBodySmallCustomFormat")
+    val Parsed.Success(qgwh, _) = quizGroupBody(Separator("|")).parse(qgBodySmallCustomFormat)
+
+    qgwh(0).numQuizItems mustEqual 0
+    qgwh(1).numQuizItems mustEqual 2
+  }
+
   "deserialize a QuizGroupWithHeader" in {
     val Parsed.Success(qgwh, _) = quizGroupWithHeader.parse(qgwhCustomFormat)
     qgwh.currentPromptNumber mustEqual 10
@@ -215,5 +230,4 @@ class CustomFormatParserFastSpec extends Specification with AppDependencyAccess 
     qgwh.levels(1).numQuizItems mustEqual 2
     qgwh.levels(2).numQuizItems mustEqual 2
   }
-
 }
