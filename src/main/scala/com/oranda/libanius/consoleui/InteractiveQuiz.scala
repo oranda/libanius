@@ -55,7 +55,7 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
 
   def testUserWithQuizItem(quiz: Quiz): Unit = {
     showScore(quiz)
-    Util.stopwatch(produceQuizItem(quiz, NoParams()), "find quiz items") match {
+    Util.stopwatch(FindQuizItem.run(quiz), "find quiz items") match {
       case Some(quizItem) => keepShowingQuizItems(quiz, quizItem)
       case _ => output("No more questions found! Done!")
     }
@@ -75,9 +75,8 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
     }
   }
 
-  def saveQuiz(quiz: Quiz): Unit = {
-    dataStore.saveQuiz(quiz, path = conf.filesDir)
-  }
+  // This can be overriden to disable saving for trivial cases.
+  def saveQuiz(quiz: Quiz): Quiz = dataStore.saveQuiz(quiz)
 
   def showScore(quiz: Quiz): Unit = {
     val score: BigDecimal = Util.stopwatch(quiz.scoreSoFar, "scoreSoFar")

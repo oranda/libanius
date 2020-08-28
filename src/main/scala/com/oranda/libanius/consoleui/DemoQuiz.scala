@@ -34,5 +34,5 @@ object DemoQuiz extends InteractiveQuiz {
   }
 
   // Don't save the small demo quiz. It should be completed in one sitting if at all.
-  override def saveQuiz(quiz: Quiz): Unit = {}
+  override def saveQuiz(quiz: Quiz): Quiz = quiz
 }
