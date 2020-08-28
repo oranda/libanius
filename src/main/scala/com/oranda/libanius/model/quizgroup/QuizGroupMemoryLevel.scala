@@ -131,10 +131,9 @@ case class QuizGroupMemoryLevel(
 
   override def toString = {
     val quizItemPrompts = quizItems.map(_.prompt)
-    val averageCorrectResponses = numCorrectResponses/totalResponses
-    s"$correctResponsesInARow($repetitionInterval):$averageCorrectResponses: $quizItemPrompts"
+    val avgCorrectResponses = if (totalResponses == 0) 0 else numCorrectResponses/totalResponses
+    s"$correctResponsesInARow($repetitionInterval):$avgCorrectResponses: $quizItemPrompts"
   }
-
 
   protected[model] def isAtLimit = totalResponses >= QuizGroupMemoryLevel.totalResponsesLimit
 

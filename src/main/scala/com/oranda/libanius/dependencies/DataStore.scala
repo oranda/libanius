@@ -77,7 +77,8 @@ trait DataStore extends AppDependencyAccess {
       case _ => initQuizGroup(header)
     }
 
-    if (quizGroup.isEmpty) l.logError(s"No quiz items loaded for $header")
+    if (quizGroup.isEmpty)
+      l.logError(s"No quiz items loaded for $header.\nquizGroup loaded was: " + quizGroup)
     quizGroup
   }
 
@@ -95,7 +96,7 @@ trait DataStore extends AppDependencyAccess {
         QuizGroup()
     }
 
-  def saveQuiz(quiz: Quiz, path: String = "", userToken: String = ""): Unit = {
+  def saveQuiz(quiz: Quiz, path: String = conf.filesDir, userToken: String = ""): Quiz = {
 
     def saveToFile(header: QuizGroupHeader, quizGroup: QuizGroup, userToken: String) = {
       val fileName = header.makeQgFileName
@@ -107,6 +108,7 @@ trait DataStore extends AppDependencyAccess {
       io.writeToFile(path + userToken + "-" + fileName, serialized)
     }
     quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg, userToken) }
+    quiz
   }
 
   /*

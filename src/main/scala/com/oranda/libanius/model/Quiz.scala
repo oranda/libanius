@@ -60,8 +60,12 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def numCorrectResponses = activeQuizGroups.values.view.map(_.numCorrectResponses).sum
   def totalCorrectResponsesRequired =
     activeQuizGroups.values.view.map(_.totalCorrectResponsesRequired).sum
-  def scoreSoFar: BigDecimal =  // out of 1.0
-    numCorrectResponses.toDouble / totalCorrectResponsesRequired.toDouble
+  def scoreSoFar: BigDecimal = // out of 1.0
+    if (totalCorrectResponsesRequired == 0) {
+      l.logError("Could not compute score because totalCorrectResponsesRequired == 0")
+      0
+    } else
+      numCorrectResponses.toDouble / totalCorrectResponsesRequired.toDouble
 
   def numCorrectResponses(qgh: QuizGroupHeader, level: Int) =
     quizGroups(qgh).numCorrectResponses(level)
@@ -309,7 +313,5 @@ object Quiz extends AppDependencyAccess {
       |wider|against
       |unterhalten|entertain
       |$memLevelsWithLowIntervals""".stripMargin
-
   )
-
 }

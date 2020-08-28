@@ -78,7 +78,13 @@ case class QuizGroup private(
 
   def maxDiffInPromptNumMinimum = levels.foldLeft(0)(_ max _.repetitionInterval)
 
-  def totalCorrectResponsesRequired = numQuizItems * numCorrectResponsesRequired
+  def totalCorrectResponsesRequired = {
+    if (numCorrectResponsesRequired == 0) {
+      l.logError("numCorrectResponsesRequired for quizGroup is 0")
+      numQuizItems
+    } else
+      numQuizItems * numCorrectResponsesRequired
+  }
 
   def totalResponses(level: Int): Int = get(level).totalResponses
   def numCorrectResponses(level: Int): Int = get(level).numCorrectResponses
@@ -188,6 +194,11 @@ case class QuizGroup private(
     new QuizItemViewWithChoices(quizItem, currentPromptNumber, header,
         falseAnswers, numCorrectResponses, numCorrectResponsesRequired,
         useMultipleChoice)
+  }
+
+  override def toString = {
+    val strLevels = levels.mkString("\n")
+    s"\nlevels: $strLevels\nuserData: $userData\nDictionary: $dictionary\n"
   }
 }
 
