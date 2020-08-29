@@ -20,10 +20,11 @@ package com.oranda.libanius.model.action.serialize
 
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model._
+import com.oranda.libanius.model.action.serialize.CustomFormatParserFast.nvpInt
 import com.oranda.libanius.model.quizgroup._
 import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
-import com.oranda.libanius.model.quizitem.{QuizItemConcrete, QuizItem}
-import com.oranda.libanius.model.wordmapping.{WordMappingValueSet, WordMappingValue}
+import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemConcrete}
+import com.oranda.libanius.model.wordmapping.{WordMappingValue, WordMappingValueSet}
 import com.oranda.libanius.util.StringSplitter
 import fastparse.all._
 import fastparse.core.Parsed
@@ -159,14 +160,15 @@ object CustomFormatParserFast extends AppDependencyAccess {
     nvpString("type").map(QuizGroupType.fromString)
 
   // Example input:
-  // #quizGroup promptType="English word" responseType="German word" type="WordMapping" mainSeparator="|" useMultipleChoiceUntil="4" currentPromptNumber="0" isActive="true"
+  // #quizGroup promptType="English word" responseType="German word" type="WordMapping" mainSeparator="|" numCorrectResponsesRequired="6" useMultipleChoiceUntil="4" currentPromptNumber="0" isActive="true"
   def quizGroupHeader: Parser[QuizGroupHeader] =
     P( "#quizGroup" ~ nvpString("promptType") ~ nvpString("responseType") ~ qgType ~
-      nvpString("mainSeparator").? ~ nvpInt("useMultipleChoiceUntil").?).map {
-      case (promptType, responseType, qgType, mainSeparator, useMultipleChoiceUntil) =>
+      nvpString("mainSeparator").? ~ nvpInt("numCorrectResponsesRequired").? ~ nvpInt("useMultipleChoiceUntil").?).map {
+      case (promptType, responseType, qgType, mainSeparator, numCorrectResponsesRequired, useMultipleChoiceUntil) =>
         QuizGroupHeader(
           QuizGroupKey(promptType, responseType, qgType),
           Separator(mainSeparator.getOrElse("|")),
+          numCorrectResponsesRequired = numCorrectResponsesRequired.getOrElse(6),
           useMultipleChoiceUntil = useMultipleChoiceUntil.getOrElse(4)
         )
     }
@@ -188,7 +190,9 @@ object CustomFormatParserFast extends AppDependencyAccess {
     def quizGroupWithHeaderInner(quizGroupHeader: QuizGroupHeader, qgud: QuizGroupUserData):
         P[QuizGroupWithHeader] =
       P (quizGroupBody(quizGroupHeader.mainSeparator)).map {
-        case (qgBody) => QuizGroupWithHeader(quizGroupHeader, QuizGroup(qgBody, qgud))
+        case (qgBody) =>
+          val quizGroup = QuizGroup(qgBody, quizGroupHeader.numCorrectResponsesRequired, qgud)
+          QuizGroupWithHeader(quizGroupHeader, quizGroup)
       }
 
     P( quizGroupHeaderAndUserData ).flatMap {

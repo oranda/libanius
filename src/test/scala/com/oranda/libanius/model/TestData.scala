@@ -128,13 +128,18 @@ object TestData {
 
   val qgudCustomFormat = """isActive="true" currentPromptNumber="10""""
   val qghCustomFormat =
-    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" mainSeparator="|" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"
+    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" mainSeparator="|" numCorrectResponsesRequired="6" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"
   val qghCustomFormatNoSeparator =
-    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"
+    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" numCorrectResponsesRequired="6" useMultipleChoiceUntil="4" isActive="true" currentPromptNumber="10"""" + "\n"
   val qghCustomFormatNoUseMultipleChoiceUntil =
-    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" isActive="true" currentPromptNumber="10"""" + "\n"
+    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" numCorrectResponsesRequired="6" isActive="true" currentPromptNumber="10"""" + "\n"
 
   val qgwhCustomFormat = qghCustomFormat + qgBodyCustomFormat
+
+  val qgwhCustomFormat4Level =
+    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" mainSeparator="|" numCorrectResponsesRequired="4" useMultipleChoiceUntil="2" isActive="true" currentPromptNumber="10"
+      |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+      |""".stripMargin
 
   def makeQgMemLevel0: QuizGroupMemoryLevel =
     QuizGroupMemoryLevel(
@@ -169,17 +174,21 @@ object TestData {
   def makeQuizGroup =
     QuizGroup(
       Map(0 -> makeQgMemLevel0, 1-> makeQgMemLevel1, 2-> makeQgMemLevel2),
+      6,
       QuizGroupUserData(isActive = true, 10),
-      new Dictionary())
+      new Dictionary()
+    )
 
   val quizGroup = makeQuizGroup
 
-  def makeSimpleQuizGroup =
-    QuizGroup(Map(0 -> makeQgMemLevel0), QuizGroupUserData(isActive = true, 0))
+  def makeSimpleQuizGroup = QuizGroup(
+    Map(0 -> makeQgMemLevel0), 6, QuizGroupUserData(isActive = true, 0)
+  )
+
   val quizGroupSimple = makeSimpleQuizGroup
 
   def makeQgwh(quizGroup: QuizGroup): QuizGroupWithHeader = {
-    val header = QuizGroupHeader("English word", "German word", WordMapping, "|", 4)
+    val header = QuizGroupHeader("English word", "German word", WordMapping, "|", 6, 4)
     QuizGroupWithHeader(header, quizGroup)
   }
   val qgwh: QuizGroupWithHeader = makeQgwh(quizGroup)
@@ -192,7 +201,7 @@ object TestData {
   // defaults for read-only
   val qgWithHeader = makeQgWithHeader
 
-  val quizData = List(
+  val quizText = List(
     """#quizGroup promptType="English word" responseType="German word" type="WordMapping" isActive="true" currentPromptNumber="0"
       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
       |against|wider|
@@ -220,9 +229,15 @@ object TestData {
       |""".stripMargin
   )
 
-  val quiz = Quiz.demoQuiz(quizData)
-  val qghEngGer = QuizGroupHeader("English word", "German word", WordMapping, "|", 4)
-  val qghGerEng = QuizGroupHeader("German word", "English word", WordMapping, "|", 4)
+  val qg4LevelText =
+    """#quizGroup promptType="English word" responseType="German word" type="WordMapping" numCorrectResponsesRequired="6" isActive="true" currentPromptNumber="0"
+      |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+      |against|wider
+      |""".stripMargin
+
+  val quiz = Quiz.demoQuiz(quizText)
+  val qghEngGer = QuizGroupHeader("English word", "German word", WordMapping, "|", 6, 4)
+  val qghGerEng = QuizGroupHeader("German word", "English word", WordMapping, "|", 6, 4)
 
   val quizGroupKeyEngGer = QuizGroupKey("English word", "German word", QuizGroupType.WordMapping)
 }

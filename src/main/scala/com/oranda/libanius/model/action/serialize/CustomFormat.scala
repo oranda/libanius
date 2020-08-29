@@ -116,6 +116,7 @@ object CustomFormatForModelComponents {
         .append("\" responseType=\"").append(qgh.responseType)
         .append("\" type=\"").append(qgh.quizGroupType)
         .append("\" mainSeparator=\"").append(qgh.mainSeparator)
+        .append("\" numCorrectResponsesRequired=\"").append(qgh.numCorrectResponsesRequired)
         .append("\" useMultipleChoiceUntil=\"").append(qgh.useMultipleChoiceUntil)
         .append("\"")
 
@@ -126,6 +127,7 @@ object CustomFormatForModelComponents {
         parseResponseType(str),
         parseQuizGroupType(str),
         parseMainSeparator(str),
+        parsenumCorrectResponsesRequired(str),
         parseUseMultipleChoiceUntil(str)
       )
 
@@ -150,9 +152,11 @@ object CustomFormatForModelComponents {
     private[this] def parseMainSeparator(str: String): String =
       StringUtil.parseValue(str, "mainSeparator=\"", "\"").getOrElse("|")
 
+    private[this] def parsenumCorrectResponsesRequired(str: String): Int =
+      StringUtil.parseValue(str, "numCorrectResponsesRequired=\"", "\"").getOrElse("6").toInt
+
     private[this] def parseUseMultipleChoiceUntil(str: String): Int =
       StringUtil.parseValue(str, "useMultipleChoiceUntil=\"", "\"").getOrElse("4").toInt
-
   }
 
   implicit object customFormatQuizGroupUserData
@@ -388,7 +392,8 @@ object CustomFormatForModelComponents {
 
       val levelsMap = quizGroupLevels.map(parseMemLevelText).toMap
       val userData: QuizGroupUserData = customFormatQuizGroupUserData.from(headerLine, NoParams())
-      QuizGroup.createFromMemLevels(levelsMap, userData)
+      val defaultNumCorrectResponsesRequired = 6
+      QuizGroup.createFromMemLevels(levelsMap, userData, defaultNumCorrectResponsesRequired)
     }
   }
 

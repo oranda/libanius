@@ -190,10 +190,8 @@ case class QuizGroup private(
       if (useMultipleChoice)
         Util.stopwatch(ConstructWrongChoices.execute(this, quizItem), "constructWrongChoices")
       else Nil
-    val numCorrectResponsesRequired = numLevels // TODO: check inconsistency with the def numCorrectResponsesRequired
     new QuizItemViewWithChoices(quizItem, currentPromptNumber, header,
-        falseAnswers, numCorrectResponses, numCorrectResponsesRequired,
-        useMultipleChoice)
+      falseAnswers, numCorrectResponses, useMultipleChoice)
   }
 
   override def toString = {
@@ -207,25 +205,41 @@ object QuizGroup extends AppDependencyAccess {
   /*
    * Form a QuizGroup from quiz items with no user responses.
    */
-  def fromQuizItems(quizItems: Stream[QuizItem] = Stream.empty,
-      userData: QuizGroupUserData = QuizGroupUserData(isActive = true),
-      dictionary: Dictionary = new Dictionary()): QuizGroup =
-    QuizGroup(Map(0 -> QuizGroupMemoryLevel(0, 0, quizItems)), userData, dictionary)
+  def fromQuizItems(
+    quizItems: Stream[QuizItem] = Stream.empty,
+    numCorrectResponsesRequired: Int = 6,
+    userData: QuizGroupUserData = QuizGroupUserData(isActive = true),
+    dictionary: Dictionary = new Dictionary()
+  ): QuizGroup =
+    QuizGroup(
+      Map(0 -> QuizGroupMemoryLevel(0, 0, quizItems)),
+      numCorrectResponsesRequired,
+      userData,
+      dictionary
+    )
 
-  def apply(memLevelMap: Map[Int, QuizGroupMemoryLevel] = Map(),
-      userData: QuizGroupUserData = QuizGroupUserData(isActive = true),
-      dictionary: Dictionary = new Dictionary()): QuizGroup =
-    QuizGroup(toMemLevelList(memLevelMap), userData, dictionary)
+  def apply(
+    memLevelMap: Map[Int, QuizGroupMemoryLevel] = Map(),
+    numCorrectResponsesRequired: Int = 6,
+    userData: QuizGroupUserData = QuizGroupUserData(isActive = true),
+    dictionary: Dictionary = new Dictionary()
+  ): QuizGroup =
+    QuizGroup(toMemLevelList(memLevelMap, numCorrectResponsesRequired), userData, dictionary)
 
-  def createFromMemLevels(memLevelMap: Map[Int, QuizGroupMemoryLevel],
-      userData: QuizGroupUserData): QuizGroup =
-    QuizGroup(toMemLevelList(memLevelMap), userData, new Dictionary())
+  def createFromMemLevels(
+    memLevelMap: Map[Int, QuizGroupMemoryLevel],
+    userData: QuizGroupUserData,
+    numCorrectResponsesRequired: Int
+  ): QuizGroup =
+    QuizGroup(toMemLevelList(memLevelMap, numCorrectResponsesRequired), userData, new Dictionary())
 
-  private def toMemLevelList(memLevelMap: Map[Int, QuizGroupMemoryLevel]):
-      List[QuizGroupMemoryLevel] = {
+  private def toMemLevelList(
+    memLevelMap: Map[Int, QuizGroupMemoryLevel],
+    numCorrectResponsesRequired: Int
+  ): List[QuizGroupMemoryLevel] = {
     // Note: the final "level" is just a resting place for complete items
-    val defaultIntervalList = List(0, 5, 15, 15, 60, 600, 0)
-    defaultIntervalList.zipWithIndex.map {
+    val intervals = QuizGroupHeader.allIntervals.take(numCorrectResponsesRequired) :+ 0
+    intervals.zipWithIndex.map {
       case (level, index) => memLevelMap.get(index).getOrElse(QuizGroupMemoryLevel(index, level))
     }
   }

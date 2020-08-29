@@ -22,6 +22,7 @@ import com.oranda.libanius.model._
 import com.oranda.libanius.model.action.serialize._
 import CustomFormat._
 import CustomFormatForModelComponents._
+import com.oranda.libanius.consoleui.RunQuiz.l
 import com.oranda.libanius.util.Util
 
 import scala.collection.immutable.Set
@@ -68,7 +69,6 @@ trait DataStore extends AppDependencyAccess {
   }
 
   def loadQuizGroupCore(header: QuizGroupHeader): QuizGroup = {
-
     val quizGroup = findQuizGroupInFilesDir(header) match {
       case Some(qgFileName) =>
         Util.stopwatch(
