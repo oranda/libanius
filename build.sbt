@@ -3,7 +3,7 @@ import sbt._
 organization := "com.github.oranda"
 name := "libanius"
 
-version := "0.9.8.6.1"
+version := "0.9.8.7.1"
 
 scalaVersion := "2.12.6"
 
@@ -37,13 +37,11 @@ publishTo := {
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
-resolvers ++= Seq("Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-                  "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
-                 )
+resolvers ++= Seq("Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases")
 
-val typesafeConfigVersion = "0.3.0"
+val typesafeConfigVersion = "1.4.0"
 
-libraryDependencies ++= Seq("com.typesafe.config" % "config" % typesafeConfigVersion,
+libraryDependencies ++= Seq("com.typesafe" % "config" % typesafeConfigVersion,
   "org.specs2" %% "specs2-core" % "4.2.0" % "test",
   "org.specs2" %% "specs2-junit" % "4.2.0" % "test",
   "org.scalaz" %% "scalaz-core" % "7.2.25",

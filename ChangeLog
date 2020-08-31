@@ -1,3 +1,15 @@
+== 0.9.8.7.1 Aug 31 2020
+
+ * Upgraded com.typesafe.config version to 1.4.0.
+
+ * Added help for "Writing your own quizzes".
+
+
+== 0.9.8.7 Aug 29 2020
+
+ * Allowed numCorrectResponsesRequired to be set for a quiz in the file.
+
+
 == 0.9.8.6.1 Aug 28 2020
 
  * Fixed a bug where an empty memory level in the .qgr file would cause the
