@@ -3,7 +3,7 @@ import sbt._
 organization := "com.github.oranda"
 name := "libanius"
 
-version := "0.9.8.7.1"
+version := "0.9.8.7.2"
 
 scalaVersion := "2.12.6"
 
@@ -52,10 +52,6 @@ libraryDependencies ++= Seq("com.typesafe" % "config" % typesafeConfigVersion,
 )
 
 parallelExecution in Test := true
-
-artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
-  artifact.name + "-" + version + "." + artifact.extension
-}
 
 // an unmanaged dependency is no longer used, but these settings are retained in case it is needed
 assemblyJarName in assembly := s"${name.value}-${version.value}-fat.jar"

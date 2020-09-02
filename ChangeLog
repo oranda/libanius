@@ -1,3 +1,8 @@
+== 0.9.8.7.2 Aug 31 2020
+
+ * Workaround for publishSigned bug where it puts .html doc into jar files instead of classfiles.
+
+
 == 0.9.8.7.1 Aug 31 2020
 
  * Upgraded com.typesafe.config version to 1.4.0.
