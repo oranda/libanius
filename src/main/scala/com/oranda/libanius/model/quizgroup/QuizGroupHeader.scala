@@ -19,12 +19,13 @@
 package com.oranda.libanius.model.quizgroup
 
 import com.oranda.libanius.dependencies.AppDependencyAccess
-
 import com.oranda.libanius.model._
 import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
 import com.oranda.libanius.model.action.serialize._
 import fastparse.all._
 import fastparse.core.Parsed
+
+import scala.collection.immutable.List
 
 case class QuizGroupKey(promptType: String, responseType: String, quizGroupType: QuizGroupType) {
   override def toString = s"$quizGroupType: $promptType-$responseType"
@@ -34,6 +35,7 @@ case class QuizGroupKey(promptType: String, responseType: String, quizGroupType:
 case class QuizGroupHeader(
   quizGroupKey: QuizGroupKey,
   mainSeparator: Separator,
+  numCorrectResponsesRequired: Int,
   useMultipleChoiceUntil: Int
 ) extends ModelComponent {
   // promptType example: "English word"
@@ -51,16 +53,18 @@ case class QuizGroupHeader(
   def makeQgFileName = s"$promptType-$responseType.qgr"
   def makeDictFileName = s"$promptType-$responseType.dct"
 
-  def reverse = QuizGroupHeader(quizGroupKey.reverse, mainSeparator, useMultipleChoiceUntil)
+  def reverse = copy(quizGroupKey.reverse)
 
   def createQuizGroup(text: String): QuizGroup = {
     val Parsed.Success(qgh, _) = quizGroupWithHeader.parse(text)
     qgh.quizGroup
   }
-
 }
 
 object QuizGroupHeader extends AppDependencyAccess {
+
+  val maxNumCorrectResponsesRequired = 12
+  val allIntervals = List(0, 5, 15, 15, 60, 600, 1200, 2500, 5000, 10000, 20000, 40000)
 
   def apply(headerLine: String): QuizGroupHeader = {
     val Parsed.Success(qgh, _) = quizGroupHeader.parse(headerLine)
@@ -72,12 +76,18 @@ object QuizGroupHeader extends AppDependencyAccess {
     responseType: String,
     quizGroupType: QuizGroupType,
     mainSeparator: String,
+    numCorrectResponsesRequired: Int,
     useMultipleChoiceUntil: Int
-  ): QuizGroupHeader = QuizGroupHeader(
-    QuizGroupKey(promptType, responseType, quizGroupType),
-    Separator(mainSeparator),
-    useMultipleChoiceUntil
-  )
+  ): QuizGroupHeader = {
+    val actualNumCorrectResponsesRequired =
+      math.min(maxNumCorrectResponsesRequired, numCorrectResponsesRequired)
+    QuizGroupHeader(
+      QuizGroupKey(promptType, responseType, quizGroupType),
+      Separator(mainSeparator),
+      actualNumCorrectResponsesRequired,
+      math.min(useMultipleChoiceUntil, actualNumCorrectResponsesRequired)
+    )
+  }
 }
 
 sealed abstract class QuizGroupType(val str: String) {

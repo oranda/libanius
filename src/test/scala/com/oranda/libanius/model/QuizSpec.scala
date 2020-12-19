@@ -79,14 +79,14 @@ class QuizSpec extends Specification with AppDependencyAccess {
     }
 
     "add a new quiz item to a specified group" in {
-      val quizBefore = Quiz.demoQuiz(quizData)
+      val quizBefore = Quiz.demoQuiz(quizText)
       val quizItem = QuizItem("to exchange", "tauschen")
       val quizUpdated = quizBefore.addQuizItemToFront(quizItem, qghEngGer)
       quizUpdated.existsQuizItem(quizItem, qghEngGer) mustEqual true
     }
 
     "delete a quiz pair without deleting all values for that prompt" in {
-      val quizBefore = Quiz.demoQuiz(quizData)
+      val quizBefore = Quiz.demoQuiz(quizText)
       def translationsOfVertrag(quiz: Quiz) =
         quiz.findResponsesFor(prompt = "Vertrag", qghGerEng.quizGroupKey)
       translationsOfVertrag(quizBefore).contains("contract") mustEqual true
@@ -102,7 +102,8 @@ class QuizSpec extends Specification with AppDependencyAccess {
 
     "contain unique groups only" in {
       quiz.numActiveGroups mustEqual 2 // precondition
-      val newQuizGroup =  QuizGroup.fromQuizItems(Stream.empty, QuizGroupUserData(isActive = true))
+      val isActive = true
+      val newQuizGroup = QuizGroup.fromQuizItems(Stream.empty, 6, QuizGroupUserData(isActive))
       val quizUpdated = quiz.addOrReplaceQuizGroup(qghEngGer, newQuizGroup)
       quizUpdated.numActiveGroups mustEqual 2
     }
@@ -173,7 +174,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
       List("against", "entertain", "teach", "winner", "en route", "full",
           "interrupted", "contract", "rides", "on", "the")
 
-    val demoQuizWith1stMemoryLevelIntervalOf5 = Quiz.demoQuiz(quizData)
+    val demoQuizWith1stMemoryLevelIntervalOf5 = Quiz.demoQuiz(quizText)
 
     "narrow a repetition interval after bad user performance" in {
 

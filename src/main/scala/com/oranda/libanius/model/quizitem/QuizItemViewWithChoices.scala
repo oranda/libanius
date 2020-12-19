@@ -35,7 +35,6 @@ case class QuizItemViewWithChoices(
     quizGroupHeader: QuizGroupHeader,
     falseAnswers: List[String],
     numCorrectResponsesInARow: Int,
-    numCorrectResponsesRequired: Int,
     useMultipleChoice: Boolean) {
 
   lazy val prompt: TextValue = quizItem.prompt
@@ -44,6 +43,7 @@ case class QuizItemViewWithChoices(
   lazy val promptType = quizGroupHeader.promptType
   lazy val responseType = quizGroupHeader.responseType
   lazy val quizGroupKey = quizGroupHeader.quizGroupKey
+  lazy val numCorrectResponsesRequired = quizGroupHeader.numCorrectResponsesRequired
 
   lazy val allChoices: List[String] = choicesInRandomOrder(falseAnswers)
 

@@ -1,8 +1,26 @@
+== 0.9.8.7.2 Aug 31 2020
+
+ * Workaround for publishSigned bug where it puts .html doc into jar files instead of classfiles.
+
+
+== 0.9.8.7.1 Aug 31 2020
+
+ * Upgraded com.typesafe.config version to 1.4.0.
+
+ * Added help for "Writing your own quizzes".
+
+
+== 0.9.8.7 Aug 29 2020
+
+ * Allowed numCorrectResponsesRequired to be set for a quiz in the file.
+
+
 == 0.9.8.6.1 Aug 28 2020
 
- * Fixed a bug where an empty memory level would cause the parser to miss subsequent memory levels
+ * Fixed a bug where an empty memory level in the .qgr file would cause the
+  parser to miss subsequent memory levels.
 
- * Fixed a bug in the CLI where unfinished quiz items weren't being found at the end of the quiz
+ * Fixed a bug in the CLI where unfinished quiz items weren't being found at the end of the quiz.
 
 
 == 0.9.8.6 Aug 25 2020

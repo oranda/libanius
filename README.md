@@ -27,6 +27,34 @@ This has been tested with Scala 2.12.6, Java 8, and sbt 1.1.2.
 A better standalone CLI is available at https://github.com/oranda/libanius-cli-zio.
 
 
+Making Your Own Quizzes
+=======================
+
+If you need to learn a subject, consider making a quiz for it. You need to write a quiz file.
+The format is simple. Just study the sample quiz files in the `data/resources` folder. Look at
+the first line. You can see that each question is asked a certain number of times depending
+on the `numCorrectResponsesRequired` parameter, and multiple-choice is used the first x times,
+where x is set using the `useMultipleChoiceUntil`.
+
+The quiz files in `data/resources` have the `.txt` extension. If a user exits a quiz before 
+finishing it, the state is saved in a `.qgr` file in the `data` folder. This will be read
+on running libanius again. Remember to delete `.qgr` files if you want to start from the 
+beginning. 
+
+Whenever the user answers a question correctly, it is said that s/he has moved up a "memory level" 
+with respect to that item. The number of memory levels for a quiz is equal to 
+`numCorrectResponsesRequired`. 
+
+In any quiz file, quiz items are grouped into "partitions", where each partition corresponds to 
+a memory level. You will observe that in the initial quiz file (`.txt`), all quiz items are in 
+the first partition. As the user makes progress, quiz items are moved to other partitions, and 
+you can observe this effect by quitting a quiz and looking at the persisted form, i.e. the 
+`.qgr` file.
+
+If you learn something using your own quiz file, and feel it is a success, consider 
+submitting it to this project (e.g. via a PR) so that other people may learn too.
+
+
 License
 =======
 

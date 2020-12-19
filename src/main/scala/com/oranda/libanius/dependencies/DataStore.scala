@@ -68,7 +68,6 @@ trait DataStore extends AppDependencyAccess {
   }
 
   def loadQuizGroupCore(header: QuizGroupHeader): QuizGroup = {
-
     val quizGroup = findQuizGroupInFilesDir(header) match {
       case Some(qgFileName) =>
         Util.stopwatch(

@@ -230,4 +230,10 @@ class CustomFormatParserFastSpec extends Specification with AppDependencyAccess 
     qgwh.levels(1).numQuizItems mustEqual 2
     qgwh.levels(2).numQuizItems mustEqual 2
   }
+
+  "deserialize a QuizGroupWithHeader with only 4 levels" in {
+    val Parsed.Success(qgwh, _) = quizGroupWithHeader.parse(qgwhCustomFormat4Level)
+    qgwh.header.numCorrectResponsesRequired mustEqual 4
+    qgwh.quizGroup.levels.size mustEqual 5 // includes resting level
+  }
 }

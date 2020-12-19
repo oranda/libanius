@@ -296,22 +296,20 @@ object Quiz extends AppDependencyAccess {
   // Demo data to use as a fallback if no file is available
   def demoDataInCustomFormat = List(
     s"""#quizGroup promptType="English word" responseType="German word" type="WordMapping" isActive="true" currentPromptNumber="0"
-      |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
-      |en route|unterwegs
-      |contract|Vertrag
-      |treaty|Vertrag
-      |against|wider
-      |entertain|unterhalten
-      |$memLevelsWithLowIntervals""".stripMargin
-      ,
-
+       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+       |en route|unterwegs
+       |contract|Vertrag
+       |treaty|Vertrag
+       |against|wider
+       |entertain|unterhalten
+       |$memLevelsWithLowIntervals""".stripMargin,
     s"""#quizGroup promptType="German word" responseType="English word" type="WordMapping" isActive="true" currentPromptNumber="0"
-      |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
-      |unterwegs|en route
-      |Vertrag|contract
-      |Vertrag|treaty
-      |wider|against
-      |unterhalten|entertain
-      |$memLevelsWithLowIntervals""".stripMargin
+       |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+       |unterwegs|en route
+       |Vertrag|contract
+       |Vertrag|treaty
+       |wider|against
+       |unterhalten|entertain
+       |$memLevelsWithLowIntervals""".stripMargin
   )
 }
