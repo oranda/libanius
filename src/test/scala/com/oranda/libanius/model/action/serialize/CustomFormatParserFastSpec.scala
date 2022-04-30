@@ -1,6 +1,6 @@
 /*
  * Libanius
- * Copyright (C) 2012-2020 James McCabe <jjtmccabe@gmail.com>
+ * Copyright (C) 2012-2022 James McCabe <jjtmccabe@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,7 +18,7 @@
 
 /*
  * Libanius
- * Copyright (C) 2012-2020 James McCabe <jjtmccabe@gmail.com>
+ * Copyright (C) 2012-2022 James McCabe <jjtmccabe@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
