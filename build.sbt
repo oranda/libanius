@@ -37,7 +37,7 @@ publishTo := {
 
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
-resolvers ++= Seq("Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases")
+resolvers ++= Seq("mvnrepository" at "https://mvnrepository.com/artifact/")
 
 val typesafeConfigVersion = "1.4.0"
 
