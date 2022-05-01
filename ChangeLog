@@ -1,3 +1,8 @@
+== 0.9.8.7.3 May 1 2022
+
+ * Added missing file FindQuizItem.
+
+
 == 0.9.8.7.2 Aug 31 2020
 
  * Workaround for publishSigned bug where it puts .html doc into jar files instead of classfiles.
