@@ -28,7 +28,7 @@ case class UserResponsesAll(correctResponsesInARow: List[UserResponse] = Nil,
   def userResponses = correctResponsesInARow ++ incorrectResponses
 
   def add(userResponse: UserResponse, wasCorrect: Boolean): UserResponsesAll =
-    if (wasCorrect)
+    if wasCorrect then
       UserResponsesAll.userResponsesCorrectResponsesLens.set(this,
           userResponse :: correctResponsesInARow)
     else {

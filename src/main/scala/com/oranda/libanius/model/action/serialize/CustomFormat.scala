@@ -32,7 +32,6 @@ import com.oranda.libanius.model.wordmapping.WordMappingPair
 import com.oranda.libanius.model.wordmapping.WordMappingValueSetLazyProxy
 import com.oranda.libanius.dependencies.AppDependencyAccess
 
-import scala.collection.immutable.Stream
 import com.oranda.libanius.model._
 import com.oranda.libanius.model.quizgroup.QuizGroupType.{QuestionAndAnswer, WordMapping}
 
@@ -93,7 +92,6 @@ object CustomFormat {
       (implicit customFormat: ToCustomFormat[A, B]): StringBuilder =
     customFormat.to(component, strBuilder, params)
 
-  //TODO: @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
   def deserialize[A <: ModelComponent, B <: FromParams](
       str: String,
       fromParams: B)
@@ -120,7 +118,6 @@ object CustomFormatForModelComponents {
         .append("\" useMultipleChoiceUntil=\"").append(qgh.useMultipleChoiceUntil)
         .append("\"")
 
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(str: String, params: NoParams) =
       QuizGroupHeader(
         parsePromptType(str),
@@ -166,7 +163,6 @@ object CustomFormatForModelComponents {
       strBuilder.append(" isActive=\"").append(qgud.isActive).append("\"").
           append(" currentPromptNumber=\"").append(qgud.currentPromptNumber).append("\"")
 
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(str: String, fromParams: NoParams) =
       QuizGroupUserData(parseIsActive(str), parseCurrentPromptNumber(str))
 
@@ -205,7 +201,6 @@ object CustomFormatForModelComponents {
       customFormatQuizGroup.to(qgwh.quizGroup, strBuilder, qgwh.header.mainSeparator)
     }
 
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(text: String, fromParams: Separator): QuizGroupWithHeader = {
       val headerLine = text.takeWhile(_ != '\n')
       val qgHeader = QuizGroupHeader(headerLine)
@@ -223,7 +218,6 @@ object CustomFormatForModelComponents {
       customFormatUserResponses.to(qi.userResponses, strBuilder, NoParams())
     }
 
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(strPromptResponse: String, fromParams: Separator): QuizItem = {
       val i = strPromptResponse.indexOf(fromParams.mainSeparator)
       val strPrompt = strPromptResponse.substring(0, i).trim
@@ -253,19 +247,18 @@ object CustomFormatForModelComponents {
     }
 
     // Example: contract:696,697;698/treaty:796;798
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(str: String, fromParams: Separator): WordMappingValueSet = {
       val values = new ListBuffer[WordMappingValue]()
       val wmvsSplitter = stringSplitterFactory.getSplitter('/')
 
       def parseFromCustomFormat(): Unit = {
         wmvsSplitter.setString(str)
-        while (wmvsSplitter.hasNext) {
+        while wmvsSplitter.hasNext do {
           val nextVal = wmvsSplitter.next
           values += customFormatWordMappingValue.from(nextVal, fromParams)
         }
       }
-      Try(parseFromCustomFormat) recover {
+      Try(parseFromCustomFormat()) recover {
         case e: Exception => l.logError(s"WordMappingValueSet: Could not parse text $str", e)
       }
       WordMappingValueSet(values.toList)
@@ -283,11 +276,11 @@ object CustomFormatForModelComponents {
         extraParams: Separator): StringBuilder = {
       strBuilder.append(wmv.value)
 
-      if (wmv.correctAnswersInARow.nonEmpty || !wmv.incorrectAnswers.isEmpty)
+      if wmv.correctAnswersInARow.nonEmpty || !wmv.incorrectAnswers.isEmpty then
         strBuilder.append(extraParams.mainSeparator)
-      if (wmv.correctAnswersInARow.nonEmpty)
+      if wmv.correctAnswersInARow.nonEmpty then
         StringUtil.mkString(strBuilder, wmv.correctAnswersInARow, wmv.answerPromptNumber, ',')
-      if (wmv.incorrectAnswers.nonEmpty) {
+      if wmv.incorrectAnswers.nonEmpty then {
         strBuilder.append(';')
         StringUtil.mkString(strBuilder, wmv.incorrectAnswers, wmv.answerPromptNumber, ',')
       }
@@ -295,7 +288,6 @@ object CustomFormatForModelComponents {
     }
 
     // Example: text = "nachlösen|1,7,9;6"
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(str: String, fromParams: Separator): WordMappingValue = {
 
       import com.oranda.libanius.util.StringUtil.RichString
@@ -305,7 +297,7 @@ object CustomFormatForModelComponents {
           val strAllAnswers = str.substring(index + fromParams.mainSeparator.length)
 
           val wmv = WordMappingValue(strResponse.trim)
-          if (strAllAnswers.isEmpty)
+          if strAllAnswers.isEmpty then
             wmv
           else {
             val (correctAnswers, incorrectAnswers) = parseAnswers(strAllAnswers)
@@ -325,7 +317,7 @@ object CustomFormatForModelComponents {
       answersSplitter.setString(correctPromptNums)
       val correctAnswers = answersSplitter.toList
       val incorrectAnswers =
-        if (allAnswersSplitter.hasNext) {
+        if allAnswersSplitter.hasNext then {
           val incorrectPromptNums = allAnswersSplitter.next
           answersSplitter.setString(incorrectPromptNums)
           answersSplitter.toList
@@ -339,7 +331,6 @@ object CustomFormatForModelComponents {
   implicit object customFormatUserResponses
     extends CustomFormat[UserResponsesAll, NoParams, Separator] {
 
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(str: String, fromParams: Separator): UserResponsesAll = {
       val wmv = customFormatWordMappingValue.from(str, fromParams)
       UserResponsesAll(wmv.correctAnswersInARow, wmv.incorrectAnswers)
@@ -349,9 +340,9 @@ object CustomFormatForModelComponents {
         ur: UserResponsesAll,
         strBuilder: StringBuilder,
         extraParams: NoParams): StringBuilder = {
-      if (ur.correctResponsesInARow.nonEmpty)
+      if ur.correctResponsesInARow.nonEmpty then
         StringUtil.mkString(strBuilder, ur.correctResponsesInARow, ur.responsePromptNumber, ',')
-      if (ur.incorrectResponses.nonEmpty) {
+      if ur.incorrectResponses.nonEmpty then {
         strBuilder.append(';')
         StringUtil.mkString(strBuilder, ur.incorrectResponses, ur.responsePromptNumber, ',')
       }
@@ -362,7 +353,7 @@ object CustomFormatForModelComponents {
   implicit object customFormatQuizGroup extends CustomFormat[QuizGroup, Separator, Separator] {
 
     def to(qg: QuizGroup, strBuilder: StringBuilder, extraParams: Separator): StringBuilder = {
-      qg.levels.zipWithIndex.toStream.foreach { case (level, idx) =>
+      qg.levels.zipWithIndex.to(LazyList).foreach { case (level, idx) =>
         customFormatQuizGroupMemoryLevel.to(level, strBuilder, extraParams.withIndex(idx))
       }
       strBuilder
@@ -371,7 +362,6 @@ object CustomFormatForModelComponents {
     /*
      * Text includes header line
      */
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(text: String, fromParams: Separator): QuizGroup = {
 
       val quizGroupParts = text.split("#quizGroupPartition ")
@@ -406,7 +396,7 @@ object CustomFormatForModelComponents {
       strBuilder.append("#quizGroupPartition numCorrectResponsesInARow=\"" +
           extraParams.index + "\" repetitionInterval=\"" + qgml.repetitionInterval + "\"" + '\n')
 
-      for (quizItem <- qgml.quizItems.toStream) {
+      for quizItem <- qgml.quizItems.to(LazyList) do {
         customFormatQuizItem.to(quizItem, strBuilder, extraParams.withoutIndex)
         strBuilder.append('\n')
       }
@@ -416,7 +406,6 @@ object CustomFormatForModelComponents {
     /*
      * Text does not include header line
      */
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(
         text: String,
         fromParams: SeparatorIndexAndRepetitionInterval): QuizGroupMemoryLevel = {
@@ -431,14 +420,14 @@ object CustomFormatForModelComponents {
         }.get
       }
 
-      def parseQuizItems(lineSplitter: StringSplitter): Stream[QuizItem] = {
-        if (lineSplitter.hasNext)
+      def parseQuizItems(lineSplitter: StringSplitter): LazyList[QuizItem] = {
+        if lineSplitter.hasNext then
           parseQuizItem(lineSplitter.next) match {
-            case Some(line) => Stream.cons(line, parseQuizItems(lineSplitter))
+            case Some(line) => LazyList.cons(line, parseQuizItems(lineSplitter))
             case _ => parseQuizItems(lineSplitter)
           }
         else
-          Stream.empty
+          LazyList.empty
       }
 
       val lineSplitter = stringSplitterFactory.getSplitter('\n')
@@ -465,7 +454,6 @@ object CustomFormatForModelComponents {
      *    against|wider
      *    entertain|unterhalten
      */
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(str: String, fromParams: NoParams): Dictionary =
 
       new Dictionary() {
@@ -478,12 +466,12 @@ object CustomFormatForModelComponents {
           splitterLineBreak.setString(str)
           splitterLineBreak.next // skip the first line, which has already been parsed
 
-          while (splitterLineBreak.hasNext) {
+          while splitterLineBreak.hasNext do {
             splitterKeyValue.setString(splitterLineBreak.next)
 
-            if (splitterKeyValue.hasNext) {
+            if splitterKeyValue.hasNext then {
               val strKey = splitterKeyValue.next
-              if (splitterKeyValue.hasNext) {
+              if splitterKeyValue.hasNext then {
                 val strValues = splitterKeyValue.next
                 // for efficiency, avoid an extra method call into Dictionary here
                 wordMappings.put(strKey, WordMappingValueSetLazyProxy(strValues, "|"))
@@ -492,7 +480,7 @@ object CustomFormatForModelComponents {
           }
         }
 
-        Try(parseCustomFormat) recover {
+        Try(parseCustomFormat()) recover {
           case e: Exception =>
             l.logError(s"Could not parse dictionary: ${e.getMessage}", e)
             None
@@ -517,7 +505,6 @@ object CustomFormatForModelComponents {
      *     against|wider
      *     entertain|unterhalten
      */
-    @deprecated("Use CustomFormatParserFast for deserialization", since = "v0.984")
     def from(str: String, fromParams: Separator): WordMappingGroup = {
 
       val splitterLineBreak = stringSplitterFactory.getSplitter('\n')
@@ -527,7 +514,7 @@ object CustomFormatForModelComponents {
         splitterLineBreak.setString(str)
         splitterLineBreak.next // skip the first line, which has already been parsed
 
-        while (splitterLineBreak.hasNext) {
+        while splitterLineBreak.hasNext do {
           val strPromptResponse = splitterLineBreak.next
 
           def parsePromptResponse = {
@@ -547,12 +534,12 @@ object CustomFormatForModelComponents {
           }
         }
       }
-      Try(parseQuizGroup) recover {
+      Try(parseQuizGroup()) recover {
         case e: Exception =>
           l.logError(s"could not parse wmg with text ${str.take(100)}...${str.takeRight(100)})")
       }
 
-      val wordMappingsStream = wordMappingsMutable.toStream
+      val wordMappingsStream = wordMappingsMutable.to(LazyList)
 
       // Now use the persistent data structure.
       new WordMappingGroup(QuizGroupHeader(str), wordMappingsStream, QuizGroupUserData(str))

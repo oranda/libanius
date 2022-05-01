@@ -25,7 +25,7 @@ case class ValueSet(values: List[String] = Nil)
   extends ModelComponent {
 
   def addValueToEnd(value: String) =
-    copy(if (!values.contains(value)) values :+ value else values)
+    copy(if !values.contains(value) then values :+ value else values)
 
   override def toString = values.mkString(", ")
 

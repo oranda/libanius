@@ -20,7 +20,7 @@ package com.oranda.libanius.io
 
 import java.io._
 import scala.io.Source
-import scala.language.reflectiveCalls
+import scala.reflect.Selectable.reflectiveSelectable
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
 
@@ -31,7 +31,7 @@ class DefaultIO extends PlatformIO {
 
   def readFile(fileName: String): Option[String] = {
     val theFile = new File(fileName)
-    if (theFile.exists) {
+    if theFile.exists then {
       val fileStream = Source.fromFile(theFile)
       val str = fileStream.mkString
       fileStream.close()
@@ -49,7 +49,11 @@ class DefaultIO extends PlatformIO {
     using (new FileWriter(fileName)) (_.write(data))
 
   private def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
-	  try { f(param) } finally { param.close() }
+    try {
+      f(param)
+    } finally {
+      param.close()
+    }
 
   def readResource(resName: String): Option[String] =
     readFile(conf.resourcesDir + resName)
@@ -62,7 +66,7 @@ class DefaultIO extends PlatformIO {
 
   private def readQgMetadata(qgPath: String): Option[QuizGroupHeader] = {
     val file = new File(qgPath)
-    if (file.exists) {
+    if file.exists then {
       l.log(s"readQgMetadata: reading file $qgPath")
       readQgMetadata(new FileInputStream(file))
     } else {

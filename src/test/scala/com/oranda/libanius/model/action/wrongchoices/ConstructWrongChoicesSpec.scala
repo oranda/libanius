@@ -18,14 +18,12 @@
 
 package com.oranda.libanius.model.action.wrongchoices
 
-import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
-import fastparse.core.Parsed
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoices._
-import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoicesForModelComponents._
-import com.oranda.libanius.model.TestData._
-import com.oranda.libanius.model.quizgroup.QuizGroupMemoryLevel
+import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoices.*
+import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoicesForModelComponents.*
+import com.oranda.libanius.model.TestData.{qgMemLevel, qgWithHeader}
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupMemoryLevel}
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValueOps}
 import com.oranda.libanius.util.Util
 
@@ -33,14 +31,15 @@ import com.oranda.libanius.util.Util
 class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
 
   "the construct wrong choices functionality " should {
-
     "generate false answers similar to a correct answer" in {
 
-      val falseAnswers = constructWrongChoicesSimilar(qgMemLevel,
-          itemCorrect = QuizItem("entertain", "unterhalten"),
-          correctResponses = List("unterhalten"),
-          numWrongChoicesRequired = 5,
-        similarityPredicate = TextValueOps.sameEnd)
+      val falseAnswers = constructWrongChoicesSimilar(
+        qgMemLevel,
+        itemCorrect = QuizItem("entertain", "unterhalten"),
+        correctResponses = List("unterhalten"),
+        numWrongChoicesRequired = 5,
+        similarityPredicate = TextValueOps.sameEnd
+      )
 
       falseAnswers.contains("unterrichten") mustEqual true
     }
@@ -48,7 +47,7 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
     "generate false answers similar to a correct answer, not including the correct answer" in {
       val quizItem1 = QuizItem("teach", "unterrichten")
       val quizItem2 = QuizItem("entertain", "unterhalten")
-      val smallQuizGroupLevel = QuizGroupMemoryLevel(0, 0, List(quizItem1, quizItem2).toStream)
+      val smallQuizGroupLevel = QuizGroupMemoryLevel(0, 0, List(quizItem1, quizItem2).to(LazyList))
 
       val falseAnswers = constructWrongChoicesSimilar(smallQuizGroupLevel,
         itemCorrect = QuizItem("entertain", "unterhalten"),
@@ -63,10 +62,11 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
       val quizItemCorrect: QuizItem =
         qgWithHeader.quizGroup.quizItems.find(_.prompt.value == "entertain").get
 
-      val (falseAnswers, timeTaken) = Util.stopwatch(ConstructWrongChoices.execute(
-        qgWithHeader.quizGroup,
-        quizItemCorrect,
-        numWrongChoicesRequired = 2))
+      val (falseAnswers: List[String], timeTaken: Long) =
+        Util.stopwatch(ConstructWrongChoices.execute(
+          qgWithHeader.quizGroup,
+          quizItemCorrect,
+          numWrongChoicesRequired = 2))
 
       falseAnswers.contains("unterbrochen") mustEqual true
       timeTaken must be lessThan 200
@@ -96,7 +96,7 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
       import CustomFormat._
       import CustomFormatForModelComponents._
 
-      val Parsed.Success(demoGroup, _) = quizGroupWithHeader.parse(demoGroupText)
+      val demoGroup: QuizGroup = deserialize[QuizGroup, Separator](demoGroupText, Separator("|"))
       val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get
 
       val (falseAnswers, _) = Util.stopwatch(ConstructWrongChoices.execute(demoGroup,

@@ -27,7 +27,7 @@ object ConsoleUtil {
   def readLineUntilNoBackspaces: String = {
     val s = scala.io.StdIn.readLine
     val extendedCode: (Char) => Boolean = (c:Char) => (c == 127)
-    if (!s.exists(extendedCode)) s else {
+    if !s.exists(extendedCode) then s else {
       println("backspace detected: try again")
       readLineUntilNoBackspaces
     }

@@ -79,7 +79,7 @@ case class QuizGroup private(
   def maxDiffInPromptNumMinimum = levels.foldLeft(0)(_ max _.repetitionInterval)
 
   def totalCorrectResponsesRequired = {
-    if (numCorrectResponsesRequired == 0) {
+    if numCorrectResponsesRequired == 0 then {
       l.logError("numCorrectResponsesRequired for quizGroup is 0")
       numQuizItems
     } else
@@ -96,7 +96,7 @@ case class QuizGroup private(
 
   def numDictionaryKeyWords = dictionary.numKeyWords
 
-  def quizItems: Stream[QuizItem] = levels.flatMap(_.quizItems).toStream
+  def quizItems: LazyList[QuizItem] = levels.flatMap(_.quizItems).to(LazyList)
 
   /*
    * Low usage expected. Slow because we are not using a Map for quizItems.
@@ -134,7 +134,7 @@ case class QuizGroup private(
   }
 
   protected[model] def +(quizItem: QuizItem): QuizGroup =
-    if (quizItem.isValid) prependItemToFirstLevel(quizItem) else this
+    if quizItem.isValid then prependItemToFirstLevel(quizItem) else this
 
   private def prependItemToFirstLevel(quizItem: QuizItem): QuizGroup =
     prependItemToNthLevel(quizItem, 0)
@@ -165,7 +165,7 @@ case class QuizGroup private(
     QuizGroup.levelsListLens(memoryLevel).mod((_: QuizGroupMemoryLevel).inc(isCorrect), this)
 
   def updateIntervalForLevel(memoryLevel: Int): QuizGroup =
-    if (memoryLevel > 0 && isAtLimit(memoryLevel)) {
+    if memoryLevel > 0 && isAtLimit(memoryLevel) then {
       val mlsIntervalLens = QuizGroupMemoryLevel.intervalLens.partial compose
           QuizGroup.levelsListLens(memoryLevel)
       val mlsUpdated = mlsIntervalLens.mod(Int => get(memoryLevel).updatedInterval, this)
@@ -187,7 +187,7 @@ case class QuizGroup private(
      */
     val useMultipleChoice = numCorrectResponses < header.useMultipleChoiceUntil
     val falseAnswers =
-      if (useMultipleChoice)
+      if useMultipleChoice then
         Util.stopwatch(ConstructWrongChoices.execute(this, quizItem), "constructWrongChoices")
       else Nil
     new QuizItemViewWithChoices(quizItem, currentPromptNumber, header,
@@ -206,7 +206,7 @@ object QuizGroup extends AppDependencyAccess {
    * Form a QuizGroup from quiz items with no user responses.
    */
   def fromQuizItems(
-    quizItems: Stream[QuizItem] = Stream.empty,
+    quizItems: LazyList[QuizItem] = LazyList.empty,
     numCorrectResponsesRequired: Int = 6,
     userData: QuizGroupUserData = QuizGroupUserData(isActive = true),
     dictionary: Dictionary = new Dictionary()

@@ -35,9 +35,9 @@ object DemoQuizWithMixedAnswers extends App with DemoQuiz {
       responsesProcessed: Long): String =
     (responsesProcessed / 100) % 3 match {
       // intervals should stay about the same
-      case 0 => if (responsesProcessed % 10 < 8) quizItem.correctResponse.value else "wrong"
+      case 0 => if responsesProcessed % 10 < 8 then quizItem.correctResponse.value else "wrong"
       // intervals should narrow
-      case 1 => if (responsesProcessed % 10 < 5) quizItem.correctResponse.value else "wrong2"
+      case 1 => if responsesProcessed % 10 < 5 then quizItem.correctResponse.value else "wrong2"
       // intervals should widen
       case 2 => quizItem.correctResponse.value
     }

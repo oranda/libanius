@@ -25,7 +25,6 @@ import com.oranda.libanius.util.{StringSplitterFactoryDefault, StringSplitterFac
  * Defaults for application dependencies. Can be used in a PC/Unix environment.
  */
 object AppDependenciesDefault extends AppDependencies {
-
   lazy val l: Logger            = new LoggerDefault
   lazy val c: ConfigProvider    = new ConfigProviderDefault
   lazy val dataStore: DataStore = new DataStoreDefault

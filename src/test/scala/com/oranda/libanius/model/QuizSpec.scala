@@ -103,7 +103,7 @@ class QuizSpec extends Specification with AppDependencyAccess {
     "contain unique groups only" in {
       quiz.numActiveGroups mustEqual 2 // precondition
       val isActive = true
-      val newQuizGroup = QuizGroup.fromQuizItems(Stream.empty, 6, QuizGroupUserData(isActive))
+      val newQuizGroup = QuizGroup.fromQuizItems(LazyList.empty, 6, QuizGroupUserData(isActive))
       val quizUpdated = quiz.addOrReplaceQuizGroup(qghEngGer, newQuizGroup)
       quizUpdated.numActiveGroups mustEqual 2
     }

@@ -46,7 +46,7 @@ class QuizItemSourceSpec extends Specification with AppDependencyAccess {
       quizItem0.prompt.value mustEqual "against"
       qgmlLocal = QuizItemSourceSpec.updateWithUserAnswer(qgmlLocal, quizItem0, 0)
 
-      for (promptNum <- 1 until 5)
+      for promptNum <- 1 until 5 do
         qgmlLocal = QuizItemSourceSpec.pullQuizItemAndAnswerCorrectly(qgmlLocal, promptNum)
 
       val quizItem5: Option[QuizItem] = produceQuizItem(qgmlLocal, CurrentPromptNumber(5))
@@ -67,7 +67,7 @@ class QuizItemSourceSpec extends Specification with AppDependencyAccess {
       quizItem0.prompt.value mustEqual "en route" // "against"
       qgwhLocal = QuizGroupWithHeader(qgwhLocal.header,
           updatedWithUserResponse(qgwhLocal, quizItem0))
-      for (promptNum <- 1 until 5)
+      for promptNum <- 1 until 5 do
         qgwhLocal = pullQuizItemAndAnswerCorrectly(qgwhLocal)
 
       val quizItem5 = produceQuizItem(qgwhLocal.quizGroup, NoParams())

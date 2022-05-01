@@ -20,12 +20,14 @@ package com.oranda.libanius.consoleui
 
 import Output._
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
+
+import scala.reflect.ClassTag
 import scala.util.Try
 
 /*
  * A list of choices in a console UI.
  */
-abstract class ChoiceGroup[T](choices: List[T]) {
+abstract class ChoiceGroup[T: ClassTag](choices: List[T]) {
   val choicesWithIndex = choices.zipWithIndex
 
   def show(): Unit =

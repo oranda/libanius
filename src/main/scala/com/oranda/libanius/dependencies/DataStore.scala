@@ -76,18 +76,18 @@ trait DataStore extends AppDependencyAccess {
       case _ => initQuizGroup(header)
     }
 
-    if (quizGroup.isEmpty)
+    if quizGroup.isEmpty then
       l.logError(s"No quiz items loaded for $header.\nquizGroup loaded was: " + quizGroup)
     quizGroup
   }
 
   def initQuizGroup(header: QuizGroupHeader): QuizGroup =
-    (for {
+    (for
       qgResName <- findQuizGroupInResources(header)
       qgText <- Util.stopwatch(
         io.readResource(qgResName),
         s"reading quiz group resource $qgResName")
-    } yield qgText) match {
+    yield qgText) match {
       case Some(qgText) =>
         Util.stopwatch(header.createQuizGroup(qgText), "creating quiz group by parsing text")
       case _ =>
@@ -114,20 +114,20 @@ trait DataStore extends AppDependencyAccess {
    * Assumes the Quiz holds a single quiz group -- this is true only for some clients.
    * TODO: should return Stream[String] for Akka Http
    */
-  def quizStream(quiz: Quiz): Stream[Char] =
+  def quizStream(quiz: Quiz): LazyList[Char] =
     quiz.activeQuizGroups.toList.lift(0) match {
       case Some(Tuple2(header, quizGroup)) =>
         val qgwh = QuizGroupWithHeader(header, quizGroup)
-        qgwh.toCustomFormat.toStream
-      case None => Stream.empty
+        qgwh.toCustomFormat.to(LazyList)
+      case None => LazyList.empty
     }
 
   private def readQuizGroupFromFilesDir(qgFileName: String): Option[QuizGroup] = {
     val qgPath = conf.filesDir + qgFileName
     l.log("reading quiz group from file " + qgPath)
-    for {
+    for
       qgText <- io.readFile(qgPath)
-    } yield QuizGroupHeader(qgText).createQuizGroup(qgText)
+    yield QuizGroupHeader(qgText).createQuizGroup(qgText)
   }
 
   private def findQuizGroupInFilesDir(header: QuizGroupHeader): Option[String] = {

@@ -18,17 +18,16 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
 import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model._
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import fastparse.all._
-import fastparse.core.Parsed
 
 import scala.language.implicitConversions
 import com.oranda.libanius.model.ValueSet
 
 import com.oranda.libanius.model.action.serialize._
+import CustomFormat._
+import CustomFormatForModelComponents._
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.
@@ -38,7 +37,7 @@ case class WordMappingValueSet(values: List[WordMappingValue] = Nil) extends Mod
   def updated(values: List[WordMappingValue]) = WordMappingValueSet(values)
 
   def addValueToEnd(value: WordMappingValue) = {
-    val newValues = if (!values.contains(value)) values :+ value else values
+    val newValues = if !values.contains(value) then values :+ value else values
     WordMappingValueSet(newValues)
   }
 
@@ -96,11 +95,8 @@ object WordMappingValueSetWrapperBase {
 case class WordMappingValueSetLazyProxy(strValues: String, mainSeparator: String)
   extends WordMappingValueSetWrapperBase {
 
-  lazy val wmvs: WordMappingValueSet = {
-    implicit val separator = Separator(mainSeparator)
-    val Parsed.Success(wmvs, _) = wordMappingValueSet(separator).parse(strValues)
-    wmvs
-  }
+  lazy val wmvs: WordMappingValueSet =
+    deserialize[WordMappingValueSet, Separator](strValues, Separator("|"))
 }
 
 /*

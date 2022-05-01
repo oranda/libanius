@@ -72,13 +72,13 @@ object TestData {
         QuizItem("contract", "Vertrag"),
         QuizItem("rides", "reitet"),
         QuizItem("on", "auf"),
-        QuizItem("sweeps", "streicht")).toStream)
+        QuizItem("sweeps", "streicht")).to(LazyList))
 
   def makeQgMemLevelSimple: QuizGroupMemoryLevel =
     QuizGroupMemoryLevel(
       0,
       0,
-      List(QuizItem("against", "wider"), QuizItem("entertain", "unterhalten")).toStream)
+      List(QuizItem("against", "wider"), QuizItem("entertain", "unterhalten")).to(LazyList))
 
 
   // defaults for read-only
@@ -154,7 +154,7 @@ object TestData {
         QuizItem("rides", "reitet"),
         QuizItem("on", "auf"),
         QuizItem("sweeps", "streicht")
-      ).toStream
+      ).to(LazyList)
     )
 
   def makeQgMemLevel1: QuizGroupMemoryLevel =
@@ -163,7 +163,7 @@ object TestData {
       5,
       List(
         QuizItem("entertain", "unterhalten", List(8), List(2)),
-        QuizItem("winner", "Siegerin", List(5), List(0))).toStream)
+        QuizItem("winner", "Siegerin", List(5), List(0))).to(LazyList))
 
   def makeQgMemLevel2: QuizGroupMemoryLevel =
     QuizGroupMemoryLevel(
@@ -171,7 +171,7 @@ object TestData {
       15,
       List(
         QuizItem("against", "wider", List(9, 7), List(6)),
-        QuizItem("teach", "unterrichten", List(4, 3), List(1))).toStream)
+        QuizItem("teach", "unterrichten", List(4, 3), List(1))).to(LazyList))
 
   def makeQuizGroup =
     QuizGroup(

@@ -45,7 +45,7 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
       case _ => Nil
     }
 
-    if (selectedQuizGroupHeaders.isEmpty) {
+    if selectedQuizGroupHeaders.isEmpty then {
       output("Unrecognized option")
       userQuizGroupSelection(quizGroupHeaders)
     }
@@ -88,14 +88,14 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
       quizItem: QuizItemViewWithChoices): State[Quiz, UserConsoleResponse] = {
     val wordText = s": what is the ${quizItem.responseType} for this ${quizItem.promptType}?"
     val wordTextToShow =
-      if (quizItem.quizGroupHeader.quizGroupType == WordMapping) wordText else ""
+      if quizItem.quizGroupHeader.quizGroupType == WordMapping then wordText else ""
     val answeredText = s" (correctly answered ${quizItem.numCorrectResponsesInARow} times)"
-    val answeredTextToShow = if (quizItem.numCorrectResponsesInARow > 0) answeredText else ""
-    val questionText = quizItem.qgCurrentPromptNumber + ": " + quizItem.prompt
+    val answeredTextToShow = if quizItem.numCorrectResponsesInARow > 0 then answeredText else ""
+    val questionText = s"${quizItem.qgCurrentPromptNumber}: ${quizItem.prompt}"
     val fullQuestionText = questionText + wordTextToShow + answeredTextToShow
     output(s"$fullQuestionText\n")
 
-    if (quizItem.useMultipleChoice) showChoicesAndProcessResponse(quizItem)
+    if quizItem.useMultipleChoice then showChoicesAndProcessResponse(quizItem)
     else getTextResponseAndProcess(quizItem)
   }
 
@@ -119,20 +119,20 @@ trait InteractiveQuiz extends App with AppDependencyAccess {
   }
 
   def processAnswer(userResponse: UserConsoleResponse,
-      quizItem: QuizItemViewWithChoices): State[Quiz, UserConsoleResponse] = for {
+      quizItem: QuizItemViewWithChoices): State[Quiz, UserConsoleResponse] = for
     quiz <- State.get[Quiz]
     _ <- State.put(userResponse match {
       case answer: Answer => processUserAnswer(quiz, answer.text, quizItem)
       case _ => quiz
     })
-  } yield userResponse
+  yield userResponse
 
   def processUserAnswer(
       quiz: Quiz, userResponse: String,
       quizItem: QuizItemViewWithChoices): Quiz = {
     val (quizGroupKey, prompt) = (quizItem.quizGroupKey, quizItem.prompt.value)
     val isCorrect = quiz.isCorrect(quizGroupKey, prompt, userResponse) == Correct
-    if (isCorrect) output("\nCorrect!\n")
+    if isCorrect then output("\nCorrect!\n")
     else output("\nWrong! It's " + quizItem.correctResponse + "\n")
 
     Util.stopwatch(quiz.updateWithUserResponse(

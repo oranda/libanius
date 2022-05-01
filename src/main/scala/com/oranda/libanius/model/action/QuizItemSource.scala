@@ -63,10 +63,10 @@ object modelComponentsAsQuizItemSources extends AppDependencyAccess {
     def produceQuizItem(
         quiz: Quiz,
         params: NoParams = NoParams()): Option[QuizItemViewWithChoices] =
-      (for {
-        (header, quizGroup) <- quiz.activeQuizGroups.toStream
-        quizItem <- quizGroupAsSource.produceQuizItem(quizGroup).toStream
-      } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
+      (for
+        (header, quizGroup) <- quiz.activeQuizGroups.to(LazyList)
+        quizItem <- quizGroupAsSource.produceQuizItem(quizGroup).to(LazyList)
+      yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
 
     /*
      * Near the end of the quiz, there will be items that are "nearly learnt" because they
@@ -78,10 +78,10 @@ object modelComponentsAsQuizItemSources extends AppDependencyAccess {
         quiz: Quiz,
         params: NoParams = NoParams()): Option[QuizItemViewWithChoices] = {
       l.log("calling Quiz.findAnyUnfinishedQuizItem")
-      (for {
+      (for
         (header, quizGroup) <- quiz.activeQuizGroups
         quizItem <- quizGroupAsSource.findAnyUnfinishedQuizItem(quizGroup, NoParams())
-      } yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
+      yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
     }
   }
 
@@ -93,18 +93,18 @@ object modelComponentsAsQuizItemSources extends AppDependencyAccess {
      * interval criteria (difference with the prompt number) is satisfied.
      */
     def produceQuizItem(qg: QuizGroup, params: NoParams = NoParams()): Option[QuizItem] =
-      (for {
-        (memLevel, levelIndex) <- qg.levels.zipWithIndex.reverse.tail.toStream
+      (for
+        (memLevel, levelIndex) <- qg.levels.zipWithIndex.reverse.tail.to(LazyList)
         quizItem <- quizGroupMemoryLevelAsSource.produceQuizItem(memLevel,
-            CurrentPromptNumber(qg)).toStream
-      } yield quizItem).headOption
+            CurrentPromptNumber(qg)).to(LazyList)
+      yield quizItem).headOption
 
     def findAnyUnfinishedQuizItem(qg: QuizGroup, params: NoParams = NoParams()): Option[QuizItem] =
-      (for {
-        (memLevel, levelIndex) <- qg.levels.zipWithIndex.reverse.tail.toStream
+      (for
+        (memLevel, levelIndex) <- qg.levels.zipWithIndex.reverse.tail.to(LazyList)
         quizItem <- quizGroupMemoryLevelAsSource.findAnyUnfinishedQuizItem(
             memLevel, CurrentPromptNumber(qg))
-      } yield quizItem).headOption
+      yield quizItem).headOption
   }
 
   implicit object quizGroupMemoryLevelAsSource
@@ -112,10 +112,10 @@ object modelComponentsAsQuizItemSources extends AppDependencyAccess {
 
     def produceQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber):
         Option[QuizItem] =
-      (for {
-        quizItem <- qgml.quizItems.toStream
+      (for
+        quizItem <- qgml.quizItems.to(LazyList)
         if quizItem.isPresentable(params.currentPromptNumber, qgml.repetitionInterval)
-      } yield quizItem).headOption
+      yield quizItem).headOption
 
     def findAnyUnfinishedQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber):
         Option[QuizItem] =

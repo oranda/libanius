@@ -22,10 +22,10 @@ import com.oranda.libanius.io.PlatformIO
 import com.oranda.libanius.util.StringSplitterFactory
 
 trait AppDependencies {
-  val l: Logger
-  val c: ConfigProvider
-  val dataStore: DataStore
-  val stringSplitterFactory: StringSplitterFactory
+  lazy val l: Logger
+  lazy val c: ConfigProvider
+  lazy val dataStore: DataStore
+  lazy val stringSplitterFactory: StringSplitterFactory
 
   def conf = c.conf
 }

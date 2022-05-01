@@ -20,10 +20,11 @@ package com.oranda.libanius.model.quizgroup
 
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model._
-import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
+import com.oranda.libanius.model.action.serialize.CustomFormat._
 import com.oranda.libanius.model.action.serialize._
-import fastparse.all._
-import fastparse.core.Parsed
+import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.customFormatQuizGroupWithHeader
+import CustomFormat._
+import CustomFormatForModelComponents._
 
 import scala.collection.immutable.List
 
@@ -56,7 +57,8 @@ case class QuizGroupHeader(
   def reverse = copy(quizGroupKey.reverse)
 
   def createQuizGroup(text: String): QuizGroup = {
-    val Parsed.Success(qgh, _) = quizGroupWithHeader.parse(text)
+    val qgh: QuizGroupWithHeader =
+      deserialize[QuizGroupWithHeader, Separator](text, Separator("|"))
     qgh.quizGroup
   }
 }
@@ -66,10 +68,8 @@ object QuizGroupHeader extends AppDependencyAccess {
   val maxNumCorrectResponsesRequired = 12
   val allIntervals = List(0, 5, 15, 15, 60, 600, 1200, 2500, 5000, 10000, 20000, 40000)
 
-  def apply(headerLine: String): QuizGroupHeader = {
-    val Parsed.Success(qgh, _) = quizGroupHeader.parse(headerLine)
-    qgh
-  }
+  def apply(headerLine: String): QuizGroupHeader =
+    deserialize[QuizGroupHeader, NoParams](headerLine, NoParams())
 
   def apply(
     promptType: String,

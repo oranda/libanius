@@ -27,10 +27,10 @@ abstract class Logger extends AppDependencyAccess {
     log(s"ERROR: $message", module, t)
 
   def log(message: String, module: String = "Libanius", t: Option[Throwable] = None): Unit =
-    if (conf.enableLogging)
+    if conf.enableLogging then
       logImpl(message, module, t)
 
-  def logImpl(message: String, module: String = "Libanius", t: Option[Throwable] = None)
+  def logImpl(message: String, module: String = "Libanius", t: Option[Throwable] = None): Unit
 }
 
 class LoggerDefault extends Logger {

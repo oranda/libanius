@@ -22,31 +22,28 @@ import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
 
 import scala.language.postfixOps
 import scala.util.Random
-
 import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.dependencies.AppDependencyAccess
-
-import scalaz._
+import scalaz.*
 import scalaz.std.set
-import scalaz.Scalaz._
-import com.oranda.libanius.model._
-import scala._
-import scala.collection.immutable.Stream
-import scala.collection.immutable.List
-import scala.collection.immutable.Iterable
-import scalaz.PLens._
+import scalaz.Scalaz.*
+import com.oranda.libanius.model.*
+
+import scala.*
+import scala.collection.immutable.{Iterable, LazyList, List}
+import scalaz.PLens.*
 import com.oranda.libanius.model.UserResponse
 
 /*
  * QuizGroupMemoryLevel: a partition of a QuizGroup, containing quiz items which have
  * all been answered correctly a certain number of times.
  * (A ListMap was formerly used to store quiz items but this was found to be too
- * slow for bulk insert. Currently a Stream is used.)
+ * slow for bulk insert. Currently a LazyList is used.)
  */
 case class QuizGroupMemoryLevel(
     correctResponsesInARow: Int,
     repetitionInterval: Int,
-    quizItemStream: Stream[QuizItem] = Stream.empty,
+    quizItemStream: LazyList[QuizItem] = LazyList.empty,
     totalResponses: Int = 0,
     numCorrectResponses: Int = 0)
   extends ModelComponent {
@@ -78,7 +75,7 @@ case class QuizGroupMemoryLevel(
   }
 
   protected[quizgroup] def addNewQuizItem(prompt: String, response: String): QuizGroupMemoryLevel =
-    if (!prompt.isEmpty && !response.isEmpty && prompt.toLowerCase != response.toLowerCase)
+    if !prompt.isEmpty && !response.isEmpty && prompt.toLowerCase != response.toLowerCase then
       this + QuizItem(prompt, response)
     else
       this
@@ -123,7 +120,7 @@ case class QuizGroupMemoryLevel(
     randomSliceOfQuizItems(sliceSize).map(_.correctResponse).toList
 
   protected[quizgroup] def randomSliceOfQuizItems(sliceSize: Int): Iterable[QuizItem] =
-    if (sliceSize >= size) quizItems
+    if sliceSize >= size then quizItems
     else {
       val randomStart = Random.nextInt(size - sliceSize)
       quizItems.slice(randomStart, randomStart + sliceSize)
@@ -131,16 +128,16 @@ case class QuizGroupMemoryLevel(
 
   override def toString = {
     val quizItemPrompts = quizItems.map(_.prompt)
-    val avgCorrectResponses = if (totalResponses == 0) 0 else numCorrectResponses/totalResponses
+    val avgCorrectResponses = if totalResponses == 0 then 0 else numCorrectResponses/totalResponses
     s"$correctResponsesInARow($repetitionInterval):$avgCorrectResponses: $quizItemPrompts"
   }
 
   protected[model] def isAtLimit = totalResponses >= QuizGroupMemoryLevel.totalResponsesLimit
 
   protected[model] def inc(isCorrect: Boolean) = {
-    val numCorrectToAdd = if (isCorrect) 1 else 0
+    val numCorrectToAdd = if isCorrect then 1 else 0
     // For each memory level, only check the recent performance. Reset the counters after a limit.
-    if (!isAtLimit)
+    if !isAtLimit then
       copy(totalResponses = totalResponses + 1,
           numCorrectResponses = numCorrectResponses + numCorrectToAdd)
     else // reset the counters
@@ -149,12 +146,12 @@ case class QuizGroupMemoryLevel(
 
   protected[model] def updatedInterval: Int = {
     def modifyBy(anInt: Int, aReal: Double) =
-      if (totalResponses <= 5) repetitionInterval + anInt
+      if totalResponses <= 5 then repetitionInterval + anInt
       else (repetitionInterval * (1 + aReal)).toInt
 
     math.max(0,
-      if (numCorrectResponses < 7) modifyBy(-1, -0.2)
-      else if (numCorrectResponses > 8)  modifyBy(1, 0.2)
+      if numCorrectResponses < 7 then modifyBy(-1, -0.2)
+      else if numCorrectResponses > 8 then  modifyBy(1, 0.2)
       else repetitionInterval
     )
   }
@@ -165,7 +162,7 @@ object QuizGroupMemoryLevel extends AppDependencyAccess {
   val itemsLens: Lens[QuizGroupMemoryLevel, List[QuizItem]] = Lens.lensu(
     get = (_: QuizGroupMemoryLevel).quizItems,
     set = (qgp: QuizGroupMemoryLevel,
-      qItems: List[QuizItem]) => qgp.copy(quizItemStream = qItems.toStream))
+      qItems: List[QuizItem]) => qgp.copy(quizItemStream = qItems.to(LazyList)))
 
   val totalResponsesLimit = 10
 

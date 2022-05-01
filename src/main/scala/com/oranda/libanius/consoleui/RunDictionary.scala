@@ -34,7 +34,7 @@ object RunDictionary extends App with AppDependencyAccess {
 
     val availableQuizGroups = dataStore.findAvailableQuizGroups
     val quiz =
-      if (!availableQuizGroups.isEmpty)
+      if !availableQuizGroups.isEmpty then
         Quiz(userQuizGroupSelection(availableQuizGroups.toList))
       else {
         output("No quiz groups found. Defaulting to dummy data.\n")

@@ -80,7 +80,7 @@ object ConstructWrongChoices extends AppDependencyAccess {
     val numCorrectResponsesSoFar = itemCorrect.userResponses.numCorrectResponsesInARow
 
     val similarityPredicate =
-      if (numCorrectResponsesSoFar % 2 == 1) TextValueOps.sameStart else TextValueOps.sameEnd
+      if numCorrectResponsesSoFar % 2 == 1 then TextValueOps.sameStart else TextValueOps.sameEnd
 
     implicit val cwc = ConstructWrongChoicesForModelComponents.cwcQuizGroup
     val badChoicesSimilar = constructWrongChoicesSimilar(quizGroup, itemCorrect,
@@ -96,7 +96,7 @@ object ConstructWrongChoices extends AppDependencyAccess {
   protected[model] def constructWrongChoicesDummy(numWrongChoicesRequired: Int):
       List[String] = {
     val characters = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray
-    if (numWrongChoicesRequired > characters.length) {
+    if numWrongChoicesRequired > characters.length then {
       l.logError("Too many dummy answers requested.")
       Nil
     } else
@@ -117,7 +117,7 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
         numWrongChoicesRequired: Int,
         correctResponses: List[String],
         similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String] =
-      if (itemCorrect.numCorrectResponsesInARow == 0) Nil
+      if itemCorrect.numCorrectResponsesInARow == 0 then Nil
       else quizGroup.levels.flatMap(cwcQuizGroupMemoryLevel.constructWrongChoicesSimilar(
         _,
         itemCorrect,
@@ -153,7 +153,7 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
 
       def similarityPred(response: String, correctAnswer: String) = {
         l.log(s"similarityPred: response $response, correctAnswer $correctAnswer")
-        if (correctAnswer.length <= 3) {
+        if correctAnswer.length <= 3 then {
           l.log(s"similarityPred for correctAnswer.length ${correctAnswer.length} is: response.length == correctAnswer.length")
           response.length == correctAnswer.length
         } else
@@ -166,10 +166,10 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
         foreach(quizItem => {
           numValueSetsSearched = numValueSetsSearched + 1
           // Avoid selecting values belonging to the "correct" correctResponse set
-          if (!correctResponses.contains(quizItem.correctResponse.toString)) {
+          if !correctResponses.contains(quizItem.correctResponse.toString) then {
             val correctResponse = quizItem.correctResponse
             val areSimilar = similarityPred(correctResponse, correctValue)
-            if (similarWords.size < numWrongResponsesRequired && areSimilar)
+            if similarWords.size < numWrongResponsesRequired && areSimilar then
               similarWords += quizItem.correctResponse.value
           }
       })

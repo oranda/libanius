@@ -33,7 +33,7 @@ import com.oranda.libanius.util.CollectionHelpers.GroupByOrderedImplicit
  * in a concise format.
  */
 case class WordMappingGroup(header: QuizGroupHeader,
-    wordMappingPairs: Stream[WordMappingPair] = Stream.empty,
+    wordMappingPairs: LazyList[WordMappingPair] = LazyList.empty,
     userData: QuizGroupUserData = new QuizGroupUserData()) extends ModelComponent {
 
   def toQuizGroup(numCorrectResponsesRequired: Int): QuizGroup = {
@@ -43,7 +43,7 @@ case class WordMappingGroup(header: QuizGroupHeader,
           wmPair.key,
           value.value,
           UserResponsesAll(value.correctAnswersInARow, value.incorrectAnswers)))
-    val quizItems: Stream[QuizItem] = wordMappingPairs.flatMap(makeQuizItems)
+    val quizItems: LazyList[QuizItem] = wordMappingPairs.flatMap(makeQuizItems)
     QuizGroup.fromQuizItems(quizItems, numCorrectResponsesRequired, userData)
   }
 }
@@ -55,13 +55,12 @@ object WordMappingGroup extends AppDependencyAccess {
     WordMappingGroup(header, wordMappingPairs, quizGroup.userData)
   }
 
-  def quizItemsToWordMappingPairs(quizItems: Stream[QuizItem]):
-      Stream[WordMappingPair] =
+  def quizItemsToWordMappingPairs(quizItems: LazyList[QuizItem]): LazyList[WordMappingPair] =
     quizItems.groupByOrdered(_.prompt).map {
         case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
           WordMappingPair(
             prompt.value,
             WordMappingValueSet.createFromQuizItems(quizItems.toList))
-    }.toStream
+    }.to(LazyList)
 
 }

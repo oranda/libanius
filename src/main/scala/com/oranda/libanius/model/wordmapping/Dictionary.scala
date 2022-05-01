@@ -58,12 +58,12 @@ case class Dictionary(wordMappings: java.util.LinkedHashMap[String, WordMappingV
 
 object Dictionary {
 
-  def fromWordMappings(wordMappingsStream: Stream[WordMappingPair]) =
+  def fromWordMappings(wordMappingsStream: LazyList[WordMappingPair]) =
     new Dictionary() {
       wordMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))
     }
 
-  def fromQuizItems(quizItems: Stream[QuizItem]) =
+  def fromQuizItems(quizItems: LazyList[QuizItem]) =
     new Dictionary() {
       val wMappingsStream = WordMappingGroup.quizItemsToWordMappingPairs(quizItems)
       wMappingsStream.foreach(pair => wordMappings.put(pair.key, pair.valueSet))

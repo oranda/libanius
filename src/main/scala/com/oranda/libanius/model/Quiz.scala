@@ -18,20 +18,21 @@
 
 package com.oranda.libanius.model
 
-import com.oranda.libanius.model.action.serialize.CustomFormatParserFast._
+import com.oranda.libanius.model.action.serialize.CustomFormat._
 import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
-import fastparse.core.Parsed
 
 import scala.collection.immutable._
 import scala.language.postfixOps
 import scala.math.BigDecimal.double2bigDecimal
 import com.oranda.libanius.dependencies._
+import com.oranda.libanius.model.action.serialize.Separator
 import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.wordmapping.Dictionary
 import scalaz._
 import PLens._
 import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
-import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupKey, QuizGroupType, QuizGroupWithHeader}
+import com.oranda.libanius.model.quizgroup._
+import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.customFormatQuizGroupWithHeader
 
 import scala.collection.immutable.Nil
 import scala.collection.immutable.List
@@ -61,7 +62,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def totalCorrectResponsesRequired =
     activeQuizGroups.values.view.map(_.totalCorrectResponsesRequired).sum
   def scoreSoFar: BigDecimal = // out of 1.0
-    if (totalCorrectResponsesRequired == 0) {
+    if totalCorrectResponsesRequired == 0 then {
       l.logError("Could not compute score because totalCorrectResponsesRequired == 0")
       0
     } else
@@ -102,7 +103,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
     responses match {
       case Nil => ItemNotFound
       case responses: List[String]  =>
-        if (responses.exists(_.looselyMatches(userResponse))) Correct else Incorrect
+        if responses.exists(_.looselyMatches(userResponse)) then Correct else Incorrect
     }
   }
 
@@ -160,7 +161,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
    * Will not replace an existing quiz group.
    */
   def addQuizGroup(header: QuizGroupHeader, quizGroup: QuizGroup): Quiz =
-    if (!hasQuizGroup(header)) setQuizGroup(header, quizGroup) else this
+    if !hasQuizGroup(header) then setQuizGroup(header, quizGroup) else this
 
   /*
    * Add or replace any existing quiz group with the given header.
@@ -232,12 +233,12 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
     // Keep trying different ways of searching the dictionary until one finds something.
     Try(
-      if (firstWord.length <= 2) Nil
+      if firstWord.length <= 2 then Nil
       else tryUntilResults(List(
         searchFunction { resultsBeginningWith(firstWord) },
         searchFunction { resultsBeginningWith(firstWord.dropRight(1)) },
         searchFunction { resultsBeginningWith(firstWord.dropRight(2)) },
-        searchFunction { if (firstWord.length > 3) resultsContaining(firstWord) else Nil }
+        searchFunction { if firstWord.length > 3 then resultsContaining(firstWord) else Nil }
       ))
     )
   }
@@ -278,10 +279,8 @@ object Quiz extends AppDependencyAccess {
 
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
-    val qgsWithHeader: Iterable[QuizGroupWithHeader] = quizGroupsData.map { qgwh =>
-      val Parsed.Success(qgh, _) = quizGroupWithHeader.parse(qgwh)
-      qgh
-    }
+    val qgsWithHeader: Iterable[QuizGroupWithHeader] = quizGroupsData.map(
+      deserialize[QuizGroupWithHeader, Separator](_, Separator("|")))
     Quiz(qgsWithHeader.map(qgWithHeader => (qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }
 

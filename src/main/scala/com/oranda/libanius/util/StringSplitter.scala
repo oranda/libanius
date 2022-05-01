@@ -24,7 +24,7 @@ abstract class StringSplitter(separator: Character) extends Iterator[String] {
   override def hasNext: Boolean
 
   override def next: String
-  def setString(str: String)
+  def setString(str: String): Unit
 }
 
 /*

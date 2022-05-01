@@ -31,7 +31,7 @@ object Rest extends AppDependencyAccess {
     val httpResponse = httpClient.execute(new HttpGet(url))
     val entity = httpResponse.getEntity
     var restContent = ""
-    if (entity != null) {
+    if entity != null then {
       val is = entity.getContent
       restContent = Source.fromInputStream(is).getLines.mkString
       is.close
@@ -40,7 +40,7 @@ object Rest extends AppDependencyAccess {
 
     // Watch out for redirection
     val statusCode = httpResponse.getStatusLine.getStatusCode
-    if (restContent.contains("<html") || statusCode != 200)
+    if restContent.contains("<html") || statusCode != 200 then
       throw new RestResponseException(restContent, statusCode)
     restContent
   }

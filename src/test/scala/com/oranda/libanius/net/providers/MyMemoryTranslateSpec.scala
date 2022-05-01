@@ -26,13 +26,12 @@ import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
 
 class MyMemoryTranslateSpec extends Specification with AppDependencyAccess {
-
   "the mymemory translation provider" should {
-
     val qghGerEng = QuizGroupHeader("German word", "English word", WordMapping, "|", 6, 4)
 
     "translate a word successfully" in {
       val results: List[SearchResult] = MyMemoryTranslate.translateQgh("Bett", qghGerEng)
+      results.nonEmpty must beTrue
       results.head.valueSet.containsValue("Bed") must beTrue
     }
 

@@ -41,7 +41,7 @@ trait Simulation {
   private var totalMillisToComputeScore: Long = 0
 
   protected def testAllQuizItems(quiz: Quiz,
-      lastQuizItem: Option[QuizItemViewWithChoices] = None) {
+      lastQuizItem: Option[QuizItemViewWithChoices] = None): Unit = {
     val quizUpdated = testWithQuizItems(quiz, lastQuizItem)
     report(quizUpdated)
   }
@@ -53,14 +53,14 @@ trait Simulation {
   private def testWithQuizItems(quiz: Quiz,
       lastQuizItem: Option[QuizItemViewWithChoices] = None): Quiz = {
 
-    if (responsesProcessed < MAX_RESPONSES) {
+    if responsesProcessed < MAX_RESPONSES then {
       val (quizItem, timeTakenToFindItem) = Util.stopwatch(findQuizItem(quiz))
       output(s"time for findQuizItem: $timeTakenToFindItem")
-      if (shouldMeasureTime) totalMillisToProduceQuizItems += timeTakenToFindItem
+      if shouldMeasureTime then totalMillisToProduceQuizItems += timeTakenToFindItem
       quizItem match {
         case Some(quizItem) =>
           lazy val allChoicesText = "\tChoices: " + quizItem.allChoices.mkString(", ")
-          val strChoices = if (quizItem.useMultipleChoice) allChoicesText else ""
+          val strChoices = if quizItem.useMultipleChoice then allChoicesText else ""
           output(s"$responsesProcessed. Prompt: ${quizItem.prompt}$strChoices")
           Problem.find(quiz, timeTakenToFindItem, quizItem, lastQuizItem,
               responsesProcessed) match {
@@ -117,18 +117,18 @@ trait Simulation {
       quizItem: QuizItemViewWithChoices): Quiz = {
     val correctAnswer = quizItem.correctResponse
     val isCorrect = correctAnswer.looselyMatches(userResponseTxt)
-    if (isCorrect) output("Correct!") else output(s"Wrong! It's $correctAnswer")
+    if isCorrect then output("Correct!") else output(s"Wrong! It's $correctAnswer")
     showScore(quiz)
     val (quizUpdated, timeTaken) = Util.stopwatch(quiz.updateWithUserResponse(
         isCorrect, quizItem.quizGroupHeader, quizItem.quizItem))
 
-    if (shouldMeasureTime) totalMillisForUpdatingWithResponses += timeTaken
+    if shouldMeasureTime then totalMillisForUpdatingWithResponses += timeTaken
     quizUpdated
   }
 
   private def showScore(quiz: Quiz): Unit = {
     val (score: BigDecimal, timeTaken) = Util.stopwatch(quiz.scoreSoFar)
-    if (shouldMeasureTime) totalMillisToComputeScore += timeTaken
+    if shouldMeasureTime then totalMillisToComputeScore += timeTaken
     val formattedScore = StringUtil.formatScore(score)
     output(s"Score: $formattedScore\n")
   }
@@ -146,7 +146,7 @@ abstract class Problem {
   def exists: Boolean
   def errorMsg: String
   def report() = output(s"PROBLEM: $errorMsg")
-  def retrieve: Option[Problem] = if (exists) Some(this) else None
+  def retrieve: Option[Problem] = if exists then Some(this) else None
 }
 
 object Problem {

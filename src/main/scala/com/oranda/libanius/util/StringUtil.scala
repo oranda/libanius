@@ -42,9 +42,9 @@ object StringUtil {
       fn: (S, T) => StringBuilder,
       separator: Character): S = {
     val iter = iterable.iterator
-    while (iter.hasNext) {
+    while iter.hasNext do {
       fn(str, iter.next)
-      if (iter.hasNext)
+      if iter.hasNext then
         str.append(separator)
     }
     str
@@ -61,16 +61,16 @@ object StringUtil {
     def removeAll(substr: String): String = s.replaceAll(substr, "")
 
     def removeFirstLetters(substr: String): String =
-      if (s.startsWith(substr)) s.replaceFirst(substr, "") else s
+      if s.startsWith(substr) then s.replaceFirst(substr, "") else s
 
     def optionalIndex(substr: String): Option[Int] = {
       val index = s.indexOf(substr)
-      if (index == -1) None else Some(index)
+      if index == -1 then None else Some(index)
     }
 
     def optionalIndex(substr: String, from: Int): Option[Int] = {
       val index = s.indexOf(substr, from)
-      if (index == -1) None else Some(index)
+      if index == -1 then None else Some(index)
     }
   }
 }

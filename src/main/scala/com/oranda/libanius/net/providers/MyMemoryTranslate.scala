@@ -19,8 +19,8 @@
 package com.oranda.libanius.net.providers
 
 import java.net.URLEncoder
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
 
 import scala.language.implicitConversions
 import com.oranda.libanius.net.Rest
@@ -37,6 +37,9 @@ import com.oranda.libanius.util.CollectionHelpers.GroupByOrderedImplicit
  * Use the free online service mymemory.translated.net to translate strings.
  */
 object MyMemoryTranslate extends AppDependencyAccess {
+  case class TranslationMatch(segment: String, translation: String, `match`: BigDecimal)
+  case class Response(matches: List[TranslationMatch])
+  implicit val codec: JsonValueCodec[Response] = JsonCodecMaker.make
 
   def translate(word: String, quiz: Quiz): Try[List[SearchResult]] = {
     val tryTranslate = Try(quiz.activeQuizGroupHeaders.flatMap(translateQgh(word, _)).toList)
@@ -46,7 +49,6 @@ object MyMemoryTranslate extends AppDependencyAccess {
     // Rethrow, so the client can decide on a custom error message.
     tryTranslate
   }
-
 
   protected[providers] def translateQgh(word: String, header: QuizGroupHeader):
       List[SearchResult] = {
@@ -77,29 +79,18 @@ object MyMemoryTranslate extends AppDependencyAccess {
         List[TranslationMatch]()
     }.get
     // Filter on the quality of the match.
-    matches.filter(_.matchWeight >= 0.5).map(trMatch => (trMatch.segment, trMatch.translation))
+    matches.filter(_.`match` >= 0.5).map(trMatch => (trMatch.segment, trMatch.translation))
   }
 
-
-  case class TranslationMatch(segment: String, translation: String, matchWeight: BigDecimal)
-
   def findMatchesInJson(jsonRaw: String): List[TranslationMatch] = {
+    val response: Response = readFromString(jsonRaw)
 
-    implicit val matchesReader = (
-      (__ \ "segment").read[String] and
-      (__ \ "translation").read[String] and
-      (__ \ "match").read[BigDecimal]
-    )(TranslationMatch)
-
-    val translationJson: JsValue = Json.parse(jsonRaw)
-    val matches = (translationJson \ "matches").as[List[TranslationMatch]]
     // In the event of failed matches, MyMemory may return $string or $array in the output
-    matches
+    response.matches
       .filterNot(_.translation.contains("$string"))
       .filterNot(_.translation.contains("$array"))
       .map(m => m.copy(translation = m.translation.replaceAll("""[\p{Punct}]""", "")))
   }
-
 
   /*
    * Get the MyMemory string corresponding to the QuizGroupHeader, e.g. "ger|en", or
@@ -115,7 +106,7 @@ object MyMemoryTranslate extends AppDependencyAccess {
   }
 
   private[this] def mmCode(promptType: String, responseType: String): Option[String] =
-    if (mmCode.isDefinedAt(promptType) && mmCode.isDefinedAt(responseType))
+    if mmCode.isDefinedAt(promptType) && mmCode.isDefinedAt(responseType) then
       Some(mmCode.apply(promptType) + "|" + mmCode.apply(responseType))
     else
       None

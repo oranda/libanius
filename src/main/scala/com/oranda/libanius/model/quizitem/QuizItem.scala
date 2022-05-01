@@ -91,7 +91,6 @@ case class QuizItemConcrete(
  * Instantiate quiz items using the default QuizItemConcrete.
  */
 object QuizItem {
-
   def apply(
       prompt: TextValue,
       response: TextValue,
@@ -107,6 +106,6 @@ object QuizItem {
       correctResponses: List[Int],
       incorrectResponses: List[Int]): QuizItem =
     QuizItemConcrete(prompt, response,
-        new UserResponsesAll(correctResponses.map(UserResponse),
-        incorrectResponses.map(UserResponse)))
+        new UserResponsesAll(correctResponses.map(UserResponse.apply),
+        incorrectResponses.map(UserResponse.apply)))
 }

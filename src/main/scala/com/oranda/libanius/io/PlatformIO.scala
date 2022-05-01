@@ -27,12 +27,11 @@ import com.oranda.libanius.model.quizgroup.QuizGroupHeader
  * Encapsulate platform-specific code.
  */
 trait PlatformIO extends AppDependencyAccess {
-
   def readFile(file: File): Option[String] = readFile(file.getName)
 
   def readFile(fileName: String): Option[String]
 
-  def writeToFile(fileName: String, data: String)
+  def writeToFile(fileName: String, data: String): Unit
 
   def readQgMetadataFromFile(qgFileName: String): Option[QuizGroupHeader]
 
@@ -45,10 +44,10 @@ trait PlatformIO extends AppDependencyAccess {
   def findQgFileNamesFromResources: Array[String]
 
   def readQgMetadata(inStream: InputStream): Option[QuizGroupHeader] = {
-    (for {
+    (for
       firstLine <- Try(readFirstLine(inStream))
       qgMetadata <- Try(Some(QuizGroupHeader(firstLine)))
-    } yield qgMetadata).recover {
+    yield qgMetadata).recover {
       case e: Exception =>
         l.logError("Could not read quiz group file")
         None
@@ -61,12 +60,12 @@ trait PlatformIO extends AppDependencyAccess {
 
     try {
       val reader = new Array[Byte](is.available)
-      while (is.read(reader) != -1) {}
+      while is.read(reader) != -1 do {}
       allText = allText + new String(reader)
     } catch {
       case e: IOException => l.logError("IO Exception", e.getMessage, Some(e))
     } finally {
-      if (is != null) {
+      if is != null then {
         try {
           is.close()
         } catch {
@@ -86,7 +85,7 @@ trait PlatformIO extends AppDependencyAccess {
         l.logError("IO Exception", e.getMessage, Some(e))
         ""
     } finally {
-      if (is != null) {
+      if is != null then {
         try {
           is.close()
         } catch {
