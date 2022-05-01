@@ -1,11 +1,12 @@
 import sbt._
 
 organization := "com.github.oranda"
+
 name := "libanius"
 
-version := "0.9.8.7.3"
+version := "0.9.9"
 
-scalaVersion := "2.12.6"
+scalaVersion := "3.1.2"
 
 homepage := Some(url("http://github.com/oranda/libanius"))
 
@@ -35,56 +36,49 @@ publishTo := {
     Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 
-scalacOptions ++= Seq("-unchecked", "-deprecation")
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-new-syntax", "-rewrite", "-feature")
 
-resolvers ++= Seq("mvnrepository" at "https://mvnrepository.com/artifact/")
+resolvers ++= Seq("Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/",
+  "mvnrepository" at "https://mvnrepository.com/artifact/"
+)
 
 val typesafeConfigVersion = "1.4.0"
 
 libraryDependencies ++= Seq("com.typesafe" % "config" % typesafeConfigVersion,
-  "org.specs2" %% "specs2-core" % "4.2.0" % "test",
-  "org.specs2" %% "specs2-junit" % "4.2.0" % "test",
-  "org.scalaz" %% "scalaz-core" % "7.2.25",
+  "org.specs2" % "specs2-core_3" % "4.15.0" % "test",
+  "org.specs2" % "specs2-junit_3" % "4.15.0" % "test",
+  "org.scalaz" % "scalaz-core_3" % "7.3.6",
   "org.apache.httpcomponents" % "httpclient" % "4.1.2",
-  "com.typesafe.play" %% "play-json" % "2.6.7",
-  "com.lihaoyi" %% "fastparse" % "1.0.0",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.1",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"   % "2.13.18",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.13.18" % "compile-internal"
 )
 
-parallelExecution in Test := true
+Test / parallelExecution := true
 
 // an unmanaged dependency is no longer used, but these settings are retained in case it is needed
-assemblyJarName in assembly := s"${name.value}-${version.value}-fat.jar"
-assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
+assembly / assemblyJarName := s"${name.value}-${version.value}-fat.jar"
+assembly / assemblyOption := (assembly / assemblyOption).value.copy(includeScala = false)
 
 // Exclude the config jar from the fat jar. Ideally the config jar would be excluded
 // from the classpath using Provided scope, but this spoils the run task, so instead:
-assemblyExcludedJars in assembly := {
-  val cp = (fullClasspath in assembly).value
+assembly / assemblyExcludedJars := {
+  val cp = (assembly / fullClasspath).value
   cp filter {_.data.getName == s"config-$typesafeConfigVersion.jar"}
 }
 
-test in assembly := {}
+assembly / test := {}
 
-scalacOptions += "-feature"
-
-initialCommands in console := "import scalaz._, Scalaz._"
+console / initialCommands := "import scalaz._, Scalaz._"
 
 exportJars := false
 
 fork := false
 
-javaOptions in run += "-XX:+UseConcMarkSweepGC"
+run / javaOptions += "-XX:+UseConcMarkSweepGC"
 
-javaOptions in run += "-XX:+CMSClassUnloadingEnabled"
+run / javaOptions += "-XX:+CMSClassUnloadingEnabled"
 
-javaOptions in run += "-XX:PermSize=512M"
+run / javaOptions += "-XX:PermSize=512M"
 
-javaOptions in run += "-XX:MaxPermSize=512M"
-
-
-import sbt._
-
-addCompilerPlugin("org.psywerx.hairyfotr" %% "linter" % "0.1.17")
-
-
+run / javaOptions += "-XX:MaxPermSize=512M"

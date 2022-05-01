@@ -1,8 +1,8 @@
-resolvers += Resolver.url("scalasbt releases", new URL("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases"))(Resolver.ivyStylePatterns)
+resolvers += Resolver.url("scalasbt releases", new URL("https://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases"))(Resolver.ivyStylePatterns)
 
-resolvers ++= Seq("snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-                  "releases"  at "http://oss.sonatype.org/content/repositories/releases",
-                  "scct-github-repository" at "http://mtkopone.github.com/scct/maven-repo",
+resolvers ++= Seq("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+                  "releases"  at "https://oss.sonatype.org/content/repositories/releases",
+                  "scct-github-repository" at "https://mtkopone.github.com/scct/maven-repo",
   Classpaths.typesafeReleases
                  )
 
