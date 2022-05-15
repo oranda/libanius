@@ -18,15 +18,16 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.model._
-import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
-import scala.collection.immutable.{Stream, Iterable}
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import scala.collection.mutable
+import com.oranda.libanius.model.*
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupUserData}
 import com.oranda.libanius.model.quizitem.QuizItem
-import scala.language.implicitConversions
-import com.oranda.libanius.model.quizgroup.{QuizGroupUserData, QuizGroupHeader, QuizGroup}
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
 import com.oranda.libanius.util.CollectionHelpers.GroupByOrderedImplicit
+
+import scala.collection.immutable.{Iterable, Stream}
+import scala.collection.mutable
+import scala.language.implicitConversions
 
 /*
  * An intermediate data structure used to persist a "WordMapping" type of quiz group

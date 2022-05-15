@@ -18,16 +18,14 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.model.quizitem.QuizItem
-import com.oranda.libanius.model._
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.*
+import com.oranda.libanius.model.action.serialize.*
+import com.oranda.libanius.model.action.serialize.CustomFormat.*
+import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.*
+import com.oranda.libanius.model.quizitem.QuizItem
 
 import scala.language.implicitConversions
-import com.oranda.libanius.model.ValueSet
-
-import com.oranda.libanius.model.action.serialize._
-import CustomFormat._
-import CustomFormatForModelComponents._
 
 /*
  * A List is a bit faster than a Set when deserializing. High performance is required.

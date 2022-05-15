@@ -18,17 +18,17 @@
 
 package com.oranda.libanius.model.action.serialize
 
-import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import java.lang.StringBuilder
-
-import com.oranda.libanius.model.action.serialize._
-import CustomFormat._
-import CustomFormatForModelComponents._
-import com.oranda.libanius.model.quizitem.QuizItem
-import com.oranda.libanius.model.wordmapping.{WordMappingValueSet, WordMappingValue}
+import com.oranda.libanius.model.TestData.*
+import com.oranda.libanius.model.action.serialize.*
+import com.oranda.libanius.model.action.serialize.CustomFormat.*
+import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.*
 import com.oranda.libanius.model.quizgroup.{QuizGroupHeader, QuizGroupWithHeader}
-import com.oranda.libanius.model.TestData._
+import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.wordmapping.{WordMappingValue, WordMappingValueSet}
+import org.specs2.mutable.Specification
+
+import java.lang.StringBuilder
 
 class CustomFormatSpec extends Specification with AppDependencyAccess {
 
@@ -102,8 +102,8 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
     }
 
     "deserialize a quiz group memory level" in {
-      import CustomFormat._
-      import CustomFormatForModelComponents._
+      import CustomFormat.*
+      import CustomFormatForModelComponents.*
 
       val qgml = deserialize(qgMemLevelSimpleCustomFormat, SeparatorIndexAndRepetitionInterval("|", 0, 0))
       qgml.numQuizItems mustEqual 2

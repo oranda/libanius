@@ -18,9 +18,9 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.TestData._
+import com.oranda.libanius.model.TestData.*
+import org.specs2.mutable.Specification
 
 class WordMappingValueSpec extends Specification with AppDependencyAccess {
 

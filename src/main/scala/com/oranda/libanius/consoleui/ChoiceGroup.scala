@@ -18,7 +18,7 @@
 
 package com.oranda.libanius.consoleui
 
-import Output._
+import com.oranda.libanius.consoleui.Output.*
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
 import scala.reflect.ClassTag

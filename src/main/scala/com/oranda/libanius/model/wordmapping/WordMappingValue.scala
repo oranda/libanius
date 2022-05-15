@@ -18,9 +18,9 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import com.oranda.libanius.model.{UserResponsesAll, ModelComponent, UserResponse}
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.{ModelComponent, UserResponse, UserResponsesAll}
 
 import java.lang.StringBuilder
 

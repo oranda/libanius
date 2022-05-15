@@ -19,7 +19,7 @@
 package com.oranda.libanius.dependencies
 
 import com.oranda.libanius.io.{DefaultIO, PlatformIO}
-import com.oranda.libanius.util.{StringSplitterFactoryDefault, StringSplitterFactory}
+import com.oranda.libanius.util.{StringSplitterFactory, StringSplitterFactoryDefault}
 
 /*
  * Defaults for application dependencies. Can be used in a PC/Unix environment.

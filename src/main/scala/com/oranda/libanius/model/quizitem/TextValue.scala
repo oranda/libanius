@@ -18,11 +18,12 @@
 
 package com.oranda.libanius.model.quizitem
 
-import scala.language.implicitConversions
-import scala.util.matching.Regex
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.util.StringUtil
-import StringUtil._
+import com.oranda.libanius.util.StringUtil.*
+
+import scala.language.implicitConversions
+import scala.util.matching.Regex
 
 object TextValueOps {
 
@@ -68,7 +69,7 @@ object TextValueOps {
  * A correct response with bracketed expressions that are optional.
  */
 case class DesiredResponse(value: String) extends AnyVal {
-  import DesiredResponse._
+  import DesiredResponse.*
 
   override def toString = value
 

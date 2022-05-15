@@ -18,10 +18,9 @@
 
 package com.oranda.libanius.model.quizgroup
 
-import org.specs2.mutable.Specification
-
 import com.oranda.libanius.model.TestData
-import TestData._
+import com.oranda.libanius.model.TestData.*
+import org.specs2.mutable.Specification
 
 class QuizGroupWithHeaderSpec extends Specification {
 

@@ -18,16 +18,16 @@
 
 package com.oranda.libanius.simulation
 
-import com.oranda.libanius.consoleui.Output._
+import com.oranda.libanius.consoleui.Output.*
 import com.oranda.libanius.model.Quiz
+import com.oranda.libanius.model.action.*
+import com.oranda.libanius.model.action.QuizItemSource.*
+import com.oranda.libanius.model.action.modelComponentsAsQuizItemSources.*
 import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
+import com.oranda.libanius.simulation.Simulation.*
 import com.oranda.libanius.util.{StringUtil, Util}
-import scala.annotation.tailrec
 
-import com.oranda.libanius.model.action._
-import QuizItemSource._
-import modelComponentsAsQuizItemSources._
-import Simulation._
+import scala.annotation.tailrec
 
 /*
  * Run through a whole quiz, simulating the part of the user and checking

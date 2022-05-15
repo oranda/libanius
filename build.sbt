@@ -38,13 +38,15 @@ publishTo := {
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-new-syntax", "-rewrite", "-feature")
 
-scalafmtOnCompile := true
+scalafmtOnCompile := false
 
 resolvers ++= Seq("Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/",
   "mvnrepository" at "https://mvnrepository.com/artifact/"
 )
 
 val typesafeConfigVersion = "1.4.0"
+
+ThisBuild / scalafixDependencies += "com.nequissimus" %% "sort-imports" % "0.6.1"
 
 libraryDependencies ++= Seq("com.typesafe" % "config" % typesafeConfigVersion,
   "org.specs2" % "specs2-core_3" % "4.15.0" % "test",

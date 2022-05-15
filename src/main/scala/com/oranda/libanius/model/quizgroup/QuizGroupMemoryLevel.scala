@@ -18,21 +18,19 @@
 
 package com.oranda.libanius.model.quizgroup
 
-import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
-
-import scala.language.postfixOps
-import scala.util.Random
-import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import scalaz.*
-import scalaz.std.set
-import scalaz.Scalaz.*
 import com.oranda.libanius.model.*
+import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
+import scalaz.*
+import scalaz.PLens.*
+import scalaz.Scalaz.*
+import scalaz.std.set
 
 import scala.*
 import scala.collection.immutable.{Iterable, LazyList, List}
-import scalaz.PLens.*
-import com.oranda.libanius.model.UserResponse
+import scala.language.postfixOps
+import scala.util.Random
 
 /*
  * QuizGroupMemoryLevel: a partition of a QuizGroup, containing quiz items which have

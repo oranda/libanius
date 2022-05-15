@@ -18,10 +18,11 @@
 
 package com.oranda.libanius.io
 
-import java.io._
+import com.oranda.libanius.model.quizgroup.QuizGroupHeader
+
+import java.io.*
 import scala.io.Source
 import scala.reflect.Selectable.reflectiveSelectable
-import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
 /*
  * Assumes an ordinary Unix/Windows filesystem.

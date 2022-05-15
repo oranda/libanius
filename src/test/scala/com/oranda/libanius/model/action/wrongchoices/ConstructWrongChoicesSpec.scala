@@ -18,14 +18,14 @@
 
 package com.oranda.libanius.model.action.wrongchoices
 
-import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.TestData.{qgMemLevel, qgWithHeader}
 import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoices.*
 import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoicesForModelComponents.*
-import com.oranda.libanius.model.TestData.{qgMemLevel, qgWithHeader}
 import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupMemoryLevel}
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValueOps}
 import com.oranda.libanius.util.Util
+import org.specs2.mutable.Specification
 
 class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
 
@@ -93,9 +93,9 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
            |en route|unterwegs|7,1;
            |""".stripMargin
 
-      import com.oranda.libanius.model.action.serialize._
-      import CustomFormat._
-      import CustomFormatForModelComponents._
+      import com.oranda.libanius.model.action.serialize.*
+      import CustomFormat.*
+      import CustomFormatForModelComponents.*
 
       val demoGroup: QuizGroup      = deserialize[QuizGroup, Separator](demoGroupText, Separator("|"))
       val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get

@@ -18,27 +18,22 @@
 
 package com.oranda.libanius.model
 
-import com.oranda.libanius.model.action.serialize.CustomFormat._
+import com.oranda.libanius.dependencies.*
+import com.oranda.libanius.model.action.serialize.CustomFormat.*
+import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.customFormatQuizGroupWithHeader
+import com.oranda.libanius.model.action.serialize.Separator
+import com.oranda.libanius.model.quizgroup.*
+import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
+import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
+import com.oranda.libanius.model.wordmapping.Dictionary
+import com.oranda.libanius.net.providers.MyMemoryTranslate
+import scalaz.*
+import scalaz.PLens.*
 
-import scala.collection.immutable._
+import scala.collection.immutable.{Iterable, List, Nil, *}
 import scala.language.postfixOps
 import scala.math.BigDecimal.double2bigDecimal
-import com.oranda.libanius.dependencies._
-import com.oranda.libanius.model.action.serialize.Separator
-import com.oranda.libanius.model.quizitem.QuizItem
-import com.oranda.libanius.model.wordmapping.Dictionary
-import scalaz._
-import PLens._
-import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
-import com.oranda.libanius.model.quizgroup._
-import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.customFormatQuizGroupWithHeader
-
-import scala.collection.immutable.Nil
-import scala.collection.immutable.List
-import scala.collection.immutable.Iterable
-import com.oranda.libanius.net.providers.MyMemoryTranslate
-
 import scala.util.Try
 
 case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends ModelComponent {
@@ -215,7 +210,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
     quizGroupIterator.exists(qg => (qg.numPrompts - qg.currentPromptNumber) < qg.maxDiffInPromptNumMinimum)
 
   def searchLocalDictionary(searchInput: String): Try[List[SearchResult]] = {
-    import Dictionary._ // make special search utilities available
+    import Dictionary.* // make special search utilities available
 
     val firstWord = searchInput.takeWhile(_ != ' ')
 

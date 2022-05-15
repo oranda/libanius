@@ -18,12 +18,12 @@
 
 package com.oranda.libanius.model.quizitem
 
+import com.oranda.libanius.model.quizgroup.QuizGroupHeader
+import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
 import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
 
 import scala.language.implicitConversions
 import scala.util.Random
-import com.oranda.libanius.model.quizgroup.QuizGroupHeader
-import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
 
 /**
  * Quiz item data holder: contains whatever information is necessary for the

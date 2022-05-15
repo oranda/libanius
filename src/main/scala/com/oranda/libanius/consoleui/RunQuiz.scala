@@ -18,11 +18,10 @@
 
 package com.oranda.libanius.consoleui
 
-import Output._
-import com.oranda.libanius.model._
+import com.oranda.libanius.consoleui.Output.*
+import com.oranda.libanius.model.*
 
 object RunQuiz extends InteractiveQuiz {
-
   runQuiz()
 
   def runQuiz(): Unit = {

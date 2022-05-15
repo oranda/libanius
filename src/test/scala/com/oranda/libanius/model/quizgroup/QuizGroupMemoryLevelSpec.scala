@@ -18,20 +18,18 @@
 
 package com.oranda.libanius.model.quizgroup
 
-import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.*
+import com.oranda.libanius.model.TestData.*
+import com.oranda.libanius.model.action.*
+import com.oranda.libanius.model.action.QuizItemSourceSpec.*
+import com.oranda.libanius.model.action.wrongchoices.*
+import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoices.*
+import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoicesForModelComponents.*
 import com.oranda.libanius.model.quizitem.QuizItem
+import org.specs2.mutable.Specification
 
-import com.oranda.libanius.model._
-import com.oranda.libanius.model.TestData._
-
-import com.oranda.libanius.model.action._
-import QuizItemSourceSpec._
-
-import com.oranda.libanius.model.action.wrongchoices._
-import ConstructWrongChoices._
-import ConstructWrongChoicesForModelComponents._
-import scala._
+import scala.*
 
 class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 

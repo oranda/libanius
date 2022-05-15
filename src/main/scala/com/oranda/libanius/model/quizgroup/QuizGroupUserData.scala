@@ -18,12 +18,12 @@
 
 package com.oranda.libanius.model.quizgroup
 
-import scalaz._
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.ModelComponent
-import com.oranda.libanius.model.action.serialize._
-import CustomFormat._
-import CustomFormatForModelComponents._
+import com.oranda.libanius.model.action.serialize.*
+import com.oranda.libanius.model.action.serialize.CustomFormat.*
+import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.*
+import scalaz.*
 
 case class QuizGroupUserData(isActive: Boolean = false, currentPromptNumber: Int = 0) extends ModelComponent
 

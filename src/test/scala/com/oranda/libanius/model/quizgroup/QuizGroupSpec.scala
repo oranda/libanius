@@ -18,18 +18,15 @@
 
 package com.oranda.libanius.model.quizgroup
 
-import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.TestData.*
+import com.oranda.libanius.model.action.*
+import com.oranda.libanius.model.action.QuizItemSource.*
+import com.oranda.libanius.model.action.QuizItemSourceSpec.*
+import com.oranda.libanius.model.action.modelComponentsAsQuizItemSources.*
+import com.oranda.libanius.model.action.wrongchoices.*
 import com.oranda.libanius.model.quizitem.QuizItem
-
-import com.oranda.libanius.model.TestData._
-
-import com.oranda.libanius.model.action._
-import QuizItemSource._
-import modelComponentsAsQuizItemSources._
-import com.oranda.libanius.model.action.QuizItemSourceSpec._
-
-import com.oranda.libanius.model.action.wrongchoices._
+import org.specs2.mutable.Specification
 
 class QuizGroupSpec extends Specification with AppDependencyAccess {
 

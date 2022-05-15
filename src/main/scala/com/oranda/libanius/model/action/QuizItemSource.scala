@@ -18,11 +18,10 @@
 
 package com.oranda.libanius.model.action
 
-import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, QuizItem}
-import com.oranda.libanius.model.quizgroup.{QuizGroupMemoryLevel, QuizGroup}
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.ModelComponent
-import com.oranda.libanius.model.Quiz
+import com.oranda.libanius.model.{ModelComponent, Quiz}
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupMemoryLevel}
+import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices}
 
 /**
  * Type class definition for finding quiz items in model entities.

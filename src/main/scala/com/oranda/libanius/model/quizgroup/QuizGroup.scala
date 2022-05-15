@@ -18,24 +18,21 @@
 
 package com.oranda.libanius.model.quizgroup
 
-import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
-
-import scala.language.postfixOps
-
-import com.oranda.libanius.model.wordmapping._
-import com.oranda.libanius.model.quizitem.{QuizItemViewWithChoices, QuizItem}
 import com.oranda.libanius.dependencies.AppDependencyAccess
-
-import scalaz._
-import com.oranda.libanius.model._
-import scalaz.PLens._
-import scala.collection.immutable.{Stream, List}
-import scala.Predef._
+import com.oranda.libanius.model.*
+import com.oranda.libanius.model.action.wrongchoices.*
+import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoices.*
+import com.oranda.libanius.model.action.wrongchoices.ConstructWrongChoicesForModelComponents.*
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
+import com.oranda.libanius.model.quizitem.{QuizItem, QuizItemViewWithChoices}
+import com.oranda.libanius.model.wordmapping.*
 import com.oranda.libanius.util.Util
+import scalaz.*
+import scalaz.PLens.*
 
-import com.oranda.libanius.model.action.wrongchoices._
-import ConstructWrongChoices._
-import ConstructWrongChoicesForModelComponents._
+import scala.Predef.*
+import scala.collection.immutable.{List, Stream}
+import scala.language.postfixOps
 
 /*
  * Contains quiz items for a topic.

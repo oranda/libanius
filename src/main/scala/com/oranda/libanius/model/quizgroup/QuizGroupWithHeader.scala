@@ -18,14 +18,14 @@
 
 package com.oranda.libanius.model.quizgroup
 
-import scala.language.implicitConversions
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.ModelComponent
-import java.lang.StringBuilder
+import com.oranda.libanius.model.action.serialize.*
+import com.oranda.libanius.model.action.serialize.CustomFormat.*
+import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.*
 
-import com.oranda.libanius.model.action.serialize._
-import CustomFormat._
-import CustomFormatForModelComponents._
+import java.lang.StringBuilder
+import scala.language.implicitConversions
 
 /*
  * Convenience class for passing around a key-value pair from the Quiz.quizGroups map.

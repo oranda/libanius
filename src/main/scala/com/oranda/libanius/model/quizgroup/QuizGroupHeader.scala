@@ -19,12 +19,10 @@
 package com.oranda.libanius.model.quizgroup
 
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model._
-import com.oranda.libanius.model.action.serialize.CustomFormat._
-import com.oranda.libanius.model.action.serialize._
-import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.customFormatQuizGroupWithHeader
-import CustomFormat._
-import CustomFormatForModelComponents._
+import com.oranda.libanius.model.*
+import com.oranda.libanius.model.action.serialize.*
+import com.oranda.libanius.model.action.serialize.CustomFormat.*
+import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.*
 
 import scala.collection.immutable.List
 

@@ -18,22 +18,18 @@
 
 package com.oranda.libanius.model.action.serialize
 
-import com.oranda.libanius.model.quizgroup._
-import java.lang.StringBuilder
-
+import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.*
+import com.oranda.libanius.model.quizgroup.*
+import com.oranda.libanius.model.quizgroup.QuizGroupType.{QuestionAndAnswer, WordMapping}
 import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
-import com.oranda.libanius.model.wordmapping._
+import com.oranda.libanius.model.wordmapping.*
 import com.oranda.libanius.util.{StringSplitter, StringUtil, Util}
 
-import scala.util.Try
+import java.lang.StringBuilder
 import scala.collection.mutable.ListBuffer
-import com.oranda.libanius.model.wordmapping.WordMappingPair
-import com.oranda.libanius.model.wordmapping.WordMappingValueSetLazyProxy
-import com.oranda.libanius.dependencies.AppDependencyAccess
-
-import com.oranda.libanius.model._
-import com.oranda.libanius.model.quizgroup.QuizGroupType.{QuestionAndAnswer, WordMapping}
+import scala.util.Try
 
 /**
  * Type class definition for ModelComponent serialization/deserialization using

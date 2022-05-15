@@ -19,9 +19,9 @@
 package com.oranda.libanius.model.quizitem
 
 import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
+import com.oranda.libanius.model.{ModelComponent, UserResponse, UserResponsesAll}
 
 import scala.language.implicitConversions
-import com.oranda.libanius.model.{UserResponsesAll, ModelComponent, UserResponse}
 
 sealed trait QuizItem extends ModelComponent {
   def prompt: TextValue

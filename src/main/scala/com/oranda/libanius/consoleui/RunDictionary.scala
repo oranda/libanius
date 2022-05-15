@@ -18,10 +18,11 @@
 
 package com.oranda.libanius.consoleui
 
-import com.oranda.libanius.consoleui.Output._
-import com.oranda.libanius.model.{SearchResult, Quiz}
-import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader}
+import com.oranda.libanius.consoleui.Output.*
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader}
+import com.oranda.libanius.model.{Quiz, SearchResult}
+
 import scala.util.{Failure, Success, Try}
 
 object RunDictionary extends App with AppDependencyAccess {

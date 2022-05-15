@@ -18,10 +18,11 @@
 
 package com.oranda.libanius.io
 
-import java.io._
-import scala.util.Try
-import com.oranda.libanius.dependencies._
+import com.oranda.libanius.dependencies.*
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
+
+import java.io.*
+import scala.util.Try
 
 /*
  * Encapsulate platform-specific code.

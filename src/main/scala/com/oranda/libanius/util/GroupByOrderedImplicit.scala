@@ -1,7 +1,6 @@
 package com.oranda.libanius.util
 
-import scala.collection.mutable.LinkedHashMap
-import scala.collection.mutable.LinkedHashSet
+import scala.collection.mutable.{LinkedHashMap, LinkedHashSet}
 
 object CollectionHelpers {
   /*

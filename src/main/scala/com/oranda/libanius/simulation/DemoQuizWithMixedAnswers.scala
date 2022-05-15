@@ -18,8 +18,8 @@
 
 package com.oranda.libanius.simulation
 
-import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 import com.oranda.libanius.model.Quiz
+import com.oranda.libanius.model.quizitem.QuizItemViewWithChoices
 
 object DemoQuizWithMixedAnswers extends App with DemoQuiz {
 

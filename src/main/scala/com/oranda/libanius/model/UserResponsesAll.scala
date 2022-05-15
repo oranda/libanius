@@ -18,9 +18,9 @@
 
 package com.oranda.libanius.model
 
-import java.lang.StringBuilder
+import scalaz.*
 
-import scalaz._
+import java.lang.StringBuilder
 
 case class UserResponsesAll(
   correctResponsesInARow: List[UserResponse] = Nil,

@@ -18,20 +18,17 @@
 
 package com.oranda.libanius.net.providers
 
-import java.net.URLEncoder
-import com.github.plokhotnyuk.jsoniter_scala.macros._
-import com.github.plokhotnyuk.jsoniter_scala.core._
-
-import scala.language.implicitConversions
-import com.oranda.libanius.net.Rest
+import com.github.plokhotnyuk.jsoniter_scala.core.*
+import com.github.plokhotnyuk.jsoniter_scala.macros.*
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model._
+import com.oranda.libanius.model.*
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
-import scala.util.Try
-import com.oranda.libanius.model.ValueSet
-import com.oranda.libanius.model.SearchResultPair
-import com.oranda.libanius.model.SearchResult
+import com.oranda.libanius.net.Rest
 import com.oranda.libanius.util.CollectionHelpers.GroupByOrderedImplicit
+
+import java.net.URLEncoder
+import scala.language.implicitConversions
+import scala.util.Try
 
 /*
  * Use the free online service mymemory.translated.net to translate strings.

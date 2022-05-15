@@ -18,22 +18,16 @@
 
 package com.oranda.libanius.dependencies
 
-import com.oranda.libanius.model._
-import com.oranda.libanius.model.action.serialize._
-import CustomFormat._
-import CustomFormatForModelComponents._
+import com.oranda.libanius.io.{DefaultIO, PlatformIO}
+import com.oranda.libanius.model.*
+import com.oranda.libanius.model.action.serialize.*
+import com.oranda.libanius.model.action.serialize.CustomFormat.*
+import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.*
+import com.oranda.libanius.model.quizgroup.*
+import com.oranda.libanius.model.wordmapping.Dictionary
 import com.oranda.libanius.util.Util
 
 import scala.collection.immutable.Set
-import com.oranda.libanius.io.{DefaultIO, PlatformIO}
-import com.oranda.libanius.model.wordmapping.Dictionary
-import com.oranda.libanius.model.quizgroup.{
-  QuizGroup,
-  QuizGroupHeader,
-  QuizGroupKey,
-  QuizGroupType,
-  QuizGroupWithHeader
-}
 
 trait DataStore extends AppDependencyAccess {
   val io: PlatformIO

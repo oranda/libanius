@@ -18,17 +18,15 @@
 
 package com.oranda.libanius.model.action
 
-import org.specs2.mutable.Specification
-
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.TestData._
-import com.oranda.libanius.model.quizitem.{TextValueOps, QuizItem}
-import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupWithHeader, QuizGroupMemoryLevel}
-import com.oranda.libanius.model.{UserResponsesAll, UserResponse}
-
-import QuizItemSource._
-import modelComponentsAsQuizItemSources._
-import QuizItemSourceSpec._
+import com.oranda.libanius.model.TestData.*
+import com.oranda.libanius.model.action.QuizItemSource.*
+import com.oranda.libanius.model.action.QuizItemSourceSpec.*
+import com.oranda.libanius.model.action.modelComponentsAsQuizItemSources.*
+import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupMemoryLevel, QuizGroupWithHeader}
+import com.oranda.libanius.model.quizitem.{QuizItem, TextValueOps}
+import com.oranda.libanius.model.{UserResponse, UserResponsesAll}
+import org.specs2.mutable.Specification
 
 class QuizItemSourceSpec extends Specification with AppDependencyAccess {
   "a QuizItemSource " should {

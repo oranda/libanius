@@ -18,11 +18,11 @@
 
 package com.oranda.libanius.model
 
-import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.TestData.*
+import com.oranda.libanius.model.quizgroup.*
 import com.oranda.libanius.model.quizitem.QuizItem
-import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupKey, QuizGroupType, QuizGroupUserData}
-import TestData._
+import org.specs2.mutable.Specification
 
 class QuizSpec extends Specification with AppDependencyAccess {
 

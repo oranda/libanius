@@ -18,10 +18,10 @@
 
 package com.oranda.libanius.model
 
+import com.oranda.libanius.model.quizgroup.*
 import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
 import com.oranda.libanius.model.quizitem.QuizItem
 import com.oranda.libanius.model.wordmapping.{Dictionary, WordMappingValue, WordMappingValueSet}
-import com.oranda.libanius.model.quizgroup._
 
 object TestData {
 

@@ -18,15 +18,15 @@
 
 package com.oranda.libanius.model.action.wrongchoices
 
-import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
-import com.oranda.libanius.model.ModelComponent
-import com.oranda.libanius.model.quizitem.{QuizItem, TextValueOps}
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.ModelComponent
 import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupMemoryLevel}
+import com.oranda.libanius.model.quizitem.TextValueOps.TextValue
+import com.oranda.libanius.model.quizitem.{QuizItem, TextValueOps}
+import com.oranda.libanius.util.Util
 
 import scala.collection.immutable.{HashSet, List}
 import scala.util.Random
-import com.oranda.libanius.util.Util
 
 /**
  * Type class definition for finding quiz items in model entities.

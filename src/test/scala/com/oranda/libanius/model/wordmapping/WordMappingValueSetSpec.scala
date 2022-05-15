@@ -18,9 +18,8 @@
 
 package com.oranda.libanius.model.wordmapping
 
+import com.oranda.libanius.model.TestData.*
 import org.specs2.mutable.Specification
-
-import com.oranda.libanius.model.TestData._
 
 class WordMappingValueSetSpec extends Specification {
 

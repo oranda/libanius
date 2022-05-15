@@ -18,9 +18,9 @@
 
 package com.oranda.libanius.simulation
 
-import com.oranda.libanius.consoleui.Output._
-import com.oranda.libanius.model.Quiz
+import com.oranda.libanius.consoleui.Output.*
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import com.oranda.libanius.model.Quiz
 
 /*
  * This is a larger test, loading a quiz of thousands of items from the filesystem.

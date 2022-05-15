@@ -18,12 +18,12 @@
 
 package com.oranda.libanius.model.wordmapping
 
-import scala.collection.JavaConverters._
-import scala.collection.immutable.Stream
-
-import com.oranda.libanius.model.{SearchResultPair, ModelComponent, SearchResult}
 import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader}
 import com.oranda.libanius.model.quizitem.QuizItem
+import com.oranda.libanius.model.{ModelComponent, SearchResult, SearchResultPair}
+
+import scala.collection.JavaConverters.*
+import scala.collection.immutable.Stream
 
 /**
  * A dictionary. A large read-only repository of word mappings, structured as a

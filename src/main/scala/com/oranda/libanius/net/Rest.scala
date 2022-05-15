@@ -18,9 +18,10 @@
 
 package com.oranda.libanius.net
 
-import org.apache.http.impl.client.DefaultHttpClient
-import org.apache.http.client.methods.HttpGet
 import com.oranda.libanius.dependencies.AppDependencyAccess
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.DefaultHttpClient
+
 import scala.io.Source
 
 object Rest extends AppDependencyAccess {
