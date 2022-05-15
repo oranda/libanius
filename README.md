@@ -22,7 +22,8 @@ Get a copy of `github.com/oranda/libanius` using `git clone`,  From SBT, type:
 
 Pick the option `com.oranda.libanius.consoleui.RunQuiz` and try out a sample quiz.
 
-This has been tested with Scala 2.12.6, Java 8, and sbt 1.1.2.
+This has been tested with Scala 3.1.2, Java 8 (Zulu), and sbt 1.5. For Scala 2.x, try an older 
+version: https://github.com/oranda/libanius/archive/refs/tags/v0.9.8.7.3.zip.
 
 A better standalone CLI is available at https://github.com/oranda/libanius-cli-zio.
 
