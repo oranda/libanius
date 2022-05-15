@@ -4,7 +4,7 @@ organization := "com.github.oranda"
 
 name := "libanius"
 
-version := "0.9.9"
+version := "0.9.9.1"
 
 scalaVersion := "3.1.2"
 
@@ -37,6 +37,8 @@ publishTo := {
 }
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-new-syntax", "-rewrite", "-feature")
+
+scalafmtOnCompile := true
 
 resolvers ++= Seq("Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/",
   "mvnrepository" at "https://mvnrepository.com/artifact/"

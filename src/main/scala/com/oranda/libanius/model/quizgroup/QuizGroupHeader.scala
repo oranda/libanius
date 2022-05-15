@@ -30,7 +30,7 @@ import scala.collection.immutable.List
 
 case class QuizGroupKey(promptType: String, responseType: String, quizGroupType: QuizGroupType) {
   override def toString = s"$quizGroupType: $promptType-$responseType"
-  def reverse = QuizGroupKey(responseType, promptType, quizGroupType)
+  def reverse           = QuizGroupKey(responseType, promptType, quizGroupType)
 }
 
 case class QuizGroupHeader(
@@ -44,14 +44,14 @@ case class QuizGroupHeader(
 
   override def toString = quizGroupKey.toString
 
-  def promptType = quizGroupKey.promptType
-  def responseType = quizGroupKey.responseType
+  def promptType    = quizGroupKey.promptType
+  def responseType  = quizGroupKey.responseType
   def quizGroupType = quizGroupKey.quizGroupType
 
   def matches(other: QuizGroupKey) =
     promptType == other.promptType && responseType == other.responseType
 
-  def makeQgFileName = s"$promptType-$responseType.qgr"
+  def makeQgFileName   = s"$promptType-$responseType.qgr"
   def makeDictFileName = s"$promptType-$responseType.dct"
 
   def reverse = copy(quizGroupKey.reverse)
@@ -66,7 +66,7 @@ case class QuizGroupHeader(
 object QuizGroupHeader extends AppDependencyAccess {
 
   val maxNumCorrectResponsesRequired = 12
-  val allIntervals = List(0, 5, 15, 15, 60, 600, 1200, 2500, 5000, 10000, 20000, 40000)
+  val allIntervals                   = List(0, 5, 15, 15, 60, 600, 1200, 2500, 5000, 10000, 20000, 40000)
 
   def apply(headerLine: String): QuizGroupHeader =
     deserialize[QuizGroupHeader, NoParams](headerLine, NoParams())
@@ -96,12 +96,11 @@ sealed abstract class QuizGroupType(val str: String) {
 }
 
 object QuizGroupType {
-  case object WordMapping extends QuizGroupType("WordMapping")
+  case object WordMapping       extends QuizGroupType("WordMapping")
   case object QuestionAndAnswer extends QuizGroupType("QuestionAndAnswer")
 
   def fromString(qgType: String): QuizGroupType = qgType match {
-    case "WordMapping" => WordMapping
+    case "WordMapping"       => WordMapping
     case "QuestionAndAnswer" => QuestionAndAnswer
   }
 }
-

@@ -21,10 +21,10 @@ package com.oranda.libanius.model
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
 case class SearchResult(quizGroupHeader: QuizGroupHeader, wmp: SearchResultPair) {
-  lazy val promptType = quizGroupHeader.promptType
+  lazy val promptType   = quizGroupHeader.promptType
   lazy val responseType = quizGroupHeader.responseType
-  lazy val keyWord = wmp.key
-  lazy val valueSet = wmp.valueSet
+  lazy val keyWord      = wmp.key
+  lazy val valueSet     = wmp.valueSet
 
   // It may be desired to filter out trivial search results where this is true
   def keyWordMatchesValue = valueSet.size == 1 && keyWord == valueSet.values.head

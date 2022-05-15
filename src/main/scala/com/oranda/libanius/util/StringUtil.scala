@@ -26,7 +26,7 @@ object StringUtil {
   def parseValue(str: String, beginStr: String, endStr: String): Option[String] = {
     val beginIndex = str.optionalIndex(beginStr)
     beginIndex.flatMap { case beginIndex =>
-      val beginTextIndex: Int = beginIndex + beginStr.length
+      val beginTextIndex: Int       = beginIndex + beginStr.length
       val endTextIndex: Option[Int] = str.optionalIndex(endStr, beginTextIndex + 1)
       endTextIndex.map(str.substring(beginTextIndex, _))
     }
@@ -37,21 +37,21 @@ object StringUtil {
    * It's necessary to pass in an existing StringBuilder.
    */
   def mkString[S <: StringBuilder, T](
-      str: S,
-      iterable: Iterable[T],
-      fn: (S, T) => StringBuilder,
-      separator: Character): S = {
+    str: S,
+    iterable: Iterable[T],
+    fn: (S, T) => StringBuilder,
+    separator: Character
+  ): S = {
     val iter = iterable.iterator
     while iter.hasNext do {
       fn(str, iter.next)
-      if iter.hasNext then
-        str.append(separator)
+      if iter.hasNext then str.append(separator)
     }
     str
   }
 
   def formatScore(score: BigDecimal): String = {
-    val scoreStr = (score * 100).toString
+    val scoreStr         = (score * 100).toString
     val scoreStrMaxIndex = scala.math.min(scoreStr.length, 6)
     scoreStr.substring(0, scoreStrMaxIndex) + "%"
   }

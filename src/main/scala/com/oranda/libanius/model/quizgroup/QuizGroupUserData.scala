@@ -25,8 +25,7 @@ import com.oranda.libanius.model.action.serialize._
 import CustomFormat._
 import CustomFormatForModelComponents._
 
-case class QuizGroupUserData(isActive: Boolean = false, currentPromptNumber: Int = 0)
-  extends ModelComponent
+case class QuizGroupUserData(isActive: Boolean = false, currentPromptNumber: Int = 0) extends ModelComponent
 
 object QuizGroupUserData extends AppDependencyAccess {
   def apply(headerLine: String): QuizGroupUserData =
@@ -34,9 +33,11 @@ object QuizGroupUserData extends AppDependencyAccess {
 
   val activeLens: Lens[QuizGroupUserData, Boolean] = Lens.lensu(
     get = (_: QuizGroupUserData).isActive,
-    set = (qgud: QuizGroupUserData, active: Boolean) => qgud.copy(isActive = active))
+    set = (qgud: QuizGroupUserData, active: Boolean) => qgud.copy(isActive = active)
+  )
 
   val promptNumberLens: Lens[QuizGroupUserData, Int] = Lens.lensu(
     get = (_: QuizGroupUserData).currentPromptNumber,
-    set = (q: QuizGroupUserData, promptNum: Int) => q.copy(currentPromptNumber = promptNum))
+    set = (q: QuizGroupUserData, promptNum: Int) => q.copy(currentPromptNumber = promptNum)
+  )
 }

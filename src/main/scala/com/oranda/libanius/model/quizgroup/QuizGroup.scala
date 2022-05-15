@@ -44,52 +44,47 @@ import ConstructWrongChoicesForModelComponents._
  * is an example of a "disjoint set" or "union find" data structure.) The index in the
  * List of partitions matches correctResponseInARow.
  */
-case class QuizGroup private(
-    levels: List[QuizGroupMemoryLevel],
-    userData: QuizGroupUserData,
-    dictionary: Dictionary)
-  extends ModelComponent {
+case class QuizGroup private (levels: List[QuizGroupMemoryLevel], userData: QuizGroupUserData, dictionary: Dictionary)
+    extends ModelComponent {
 
   lazy val currentPromptNumber = userData.currentPromptNumber
-  lazy val isActive = userData.isActive
+  lazy val isActive            = userData.isActive
 
-  def updatedPromptNumber: QuizGroup = QuizGroup.promptNumberLens.mod((1+), this)
+  def updatedPromptNumber: QuizGroup = QuizGroup.promptNumberLens.mod((1 +), this)
 
-  def activate = QuizGroup.activeLens.set(this, true)
+  def activate   = QuizGroup.activeLens.set(this, true)
   def deactivate = QuizGroup.activeLens.set(this, false)
 
   def contains(quizItem: QuizItem): Boolean = levels.exists(_.contains(quizItem))
 
-  def hasPrompt(prompt: String): Boolean = contains(prompt)
+  def hasPrompt(prompt: String): Boolean   = contains(prompt)
   def contains(prompt: TextValue): Boolean = levels.exists(_.contains(prompt))
-  def numQuizItems = levels.view.map(_.numQuizItems).sum
+  def numQuizItems                         = levels.view.map(_.numQuizItems).sum
 
-  def isEmpty = levels.forall(_.isEmpty)
-  def size = numQuizItems
-  def numPrompts = size
-  def numResponses = size
-  def numLevels = levels.size
+  def isEmpty                     = levels.forall(_.isEmpty)
+  def size                        = numQuizItems
+  def numPrompts                  = size
+  def numResponses                = size
+  def numLevels                   = levels.size
   def numCorrectResponsesRequired = numLevels - 1
 
   // Because memLevel index corresponds to numCorrectAnswersInARow, score computation is fast
-  def numCorrectResponses: Int = levels.zipWithIndex.foldLeft(0) {
-    case (accum, (level, index)) => accum + level.size * index
+  def numCorrectResponses: Int = levels.zipWithIndex.foldLeft(0) { case (accum, (level, index)) =>
+    accum + level.size * index
   }
 
   def maxDiffInPromptNumMinimum = levels.foldLeft(0)(_ max _.repetitionInterval)
 
-  def totalCorrectResponsesRequired = {
+  def totalCorrectResponsesRequired =
     if numCorrectResponsesRequired == 0 then {
       l.logError("numCorrectResponsesRequired for quizGroup is 0")
       numQuizItems
-    } else
-      numQuizItems * numCorrectResponsesRequired
-  }
+    } else numQuizItems * numCorrectResponsesRequired
 
-  def totalResponses(level: Int): Int = get(level).totalResponses
+  def totalResponses(level: Int): Int      = get(level).totalResponses
   def numCorrectResponses(level: Int): Int = get(level).numCorrectResponses
-  def memoryLevelInterval(level: Int) = get(level).repetitionInterval
-  def isAtLimit(level: Int): Boolean = get(level).isAtLimit
+  def memoryLevelInterval(level: Int)      = get(level).repetitionInterval
+  def isAtLimit(level: Int): Boolean       = get(level).isAtLimit
 
   def updatedDictionary(newDictionary: Dictionary) =
     QuizGroup.dictionaryLens.set(this, newDictionary)
@@ -114,14 +109,15 @@ case class QuizGroup private(
    * Low usage expected. Slow because we are not using a Map for quizItems.
    */
   protected[model] def findQuizItem(prompt: String, response: String): Option[QuizItem] =
-    quizItems.find(quizItem => quizItem.prompt.matches(prompt) &&
-      quizItem.correctResponse.matches(response))
+    quizItems.find(quizItem =>
+      quizItem.prompt.matches(prompt) &&
+        quizItem.correctResponse.matches(response)
+    )
 
   protected[model] def findQuizItem(prompt: String): Option[QuizItem] =
     quizItems.find(quizItem => quizItem.prompt.matches(prompt))
 
-  protected[model] def updateWithQuizItem(quizItem: QuizItem, isCorrect: Boolean,
-      prevMemLevel: Int): QuizGroup = {
+  protected[model] def updateWithQuizItem(quizItem: QuizItem, isCorrect: Boolean, prevMemLevel: Int): QuizGroup = {
     val updatedQuizGroup1 = moveQuizItem(quizItem)
     val updatedQuizGroup2 = updatedQuizGroup1.incrementResponses(prevMemLevel, isCorrect)
     val updatedQuizGroup3 = updatedQuizGroup2.updatedPromptNumber
@@ -140,7 +136,7 @@ case class QuizGroup private(
     prependItemToNthLevel(quizItem, 0)
 
   private def prependItemToNthLevel(quizItem: QuizItem, n: Int): QuizGroup = {
-    val nthLevelLens = listNthPLens(n) compose QuizGroup.levelsLens.partial
+    val nthLevelLens      = listNthPLens(n) compose QuizGroup.levelsLens.partial
     val nthLevelItemsLens = QuizGroupMemoryLevel.itemsLens.partial compose nthLevelLens
     nthLevelItemsLens.mod(quizItem +: _.filterNot(_ == quizItem), this)
   }
@@ -167,19 +163,19 @@ case class QuizGroup private(
   def updateIntervalForLevel(memoryLevel: Int): QuizGroup =
     if memoryLevel > 0 && isAtLimit(memoryLevel) then {
       val mlsIntervalLens = QuizGroupMemoryLevel.intervalLens.partial compose
-          QuizGroup.levelsListLens(memoryLevel)
-      val mlsUpdated = mlsIntervalLens.mod(Int => get(memoryLevel).updatedInterval, this)
+        QuizGroup.levelsListLens(memoryLevel)
+      val mlsUpdated                  = mlsIntervalLens.mod(Int => get(memoryLevel).updatedInterval, this)
       def strIntervals(qg: QuizGroup) = qg.levels.map(_.repetitionInterval)
-      l.log(s"Updating memory intervals from ${strIntervals(this)} to " +
-        s"${strIntervals(mlsUpdated)}, $numCorrectResponses ${numCorrectResponses(memoryLevel)}")
+      l.log(
+        s"Updating memory intervals from ${strIntervals(this)} to " +
+          s"${strIntervals(mlsUpdated)}, $numCorrectResponses ${numCorrectResponses(memoryLevel)}"
+      )
       mlsUpdated
-    } else
-      this
+    } else this
 
   protected[model] def get(level: Int): QuizGroupMemoryLevel = levels(level)
 
-  protected[model] def quizItemWithChoices(quizItem: QuizItem, header: QuizGroupHeader):
-      QuizItemViewWithChoices = {
+  protected[model] def quizItemWithChoices(quizItem: QuizItem, header: QuizGroupHeader): QuizItemViewWithChoices = {
     val numCorrectResponses = quizItem.userResponses.numCorrectResponsesInARow
     /*
      * A quiz item might be presented initially in multiple-choice format,
@@ -187,11 +183,16 @@ case class QuizGroup private(
      */
     val useMultipleChoice = numCorrectResponses < header.useMultipleChoiceUntil
     val falseAnswers =
-      if useMultipleChoice then
-        Util.stopwatch(ConstructWrongChoices.execute(this, quizItem), "constructWrongChoices")
+      if useMultipleChoice then Util.stopwatch(ConstructWrongChoices.execute(this, quizItem), "constructWrongChoices")
       else Nil
-    new QuizItemViewWithChoices(quizItem, currentPromptNumber, header,
-      falseAnswers, numCorrectResponses, useMultipleChoice)
+    new QuizItemViewWithChoices(
+      quizItem,
+      currentPromptNumber,
+      header,
+      falseAnswers,
+      numCorrectResponses,
+      useMultipleChoice
+    )
   }
 
   override def toString = {
@@ -239,26 +240,24 @@ object QuizGroup extends AppDependencyAccess {
   ): List[QuizGroupMemoryLevel] = {
     // Note: the final "level" is just a resting place for complete items
     val intervals = QuizGroupHeader.allIntervals.take(numCorrectResponsesRequired) :+ 0
-    intervals.zipWithIndex.map {
-      case (level, index) => memLevelMap.get(index).getOrElse(QuizGroupMemoryLevel(index, level))
+    intervals.zipWithIndex.map { case (level, index) =>
+      memLevelMap.get(index).getOrElse(QuizGroupMemoryLevel(index, level))
     }
   }
 
   val levelsLens: Lens[QuizGroup, List[QuizGroupMemoryLevel]] = Lens.lensu(
     get = (_: QuizGroup).levels,
-    set = (qGroup: QuizGroup,
-      qLevels: List[QuizGroupMemoryLevel]) => qGroup.copy(levels = qLevels))
+    set = (qGroup: QuizGroup, qLevels: List[QuizGroupMemoryLevel]) => qGroup.copy(levels = qLevels)
+  )
 
   protected[quizgroup] def levelsListLens(memoryLevel: Int) =
     listNthPLens(memoryLevel) compose levelsLens.partial
 
-  val dictionaryLens: Lens[QuizGroup, Dictionary] = Lens.lensu(
-    get = (_: QuizGroup).dictionary,
-    set = (qGroup: QuizGroup, d: Dictionary) => qGroup.copy(dictionary = d))
+  val dictionaryLens: Lens[QuizGroup, Dictionary] =
+    Lens.lensu(get = (_: QuizGroup).dictionary, set = (qGroup: QuizGroup, d: Dictionary) => qGroup.copy(dictionary = d))
 
-  val userDataLens = Lens.lensu(
-    get = (_: QuizGroup).userData,
-    set = (qg: QuizGroup, ud: QuizGroupUserData) => qg.copy(userData = ud))
+  val userDataLens =
+    Lens.lensu(get = (_: QuizGroup).userData, set = (qg: QuizGroup, ud: QuizGroupUserData) => qg.copy(userData = ud))
 
   val activeLens: Lens[QuizGroup, Boolean] =
     QuizGroupUserData.activeLens compose userDataLens
@@ -266,7 +265,6 @@ object QuizGroup extends AppDependencyAccess {
   val promptNumberLens: Lens[QuizGroup, Int] =
     QuizGroupUserData.promptNumberLens compose userDataLens
 }
-
 
 // simple correctResponse object used for saving a data structure to a file
 case class SaveData(fileName: String, data: String)

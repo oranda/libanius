@@ -26,13 +26,10 @@ object DemoQuizWithMixedAnswers extends App with DemoQuiz {
   runQuiz()
 
   /**
-   * Give wrong and right answers according to a schedule, changing the pattern every
-   * hundred prompts, and keep cycling.
+   * Give wrong and right answers according to a schedule, changing the pattern
+   * every hundred prompts, and keep cycling.
    */
-  override def makeResponse(
-      quizItem: QuizItemViewWithChoices,
-      quiz: Quiz,
-      responsesProcessed: Long): String =
+  override def makeResponse(quizItem: QuizItemViewWithChoices, quiz: Quiz, responsesProcessed: Long): String =
     (responsesProcessed / 100) % 3 match {
       // intervals should stay about the same
       case 0 => if responsesProcessed % 10 < 8 then quizItem.correctResponse.value else "wrong"

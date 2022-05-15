@@ -24,13 +24,12 @@ import com.oranda.libanius.dependencies.AppDependencyAccess
 import com.oranda.libanius.model.ModelComponent
 import com.oranda.libanius.model.Quiz
 
-
 /**
  * Type class definition for finding quiz items in model entities.
  */
 trait QuizItemSourceBase[A <: ModelComponent, B <: Params, C] {
   def produceQuizItem(component: A, params: B): Option[C]
-  def findAnyUnfinishedQuizItem(component: A, params:B): Option[C]
+  def findAnyUnfinishedQuizItem(component: A, params: B): Option[C]
 }
 
 /**
@@ -41,14 +40,16 @@ trait QuizItemSource[A <: ModelComponent, C] extends QuizItemSourceBase[A, NoPar
 // provides external access to the typeclass, forwarding the call to the appropriate type
 object QuizItemSource {
 
-  def produceQuizItem[A <: ModelComponent, B <: Params, C]
-      (component: A, params: B)
-      (implicit qis: QuizItemSourceBase[A, B, C], c: C => QuizItem): Option[C] =
+  def produceQuizItem[A <: ModelComponent, B <: Params, C](component: A, params: B)(implicit
+    qis: QuizItemSourceBase[A, B, C],
+    c: C => QuizItem
+  ): Option[C] =
     qis.produceQuizItem(component, params)
 
-  def findAnyUnfinishedQuizItem[A <: ModelComponent, B <: Params, C]
-      (component: A, params: B)
-      (implicit qis: QuizItemSourceBase[A, B, C], c: C => QuizItem): Option[C] =
+  def findAnyUnfinishedQuizItem[A <: ModelComponent, B <: Params, C](component: A, params: B)(implicit
+    qis: QuizItemSourceBase[A, B, C],
+    c: C => QuizItem
+  ): Option[C] =
     qis.findAnyUnfinishedQuizItem(component, params)
 }
 
@@ -60,12 +61,10 @@ object modelComponentsAsQuizItemSources extends AppDependencyAccess {
      * Find the first available "presentable" quiz item.
      * Return a quiz item view and the associated quiz group header.
      */
-    def produceQuizItem(
-        quiz: Quiz,
-        params: NoParams = NoParams()): Option[QuizItemViewWithChoices] =
+    def produceQuizItem(quiz: Quiz, params: NoParams = NoParams()): Option[QuizItemViewWithChoices] =
       (for
         (header, quizGroup) <- quiz.activeQuizGroups.to(LazyList)
-        quizItem <- quizGroupAsSource.produceQuizItem(quizGroup).to(LazyList)
+        quizItem            <- quizGroupAsSource.produceQuizItem(quizGroup).to(LazyList)
       yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
 
     /*
@@ -74,13 +73,11 @@ object modelComponentsAsQuizItemSources extends AppDependencyAccess {
      * normal criteria, because the last correct response was recent. However, they do need
      * to be presented in order for the quiz to finish, so this method is called as a last try.
      */
-    def findAnyUnfinishedQuizItem(
-        quiz: Quiz,
-        params: NoParams = NoParams()): Option[QuizItemViewWithChoices] = {
+    def findAnyUnfinishedQuizItem(quiz: Quiz, params: NoParams = NoParams()): Option[QuizItemViewWithChoices] = {
       l.log("calling Quiz.findAnyUnfinishedQuizItem")
       (for
         (header, quizGroup) <- quiz.activeQuizGroups
-        quizItem <- quizGroupAsSource.findAnyUnfinishedQuizItem(quizGroup, NoParams())
+        quizItem            <- quizGroupAsSource.findAnyUnfinishedQuizItem(quizGroup, NoParams())
       yield quizGroup.quizItemWithChoices(quizItem, header)).headOption
     }
   }
@@ -95,37 +92,34 @@ object modelComponentsAsQuizItemSources extends AppDependencyAccess {
     def produceQuizItem(qg: QuizGroup, params: NoParams = NoParams()): Option[QuizItem] =
       (for
         (memLevel, levelIndex) <- qg.levels.zipWithIndex.reverse.tail.to(LazyList)
-        quizItem <- quizGroupMemoryLevelAsSource.produceQuizItem(memLevel,
-            CurrentPromptNumber(qg)).to(LazyList)
+        quizItem               <- quizGroupMemoryLevelAsSource.produceQuizItem(memLevel, CurrentPromptNumber(qg)).to(LazyList)
       yield quizItem).headOption
 
     def findAnyUnfinishedQuizItem(qg: QuizGroup, params: NoParams = NoParams()): Option[QuizItem] =
       (for
         (memLevel, levelIndex) <- qg.levels.zipWithIndex.reverse.tail.to(LazyList)
-        quizItem <- quizGroupMemoryLevelAsSource.findAnyUnfinishedQuizItem(
-            memLevel, CurrentPromptNumber(qg))
+        quizItem               <- quizGroupMemoryLevelAsSource.findAnyUnfinishedQuizItem(memLevel, CurrentPromptNumber(qg))
       yield quizItem).headOption
   }
 
   implicit object quizGroupMemoryLevelAsSource
-    extends QuizItemSourceBase[QuizGroupMemoryLevel, CurrentPromptNumber, QuizItem] {
+      extends QuizItemSourceBase[QuizGroupMemoryLevel, CurrentPromptNumber, QuizItem] {
 
-    def produceQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber):
-        Option[QuizItem] =
+    def produceQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber): Option[QuizItem] =
       (for
         quizItem <- qgml.quizItems.to(LazyList)
         if quizItem.isPresentable(params.currentPromptNumber, qgml.repetitionInterval)
       yield quizItem).headOption
 
-    def findAnyUnfinishedQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber):
-        Option[QuizItem] =
+    def findAnyUnfinishedQuizItem(qgml: QuizGroupMemoryLevel, params: CurrentPromptNumber): Option[QuizItem] =
       qgml.quizItems.headOption
   }
 }
 
 trait Params
-case class NoParams() extends Params
+case class NoParams()                                    extends Params
 case class CurrentPromptNumber(currentPromptNumber: Int) extends Params
+
 /**
  * Provide factory method based on quiz group for CurrentPromptNumber Params.
  */

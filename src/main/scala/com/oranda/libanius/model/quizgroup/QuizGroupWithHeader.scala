@@ -30,10 +30,9 @@ import CustomFormatForModelComponents._
 /*
  * Convenience class for passing around a key-value pair from the Quiz.quizGroups map.
  */
-case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup)
-  extends ModelComponent {
+case class QuizGroupWithHeader(header: QuizGroupHeader, quizGroup: QuizGroup) extends ModelComponent {
 
-  def toPair = (header, quizGroup)
+  def toPair         = (header, quizGroup)
   def toCustomFormat = serialize(this, new StringBuilder, new NoParams).toString
 }
 

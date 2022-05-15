@@ -32,11 +32,11 @@ import com.oranda.libanius.model.TestData._
 
 class CustomFormatSpec extends Specification with AppDependencyAccess {
 
-  def paramsDefault = NoParams()
-  def paramsWithSeparator = Separator("|")
+  def paramsDefault               = NoParams()
+  def paramsWithSeparator         = Separator("|")
   def paramsWithSeparatorAndIndex = SeparatorAndIndex("|", 0)
 
-  val quizItem = QuizItem("solve", "nachlösen", userResponsesAll)
+  val quizItem             = QuizItem("solve", "nachlösen", userResponsesAll)
   val quizItemCustomFormat = "solve|nachlösen|9,7;6"
 
   def strBuilder = new StringBuilder
@@ -60,7 +60,7 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
 
     "serialize a quiz group memory level" in {
       val customFormat = serialize(qgMemLevelSimple, strBuilder, paramsWithSeparatorAndIndex)
-      val qgpHeader = "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n"
+      val qgpHeader    = "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n"
       customFormat.toString mustEqual qgpHeader + qgMemLevelSimpleCustomFormat
     }
 
@@ -75,8 +75,7 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
     }
 
     "deserialize a word mapping value" in {
-      val wmv: WordMappingValue = deserialize[WordMappingValue, Separator](
-          wmvCustomFormat, Separator("|"))
+      val wmv: WordMappingValue = deserialize[WordMappingValue, Separator](wmvCustomFormat, Separator("|"))
       wmv.value mustEqual "nachlösen"
       wmv.userAnswers.length mustEqual 3
       wmv.numCorrectAnswersInARow mustEqual 2
@@ -89,17 +88,16 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
     }
 
     "deserialize a quiz item" in {
-      val quizItemStr = "on|auf|"
-      val quizItem = deserialize[QuizItem, Separator](quizItemStr, Separator("|"))
+      val quizItemStr      = "on|auf|"
+      val quizItem         = deserialize[QuizItem, Separator](quizItemStr, Separator("|"))
       val quizItemExpected = QuizItem("on", "auf")
       quizItem mustEqual quizItemExpected
     }
 
     "deserialize a quiz item with a special separator" in {
-      val quizItemStr = "Given a String s = \"2.3\" convert it to a Double ||| s.toDouble"
-      val quizItem = deserialize[QuizItem, Separator](quizItemStr, Separator("|||"))
-      val quizItemExpected = QuizItem("Given a String s = \"2.3\" convert it to a Double",
-          "s.toDouble")
+      val quizItemStr      = "Given a String s = \"2.3\" convert it to a Double ||| s.toDouble"
+      val quizItem         = deserialize[QuizItem, Separator](quizItemStr, Separator("|||"))
+      val quizItemExpected = QuizItem("Given a String s = \"2.3\" convert it to a Double", "s.toDouble")
       quizItem mustEqual quizItemExpected
     }
 
@@ -107,8 +105,7 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
       import CustomFormat._
       import CustomFormatForModelComponents._
 
-      val qgml = deserialize(qgMemLevelSimpleCustomFormat,
-          SeparatorIndexAndRepetitionInterval("|", 0, 0))
+      val qgml = deserialize(qgMemLevelSimpleCustomFormat, SeparatorIndexAndRepetitionInterval("|", 0, 0))
       qgml.numQuizItems mustEqual 2
     }
 

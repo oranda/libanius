@@ -41,23 +41,22 @@ import com.oranda.libanius.net.providers.MyMemoryTranslate
 
 import scala.util.Try
 
-case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap())
-  extends ModelComponent {
+case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMap()) extends ModelComponent {
 
   def quizGroupIterator = quizGroups.valuesIterator
 
   def hasQuizGroup(header: QuizGroupHeader): Boolean = quizGroups.contains(header)
-  def isActive(header: QuizGroupHeader): Boolean = quizGroups.get(header).exists(_.isActive)
+  def isActive(header: QuizGroupHeader): Boolean     = quizGroups.get(header).exists(_.isActive)
 
   // By default, reading of data accesses the activeQuizGroups
   def activeQuizGroups: Map[QuizGroupHeader, QuizGroup] =
     quizGroups.filter { case (_, quizGroup) => quizGroup.isActive }
   def activeQuizGroupHeaders: Set[QuizGroupHeader] = activeQuizGroups.keySet
 
-  def numActiveGroups = activeQuizGroups.size
-  def numPrompts = activeQuizGroups.values.view.map(_.numPrompts).sum
-  def numResponses = activeQuizGroups.values.view.map(_.numResponses).sum
-  def numQuizItems = activeQuizGroups.values.view.map(_.size).sum
+  def numActiveGroups     = activeQuizGroups.size
+  def numPrompts          = activeQuizGroups.values.view.map(_.numPrompts).sum
+  def numResponses        = activeQuizGroups.values.view.map(_.numResponses).sum
+  def numQuizItems        = activeQuizGroups.values.view.map(_.size).sum
   def numCorrectResponses = activeQuizGroups.values.view.map(_.numCorrectResponses).sum
   def totalCorrectResponsesRequired =
     activeQuizGroups.values.view.map(_.totalCorrectResponsesRequired).sum
@@ -65,8 +64,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
     if totalCorrectResponsesRequired == 0 then {
       l.logError("Could not compute score because totalCorrectResponsesRequired == 0")
       0
-    } else
-      numCorrectResponses.toDouble / totalCorrectResponsesRequired.toDouble
+    } else numCorrectResponses.toDouble / totalCorrectResponsesRequired.toDouble
 
   def numCorrectResponses(qgh: QuizGroupHeader, level: Int) =
     quizGroups(qgh).numCorrectResponses(level)
@@ -83,26 +81,20 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
     findQuizGroupHeader(quizGroupKey).flatMap(activeQuizGroups.get(_))
 
   def resultsBeginningWith(input: String): List[SearchResult] =
-    activeQuizGroups.flatMap {
-      case (header, quizGroup) =>
-        Dictionary.convertToSearchResults(
-            quizGroup.dictionary.mappingsForKeysBeginningWith(input),
-            header)
+    activeQuizGroups.flatMap { case (header, quizGroup) =>
+      Dictionary.convertToSearchResults(quizGroup.dictionary.mappingsForKeysBeginningWith(input), header)
     }.toList
 
   def resultsContaining(input: String): List[SearchResult] =
-    activeQuizGroups.flatMap {
-      case (header, quizGroup) =>
-        Dictionary.convertToSearchResults(
-        quizGroup.dictionary.mappingsForKeysContaining(input),
-        header)
+    activeQuizGroups.flatMap { case (header, quizGroup) =>
+      Dictionary.convertToSearchResults(quizGroup.dictionary.mappingsForKeysContaining(input), header)
     }.toList
 
   def isCorrect(qgKey: QuizGroupKey, prompt: String, userResponse: String): ResponseCorrectness = {
     val responses = findResponsesFor(prompt, qgKey)
     responses match {
       case Nil => ItemNotFound
-      case responses: List[String]  =>
+      case responses: List[String] =>
         if responses.exists(_.looselyMatches(userResponse)) then Correct else Incorrect
     }
   }
@@ -131,7 +123,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
             (addQuizGroup(qgh, dataStore.initQuizGroup(qgh)), Some(qgh))
           case None =>
             l.logError(s"Could not find quiz group $quizGroupKey in the data store")
-          (this, None)
+            (this, None)
         }
     }
 
@@ -174,9 +166,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
   // adds the quiz item to the front of the right queue within the Quiz data structure
   def addQuizItemToFront(quizItem: QuizItem, header: QuizGroupHeader): Quiz =
-    Quiz.quizGroupsLens.set(this,
-      mapVPLens(header) mod ((_: QuizGroup) + quizItem, quizGroups)
-    )
+    Quiz.quizGroupsLens.set(this, mapVPLens(header) mod ((_: QuizGroup) + quizItem, quizGroups))
 
   /*
    * This is intended for reversible quiz items, principally word translations.
@@ -192,8 +182,7 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
 
   def removeQuizItem(quizItem: QuizItem, header: QuizGroupHeader): (Quiz, Boolean) = {
     val quizItemExisted = existsQuizItem(quizItem, header)
-    val quiz: Quiz = Quiz.quizGroupsLens.set(this,
-        mapVPLens(header) mod ((_: QuizGroup) - quizItem, quizGroups))
+    val quiz: Quiz      = Quiz.quizGroupsLens.set(this, mapVPLens(header) mod ((_: QuizGroup) - quizItem, quizGroups))
     (quiz, quizItemExisted)
   }
 
@@ -203,43 +192,45 @@ case class Quiz(private val quizGroups: Map[QuizGroupHeader, QuizGroup] = ListMa
   def findQuizItem(header: QuizGroupHeader, prompt: String): Option[QuizItem] =
     mapVPLens(header).get(activeQuizGroups).flatMap(_.findQuizItem(prompt))
 
-  def findQuizItem(header: QuizGroupHeader, prompt: String, response: String):
-      Option[QuizItem] =
+  def findQuizItem(header: QuizGroupHeader, prompt: String, response: String): Option[QuizItem] =
     mapVPLens(header).get(activeQuizGroups).flatMap(_.findQuizItem(prompt, response))
 
-  def updateWithUserResponse(isCorrect: Boolean, quizGroupHeader: QuizGroupHeader,
-      quizItem: QuizItem): Quiz =
+  def updateWithUserResponse(isCorrect: Boolean, quizGroupHeader: QuizGroupHeader, quizItem: QuizItem): Quiz =
     qgCurrentPromptNumber(quizGroupHeader) match {
       case Some(qgPromptNumber) =>
         val userResponse = new UserResponse(qgPromptNumber)
 
         val prevMemLevel = quizItem.numCorrectResponsesInARow
-        val updQuizItem = quizItem.updatedWithUserResponse(quizItem.correctResponse,
-            isCorrect, userResponse)
+        val updQuizItem  = quizItem.updatedWithUserResponse(quizItem.correctResponse, isCorrect, userResponse)
 
-        Quiz.quizGroupsLens.set(this, mapVPLens(quizGroupHeader) mod
+        Quiz.quizGroupsLens.set(
+          this,
+          mapVPLens(quizGroupHeader) mod
             ((_: QuizGroup).updateWithQuizItem(updQuizItem, isCorrect, prevMemLevel), quizGroups)
         )
       case _ => this
     }
 
-  def nearTheEnd = quizGroupIterator.exists(qg =>
-      (qg.numPrompts - qg.currentPromptNumber) < qg.maxDiffInPromptNumMinimum)
+  def nearTheEnd =
+    quizGroupIterator.exists(qg => (qg.numPrompts - qg.currentPromptNumber) < qg.maxDiffInPromptNumMinimum)
 
   def searchLocalDictionary(searchInput: String): Try[List[SearchResult]] = {
-    import Dictionary._  // make special search utilities available
+    import Dictionary._ // make special search utilities available
 
     val firstWord = searchInput.takeWhile(_ != ' ')
 
     // Keep trying different ways of searching the dictionary until one finds something.
     Try(
       if firstWord.length <= 2 then Nil
-      else tryUntilResults(List(
-        searchFunction { resultsBeginningWith(firstWord) },
-        searchFunction { resultsBeginningWith(firstWord.dropRight(1)) },
-        searchFunction { resultsBeginningWith(firstWord.dropRight(2)) },
-        searchFunction { if firstWord.length > 3 then resultsContaining(firstWord) else Nil }
-      ))
+      else
+        tryUntilResults(
+          List(
+            searchFunction(resultsBeginningWith(firstWord)),
+            searchFunction(resultsBeginningWith(firstWord.dropRight(1))),
+            searchFunction(resultsBeginningWith(firstWord.dropRight(2))),
+            searchFunction(if firstWord.length > 3 then resultsContaining(firstWord) else Nil)
+          )
+        )
     )
   }
 
@@ -251,16 +242,20 @@ object Quiz extends AppDependencyAccess {
 
   val quizGroupsLens: Lens[Quiz, Map[QuizGroupHeader, QuizGroup]] = Lens.lensu(
     get = (_: Quiz).quizGroups,
-    set = (q: Quiz, qgs: Map[QuizGroupHeader, QuizGroup]) => q.copy(quizGroups = qgs))
+    set = (q: Quiz, qgs: Map[QuizGroupHeader, QuizGroup]) => q.copy(quizGroups = qgs)
+  )
 
-  def quizGroupMapLens[QuizGroupHeader, QuizGroup](header: QuizGroupHeader):
-      Lens[Map[QuizGroupHeader, QuizGroup], Option[QuizGroup]] =
+  def quizGroupMapLens[QuizGroupHeader, QuizGroup](
+    header: QuizGroupHeader
+  ): Lens[Map[QuizGroupHeader, QuizGroup], Option[QuizGroup]] =
     Lens.lensu(
       get = _ get header,
-      set = (quizGroups, qg) => qg match {
-        case None => quizGroups - header
-        case Some(quizGroup) => quizGroups + ((header, quizGroup))
-      })
+      set = (quizGroups, qg) =>
+        qg match {
+          case None            => quizGroups - header
+          case Some(quizGroup) => quizGroups + ((header, quizGroup))
+        }
+    )
 
   def metadataFromCustomFormat(str: String): Set[QuizGroupHeader] = {
     val quizGroupHeadings = str.split("quizGroup").tail
@@ -279,8 +274,8 @@ object Quiz extends AppDependencyAccess {
 
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
-    val qgsWithHeader: Iterable[QuizGroupWithHeader] = quizGroupsData.map(
-      deserialize[QuizGroupWithHeader, Separator](_, Separator("|")))
+    val qgsWithHeader: Iterable[QuizGroupWithHeader] =
+      quizGroupsData.map(deserialize[QuizGroupWithHeader, Separator](_, Separator("|")))
     Quiz(qgsWithHeader.map(qgWithHeader => (qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }
 

@@ -26,13 +26,15 @@ import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader}
 import com.oranda.libanius.model.quizitem.QuizItem
 
 /**
- * A dictionary. A large read-only repository of word mappings, structured as a map
- * for fast access.
+ * A dictionary. A large read-only repository of word mappings, structured as a
+ * map for fast access.
  */
 
 // When populating, the java.util map is faster than the mutable Scala map
-case class Dictionary(wordMappings: java.util.LinkedHashMap[String, WordMappingValueSet] =
-    new java.util.LinkedHashMap[String, WordMappingValueSet]) extends ModelComponent {
+case class Dictionary(
+  wordMappings: java.util.LinkedHashMap[String, WordMappingValueSet] =
+    new java.util.LinkedHashMap[String, WordMappingValueSet]
+) extends ModelComponent {
 
   def numKeyWords = wordMappings.size
 
@@ -46,15 +48,13 @@ case class Dictionary(wordMappings: java.util.LinkedHashMap[String, WordMappingV
     pairListForKeys(matchingKeys, 5)
   }
 
-  def pairListForKeys(keys: Iterable[String], size: Int):
-      List[(String, WordMappingValueSet)] = {
+  def pairListForKeys(keys: Iterable[String], size: Int): List[(String, WordMappingValueSet)] = {
     val keysSubset = keys.toList.sorted.slice(0, size)
     keysSubset.map(key => (key, wordMappings.get(key)))
   }
 
   def findValuesFor(keyWord: String): WordMappingValueSet = wordMappings.get(keyWord)
 }
-
 
 object Dictionary {
 
@@ -74,8 +74,8 @@ object Dictionary {
   // Useful functions for search:
 
   def convertToSearchResults(pairs: List[(String, WordMappingValueSet)], header: QuizGroupHeader) =
-    pairs.map {
-      case (key, values) => SearchResult(header, SearchResultPair(key, values.toValueSet))
+    pairs.map { case (key, values) =>
+      SearchResult(header, SearchResultPair(key, values.toValueSet))
     }
 
   def searchFunction(param: => List[SearchResult]) = () => param

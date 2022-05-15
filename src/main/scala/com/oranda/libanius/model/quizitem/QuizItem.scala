@@ -39,10 +39,7 @@ sealed trait QuizItem extends ModelComponent {
 
   def isValid: Boolean
 
-  def updatedWithUserResponse(
-      response: TextValue,
-      wasCorrect: Boolean,
-      userResponse: UserResponse): QuizItem
+  def updatedWithUserResponse(response: TextValue, wasCorrect: Boolean, userResponse: UserResponse): QuizItem
 }
 
 /*
@@ -57,13 +54,13 @@ sealed trait QuizItem extends ModelComponent {
  *  2. a QuizItem for a question and an answer
  */
 case class QuizItemConcrete(
-    prompt: TextValue,
-    correctResponse: TextValue,
-    userResponses: UserResponsesAll = new UserResponsesAll())
-  extends QuizItem {
+  prompt: TextValue,
+  correctResponse: TextValue,
+  userResponses: UserResponsesAll = new UserResponsesAll()
+) extends QuizItem {
 
   def promptNumInMostRecentAnswer = userResponses.promptNumInMostRecentResponse
-  def numCorrectResponsesInARow = userResponses.numCorrectResponsesInARow
+  def numCorrectResponsesInARow   = userResponses.numCorrectResponsesInARow
 
   def samePromptAndResponse(other: QuizItem) =
     other.prompt == prompt && other.correctResponse == correctResponse
@@ -78,10 +75,7 @@ case class QuizItemConcrete(
     !prompt.isEmpty && !correctResponse.isEmpty &&
       !(prompt.toLowerCase == correctResponse.toLowerCase)
 
-  def updatedWithUserResponse(
-      response: TextValue,
-      wasCorrect: Boolean,
-      userResponse: UserResponse): QuizItem = {
+  def updatedWithUserResponse(response: TextValue, wasCorrect: Boolean, userResponse: UserResponse): QuizItem = {
     val userResponsesUpdated = userResponses.add(userResponse, wasCorrect)
     QuizItemConcrete(prompt, response, userResponsesUpdated)
   }
@@ -92,20 +86,19 @@ case class QuizItemConcrete(
  */
 object QuizItem {
   def apply(
-      prompt: TextValue,
-      response: TextValue,
-      userResponses: UserResponsesAll = new UserResponsesAll()): QuizItem =
+    prompt: TextValue,
+    response: TextValue,
+    userResponses: UserResponsesAll = new UserResponsesAll()
+  ): QuizItem =
     QuizItemConcrete(prompt, response, userResponses)
 
   def apply(prompt: String, response: String): QuizItem =
     QuizItemConcrete(prompt, response)
 
-  def apply(
-      prompt: String,
-      response: String,
-      correctResponses: List[Int],
-      incorrectResponses: List[Int]): QuizItem =
-    QuizItemConcrete(prompt, response,
-        new UserResponsesAll(correctResponses.map(UserResponse.apply),
-        incorrectResponses.map(UserResponse.apply)))
+  def apply(prompt: String, response: String, correctResponses: List[Int], incorrectResponses: List[Int]): QuizItem =
+    QuizItemConcrete(
+      prompt,
+      response,
+      new UserResponsesAll(correctResponses.map(UserResponse.apply), incorrectResponses.map(UserResponse.apply))
+    )
 }

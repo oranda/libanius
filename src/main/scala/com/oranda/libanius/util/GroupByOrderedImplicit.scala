@@ -12,7 +12,7 @@ object CollectionHelpers {
    */
   implicit class GroupByOrderedImplicit[A](t: Traversable[A]) {
     def groupByOrdered[K](f: A => K): LinkedHashMap[K, LinkedHashSet[A]] = {
-      val map = LinkedHashMap[K,LinkedHashSet[A]]()
+      val map = LinkedHashMap[K, LinkedHashSet[A]]()
       for i <- t do {
         val key = f(i)
         map(key) = (map.lift(key).getOrElse(LinkedHashSet[A]())).union(Set(i))

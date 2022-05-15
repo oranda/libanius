@@ -21,8 +21,7 @@ package com.oranda.libanius.model
 /*
  * Used for search results.
  */
-case class ValueSet(values: List[String] = Nil)
-  extends ModelComponent {
+case class ValueSet(values: List[String] = Nil) extends ModelComponent {
 
   def addValueToEnd(value: String) =
     copy(if !values.contains(value) then values :+ value else values)
@@ -37,4 +36,3 @@ case class ValueSet(values: List[String] = Nil)
 
   def valueBeginningWith(valueStart: String) = values.find(_.startsWith(valueStart))
 }
-

@@ -43,23 +43,21 @@ object MyMemoryTranslate extends AppDependencyAccess {
 
   def translate(word: String, quiz: Quiz): Try[List[SearchResult]] = {
     val tryTranslate = Try(quiz.activeQuizGroupHeaders.flatMap(translateQgh(word, _)).toList)
-    tryTranslate.recover {
-      case t: Throwable => l.logError("Unknown error in MyMemoryTranslate", t)
+    tryTranslate.recover { case t: Throwable =>
+      l.logError("Unknown error in MyMemoryTranslate", t)
     }
     // Rethrow, so the client can decide on a custom error message.
     tryTranslate
   }
 
-  protected[providers] def translateQgh(word: String, header: QuizGroupHeader):
-      List[SearchResult] = {
+  protected[providers] def translateQgh(word: String, header: QuizGroupHeader): List[SearchResult] = {
 
     val matches: List[(String, String)] =
       mmCode(header).toList.flatMap(translateOrError(word, _))
 
     // Group by key so as to go from (key, value) to (key, values)
-    val groupedMatches = matches.groupByOrdered(_._1).map {
-      case (key, valueSet) =>
-        SearchResult(header, SearchResultPair(key, ValueSet(valueSet.map(_._2).toList)))
+    val groupedMatches = matches.groupByOrdered(_._1).map { case (key, valueSet) =>
+      SearchResult(header, SearchResultPair(key, ValueSet(valueSet.map(_._2).toList)))
     }
     groupedMatches.filterNot(_.keyWordMatchesValue).toList
   }
@@ -70,13 +68,12 @@ object MyMemoryTranslate extends AppDependencyAccess {
    * This method is prone to throwing exceptions. As suggested by the name, it should be guarded.
    */
   private[this] def translateOrError(word: String, mmCode: String): List[(String, String)] = {
-    val queryArgs = s"q=${urlEncode(word)}&de=${conf.email}&langpair=${urlEncode(mmCode)}"
-    val restQuery = "http://api.mymemory.translated.net/get?" + queryArgs
+    val queryArgs      = s"q=${urlEncode(word)}&de=${conf.email}&langpair=${urlEncode(mmCode)}"
+    val restQuery      = "http://api.mymemory.translated.net/get?" + queryArgs
     val translationRaw = Rest.query(restQuery)
-    val matches = Try(findMatchesInJson(translationRaw)).recover {
-      case t: Throwable =>
-        l.logError(s"Could not parse JSON text: $translationRaw", t)
-        List[TranslationMatch]()
+    val matches = Try(findMatchesInJson(translationRaw)).recover { case t: Throwable =>
+      l.logError(s"Could not parse JSON text: $translationRaw", t)
+      List[TranslationMatch]()
     }.get
     // Filter on the quality of the match.
     matches.filter(_.`match` >= 0.5).map(trMatch => (trMatch.segment, trMatch.translation))
@@ -100,7 +97,7 @@ object MyMemoryTranslate extends AppDependencyAccess {
     mmCode(header.promptType, header.responseType)
 
   val mmCode: PartialFunction[String, String] = {
-    case "German word" => "ger"
+    case "German word"  => "ger"
     case "English word" => "en"
     case "Spanish word" => "spa"
   }
@@ -108,6 +105,5 @@ object MyMemoryTranslate extends AppDependencyAccess {
   private[this] def mmCode(promptType: String, responseType: String): Option[String] =
     if mmCode.isDefinedAt(promptType) && mmCode.isDefinedAt(responseType) then
       Some(mmCode.apply(promptType) + "|" + mmCode.apply(responseType))
-    else
-      None
+    else None
 }

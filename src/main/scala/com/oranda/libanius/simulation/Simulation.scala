@@ -35,13 +35,12 @@ import Simulation._
  */
 trait Simulation {
 
-  private var responsesProcessed: Long = 0
+  private var responsesProcessed: Long                  = 0
   private var totalMillisForUpdatingWithResponses: Long = 0
-  private var totalMillisToProduceQuizItems: Long = 0
-  private var totalMillisToComputeScore: Long = 0
+  private var totalMillisToProduceQuizItems: Long       = 0
+  private var totalMillisToComputeScore: Long           = 0
 
-  protected def testAllQuizItems(quiz: Quiz,
-      lastQuizItem: Option[QuizItemViewWithChoices] = None): Unit = {
+  protected def testAllQuizItems(quiz: Quiz, lastQuizItem: Option[QuizItemViewWithChoices] = None): Unit = {
     val quizUpdated = testWithQuizItems(quiz, lastQuizItem)
     report(quizUpdated)
   }
@@ -50,9 +49,7 @@ trait Simulation {
     produceQuizItem(quiz, NoParams()).orElse(findAnyUnfinishedQuizItem(quiz, NoParams()))
 
   @tailrec
-  private def testWithQuizItems(quiz: Quiz,
-      lastQuizItem: Option[QuizItemViewWithChoices] = None): Quiz = {
-
+  private def testWithQuizItems(quiz: Quiz, lastQuizItem: Option[QuizItemViewWithChoices] = None): Quiz =
     if responsesProcessed < MAX_RESPONSES then {
       val (quizItem, timeTakenToFindItem) = Util.stopwatch(findQuizItem(quiz))
       output(s"time for findQuizItem: $timeTakenToFindItem")
@@ -60,10 +57,9 @@ trait Simulation {
       quizItem match {
         case Some(quizItem) =>
           lazy val allChoicesText = "\tChoices: " + quizItem.allChoices.mkString(", ")
-          val strChoices = if quizItem.useMultipleChoice then allChoicesText else ""
+          val strChoices          = if quizItem.useMultipleChoice then allChoicesText else ""
           output(s"$responsesProcessed. Prompt: ${quizItem.prompt}$strChoices")
-          Problem.find(quiz, timeTakenToFindItem, quizItem, lastQuizItem,
-              responsesProcessed) match {
+          Problem.find(quiz, timeTakenToFindItem, quizItem, lastQuizItem, responsesProcessed) match {
             case Some(problem: Problem) =>
               problem.report()
               quiz
@@ -79,7 +75,6 @@ trait Simulation {
       output("Max responses reached for this simulation. Finished!")
       quiz
     }
-  }
 
   private def respondToQuizItem(quiz: Quiz, quizItem: QuizItemViewWithChoices): Quiz = {
     val simulatedResponse = makeResponse(quizItem, quiz, responsesProcessed)
@@ -105,22 +100,16 @@ trait Simulation {
   }
 
   // For now, just return the correct Answer. Intended to be overridden.
-  protected def makeResponse(
-      quizItem: QuizItemViewWithChoices,
-      quiz: Quiz,
-      responsesProcessed: Long): String =
+  protected def makeResponse(quizItem: QuizItemViewWithChoices, quiz: Quiz, responsesProcessed: Long): String =
     quizItem.correctResponse.value
 
-  private def processUserResponse(
-      quiz: Quiz,
-      userResponseTxt: String,
-      quizItem: QuizItemViewWithChoices): Quiz = {
+  private def processUserResponse(quiz: Quiz, userResponseTxt: String, quizItem: QuizItemViewWithChoices): Quiz = {
     val correctAnswer = quizItem.correctResponse
-    val isCorrect = correctAnswer.looselyMatches(userResponseTxt)
+    val isCorrect     = correctAnswer.looselyMatches(userResponseTxt)
     if isCorrect then output("Correct!") else output(s"Wrong! It's $correctAnswer")
     showScore(quiz)
-    val (quizUpdated, timeTaken) = Util.stopwatch(quiz.updateWithUserResponse(
-        isCorrect, quizItem.quizGroupHeader, quizItem.quizItem))
+    val (quizUpdated, timeTaken) =
+      Util.stopwatch(quiz.updateWithUserResponse(isCorrect, quizItem.quizGroupHeader, quizItem.quizItem))
 
     if shouldMeasureTime then totalMillisForUpdatingWithResponses += timeTaken
     quizUpdated
@@ -139,38 +128,40 @@ trait Simulation {
 
 object Simulation {
   val MAX_RESPONSES: Int = 300000
-  val NUM_WARMUP: Int = 2
+  val NUM_WARMUP: Int    = 2
 }
 
 abstract class Problem {
   def exists: Boolean
   def errorMsg: String
-  def report() = output(s"PROBLEM: $errorMsg")
+  def report()                  = output(s"PROBLEM: $errorMsg")
   def retrieve: Option[Problem] = if exists then Some(this) else None
 }
 
 object Problem {
   def find(
-      quiz: Quiz, timeTakenToFindItem: Long,
-      quizItem: QuizItemViewWithChoices,
-      lastQuizItem: Option[QuizItemViewWithChoices],
-      responsesProcessed: Long): Option[Problem] =
-    TimeTooLong(quizItem, timeTakenToFindItem, responsesProcessed).retrieve.orElse(
-        QuizItemRepeated(quiz, quizItem, lastQuizItem).retrieve).orElse(
-        MultipleCorrectChoices(quiz, quizItem).retrieve)
+    quiz: Quiz,
+    timeTakenToFindItem: Long,
+    quizItem: QuizItemViewWithChoices,
+    lastQuizItem: Option[QuizItemViewWithChoices],
+    responsesProcessed: Long
+  ): Option[Problem] =
+    TimeTooLong(quizItem, timeTakenToFindItem, responsesProcessed).retrieve
+      .orElse(QuizItemRepeated(quiz, quizItem, lastQuizItem).retrieve)
+      .orElse(MultipleCorrectChoices(quiz, quizItem).retrieve)
 }
 
-case class TimeTooLong(quizItem: QuizItemViewWithChoices, timeTakenToFindItem: Long,
-    responsesProcessed: Long) extends Problem {
-  def exists = timeTakenToFindItem > 500 && responsesProcessed > NUM_WARMUP
+case class TimeTooLong(quizItem: QuizItemViewWithChoices, timeTakenToFindItem: Long, responsesProcessed: Long)
+    extends Problem {
+  def exists   = timeTakenToFindItem > 500 && responsesProcessed > NUM_WARMUP
   def errorMsg = s"time to find a quiz item was too long for ${quizItem.prompt}"
 }
 
 case class MultipleCorrectChoices(quiz: Quiz, quizItem: QuizItemViewWithChoices) extends Problem {
 
   lazy val correctChoices = {
-    val choices = quizItem.allChoices.toSet
-    val qgKey = quizItem.quizGroupKey
+    val choices          = quizItem.allChoices.toSet
+    val qgKey            = quizItem.quizGroupKey
     val correctResponses = quiz.findResponsesFor(quizItem.prompt.value, qgKey).toSet
     choices.intersect(correctResponses)
   }
@@ -182,14 +173,13 @@ case class MultipleCorrectChoices(quiz: Quiz, quizItem: QuizItemViewWithChoices)
 }
 
 case class QuizItemRepeated(
-    quiz: Quiz,
-    quizItem: QuizItemViewWithChoices,
-    lastQuizItem: Option[QuizItemViewWithChoices])
-  extends Problem {
+  quiz: Quiz,
+  quizItem: QuizItemViewWithChoices,
+  lastQuizItem: Option[QuizItemViewWithChoices]
+) extends Problem {
 
   def exists: Boolean =
     !quiz.nearTheEnd && lastQuizItem.exists(_.quizItem.samePromptAndResponse(quizItem.quizItem))
 
   def errorMsg = s"quiz item was repeated: ${quizItem.prompt}"
 }
-

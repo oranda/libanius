@@ -23,7 +23,6 @@ import scala.io.Source
 import scala.reflect.Selectable.reflectiveSelectable
 import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 
-
 /*
  * Assumes an ordinary Unix/Windows filesystem.
  */
@@ -33,7 +32,7 @@ class DefaultIO extends PlatformIO {
     val theFile = new File(fileName)
     if theFile.exists then {
       val fileStream = Source.fromFile(theFile)
-      val str = fileStream.mkString
+      val str        = fileStream.mkString
       fileStream.close()
       Option(str)
     } else {
@@ -46,9 +45,9 @@ class DefaultIO extends PlatformIO {
     writeToFile(fileName, strToSave)
 
   def writeToFile(fileName: String, data: String) =
-    using (new FileWriter(fileName)) (_.write(data))
+    using(new FileWriter(fileName))(_.write(data))
 
-  private def using[A <: {def close(): Unit}, B](param: A)(f: A => B): B =
+  private def using[A <: { def close(): Unit }, B](param: A)(f: A => B): B =
     try {
       f(param)
     } finally {

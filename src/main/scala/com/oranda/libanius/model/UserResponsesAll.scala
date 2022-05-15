@@ -22,18 +22,19 @@ import java.lang.StringBuilder
 
 import scalaz._
 
-case class UserResponsesAll(correctResponsesInARow: List[UserResponse] = Nil,
-    incorrectResponses: List[UserResponse] = Nil) extends ModelComponent {
+case class UserResponsesAll(
+  correctResponsesInARow: List[UserResponse] = Nil,
+  incorrectResponses: List[UserResponse] = Nil
+) extends ModelComponent {
 
   def userResponses = correctResponsesInARow ++ incorrectResponses
 
   def add(userResponse: UserResponse, wasCorrect: Boolean): UserResponsesAll =
     if wasCorrect then
-      UserResponsesAll.userResponsesCorrectResponsesLens.set(this,
-          userResponse :: correctResponsesInARow)
+      UserResponsesAll.userResponsesCorrectResponsesLens.set(this, userResponse :: correctResponsesInARow)
     else {
       // on an incorrect answer, old correct answers are discarded
-      val ur = UserResponsesAll.userResponsesCorrectResponsesLens.set(this, Nil)
+      val ur                    = UserResponsesAll.userResponsesCorrectResponsesLens.set(this, Nil)
       val newIncorrectResponses = userResponse :: incorrectResponses
       UserResponsesAll.userResponsesIncorrectResponsesLens.set(ur, newIncorrectResponses)
     }
@@ -46,23 +47,21 @@ case class UserResponsesAll(correctResponsesInARow: List[UserResponse] = Nil,
     wasNotTooRecentlyUsed(currentPromptNum, promptNumInMostRecentResponse, repetitionInterval)
 
   def wasNotTooRecentlyUsed(
-      currentPromptNum: Int,
-      promptNumInMostRecentResponse: Option[Int],
-      repetitionInterval: Int): Boolean =
-    promptNumInMostRecentResponse.forall {
-      case promptNumInMostRecentResponse =>
-        val diffInPromptNum = currentPromptNum - promptNumInMostRecentResponse
-        diffInPromptNum >= repetitionInterval
+    currentPromptNum: Int,
+    promptNumInMostRecentResponse: Option[Int],
+    repetitionInterval: Int
+  ): Boolean =
+    promptNumInMostRecentResponse.forall { case promptNumInMostRecentResponse =>
+      val diffInPromptNum = currentPromptNum - promptNumInMostRecentResponse
+      diffInPromptNum >= repetitionInterval
     }
 
   def numCorrectResponsesInARow = correctResponsesInARow.length
 
   def promptNumInMostRecentResponse: Option[Int] =
-    correctResponsesInARow.headOption.orElse(incorrectResponses.headOption).orElse(None).
-        map(_.promptNumber)
+    correctResponsesInARow.headOption.orElse(incorrectResponses.headOption).orElse(None).map(_.promptNumber)
 
-  def updated(correctResponsesInARow: List[UserResponse], incorrectResponses: List[UserResponse]):
-      UserResponsesAll =
+  def updated(correctResponsesInARow: List[UserResponse], incorrectResponses: List[UserResponse]): UserResponsesAll =
     UserResponsesAll(correctResponsesInARow, incorrectResponses)
 
   def responsePromptNumber(strBuilder: StringBuilder, response: UserResponse) =
@@ -74,9 +73,11 @@ object UserResponsesAll {
 
   val userResponsesCorrectResponsesLens = Lens.lensu(
     get = (_: UserResponsesAll).correctResponsesInARow,
-    set = (ur: UserResponsesAll, urs: List[UserResponse]) => ur.copy(correctResponsesInARow = urs))
+    set = (ur: UserResponsesAll, urs: List[UserResponse]) => ur.copy(correctResponsesInARow = urs)
+  )
 
   val userResponsesIncorrectResponsesLens = Lens.lensu(
     get = (_: UserResponsesAll).incorrectResponses,
-    set = (ur: UserResponsesAll, urs: List[UserResponse]) => ur.copy(incorrectResponses = urs))
+    set = (ur: UserResponsesAll, urs: List[UserResponse]) => ur.copy(incorrectResponses = urs)
+  )
 }

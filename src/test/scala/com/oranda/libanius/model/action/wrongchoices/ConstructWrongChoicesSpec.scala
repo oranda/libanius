@@ -27,7 +27,6 @@ import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupMemoryLevel}
 import com.oranda.libanius.model.quizitem.{QuizItem, TextValueOps}
 import com.oranda.libanius.util.Util
 
-
 class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
 
   "the construct wrong choices functionality " should {
@@ -45,15 +44,17 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
     }
 
     "generate false answers similar to a correct answer, not including the correct answer" in {
-      val quizItem1 = QuizItem("teach", "unterrichten")
-      val quizItem2 = QuizItem("entertain", "unterhalten")
+      val quizItem1           = QuizItem("teach", "unterrichten")
+      val quizItem2           = QuizItem("entertain", "unterhalten")
       val smallQuizGroupLevel = QuizGroupMemoryLevel(0, 0, List(quizItem1, quizItem2).to(LazyList))
 
-      val falseAnswers = constructWrongChoicesSimilar(smallQuizGroupLevel,
+      val falseAnswers = constructWrongChoicesSimilar(
+        smallQuizGroupLevel,
         itemCorrect = QuizItem("entertain", "unterhalten"),
         correctResponses = List("unterhalten"),
         numWrongChoicesRequired = 2,
-        similarityPredicate = TextValueOps.sameEnd)
+        similarityPredicate = TextValueOps.sameEnd
+      )
 
       falseAnswers.contains("unterhalten") mustEqual false
     }
@@ -63,44 +64,44 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
         qgWithHeader.quizGroup.quizItems.find(_.prompt.value == "entertain").get
 
       val (falseAnswers: List[String], timeTaken: Long) =
-        Util.stopwatch(ConstructWrongChoices.execute(
-          qgWithHeader.quizGroup,
-          quizItemCorrect,
-          numWrongChoicesRequired = 2))
+        Util.stopwatch(
+          ConstructWrongChoices.execute(qgWithHeader.quizGroup, quizItemCorrect, numWrongChoicesRequired = 2)
+        )
 
       falseAnswers.contains("unterbrochen") mustEqual true
       timeTaken must be lessThan 200
     }
 
     /**
-     * This reproduces a (former) bug, where only one wrong choice was being produced.
+     * This reproduces a (former) bug, where only one wrong choice was being
+     * produced.
      */
 
     "construct a full set of wrong choices" in {
 
-      val demoGroupHeader = """#quizGroup promptType="German word" responseType="English word" type="WordMapping" isActive="true" currentPromptNumber="21""""
+      val demoGroupHeader =
+        """#quizGroup promptType="German word" responseType="English word" type="WordMapping" isActive="true" currentPromptNumber="21""""
       val demoGroupText =
-          s"""$demoGroupHeader
-            |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
-            |entertain|unterhalten|
-            |#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="5"
-            |against|wider|13;
-            |#quizGroupPartition numCorrectResponsesInARow="2" repetitionInterval="15"
-            |treaty|Vertrag|11,5;
-            |contract|Vertrag|9,3;
-            |en route|unterwegs|7,1;
-            |""".stripMargin
-
+        s"""$demoGroupHeader
+           |#quizGroupPartition numCorrectResponsesInARow="0" repetitionInterval="0"
+           |entertain|unterhalten|
+           |#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="5"
+           |against|wider|13;
+           |#quizGroupPartition numCorrectResponsesInARow="2" repetitionInterval="15"
+           |treaty|Vertrag|11,5;
+           |contract|Vertrag|9,3;
+           |en route|unterwegs|7,1;
+           |""".stripMargin
 
       import com.oranda.libanius.model.action.serialize._
       import CustomFormat._
       import CustomFormatForModelComponents._
 
-      val demoGroup: QuizGroup = deserialize[QuizGroup, Separator](demoGroupText, Separator("|"))
+      val demoGroup: QuizGroup      = deserialize[QuizGroup, Separator](demoGroupText, Separator("|"))
       val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get
 
-      val (falseAnswers, _) = Util.stopwatch(ConstructWrongChoices.execute(demoGroup,
-        quizItemCorrect, numWrongChoicesRequired = 2))
+      val (falseAnswers, _) =
+        Util.stopwatch(ConstructWrongChoices.execute(demoGroup, quizItemCorrect, numWrongChoicesRequired = 2))
 
       falseAnswers.size mustEqual 2
     }

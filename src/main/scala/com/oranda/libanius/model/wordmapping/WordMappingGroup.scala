@@ -32,17 +32,17 @@ import com.oranda.libanius.util.CollectionHelpers.GroupByOrderedImplicit
  * An intermediate data structure used to persist a "WordMapping" type of quiz group
  * in a concise format.
  */
-case class WordMappingGroup(header: QuizGroupHeader,
-    wordMappingPairs: LazyList[WordMappingPair] = LazyList.empty,
-    userData: QuizGroupUserData = new QuizGroupUserData()) extends ModelComponent {
+case class WordMappingGroup(
+  header: QuizGroupHeader,
+  wordMappingPairs: LazyList[WordMappingPair] = LazyList.empty,
+  userData: QuizGroupUserData = new QuizGroupUserData()
+) extends ModelComponent {
 
   def toQuizGroup(numCorrectResponsesRequired: Int): QuizGroup = {
     def makeQuizItems(wmPair: WordMappingPair): Iterable[QuizItem] =
       wmPair.valueSet.values.map(value =>
-        QuizItem(
-          wmPair.key,
-          value.value,
-          UserResponsesAll(value.correctAnswersInARow, value.incorrectAnswers)))
+        QuizItem(wmPair.key, value.value, UserResponsesAll(value.correctAnswersInARow, value.incorrectAnswers))
+      )
     val quizItems: LazyList[QuizItem] = wordMappingPairs.flatMap(makeQuizItems)
     QuizGroup.fromQuizItems(quizItems, numCorrectResponsesRequired, userData)
   }
@@ -56,11 +56,11 @@ object WordMappingGroup extends AppDependencyAccess {
   }
 
   def quizItemsToWordMappingPairs(quizItems: LazyList[QuizItem]): LazyList[WordMappingPair] =
-    quizItems.groupByOrdered(_.prompt).map {
-        case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
-          WordMappingPair(
-            prompt.value,
-            WordMappingValueSet.createFromQuizItems(quizItems.toList))
-    }.to(LazyList)
+    quizItems
+      .groupByOrdered(_.prompt)
+      .map { case (prompt: TextValue, quizItems: mutable.LinkedHashSet[QuizItem]) =>
+        WordMappingPair(prompt.value, WordMappingValueSet.createFromQuizItems(quizItems.toList))
+      }
+      .to(LazyList)
 
 }

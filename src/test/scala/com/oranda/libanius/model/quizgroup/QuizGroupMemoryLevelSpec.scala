@@ -20,7 +20,7 @@ package com.oranda.libanius.model.quizgroup
 
 import org.specs2.mutable.Specification
 import com.oranda.libanius.dependencies.AppDependencyAccess
-import com.oranda.libanius.model.quizitem.{QuizItem}
+import com.oranda.libanius.model.quizitem.QuizItem
 
 import com.oranda.libanius.model._
 import com.oranda.libanius.model.TestData._
@@ -32,7 +32,6 @@ import com.oranda.libanius.model.action.wrongchoices._
 import ConstructWrongChoices._
 import ConstructWrongChoicesForModelComponents._
 import scala._
-
 
 class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
@@ -67,23 +66,23 @@ class QuizGroupMemoryLevelSpec extends Specification with AppDependencyAccess {
 
     "move an existing quiz pair to the front of its queue" in {
       val numPromptsBefore = qgMemLevel.numPrompts
-      val qgUpdated = qgMemLevel + QuizItem("sweeps", "streicht")
-      val numPromptsAfter = qgUpdated.numPrompts
+      val qgUpdated        = qgMemLevel + QuizItem("sweeps", "streicht")
+      val numPromptsAfter  = qgUpdated.numPrompts
       numPromptsAfter mustEqual numPromptsBefore
       pullQuizItem(qgUpdated, 0).promptAndResponse mustEqual ("sweeps", "streicht")
     }
 
     "move a quiz pair to the front of its queue where only the prompt already exists" in {
       val sizeBefore = qgMemLevel.size
-      val qgUpdated = qgMemLevel + QuizItem("entertain", "bewirten")
-      val sizeAfter = qgUpdated.size
+      val qgUpdated  = qgMemLevel + QuizItem("entertain", "bewirten")
+      val sizeAfter  = qgUpdated.size
       sizeAfter mustEqual sizeBefore + 1
       pullQuizItem(qgUpdated, 0).promptAndResponse mustEqual ("entertain", "bewirten")
     }
 
     "add more than one new quiz pair to the front of its queue" in {
-      val qgUpdated1 = qgMemLevel + QuizItem("to exchange", "tauschen")
-      val qgUpdated2 = qgUpdated1 + QuizItem("whole", "ganz")
+      val qgUpdated1                               = qgMemLevel + QuizItem("to exchange", "tauschen")
+      val qgUpdated2                               = qgUpdated1 + QuizItem("whole", "ganz")
       val QgmlWithQuizItem(qgml, prompt, response) = pullQuizItem(qgUpdated2, 0)
       (prompt, response) mustEqual ("whole", "ganz")
       pullQuizItem(qgml, 1).promptAndResponse mustEqual ("to exchange", "tauschen")

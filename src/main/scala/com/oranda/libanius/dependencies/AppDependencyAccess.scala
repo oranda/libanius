@@ -34,15 +34,15 @@ import scala.util.Try
  * com.oranda.libanius.dependencies.AppDependenciesOverride
  */
 trait AppDependencyAccess {
-  def companion[T](name : String)(implicit man: ClassTag[T]): Try[T] =
+  def companion[T](name: String)(implicit man: ClassTag[T]): Try[T] =
     Try(Class.forName(name + "$").getField("MODULE$").get(man.runtimeClass).asInstanceOf[T])
 
   val fqcnDependenciesOverride = "com.oranda.libanius.dependencies.AppDependenciesOverride"
   lazy val appDependenciesObject: AppDependencies =
     companion[AppDependencies](fqcnDependenciesOverride).getOrElse(AppDependenciesDefault)
 
-  lazy val l = appDependenciesObject.l
-  lazy val conf = appDependenciesObject.conf
-  lazy val dataStore = appDependenciesObject.dataStore
+  lazy val l                     = appDependenciesObject.l
+  lazy val conf                  = appDependenciesObject.conf
+  lazy val dataStore             = appDependenciesObject.dataStore
   lazy val stringSplitterFactory = appDependenciesObject.stringSplitterFactory
 }

@@ -35,5 +35,5 @@ case class ChosenOptions[T](chosenOptions: List[T]) extends Answer {
   override def text = chosenOptions.iterator.next.toString
 }
 sealed trait NoProcessResponse extends UserConsoleResponse
-case object Invalid extends NoProcessResponse
-case object Quit extends NoProcessResponse
+case object Invalid            extends NoProcessResponse
+case object Quit               extends NoProcessResponse

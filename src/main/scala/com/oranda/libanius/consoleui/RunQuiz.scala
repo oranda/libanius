@@ -31,8 +31,7 @@ object RunQuiz extends InteractiveQuiz {
 
     val availableQuizGroups = dataStore.findAvailableQuizGroups
     val quiz =
-      if !availableQuizGroups.isEmpty then
-        Quiz(userQuizGroupSelection(availableQuizGroups.toList))
+      if !availableQuizGroups.isEmpty then Quiz(userQuizGroupSelection(availableQuizGroups.toList))
       else {
         output("No quiz groups found. Defaulting to dummy data.\n")
         Quiz.demoQuiz()
@@ -41,4 +40,3 @@ object RunQuiz extends InteractiveQuiz {
     testUserWithQuizItem(quiz)
   }
 }
-

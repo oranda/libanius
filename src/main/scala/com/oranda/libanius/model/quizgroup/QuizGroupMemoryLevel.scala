@@ -41,35 +41,36 @@ import com.oranda.libanius.model.UserResponse
  * slow for bulk insert. Currently a LazyList is used.)
  */
 case class QuizGroupMemoryLevel(
-    correctResponsesInARow: Int,
-    repetitionInterval: Int,
-    quizItemStream: LazyList[QuizItem] = LazyList.empty,
-    totalResponses: Int = 0,
-    numCorrectResponses: Int = 0)
-  extends ModelComponent {
+  correctResponsesInARow: Int,
+  repetitionInterval: Int,
+  quizItemStream: LazyList[QuizItem] = LazyList.empty,
+  totalResponses: Int = 0,
+  numCorrectResponses: Int = 0
+) extends ModelComponent {
 
-  lazy val quizItems = quizItemStream.toList
+  lazy val quizItems                = quizItemStream.toList
   protected[model] def numQuizItems = quizItems.size
-  protected[model] def size = numQuizItems
-  protected[model] def isEmpty = quizItems.isEmpty
-  protected[model] def numPrompts = size
+  protected[model] def size         = numQuizItems
+  protected[model] def isEmpty      = quizItems.isEmpty
+  protected[model] def numPrompts   = size
   protected[model] def numResponses = size
 
   protected[model] def contains(quizItem: QuizItem): Boolean =
     quizItems.exists(_.samePromptAndResponse(quizItem))
 
   protected[model] def contains(prompt: TextValue): Boolean =
-      quizItems.exists(_.prompt == prompt)
+    quizItems.exists(_.prompt == prompt)
 
   protected[model] def updatedQuizItems(newQuizItems: List[QuizItem]): QuizGroupMemoryLevel =
     QuizGroupMemoryLevel.itemsLens.set(this, newQuizItems)
 
   protected[model] def updatedWithUserAnswer(
-      prompt: TextValue,
-      response: TextValue,
-      wasCorrect: Boolean,
-      userResponses: UserResponsesAll,
-      userAnswer: UserResponse): QuizGroupMemoryLevel = {
+    prompt: TextValue,
+    response: TextValue,
+    wasCorrect: Boolean,
+    userResponses: UserResponsesAll,
+    userAnswer: UserResponse
+  ): QuizGroupMemoryLevel = {
     val userResponseUpdated = userResponses.add(userAnswer, wasCorrect)
     this + QuizItem(prompt, response, userResponseUpdated)
   }
@@ -77,8 +78,7 @@ case class QuizGroupMemoryLevel(
   protected[quizgroup] def addNewQuizItem(prompt: String, response: String): QuizGroupMemoryLevel =
     if !prompt.isEmpty && !response.isEmpty && prompt.toLowerCase != response.toLowerCase then
       this + QuizItem(prompt, response)
-    else
-      this
+    else this
 
   // Adds the quiz item to the front of the queue
   protected[quizgroup] def +(quizItem: QuizItem): QuizGroupMemoryLevel =
@@ -95,7 +95,7 @@ case class QuizGroupMemoryLevel(
   protected[quizgroup] def removeQuizItemsForResponse(response: String) =
     updatedQuizItems(quizItems.filter(_.correctResponse.value != response))
 
-  protected[quizgroup] def quizPrompts: List[TextValue] = quizItems.map(_.prompt)
+  protected[quizgroup] def quizPrompts: List[TextValue]   = quizItems.map(_.prompt)
   protected[quizgroup] def quizResponses: List[TextValue] = quizItems.map(_.correctResponse)
 
   /*
@@ -127,8 +127,8 @@ case class QuizGroupMemoryLevel(
     }
 
   override def toString = {
-    val quizItemPrompts = quizItems.map(_.prompt)
-    val avgCorrectResponses = if totalResponses == 0 then 0 else numCorrectResponses/totalResponses
+    val quizItemPrompts     = quizItems.map(_.prompt)
+    val avgCorrectResponses = if totalResponses == 0 then 0 else numCorrectResponses / totalResponses
     s"$correctResponsesInARow($repetitionInterval):$avgCorrectResponses: $quizItemPrompts"
   }
 
@@ -138,8 +138,7 @@ case class QuizGroupMemoryLevel(
     val numCorrectToAdd = if isCorrect then 1 else 0
     // For each memory level, only check the recent performance. Reset the counters after a limit.
     if !isAtLimit then
-      copy(totalResponses = totalResponses + 1,
-          numCorrectResponses = numCorrectResponses + numCorrectToAdd)
+      copy(totalResponses = totalResponses + 1, numCorrectResponses = numCorrectResponses + numCorrectToAdd)
     else // reset the counters
       copy(totalResponses = 1, numCorrectResponses = numCorrectToAdd)
   }
@@ -149,9 +148,10 @@ case class QuizGroupMemoryLevel(
       if totalResponses <= 5 then repetitionInterval + anInt
       else (repetitionInterval * (1 + aReal)).toInt
 
-    math.max(0,
+    math.max(
+      0,
       if numCorrectResponses < 7 then modifyBy(-1, -0.2)
-      else if numCorrectResponses > 8 then  modifyBy(1, 0.2)
+      else if numCorrectResponses > 8 then modifyBy(1, 0.2)
       else repetitionInterval
     )
   }
@@ -161,12 +161,13 @@ object QuizGroupMemoryLevel extends AppDependencyAccess {
 
   val itemsLens: Lens[QuizGroupMemoryLevel, List[QuizItem]] = Lens.lensu(
     get = (_: QuizGroupMemoryLevel).quizItems,
-    set = (qgp: QuizGroupMemoryLevel,
-      qItems: List[QuizItem]) => qgp.copy(quizItemStream = qItems.to(LazyList)))
+    set = (qgp: QuizGroupMemoryLevel, qItems: List[QuizItem]) => qgp.copy(quizItemStream = qItems.to(LazyList))
+  )
 
   val totalResponsesLimit = 10
 
   val intervalLens: Lens[QuizGroupMemoryLevel, Int] = Lens.lensu(
     get = (_: QuizGroupMemoryLevel).repetitionInterval,
-    set = (qgml: QuizGroupMemoryLevel, ri: Int) => qgml.copy(repetitionInterval = ri))
+    set = (qgml: QuizGroupMemoryLevel, ri: Int) => qgml.copy(repetitionInterval = ri)
+  )
 }

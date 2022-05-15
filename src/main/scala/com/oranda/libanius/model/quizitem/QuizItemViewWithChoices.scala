@@ -26,23 +26,24 @@ import com.oranda.libanius.model.quizgroup.QuizGroupHeader
 import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
 
 /**
- * Quiz item data holder:
- * contains whatever information is necessary for the view, and for updating the backing data.
+ * Quiz item data holder: contains whatever information is necessary for the
+ * view, and for updating the backing data.
  */
 case class QuizItemViewWithChoices(
-    quizItem: QuizItem,
-    qgCurrentPromptNumber: Int,
-    quizGroupHeader: QuizGroupHeader,
-    falseAnswers: List[String],
-    numCorrectResponsesInARow: Int,
-    useMultipleChoice: Boolean) {
+  quizItem: QuizItem,
+  qgCurrentPromptNumber: Int,
+  quizGroupHeader: QuizGroupHeader,
+  falseAnswers: List[String],
+  numCorrectResponsesInARow: Int,
+  useMultipleChoice: Boolean
+) {
 
-  lazy val prompt: TextValue = quizItem.prompt
-  lazy val correctResponse: TextValue = quizItem.correctResponse
-  lazy val userResponses = quizItem.userResponses
-  lazy val promptType = quizGroupHeader.promptType
-  lazy val responseType = quizGroupHeader.responseType
-  lazy val quizGroupKey = quizGroupHeader.quizGroupKey
+  lazy val prompt: TextValue           = quizItem.prompt
+  lazy val correctResponse: TextValue  = quizItem.correctResponse
+  lazy val userResponses               = quizItem.userResponses
+  lazy val promptType                  = quizGroupHeader.promptType
+  lazy val responseType                = quizGroupHeader.responseType
+  lazy val quizGroupKey                = quizGroupHeader.quizGroupKey
   lazy val numCorrectResponsesRequired = quizGroupHeader.numCorrectResponsesRequired
 
   lazy val allChoices: List[String] = choicesInRandomOrder(falseAnswers)

@@ -29,8 +29,8 @@ object Util extends AppDependencyAccess {
   }
 
   def stopwatch[X](fn: => X): (X, Long) = {
-    val start = System.currentTimeMillis()
-    val result = fn
+    val start     = System.currentTimeMillis()
+    val result    = fn
     val timeTaken = System.currentTimeMillis() - start
     (result, timeTaken)
   }

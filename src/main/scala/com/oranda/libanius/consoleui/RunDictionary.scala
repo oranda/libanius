@@ -34,8 +34,7 @@ object RunDictionary extends App with AppDependencyAccess {
 
     val availableQuizGroups = dataStore.findAvailableQuizGroups
     val quiz =
-      if !availableQuizGroups.isEmpty then
-        Quiz(userQuizGroupSelection(availableQuizGroups.toList))
+      if !availableQuizGroups.isEmpty then Quiz(userQuizGroupSelection(availableQuizGroups.toList))
       else {
         output("No quiz groups found. Defaulting to dummy data.\n")
         Quiz.demoQuiz()
@@ -44,15 +43,14 @@ object RunDictionary extends App with AppDependencyAccess {
     serveUserRequest(quiz)
   }
 
-  private[this] def userQuizGroupSelection(
-      quizGroupHeaders: List[QuizGroupHeader]): Map[QuizGroupHeader, QuizGroup] = {
+  private[this] def userQuizGroupSelection(quizGroupHeaders: List[QuizGroupHeader]): Map[QuizGroupHeader, QuizGroup] = {
     output("Choose quiz group(s). For more than one, separate with commas, e.g. 1,2,3")
     val choices = ChoiceGroupQgHeaders(quizGroupHeaders)
     choices.show()
 
     def selectedQuizGroupHeaders = choices.getSelectionFromInput match {
       case Right(ChosenOptions(selectedChoices)) => selectedChoices
-      case _ => Nil
+      case _                                     => Nil
     }
 
     selectedQuizGroupHeaders.map(header => (header, dataStore.loadQuizGroup(header))).toMap
@@ -81,12 +79,12 @@ object RunDictionary extends App with AppDependencyAccess {
     results match {
       case Success(results) => results.map(_.toString).mkString("\n")
       case Failure(ex) =>
-          s"Problem getting results: ${ex.getClass.getSimpleName}  ${ex.getMessage}"
+        s"Problem getting results: ${ex.getClass.getSimpleName}  ${ex.getMessage}"
     }
 
   private[this] def getWordQueryFromInput: UserConsoleResponse =
     ConsoleUtil.readLineUntilNoBackspaces match {
-      case "q" | "quit" => Quit
+      case "q" | "quit"  => Quit
       case input: String => WordQuery(input)
     }
 }

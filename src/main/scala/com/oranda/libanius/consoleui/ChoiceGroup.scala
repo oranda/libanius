@@ -31,8 +31,8 @@ abstract class ChoiceGroup[T: ClassTag](choices: List[T]) {
   val choicesWithIndex = choices.zipWithIndex
 
   def show(): Unit =
-    choicesWithIndex.foreach {
-      case (header, index) => output((index + 1).toString + ". " + header.toString)
+    choicesWithIndex.foreach { case (header, index) =>
+      output((index + 1).toString + ". " + header.toString)
     }
 
   def getSelectionFromInput: Either[NoProcessResponse, ChosenOptions[T]] =
@@ -40,17 +40,19 @@ abstract class ChoiceGroup[T: ClassTag](choices: List[T]) {
       case "q" | "quit" => Left(Quit)
       case userResponse: String =>
         Try(
-          Right(ChosenOptions[T](
-            userResponse.split(",")
-              .map(_.toInt - 1)
-              .map(choices).toList)))
-          .recover { case e: Exception => Left(Invalid) }
-          .get
+          Right(
+            ChosenOptions[T](
+              userResponse
+                .split(",")
+                .map(_.toInt - 1)
+                .map(choices)
+                .toList
+            )
+          )
+        ).recover { case e: Exception => Left(Invalid) }.get
     }
 }
 
-case class ChoiceGroupStrings(choices: List[String])
-  extends ChoiceGroup[String](choices)
+case class ChoiceGroupStrings(choices: List[String]) extends ChoiceGroup[String](choices)
 
-case class ChoiceGroupQgHeaders(choices: List[QuizGroupHeader])
-  extends ChoiceGroup[QuizGroupHeader](choices)
+case class ChoiceGroupQgHeaders(choices: List[QuizGroupHeader]) extends ChoiceGroup[QuizGroupHeader](choices)

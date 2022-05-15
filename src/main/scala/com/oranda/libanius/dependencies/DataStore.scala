@@ -27,24 +27,35 @@ import com.oranda.libanius.util.Util
 import scala.collection.immutable.Set
 import com.oranda.libanius.io.{DefaultIO, PlatformIO}
 import com.oranda.libanius.model.wordmapping.Dictionary
-import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupHeader, QuizGroupKey, QuizGroupType, QuizGroupWithHeader}
+import com.oranda.libanius.model.quizgroup.{
+  QuizGroup,
+  QuizGroupHeader,
+  QuizGroupKey,
+  QuizGroupType,
+  QuizGroupWithHeader
+}
 
 trait DataStore extends AppDependencyAccess {
   val io: PlatformIO
 
   def findQuizGroupHeader(
-      promptType: String,
-      responseType: String,
-      quizGroupType: QuizGroupType): Option[QuizGroupHeader] = {
+    promptType: String,
+    responseType: String,
+    quizGroupType: QuizGroupType
+  ): Option[QuizGroupHeader] = {
     val availableQuizGroups = findAvailableQuizGroups
-    availableQuizGroups.find(qgh => qgh.promptType == promptType &&
-      qgh.responseType == responseType && qgh.quizGroupType == quizGroupType)
+    availableQuizGroups.find(qgh =>
+      qgh.promptType == promptType &&
+        qgh.responseType == responseType && qgh.quizGroupType == quizGroupType
+    )
   }
 
   def findQuizGroupHeader(promptType: String, responseType: String): Option[QuizGroupHeader] = {
     val availableQuizGroups = findAvailableQuizGroups
-    availableQuizGroups.find(qgh => qgh.promptType == promptType
-      && qgh.responseType == responseType)
+    availableQuizGroups.find(qgh =>
+      qgh.promptType == promptType
+        && qgh.responseType == responseType
+    )
   }
 
   def findQuizGroupHeader(quizGroupKey: QuizGroupKey): Option[QuizGroupHeader] =
@@ -61,8 +72,10 @@ trait DataStore extends AppDependencyAccess {
     readDictionary(conf.filesDir + dictFileName) match {
       case Some(dictionary) => qg.updatedDictionary(dictionary)
       case _ =>
-        l.logError(s"Could not find dictionary on filesystem for $header.toString, " +
-          "so creating dictionary from the quizGroup")
+        l.logError(
+          s"Could not find dictionary on filesystem for $header.toString, " +
+            "so creating dictionary from the quizGroup"
+        )
         qg.updatedDictionary(Dictionary.fromQuizGroup(qg))
     }
   }
@@ -71,22 +84,20 @@ trait DataStore extends AppDependencyAccess {
     val quizGroup = findQuizGroupInFilesDir(header) match {
       case Some(qgFileName) =>
         Util.stopwatch(
-            readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup()),
-            s"reading quiz group from file $qgFileName")
+          readQuizGroupFromFilesDir(qgFileName).getOrElse(QuizGroup()),
+          s"reading quiz group from file $qgFileName"
+        )
       case _ => initQuizGroup(header)
     }
 
-    if quizGroup.isEmpty then
-      l.logError(s"No quiz items loaded for $header.\nquizGroup loaded was: " + quizGroup)
+    if quizGroup.isEmpty then l.logError(s"No quiz items loaded for $header.\nquizGroup loaded was: " + quizGroup)
     quizGroup
   }
 
   def initQuizGroup(header: QuizGroupHeader): QuizGroup =
     (for
       qgResName <- findQuizGroupInResources(header)
-      qgText <- Util.stopwatch(
-        io.readResource(qgResName),
-        s"reading quiz group resource $qgResName")
+      qgText    <- Util.stopwatch(io.readResource(qgResName), s"reading quiz group resource $qgResName")
     yield qgText) match {
       case Some(qgText) =>
         Util.stopwatch(header.createQuizGroup(qgText), "creating quiz group by parsing text")
@@ -98,12 +109,14 @@ trait DataStore extends AppDependencyAccess {
   def saveQuiz(quiz: Quiz, path: String = conf.filesDir, userToken: String = ""): Quiz = {
 
     def saveToFile(header: QuizGroupHeader, quizGroup: QuizGroup, userToken: String) = {
-      val fileName = header.makeQgFileName
-      val qgwh = QuizGroupWithHeader(header, quizGroup)
+      val fileName   = header.makeQgFileName
+      val qgwh       = QuizGroupWithHeader(header, quizGroup)
       val serialized = qgwh.toCustomFormat
 
-      l.log(s"Saving quiz group $header.promptType , quiz group has promptNumber " +
-        s"quizGroup.currentPromptNumber to $fileName")
+      l.log(
+        s"Saving quiz group $header.promptType , quiz group has promptNumber " +
+          s"quizGroup.currentPromptNumber to $fileName"
+      )
       io.writeToFile(path + userToken + "-" + fileName, serialized)
     }
     quiz.activeQuizGroups.foreach { case (header, qg) => saveToFile(header, qg, userToken) }
@@ -125,8 +138,7 @@ trait DataStore extends AppDependencyAccess {
   private def readQuizGroupFromFilesDir(qgFileName: String): Option[QuizGroup] = {
     val qgPath = conf.filesDir + qgFileName
     l.log("reading quiz group from file " + qgPath)
-    for
-      qgText <- io.readFile(qgPath)
+    for qgText <- io.readFile(qgPath)
     yield QuizGroupHeader(qgText).createQuizGroup(qgText)
   }
 
@@ -162,9 +174,7 @@ trait DataStore extends AppDependencyAccess {
   private def readDictionary(fileName: String): Option[Dictionary] = {
     val fileText = Util.stopwatch(io.readFile(fileName), "reading dictionary " + fileName)
     val dictionary: Option[Dictionary] =
-      Util.stopwatch(
-          fileText.map(deserialize[Dictionary, NoParams](_, NoParams())),
-          "parsing dictionary")
+      Util.stopwatch(fileText.map(deserialize[Dictionary, NoParams](_, NoParams())), "parsing dictionary")
     val dictionaryNumKeyWords = dictionary.map(_.numKeyWords).getOrElse(0)
     l.log(s"Finished reading $dictionaryNumKeyWords dictionary prompt words")
     dictionary

@@ -28,13 +28,13 @@ import java.lang.StringBuilder
  * TODO: this old class is only used by Dictionary now so perhaps
  * correctAnswersInARow and incorrectAnswers are unnecessary now
  */
-case class WordMappingValue(value: String,
-    correctAnswersInARow: List[UserResponse] = Nil,
-    incorrectAnswers: List[UserResponse] = Nil)
-  extends ModelComponent {
+case class WordMappingValue(
+  value: String,
+  correctAnswersInARow: List[UserResponse] = Nil,
+  incorrectAnswers: List[UserResponse] = Nil
+) extends ModelComponent {
 
-  def updated(correctAnswersInARow: List[UserResponse], incorrectAnswers: List[UserResponse]):
-      WordMappingValue =
+  def updated(correctAnswersInARow: List[UserResponse], incorrectAnswers: List[UserResponse]): WordMappingValue =
     WordMappingValue(value, correctAnswersInARow, incorrectAnswers)
 
   def userAnswers = correctAnswersInARow ++ incorrectAnswers
@@ -44,12 +44,13 @@ case class WordMappingValue(value: String,
   def answerPromptNumber(strBuilder: StringBuilder, answer: UserResponse) =
     strBuilder.append(answer.promptNumber)
 
-  def addUserAnswersBatch(correctPromptNumStrs: List[String],
-      incorrectPromptNumStrs: List[String]): WordMappingValue = {
-    val newCorrectAnswersInARow = correctPromptNumStrs.map(correctPromptNum =>
-        new UserResponse(correctPromptNum.toInt))
-    val newIncorrectAnswers = incorrectPromptNumStrs.map(incorrectPromptNum =>
-        new UserResponse(incorrectPromptNum.toInt))
+  def addUserAnswersBatch(
+    correctPromptNumStrs: List[String],
+    incorrectPromptNumStrs: List[String]
+  ): WordMappingValue = {
+    val newCorrectAnswersInARow = correctPromptNumStrs.map(correctPromptNum => new UserResponse(correctPromptNum.toInt))
+    val newIncorrectAnswers =
+      incorrectPromptNumStrs.map(incorrectPromptNum => new UserResponse(incorrectPromptNum.toInt))
     updated(newCorrectAnswersInARow, newIncorrectAnswers)
   }
 }
@@ -60,11 +61,9 @@ object WordMappingValue extends AppDependencyAccess {
     WordMappingValue(
       quizItem.correctResponse.toString,
       quizItem.userResponses.correctResponsesInARow,
-      quizItem.userResponses.incorrectResponses)
+      quizItem.userResponses.incorrectResponses
+    )
 
   def apply(value: String, userResponsesAll: UserResponsesAll): WordMappingValue =
-    WordMappingValue(
-      value,
-      userResponsesAll.correctResponsesInARow,
-      userResponsesAll.incorrectResponses)
+    WordMappingValue(value, userResponsesAll.correctResponsesInARow, userResponsesAll.incorrectResponses)
 }

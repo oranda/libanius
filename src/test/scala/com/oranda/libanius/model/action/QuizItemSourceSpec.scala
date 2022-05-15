@@ -26,11 +26,9 @@ import com.oranda.libanius.model.quizitem.{TextValueOps, QuizItem}
 import com.oranda.libanius.model.quizgroup.{QuizGroup, QuizGroupWithHeader, QuizGroupMemoryLevel}
 import com.oranda.libanius.model.{UserResponsesAll, UserResponse}
 
-
 import QuizItemSource._
 import modelComponentsAsQuizItemSources._
 import QuizItemSourceSpec._
-
 
 class QuizItemSourceSpec extends Specification with AppDependencyAccess {
   "a QuizItemSource " should {
@@ -46,8 +44,7 @@ class QuizItemSourceSpec extends Specification with AppDependencyAccess {
       quizItem0.prompt.value mustEqual "against"
       qgmlLocal = QuizItemSourceSpec.updateWithUserAnswer(qgmlLocal, quizItem0, 0)
 
-      for promptNum <- 1 until 5 do
-        qgmlLocal = QuizItemSourceSpec.pullQuizItemAndAnswerCorrectly(qgmlLocal, promptNum)
+      for promptNum <- 1 until 5 do qgmlLocal = QuizItemSourceSpec.pullQuizItemAndAnswerCorrectly(qgmlLocal, promptNum)
 
       val quizItem5: Option[QuizItem] = produceQuizItem(qgmlLocal, CurrentPromptNumber(5))
       quizItem5.get.prompt.value mustEqual "against"
@@ -65,10 +62,8 @@ class QuizItemSourceSpec extends Specification with AppDependencyAccess {
       var qgwhLocal = makeSimpleQgWithHeader
       val quizItem0 = produceQuizItem(qgwhLocal.quizGroup, NoParams()).get
       quizItem0.prompt.value mustEqual "en route" // "against"
-      qgwhLocal = QuizGroupWithHeader(qgwhLocal.header,
-          updatedWithUserResponse(qgwhLocal, quizItem0))
-      for promptNum <- 1 until 5 do
-        qgwhLocal = pullQuizItemAndAnswerCorrectly(qgwhLocal)
+      qgwhLocal = QuizGroupWithHeader(qgwhLocal.header, updatedWithUserResponse(qgwhLocal, quizItem0))
+      for promptNum <- 1 until 5 do qgwhLocal = pullQuizItemAndAnswerCorrectly(qgwhLocal)
 
       val quizItem5 = produceQuizItem(qgwhLocal.quizGroup, NoParams())
       quizItem5.get.prompt.value mustEqual "en route" // "against"
@@ -113,15 +108,18 @@ object QuizItemSourceSpec {
 
     assert(quizItem.isDefined)
     // Each time a quiz item is pulled, a user answer must be set
-    val qgmlUpdated1 = qgml.updatedWithUserAnswer(quizItem.get.prompt,
-      quizItem.get.correctResponse, wasCorrect = true, UserResponsesAll(), new UserResponse(0))
+    val qgmlUpdated1 = qgml.updatedWithUserAnswer(
+      quizItem.get.prompt,
+      quizItem.get.correctResponse,
+      wasCorrect = true,
+      UserResponsesAll(),
+      new UserResponse(0)
+    )
     val qgmlUpdated2 = qgmlUpdated1 - quizItem.get
     QgmlWithQuizItem(qgmlUpdated2, quizItem.get.prompt.value, quizItem.get.correctResponse.value)
   }
 
-  def pullQuizItemAndAnswerCorrectly(
-      qgml: QuizGroupMemoryLevel,
-      currentPromptNumber: Int): QuizGroupMemoryLevel = {
+  def pullQuizItemAndAnswerCorrectly(qgml: QuizGroupMemoryLevel, currentPromptNumber: Int): QuizGroupMemoryLevel = {
     val quizItem = produceQuizItem(qgml, CurrentPromptNumber(currentPromptNumber)).get
     updateWithUserAnswer(qgml, quizItem, currentPromptNumber)
   }
@@ -131,24 +129,28 @@ object QuizItemSourceSpec {
     QuizGroupWithHeader(qgwh.header, updatedWithUserResponse(qgwh.quizGroup, quizItem))
   }
 
-
   // updatedWithUserResponse for QuizGroup
   def updatedWithUserResponse(qg: QuizGroup, quizItem: QuizItem): QuizGroup = {
-    val userResponse = new UserResponse(qg.currentPromptNumber)
-    val wasCorrect = true
-    val quizItemUpdated = quizItem.updatedWithUserResponse(
-      quizItem.correctResponse, wasCorrect, userResponse)
-    val prevMemLevel = quizItemUpdated.numCorrectResponsesInARow
+    val userResponse    = new UserResponse(qg.currentPromptNumber)
+    val wasCorrect      = true
+    val quizItemUpdated = quizItem.updatedWithUserResponse(quizItem.correctResponse, wasCorrect, userResponse)
+    val prevMemLevel    = quizItemUpdated.numCorrectResponsesInARow
     qg.updateWithQuizItem(quizItemUpdated, wasCorrect, prevMemLevel)
   }
 
   // updatedWithUserResponse for QuizGroupMemoryLevel
   def updateWithUserAnswer(
-      qgml: QuizGroupMemoryLevel,
-      quizItem: QuizItem,
-      currentPromptNumber: Int): QuizGroupMemoryLevel = {
+    qgml: QuizGroupMemoryLevel,
+    quizItem: QuizItem,
+    currentPromptNumber: Int
+  ): QuizGroupMemoryLevel = {
     val userAnswer = new UserResponse(currentPromptNumber)
-    qgml.updatedWithUserAnswer(quizItem.prompt, quizItem.correctResponse, wasCorrect = true,
-      UserResponsesAll(), userAnswer)
+    qgml.updatedWithUserAnswer(
+      quizItem.prompt,
+      quizItem.correctResponse,
+      wasCorrect = true,
+      UserResponsesAll(),
+      userAnswer
+    )
   }
 }

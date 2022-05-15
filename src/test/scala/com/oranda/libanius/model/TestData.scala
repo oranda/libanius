@@ -25,32 +25,29 @@ import com.oranda.libanius.model.quizgroup._
 
 object TestData {
 
-  val userResponse = "796"
-  val userResponses = "9,7"
+  val userResponse         = "796"
+  val userResponses        = "9,7"
   val userResponsesAllText = "9,7;6"
 
   // word-mapping value
   val wmvCustomFormat = "nachlösen|9,7;6"
-  val wmv: WordMappingValue = WordMappingValue("nachlösen",
-      List(UserResponse(9), UserResponse(7)),
-      List(UserResponse(6)))
+  val wmv: WordMappingValue =
+    WordMappingValue("nachlösen", List(UserResponse(9), UserResponse(7)), List(UserResponse(6)))
 
   // word-mapping value set
   val wmvsCustomFormat = "contract|698,696;697/treaty|796;798"
   val wmvs: WordMappingValueSet = WordMappingValueSet(
     List(
-      WordMappingValue("contract",
-      List(
-        UserResponse(698), UserResponse(696)), List(UserResponse(697))),
-        WordMappingValue("treaty",
-        List(UserResponse(796)), List(UserResponse(798)))
-  ))
+      WordMappingValue("contract", List(UserResponse(698), UserResponse(696)), List(UserResponse(697))),
+      WordMappingValue("treaty", List(UserResponse(796)), List(UserResponse(798)))
+    )
+  )
 
   // QuizItem data
   val correctAnswersInARow = List(UserResponse(9), UserResponse(7))
-  val incorrectAnswers = List(UserResponse(6))
-  val userResponsesAll = UserResponsesAll(correctAnswersInARow, incorrectAnswers)
-  val quizItem = QuizItem("solve", "nachlösen", userResponsesAll)
+  val incorrectAnswers     = List(UserResponse(6))
+  val userResponsesAll     = UserResponsesAll(correctAnswersInARow, incorrectAnswers)
+  val quizItem             = QuizItem("solve", "nachlösen", userResponsesAll)
 
   // Memory level
   /*
@@ -72,17 +69,15 @@ object TestData {
         QuizItem("contract", "Vertrag"),
         QuizItem("rides", "reitet"),
         QuizItem("on", "auf"),
-        QuizItem("sweeps", "streicht")).to(LazyList))
+        QuizItem("sweeps", "streicht")
+      ).to(LazyList)
+    )
 
   def makeQgMemLevelSimple: QuizGroupMemoryLevel =
-    QuizGroupMemoryLevel(
-      0,
-      0,
-      List(QuizItem("against", "wider"), QuizItem("entertain", "unterhalten")).to(LazyList))
-
+    QuizGroupMemoryLevel(0, 0, List(QuizItem("against", "wider"), QuizItem("entertain", "unterhalten")).to(LazyList))
 
   // defaults for read-only
-  val qgMemLevel = makeQgMemLevel
+  val qgMemLevel       = makeQgMemLevel
   val qgMemLevelSimple = makeQgMemLevelSimple
 
   val eol = sys.props("line.separator")
@@ -98,26 +93,26 @@ object TestData {
     s"""$qgMemLevelHeaderCustomFormat\n$qgMemLevelSimpleCustomFormat"""
 
   val qgBodyCustomFormat =
-      s"""$qgMemLevelHeaderCustomFormat
-         |en route|unterwegs|
-         |full|satt|
-         |full|voll|
-         |interrupted|unterbrochen|
-         |contract|Vertrag|
-         |rides|reitet|
-         |on|auf|
-         |sweeps|streicht|
-         |#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="5"
-         |entertain|unterhalten|8;2
-         |winner|Siegerin|5;0
-         |#quizGroupPartition numCorrectResponsesInARow="2" repetitionInterval="15"
-         |against|wider|9,7;6
-         |teach|unterrichten|4,3;1
-         |#quizGroupPartition numCorrectResponsesInARow="3" repetitionInterval="15"
-         |#quizGroupPartition numCorrectResponsesInARow="4" repetitionInterval="60"
-         |#quizGroupPartition numCorrectResponsesInARow="5" repetitionInterval="600"
-         |#quizGroupPartition numCorrectResponsesInARow="6" repetitionInterval="0"
-         |""".stripMargin
+    s"""$qgMemLevelHeaderCustomFormat
+       |en route|unterwegs|
+       |full|satt|
+       |full|voll|
+       |interrupted|unterbrochen|
+       |contract|Vertrag|
+       |rides|reitet|
+       |on|auf|
+       |sweeps|streicht|
+       |#quizGroupPartition numCorrectResponsesInARow="1" repetitionInterval="5"
+       |entertain|unterhalten|8;2
+       |winner|Siegerin|5;0
+       |#quizGroupPartition numCorrectResponsesInARow="2" repetitionInterval="15"
+       |against|wider|9,7;6
+       |teach|unterrichten|4,3;1
+       |#quizGroupPartition numCorrectResponsesInARow="3" repetitionInterval="15"
+       |#quizGroupPartition numCorrectResponsesInARow="4" repetitionInterval="60"
+       |#quizGroupPartition numCorrectResponsesInARow="5" repetitionInterval="600"
+       |#quizGroupPartition numCorrectResponsesInARow="6" repetitionInterval="0"
+       |""".stripMargin
 
   val qgBodySmallCustomFormat =
     s"""$qgMemLevelHeaderCustomFormat
@@ -161,21 +156,21 @@ object TestData {
     QuizGroupMemoryLevel(
       1,
       5,
-      List(
-        QuizItem("entertain", "unterhalten", List(8), List(2)),
-        QuizItem("winner", "Siegerin", List(5), List(0))).to(LazyList))
+      List(QuizItem("entertain", "unterhalten", List(8), List(2)), QuizItem("winner", "Siegerin", List(5), List(0)))
+        .to(LazyList)
+    )
 
   def makeQgMemLevel2: QuizGroupMemoryLevel =
     QuizGroupMemoryLevel(
       2,
       15,
-      List(
-        QuizItem("against", "wider", List(9, 7), List(6)),
-        QuizItem("teach", "unterrichten", List(4, 3), List(1))).to(LazyList))
+      List(QuizItem("against", "wider", List(9, 7), List(6)), QuizItem("teach", "unterrichten", List(4, 3), List(1)))
+        .to(LazyList)
+    )
 
   def makeQuizGroup =
     QuizGroup(
-      Map(0 -> makeQgMemLevel0, 1-> makeQgMemLevel1, 2-> makeQgMemLevel2),
+      Map(0 -> makeQgMemLevel0, 1 -> makeQgMemLevel1, 2 -> makeQgMemLevel2),
       6,
       QuizGroupUserData(isActive = true, 10),
       new Dictionary()
@@ -184,7 +179,9 @@ object TestData {
   val quizGroup = makeQuizGroup
 
   def makeSimpleQuizGroup = QuizGroup(
-    Map(0 -> makeQgMemLevel0), 6, QuizGroupUserData(isActive = true, 0)
+    Map(0 -> makeQgMemLevel0),
+    6,
+    QuizGroupUserData(isActive = true, 0)
   )
 
   val quizGroupSimple = makeSimpleQuizGroup
@@ -195,7 +192,7 @@ object TestData {
   }
   val qgwh: QuizGroupWithHeader = makeQgwh(quizGroup)
 
-  def makeQgWithHeader: QuizGroupWithHeader = makeQgwh(makeQuizGroup)
+  def makeQgWithHeader: QuizGroupWithHeader       = makeQgwh(makeQuizGroup)
   def makeSimpleQgWithHeader: QuizGroupWithHeader = makeQgwh(makeSimpleQuizGroup)
 
   val qgwhSimple: QuizGroupWithHeader = makeSimpleQgWithHeader
@@ -237,7 +234,7 @@ object TestData {
       |against|wider
       |""".stripMargin
 
-  val quiz = Quiz.demoQuiz(quizText)
+  val quiz      = Quiz.demoQuiz(quizText)
   val qghEngGer = QuizGroupHeader("English word", "German word", WordMapping, "|", 6, 4)
   val qghGerEng = QuizGroupHeader("German word", "English word", WordMapping, "|", 6, 4)
 

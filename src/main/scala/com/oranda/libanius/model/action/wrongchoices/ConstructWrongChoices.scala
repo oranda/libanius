@@ -33,74 +33,81 @@ import com.oranda.libanius.util.Util
  */
 trait ConstructWrongChoices[A <: ModelComponent] {
   def constructWrongChoicesSimilar(
-      component: A,
-      itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int,
-      correctResponses: List[String],
-      similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String]
+    component: A,
+    itemCorrect: QuizItem,
+    numWrongChoicesRequired: Int,
+    correctResponses: List[String],
+    similarityPredicate: (TextValue, TextValue) => Int => Boolean
+  ): List[String]
 
   def constructWrongChoicesRandom(
-      component: A,
-      itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int,
-      correctResponses: List[String]): List[String]
+    component: A,
+    itemCorrect: QuizItem,
+    numWrongChoicesRequired: Int,
+    correctResponses: List[String]
+  ): List[String]
 }
 
 // provides external access to the typeclass
 object ConstructWrongChoices extends AppDependencyAccess {
 
   def constructWrongChoicesSimilar[A <: ModelComponent](
-      component: A,
-      itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int,
-      correctResponses: List[String],
-      similarityPredicate: (TextValue, TextValue) => Int => Boolean)
-      (implicit cwc: ConstructWrongChoices[A]): List[String] =
-    cwc.constructWrongChoicesSimilar(component, itemCorrect, numWrongChoicesRequired,
-        correctResponses, similarityPredicate)
+    component: A,
+    itemCorrect: QuizItem,
+    numWrongChoicesRequired: Int,
+    correctResponses: List[String],
+    similarityPredicate: (TextValue, TextValue) => Int => Boolean
+  )(implicit cwc: ConstructWrongChoices[A]): List[String] =
+    cwc.constructWrongChoicesSimilar(
+      component,
+      itemCorrect,
+      numWrongChoicesRequired,
+      correctResponses,
+      similarityPredicate
+    )
 
   def constructWrongChoicesRandom[A <: ModelComponent](
-      component: A,
-      itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int,
-      correctResponses: List[String])
-      (implicit cwc: ConstructWrongChoices[A]): List[String] =
-    cwc.constructWrongChoicesRandom(component, itemCorrect, numWrongChoicesRequired,
-        correctResponses)
-
+    component: A,
+    itemCorrect: QuizItem,
+    numWrongChoicesRequired: Int,
+    correctResponses: List[String]
+  )(implicit cwc: ConstructWrongChoices[A]): List[String] =
+    cwc.constructWrongChoicesRandom(component, itemCorrect, numWrongChoicesRequired, correctResponses)
 
   protected[model] def execute(
-      quizGroup: QuizGroup,
-      itemCorrect: QuizItem,
-      numWrongChoicesRequired: Int = 2): List[String] = {
+    quizGroup: QuizGroup,
+    itemCorrect: QuizItem,
+    numWrongChoicesRequired: Int = 2
+  ): List[String] = {
 
-    val correctResponses = Util.stopwatch(
-        quizGroup.findResponsesFor(itemCorrect.prompt.value),
-        "findResponsesFor")
+    val correctResponses         = Util.stopwatch(quizGroup.findResponsesFor(itemCorrect.prompt.value), "findResponsesFor")
     val numCorrectResponsesSoFar = itemCorrect.userResponses.numCorrectResponsesInARow
 
     val similarityPredicate =
       if numCorrectResponsesSoFar % 2 == 1 then TextValueOps.sameStart else TextValueOps.sameEnd
 
     implicit val cwc = ConstructWrongChoicesForModelComponents.cwcQuizGroup
-    val badChoicesSimilar = constructWrongChoicesSimilar(quizGroup, itemCorrect,
-        numWrongChoicesRequired, correctResponses, similarityPredicate)
-    val badChoicesRandom = constructWrongChoicesRandom(quizGroup, itemCorrect,
-        numWrongChoicesRequired, correctResponses)
-    val badChoicesDummy = constructWrongChoicesDummy(numWrongChoicesRequired)
+    val badChoicesSimilar = constructWrongChoicesSimilar(
+      quizGroup,
+      itemCorrect,
+      numWrongChoicesRequired,
+      correctResponses,
+      similarityPredicate
+    )
+    val badChoicesRandom =
+      constructWrongChoicesRandom(quizGroup, itemCorrect, numWrongChoicesRequired, correctResponses)
+    val badChoicesDummy              = constructWrongChoicesDummy(numWrongChoicesRequired)
     val falseResponses: List[String] = badChoicesSimilar ++ badChoicesRandom ++ badChoicesDummy
 
     falseResponses.distinct.take(numWrongChoicesRequired)
   }
 
-  protected[model] def constructWrongChoicesDummy(numWrongChoicesRequired: Int):
-      List[String] = {
+  protected[model] def constructWrongChoicesDummy(numWrongChoicesRequired: Int): List[String] = {
     val characters = "abcdefghijklmnopqrstuvwxyz0123456789".toCharArray
     if numWrongChoicesRequired > characters.length then {
       l.logError("Too many dummy answers requested.")
       Nil
-    } else
-      characters.map(_.toString).take(numWrongChoicesRequired).toList
+    } else characters.map(_.toString).take(numWrongChoicesRequired).toList
   }
 }
 
@@ -112,87 +119,99 @@ object ConstructWrongChoicesForModelComponents extends AppDependencyAccess {
      * find responses that look similar to the correct one.
      */
     def constructWrongChoicesSimilar(
-        quizGroup: QuizGroup,
-        itemCorrect: QuizItem,
-        numWrongChoicesRequired: Int,
-        correctResponses: List[String],
-        similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String] =
+      quizGroup: QuizGroup,
+      itemCorrect: QuizItem,
+      numWrongChoicesRequired: Int,
+      correctResponses: List[String],
+      similarityPredicate: (TextValue, TextValue) => Int => Boolean
+    ): List[String] =
       if itemCorrect.numCorrectResponsesInARow == 0 then Nil
-      else quizGroup.levels.flatMap(cwcQuizGroupMemoryLevel.constructWrongChoicesSimilar(
-        _,
-        itemCorrect,
-        numWrongChoicesRequired,
-        correctResponses,
-        similarityPredicate))
+      else
+        quizGroup.levels.flatMap(
+          cwcQuizGroupMemoryLevel.constructWrongChoicesSimilar(
+            _,
+            itemCorrect,
+            numWrongChoicesRequired,
+            correctResponses,
+            similarityPredicate
+          )
+        )
 
     def constructWrongChoicesRandom(
-        quizGroup: QuizGroup,
-        itemCorrect: QuizItem,
-        numWrongChoicesRequired: Int,
-        correctResponses: List[String]): List[String] =
-      quizGroup.levels.filterNot(_.isEmpty).flatMap(level =>
-        cwcQuizGroupMemoryLevel.constructWrongChoicesRandom(
-          level,
-          itemCorrect,
-          numWrongChoicesRequired,
-          correctResponses))
+      quizGroup: QuizGroup,
+      itemCorrect: QuizItem,
+      numWrongChoicesRequired: Int,
+      correctResponses: List[String]
+    ): List[String] =
+      quizGroup.levels
+        .filterNot(_.isEmpty)
+        .flatMap(level =>
+          cwcQuizGroupMemoryLevel
+            .constructWrongChoicesRandom(level, itemCorrect, numWrongChoicesRequired, correctResponses)
+        )
   }
 
   implicit object cwcQuizGroupMemoryLevel extends ConstructWrongChoices[QuizGroupMemoryLevel] {
 
     def constructWrongChoicesSimilar(
-        qgml: QuizGroupMemoryLevel,
-        itemCorrect: QuizItem,
-        numWrongResponsesRequired: Int,
-        correctResponses: List[String],
-        similarityPredicate: (TextValue, TextValue) => Int => Boolean): List[String] = {
+      qgml: QuizGroupMemoryLevel,
+      itemCorrect: QuizItem,
+      numWrongResponsesRequired: Int,
+      correctResponses: List[String],
+      similarityPredicate: (TextValue, TextValue) => Int => Boolean
+    ): List[String] = {
 
-      var similarWords = new HashSet[String]
-      var numValueSetsSearched = 0
+      var similarWords              = new HashSet[String]
+      var numValueSetsSearched      = 0
       val numSimilarLettersRequired = 2
 
       def similarityPred(response: String, correctAnswer: String) = {
         l.log(s"similarityPred: response $response, correctAnswer $correctAnswer")
         if correctAnswer.length <= 3 then {
-          l.log(s"similarityPred for correctAnswer.length ${correctAnswer.length} is: response.length == correctAnswer.length")
+          l.log(
+            s"similarityPred for correctAnswer.length ${correctAnswer.length} is: response.length == correctAnswer.length"
+          )
           response.length == correctAnswer.length
-        } else
-          similarityPredicate(response, correctAnswer)(numSimilarLettersRequired)
+        } else similarityPredicate(response, correctAnswer)(numSimilarLettersRequired)
       }
 
       val correctValue = itemCorrect.correctResponse
 
-      qgml.quizItems.iterator.takeWhile(_ => similarWords.size < numWrongResponsesRequired).
-        foreach(quizItem => {
+      qgml.quizItems.iterator
+        .takeWhile(_ => similarWords.size < numWrongResponsesRequired)
+        .foreach { quizItem =>
           numValueSetsSearched = numValueSetsSearched + 1
           // Avoid selecting values belonging to the "correct" correctResponse set
           if !correctResponses.contains(quizItem.correctResponse.toString) then {
             val correctResponse = quizItem.correctResponse
-            val areSimilar = similarityPred(correctResponse, correctValue)
+            val areSimilar      = similarityPred(correctResponse, correctValue)
             if similarWords.size < numWrongResponsesRequired && areSimilar then
               similarWords += quizItem.correctResponse.value
           }
-      })
+        }
       similarWords.toList
     }
 
     def constructWrongChoicesRandom(
-        qgml: QuizGroupMemoryLevel,
-        itemCorrect: QuizItem,
-        numWrongChoicesRequired: Int,
-        correctResponses: List[String]): List[String] = {
+      qgml: QuizGroupMemoryLevel,
+      itemCorrect: QuizItem,
+      numWrongChoicesRequired: Int,
+      correctResponses: List[String]
+    ): List[String] = {
 
       def randomFalseWordValue(sliceIndex: Int): Option[String] = {
-        val sliceSize = (qgml.numQuizItems / numWrongChoicesRequired)
+        val sliceSize       = (qgml.numQuizItems / numWrongChoicesRequired)
         val sliceStartIndex = sliceIndex * sliceSize
-        val randomOffset = Random.nextInt(math.max(sliceSize, 1))
-        val randomIndex = math.min(sliceStartIndex + randomOffset, qgml.numQuizItems - 1)
-        val randomItem = Option(qgml.quizItems(randomIndex).correctResponse.value)
+        val randomOffset    = Random.nextInt(math.max(sliceSize, 1))
+        val randomIndex     = math.min(sliceStartIndex + randomOffset, qgml.numQuizItems - 1)
+        val randomItem      = Option(qgml.quizItems(randomIndex).correctResponse.value)
         randomItem.filter(!correctResponses.contains(_))
       }
 
       (0 until numWrongChoicesRequired)
-        .map(sliceIndex => randomFalseWordValue(sliceIndex)).flatten.toList
+        .map(sliceIndex => randomFalseWordValue(sliceIndex))
+        .flatten
+        .toList
     }
   }
 }

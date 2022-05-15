@@ -21,4 +21,3 @@ package com.oranda.libanius.util
 trait StringSplitterFactory {
   def getSplitter(separator: java.lang.Character): StringSplitter
 }
-

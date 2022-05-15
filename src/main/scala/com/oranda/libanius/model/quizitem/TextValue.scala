@@ -51,12 +51,14 @@ object TextValueOps {
   def sameEnd = (value1: TextValue, value2: TextValue) => hasSameEnd(value1, value2)
 
   def hasSameStart(value: String, otherValue: String): Int => Boolean =
-    (numOfLetters: Int) => otherValue != value &&
-      value.take(numOfLetters) == otherValue.take(numOfLetters)
+    (numOfLetters: Int) =>
+      otherValue != value &&
+        value.take(numOfLetters) == otherValue.take(numOfLetters)
 
   def hasSameEnd(value: String, otherValue: String): Int => Boolean =
-    (numOfLetters: Int) => otherValue != value &&
-      value.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
+    (numOfLetters: Int) =>
+      otherValue != value &&
+        value.takeRight(numOfLetters) == otherValue.takeRight(numOfLetters)
 
   // Forward calls, TextValue -> String. The "implicit class" functionality works the other way.
   implicit def textValue2String(textValue: TextValue): String = textValue.value
@@ -81,9 +83,14 @@ case class DesiredResponse(value: String) extends AnyVal {
 object DesiredResponse extends AppDependencyAccess {
 
   def standardized(response: String) =
-    response.toLowerCase.removeFirstLetters("to ").removeAll(" ").removeAll("-").
-        removeAll(",").removeAll("\\.").removeAll("!").
-        takeWhile(c => c != '/' && c != '(' && c != '[' && c != '{')
+    response.toLowerCase
+      .removeFirstLetters("to ")
+      .removeAll(" ")
+      .removeAll("-")
+      .removeAll(",")
+      .removeAll("\\.")
+      .removeAll("!")
+      .takeWhile(c => c != '/' && c != '(' && c != '[' && c != '{')
 
   def standardized1(response: String) =
     response.toLowerCase.removeFirstLetters("to ").removeAll(" ").removeAll("-")
@@ -97,14 +104,13 @@ object DesiredResponse extends AppDependencyAccess {
   }
 
   private def partsOutsideBrackets(desiredResponse: String): List[String] = {
-    val pattern = new Regex("""([\s|\w]+)(\(|\z)""")
+    val pattern   = new Regex("""([\s|\w]+)(\(|\z)""")
     val matchIter = pattern.findAllIn(desiredResponse)
     matchIter.matchData.toList map { m => m.subgroups.head.trim() }
   }
 
-  private def allPartsArePresentAndInTheRightOrder(requiredParts: List[String],
-      userResponse: String): Boolean = {
+  private def allPartsArePresentAndInTheRightOrder(requiredParts: List[String], userResponse: String): Boolean = {
     val indexes = requiredParts.map(userResponse.indexOf)
-    !indexes.contains(-1) && indexes.sortWith(_<_) == indexes
+    !indexes.contains(-1) && indexes.sortWith(_ < _) == indexes
   }
 }

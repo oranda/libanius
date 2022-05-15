@@ -23,14 +23,13 @@ import org.apache.http.client.methods.HttpGet
 import com.oranda.libanius.dependencies.AppDependencyAccess
 import scala.io.Source
 
-
 object Rest extends AppDependencyAccess {
 
   protected[net] def query(url: String): String = {
-    val httpClient = new DefaultHttpClient()
+    val httpClient   = new DefaultHttpClient()
     val httpResponse = httpClient.execute(new HttpGet(url))
-    val entity = httpResponse.getEntity
-    var restContent = ""
+    val entity       = httpResponse.getEntity
+    var restContent  = ""
     if entity != null then {
       val is = entity.getContent
       restContent = Source.fromInputStream(is).getLines.mkString
@@ -40,8 +39,7 @@ object Rest extends AppDependencyAccess {
 
     // Watch out for redirection
     val statusCode = httpResponse.getStatusLine.getStatusCode
-    if restContent.contains("<html") || statusCode != 200 then
-      throw new RestResponseException(restContent, statusCode)
+    if restContent.contains("<html") || statusCode != 200 then throw new RestResponseException(restContent, statusCode)
     restContent
   }
 }

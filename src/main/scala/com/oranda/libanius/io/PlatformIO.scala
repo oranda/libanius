@@ -43,16 +43,14 @@ trait PlatformIO extends AppDependencyAccess {
 
   def findQgFileNamesFromResources: Array[String]
 
-  def readQgMetadata(inStream: InputStream): Option[QuizGroupHeader] = {
+  def readQgMetadata(inStream: InputStream): Option[QuizGroupHeader] =
     (for
-      firstLine <- Try(readFirstLine(inStream))
+      firstLine  <- Try(readFirstLine(inStream))
       qgMetadata <- Try(Some(QuizGroupHeader(firstLine)))
-    yield qgMetadata).recover {
-      case e: Exception =>
-        l.logError("Could not read quiz group file")
-        None
+    yield qgMetadata).recover { case e: Exception =>
+      l.logError("Could not read quiz group file")
+      None
     }.get
-  }
 
   // This is much faster than using Scala's Source functionality
   def readInputStream(is: InputStream): String = {
@@ -76,7 +74,7 @@ trait PlatformIO extends AppDependencyAccess {
     allText
   }
 
-  def readFirstLine(is: InputStream): String = {
+  def readFirstLine(is: InputStream): String =
     try {
       val br = new BufferedReader(new InputStreamReader(is))
       br.readLine
@@ -93,5 +91,4 @@ trait PlatformIO extends AppDependencyAccess {
         }
       }
     }
-  }
 }

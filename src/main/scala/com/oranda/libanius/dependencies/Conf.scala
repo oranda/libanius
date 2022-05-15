@@ -36,7 +36,7 @@ object Conf {
   }
 
   // Mock configuration for tests
-  def setUpForTest() = {
+  def setUpForTest() =
     new Conf(
       enableLogging = false,
       email = "",
@@ -46,10 +46,9 @@ object Conf {
       resourcesDir = "",
       resQuizPublic = ""
     )
-  }
 
   // Configuration for preparing data files before the app is deployed
-  def setUpForParsing = {
+  def setUpForParsing =
     new Conf(
       enableLogging = true,
       email = "",
@@ -59,18 +58,17 @@ object Conf {
       resourcesDir = "",
       resQuizPublic = ""
     )
-  }
 }
 
 /*
  * This could be extended in applications that use these classes as a library.
  */
 class Conf(
-    val enableLogging: Boolean,
-    val email: String,
-    val defaultPromptType: String,
-    val defaultResponseType: String,
-    val filesDir: String,
-    val resourcesDir: String,
-    val resQuizPublic: String)
-
+  val enableLogging: Boolean,
+  val email: String,
+  val defaultPromptType: String,
+  val defaultResponseType: String,
+  val filesDir: String,
+  val resourcesDir: String,
+  val resQuizPublic: String
+)

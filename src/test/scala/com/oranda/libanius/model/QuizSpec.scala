@@ -79,8 +79,8 @@ class QuizSpec extends Specification with AppDependencyAccess {
     }
 
     "add a new quiz item to a specified group" in {
-      val quizBefore = Quiz.demoQuiz(quizText)
-      val quizItem = QuizItem("to exchange", "tauschen")
+      val quizBefore  = Quiz.demoQuiz(quizText)
+      val quizItem    = QuizItem("to exchange", "tauschen")
       val quizUpdated = quizBefore.addQuizItemToFront(quizItem, qghEngGer)
       quizUpdated.existsQuizItem(quizItem, qghEngGer) mustEqual true
     }
@@ -102,9 +102,9 @@ class QuizSpec extends Specification with AppDependencyAccess {
 
     "contain unique groups only" in {
       quiz.numActiveGroups mustEqual 2 // precondition
-      val isActive = true
+      val isActive     = true
       val newQuizGroup = QuizGroup.fromQuizItems(LazyList.empty, 6, QuizGroupUserData(isActive))
-      val quizUpdated = quiz.addOrReplaceQuizGroup(qghEngGer, newQuizGroup)
+      val quizUpdated  = quiz.addOrReplaceQuizGroup(qghEngGer, newQuizGroup)
       quizUpdated.numActiveGroups mustEqual 2
     }
 
@@ -149,30 +149,42 @@ class QuizSpec extends Specification with AppDependencyAccess {
       quiz.numCorrectResponses mustEqual 6
 
       quiz.numCorrectResponses(qghEngGer, 0) mustEqual 0
-      val quizItem = QuizItem("against", "wider")
+      val quizItem    = QuizItem("against", "wider")
       val quizUpdated = quiz.updateWithUserResponse(isCorrect = true, qghEngGer, quizItem)
       quizUpdated.numCorrectResponses mustEqual 7
       quizUpdated.numCorrectResponses(qghEngGer, 0) mustEqual 1
     }
 
-    def updateWithResponsesFor(quiz: Quiz, wasCorrect: Boolean,
-        qgHeader: QuizGroupHeader, quizPrompts: List[String]): Quiz = {
+    def updateWithResponsesFor(
+      quiz: Quiz,
+      wasCorrect: Boolean,
+      qgHeader: QuizGroupHeader,
+      quizPrompts: List[String]
+    ): Quiz = {
 
-      var quizUpdated = quiz
+      var quizUpdated                 = quiz
       def quizItemFor(prompt: String) = quizUpdated.findQuizItem(qgHeader, prompt).get
 
       quizPrompts.foreach { quizPrompt =>
-        quizUpdated = quizUpdated.updateWithUserResponse(
-          wasCorrect,
-          qgHeader,
-          quizItemFor(quizPrompt))
+        quizUpdated = quizUpdated.updateWithUserResponse(wasCorrect, qgHeader, quizItemFor(quizPrompt))
       }
       quizUpdated
     }
 
     val quizPromptsFor11Items =
-      List("against", "entertain", "teach", "winner", "en route", "full",
-          "interrupted", "contract", "rides", "on", "the")
+      List(
+        "against",
+        "entertain",
+        "teach",
+        "winner",
+        "en route",
+        "full",
+        "interrupted",
+        "contract",
+        "rides",
+        "on",
+        "the"
+      )
 
     val demoQuizWith1stMemoryLevelIntervalOf5 = Quiz.demoQuiz(quizText)
 
@@ -184,12 +196,9 @@ class QuizSpec extends Specification with AppDependencyAccess {
         demoQuizWith1stMemoryLevelIntervalOf5,
         wasCorrect = true,
         qghEngGer,
-        quizPromptsFor11Items)
-      val quizUpdated2 = updateWithResponsesFor(
-        quizUpdated1,
-        wasCorrect = false,
-        qghEngGer,
-        quizPromptsFor11Items)
+        quizPromptsFor11Items
+      )
+      val quizUpdated2 = updateWithResponsesFor(quizUpdated1, wasCorrect = false, qghEngGer, quizPromptsFor11Items)
       quizUpdated2.memoryLevelInterval(qghEngGer, 1) mustEqual 4
     }
 
@@ -200,12 +209,9 @@ class QuizSpec extends Specification with AppDependencyAccess {
         demoQuizWith1stMemoryLevelIntervalOf5,
         wasCorrect = true,
         qghEngGer,
-        quizPromptsFor11Items)
-      val quizUpdated2 = updateWithResponsesFor(
-        quizUpdated1,
-        wasCorrect = true,
-        qghEngGer,
-        quizPromptsFor11Items)
+        quizPromptsFor11Items
+      )
+      val quizUpdated2 = updateWithResponsesFor(quizUpdated1, wasCorrect = true, qghEngGer, quizPromptsFor11Items)
       quizUpdated2.memoryLevelInterval(qghEngGer, 1) mustEqual 6
     }
   }
