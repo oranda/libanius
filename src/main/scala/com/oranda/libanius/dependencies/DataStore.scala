@@ -168,7 +168,7 @@ trait DataStore extends AppDependencyAccess {
   private def readDictionary(fileName: String): Option[Dictionary] = {
     val fileText = Util.stopwatch(io.readFile(fileName), "reading dictionary " + fileName)
     val dictionary: Option[Dictionary] =
-      Util.stopwatch(fileText.map(deserialize[Dictionary, NoParams](_, NoParams())), "parsing dictionary")
+      Util.stopwatch(fileText.map(deserialize[Dictionary, ParamsNone](_, ParamsNone())), "parsing dictionary")
     val dictionaryNumKeyWords = dictionary.map(_.numKeyWords).getOrElse(0)
     l.log(s"Finished reading $dictionaryNumKeyWords dictionary prompt words")
     dictionary

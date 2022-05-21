@@ -29,7 +29,7 @@ case class QuizGroupUserData(isActive: Boolean = false, currentPromptNumber: Int
 
 object QuizGroupUserData extends AppDependencyAccess {
   def apply(headerLine: String): QuizGroupUserData =
-    deserialize[QuizGroupUserData, NoParams](headerLine, NoParams())
+    deserialize[QuizGroupUserData, ParamsNone](headerLine, ParamsNone())
 
   val activeLens: Lens[QuizGroupUserData, Boolean] = Lens.lensu(
     get = (_: QuizGroupUserData).isActive,

@@ -94,7 +94,7 @@ case class WordMappingValueSetLazyProxy(strValues: String, mainSeparator: String
     extends WordMappingValueSetWrapperBase {
 
   lazy val wmvs: WordMappingValueSet =
-    deserialize[WordMappingValueSet, Separator](strValues, Separator("|"))
+    deserialize[WordMappingValueSet, ParamsSeparator](strValues, ParamsSeparator("|"))
 }
 
 /*

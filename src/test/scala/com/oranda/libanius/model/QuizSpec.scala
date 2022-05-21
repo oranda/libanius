@@ -25,9 +25,7 @@ import com.oranda.libanius.model.quizitem.QuizItem
 import org.specs2.mutable.Specification
 
 class QuizSpec extends Specification with AppDependencyAccess {
-
   "a quiz" should {
-
     "have a certain number of active groups" in {
       quiz.numActiveGroups mustEqual 2
     }

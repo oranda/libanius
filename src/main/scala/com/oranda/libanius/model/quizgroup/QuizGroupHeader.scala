@@ -33,7 +33,7 @@ case class QuizGroupKey(promptType: String, responseType: String, quizGroupType:
 
 case class QuizGroupHeader(
   quizGroupKey: QuizGroupKey,
-  mainSeparator: Separator,
+  mainSeparator: ParamsSeparator,
   numCorrectResponsesRequired: Int,
   useMultipleChoiceUntil: Int
 ) extends ModelComponent {
@@ -56,18 +56,19 @@ case class QuizGroupHeader(
 
   def createQuizGroup(text: String): QuizGroup = {
     val qgh: QuizGroupWithHeader =
-      deserialize[QuizGroupWithHeader, Separator](text, Separator("|"))
+      deserialize[QuizGroupWithHeader, ParamsSeparator](text, ParamsSeparator("|"))
     qgh.quizGroup
   }
 }
 
 object QuizGroupHeader extends AppDependencyAccess {
-
+  val defaultNumCorrectResponsesRequired = 6
+  val defaultUseMultipleChoiceUntil = 4
   val maxNumCorrectResponsesRequired = 12
   val allIntervals                   = List(0, 5, 15, 15, 60, 600, 1200, 2500, 5000, 10000, 20000, 40000)
 
   def apply(headerLine: String): QuizGroupHeader =
-    deserialize[QuizGroupHeader, NoParams](headerLine, NoParams())
+    deserialize[QuizGroupHeader, ParamsNone](headerLine, ParamsNone())
 
   def apply(
     promptType: String,
@@ -81,7 +82,7 @@ object QuizGroupHeader extends AppDependencyAccess {
       math.min(maxNumCorrectResponsesRequired, numCorrectResponsesRequired)
     QuizGroupHeader(
       QuizGroupKey(promptType, responseType, quizGroupType),
-      Separator(mainSeparator),
+      ParamsSeparator(mainSeparator),
       actualNumCorrectResponsesRequired,
       math.min(useMultipleChoiceUntil, actualNumCorrectResponsesRequired)
     )

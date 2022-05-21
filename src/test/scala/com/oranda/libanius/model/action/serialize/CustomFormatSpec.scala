@@ -31,10 +31,8 @@ import org.specs2.mutable.Specification
 import java.lang.StringBuilder
 
 class CustomFormatSpec extends Specification with AppDependencyAccess {
-
-  def paramsDefault               = NoParams()
-  def paramsWithSeparator         = Separator("|")
-  def paramsWithSeparatorAndIndex = SeparatorAndIndex("|", 0)
+  def paramsDefault               = ParamsNone()
+  def paramsWithSeparator         = ParamsSeparator("|")
 
   val quizItem             = QuizItem("solve", "nachlösen", userResponsesAll)
   val quizItemCustomFormat = "solve|nachlösen|9,7;6"
@@ -59,13 +57,13 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
     }
 
     "serialize a quiz group memory level" in {
-      val customFormat = serialize(qgMemLevelSimple, strBuilder, paramsWithSeparatorAndIndex)
+      val customFormat = serialize(qgMemLevelSimple, strBuilder, QuizGroupMemoryLevelToParams("|", 0))
       val qgpHeader    = "#quizGroupPartition numCorrectResponsesInARow=\"0\" repetitionInterval=\"0\"\n"
       customFormat.toString mustEqual qgpHeader + qgMemLevelSimpleCustomFormat
     }
 
     "serialize a quiz group" in {
-      val customFormat = serialize(qgWithHeader.quizGroup, strBuilder, paramsWithSeparator)
+      val customFormat = serialize(qgWithHeader.quizGroup, strBuilder, QuizGroupHeaderToParams("|"))
       customFormat.toString mustEqual qgBodyCustomFormat
     }
 
@@ -75,28 +73,28 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
     }
 
     "deserialize a word mapping value" in {
-      val wmv: WordMappingValue = deserialize[WordMappingValue, Separator](wmvCustomFormat, Separator("|"))
+      val wmv: WordMappingValue = deserialize[WordMappingValue, ParamsSeparator](wmvCustomFormat, ParamsSeparator("|"))
       wmv.value mustEqual "nachlösen"
       wmv.userAnswers.length mustEqual 3
       wmv.numCorrectAnswersInARow mustEqual 2
     }
 
     "deserialize a word mapping value set" in {
-      val wmvs = deserialize[WordMappingValueSet, Separator](wmvsCustomFormat, Separator("|"))
+      val wmvs = deserialize[WordMappingValueSet, ParamsSeparator](wmvsCustomFormat, ParamsSeparator("|"))
       wmvs.containsValue("treaty")
       wmvs.size mustEqual 2
     }
 
     "deserialize a quiz item" in {
       val quizItemStr      = "on|auf|"
-      val quizItem         = deserialize[QuizItem, Separator](quizItemStr, Separator("|"))
+      val quizItem         = deserialize[QuizItem, ParamsSeparator](quizItemStr, ParamsSeparator("|"))
       val quizItemExpected = QuizItem("on", "auf")
       quizItem mustEqual quizItemExpected
     }
 
     "deserialize a quiz item with a special separator" in {
       val quizItemStr      = "Given a String s = \"2.3\" convert it to a Double ||| s.toDouble"
-      val quizItem         = deserialize[QuizItem, Separator](quizItemStr, Separator("|||"))
+      val quizItem         = deserialize[QuizItem, ParamsSeparator](quizItemStr, ParamsSeparator("|||"))
       val quizItemExpected = QuizItem("Given a String s = \"2.3\" convert it to a Double", "s.toDouble")
       quizItem mustEqual quizItemExpected
     }
@@ -105,18 +103,18 @@ class CustomFormatSpec extends Specification with AppDependencyAccess {
       import CustomFormat.*
       import CustomFormatForModelComponents.*
 
-      val qgml = deserialize(qgMemLevelSimpleCustomFormat, SeparatorIndexAndRepetitionInterval("|", 0, 0))
+      val qgml = deserialize(qgMemLevelSimpleCustomFormat, QuizGroupMemoryLevelFromParams("|", 0, 0))
       qgml.numQuizItems mustEqual 2
     }
 
     "deserialize a QuizGroup header" in {
-      val qgh = deserialize[QuizGroupHeader, NoParams](qghCustomFormat, NoParams())
+      val qgh = deserialize[QuizGroupHeader, ParamsNone](qghCustomFormat, ParamsNone())
       qgh.promptType mustEqual "English word"
       qgh.responseType mustEqual "German word"
     }
 
     "deserialize a QuizGroupWithHeader" in {
-      val qgwh = deserialize[QuizGroupWithHeader, Separator](qgwhCustomFormat, Separator("|"))
+      val qgwh = deserialize[QuizGroupWithHeader, ParamsSeparator](qgwhCustomFormat, ParamsSeparator("|"))
       qgwh.currentPromptNumber mustEqual 10
       qgwh.promptType mustEqual "English word"
       qgwh.responseType mustEqual "German word"

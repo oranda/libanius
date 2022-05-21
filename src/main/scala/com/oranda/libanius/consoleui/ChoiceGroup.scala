@@ -31,8 +31,8 @@ abstract class ChoiceGroup[T: ClassTag](choices: List[T]) {
   val choicesWithIndex = choices.zipWithIndex
 
   def show(): Unit =
-    choicesWithIndex.foreach { case (header, index) =>
-      output((index + 1).toString + ". " + header.toString)
+    choicesWithIndex.foreach { case (choice, index) =>
+      output((index + 1).toString + ". " + choice.toString)
     }
 
   def getSelectionFromInput: Either[NoProcessResponse, ChosenOptions[T]] =

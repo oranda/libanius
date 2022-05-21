@@ -21,7 +21,7 @@ package com.oranda.libanius.model
 import com.oranda.libanius.dependencies.*
 import com.oranda.libanius.model.action.serialize.CustomFormat.*
 import com.oranda.libanius.model.action.serialize.CustomFormatForModelComponents.customFormatQuizGroupWithHeader
-import com.oranda.libanius.model.action.serialize.Separator
+import com.oranda.libanius.model.action.serialize.ParamsSeparator
 import com.oranda.libanius.model.quizgroup.*
 import com.oranda.libanius.model.quizgroup.QuizGroupType.WordMapping
 import com.oranda.libanius.model.quizitem.QuizItem
@@ -270,7 +270,7 @@ object Quiz extends AppDependencyAccess {
   def demoQuiz(quizGroupsData: List[String] = demoDataInCustomFormat): Quiz = {
     l.log("Using demo data")
     val qgsWithHeader: Iterable[QuizGroupWithHeader] =
-      quizGroupsData.map(deserialize[QuizGroupWithHeader, Separator](_, Separator("|")))
+      quizGroupsData.map(deserialize[QuizGroupWithHeader, ParamsSeparator](_, ParamsSeparator("|")))
     Quiz(qgsWithHeader.map(qgWithHeader => (qgWithHeader.header, qgWithHeader.quizGroup)).toMap)
   }
 

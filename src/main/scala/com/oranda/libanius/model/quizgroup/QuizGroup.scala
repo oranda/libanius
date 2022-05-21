@@ -43,7 +43,6 @@ import scala.language.postfixOps
  */
 case class QuizGroup private (levels: List[QuizGroupMemoryLevel], userData: QuizGroupUserData, dictionary: Dictionary)
     extends ModelComponent {
-
   lazy val currentPromptNumber = userData.currentPromptNumber
   lazy val isActive            = userData.isActive
 
@@ -205,20 +204,21 @@ object QuizGroup extends AppDependencyAccess {
    */
   def fromQuizItems(
     quizItems: LazyList[QuizItem] = LazyList.empty,
-    numCorrectResponsesRequired: Int = 6,
+    numCorrectResponsesRequired: Int = QuizGroupHeader.defaultNumCorrectResponsesRequired,
     userData: QuizGroupUserData = QuizGroupUserData(isActive = true),
     dictionary: Dictionary = new Dictionary()
-  ): QuizGroup =
+  ): QuizGroup = {
     QuizGroup(
       Map(0 -> QuizGroupMemoryLevel(0, 0, quizItems)),
       numCorrectResponsesRequired,
       userData,
       dictionary
     )
+  }
 
   def apply(
     memLevelMap: Map[Int, QuizGroupMemoryLevel] = Map(),
-    numCorrectResponsesRequired: Int = 6,
+    numCorrectResponsesRequired: Int = QuizGroupHeader.defaultNumCorrectResponsesRequired,
     userData: QuizGroupUserData = QuizGroupUserData(isActive = true),
     dictionary: Dictionary = new Dictionary()
   ): QuizGroup =

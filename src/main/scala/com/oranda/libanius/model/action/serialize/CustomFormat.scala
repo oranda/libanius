@@ -50,32 +50,35 @@ trait ToCustomFormat[A <: ModelComponent, B <: ToParams] {
 trait FromParams
 trait ToParams
 
-case class NoParams() extends FromParams with ToParams {
-  def withSeparator(separator: String) = Separator(separator)
+case class ParamsNone() extends FromParams with ToParams {
+  def withSeparator(separator: String) = ParamsSeparator(separator)
 }
 
-case class Separator(mainSeparator: String) extends ToParams with FromParams {
-  def withIndex(index: Int) = SeparatorAndIndex(mainSeparator, index)
+case class ParamsSeparator(separator: String) extends ToParams with FromParams {
+  override def toString = separator
+}
+
+case class QuizGroupMemoryLevelFromParams(separator: String, index: Int, repetitionInterval: Int)
+  extends FromParams
+
+case class QuizGroupMemoryLevelToParams(mainSeparator: String, index: Int) extends ToParams {
+  def withoutIndex = ParamsSeparator(mainSeparator)
+}
+
+case class QuizGroupHeaderFromParams(
+  separator: String,
+  numCorrectResponsesRequired: Int,
+  useMultipleChoiceUntil: Int
+) extends FromParams
+
+case class QuizGroupHeaderToParams(separator: String) extends ToParams {
+  def withIndex(index: Int) = QuizGroupMemoryLevelToParams(separator, index)
   def withIndexAndRepetitionInterval(index: Int, repetitionInterval: Int) =
-    SeparatorIndexAndRepetitionInterval(this, index, repetitionInterval)
-  override def toString = mainSeparator
+    QuizGroupHeaderFromParams(separator, index, repetitionInterval)
+  override def toString = separator
 }
-
-case class SeparatorAndIndex(mainSeparator: String, index: Int) extends ToParams {
-  def withoutIndex = Separator(mainSeparator)
-}
-
-case class SeparatorIndexAndRepetitionInterval(separator: Separator, index: Int, repetitionInterval: Int)
-    extends FromParams
-
-object SeparatorIndexAndRepetitionInterval {
-  def apply(separator: String, index: Int, repetitionInterval: Int): SeparatorIndexAndRepetitionInterval =
-    SeparatorIndexAndRepetitionInterval(Separator(separator), index, repetitionInterval)
-}
-
 // provides external access to the typeclass, forwarding the call to the appropriate type
 object CustomFormat {
-
   def serialize[A <: ModelComponent, B <: ToParams](component: A, strBuilder: StringBuilder, params: B)(implicit
     customFormat: ToCustomFormat[A, B]
   ): StringBuilder =
@@ -83,21 +86,18 @@ object CustomFormat {
 
   def deserialize[A <: ModelComponent, B <: FromParams](str: String, fromParams: B)(implicit
     customFormat: FromCustomFormat[A, B]
-  ): A =
-    customFormat.from(str, fromParams)
+  ): A = customFormat.from(str, fromParams)
 }
 
 object CustomFormatForModelComponents {
-
   implicit object customFormatQuizGroupHeader
-      extends CustomFormat[QuizGroupHeader, NoParams, NoParams]
+      extends CustomFormat[QuizGroupHeader, ParamsNone, ParamsNone]
       with AppDependencyAccess {
-
     /**
      * StringBuilder holds mutable state, but the serialization needs to be
      * highly efficient on Android for large quiz files.
      */
-    def to(qgh: QuizGroupHeader, strBuilder: StringBuilder, params: NoParams) =
+    def to(qgh: QuizGroupHeader, strBuilder: StringBuilder, params: ParamsNone) =
       strBuilder
         .append("#quizGroup promptType=\"")
         .append(qgh.promptType)
@@ -113,13 +113,13 @@ object CustomFormatForModelComponents {
         .append(qgh.useMultipleChoiceUntil)
         .append("\"")
 
-    def from(str: String, params: NoParams) =
+    def from(str: String, params: ParamsNone) =
       QuizGroupHeader(
         parsePromptType(str),
         parseResponseType(str),
         parseQuizGroupType(str),
         parseMainSeparator(str),
-        parsenumCorrectResponsesRequired(str),
+        parseNumCorrectResponsesRequired(str),
         parseUseMultipleChoiceUntil(str)
       )
 
@@ -144,18 +144,19 @@ object CustomFormatForModelComponents {
     private[this] def parseMainSeparator(str: String): String =
       StringUtil.parseValue(str, "mainSeparator=\"", "\"").getOrElse("|")
 
-    private[this] def parsenumCorrectResponsesRequired(str: String): Int =
-      StringUtil.parseValue(str, "numCorrectResponsesRequired=\"", "\"").getOrElse("6").toInt
+    private[this] def parseNumCorrectResponsesRequired(str: String): Int =
+      StringUtil.parseInt(str, "numCorrectResponsesRequired=\"", "\"").
+        getOrElse(QuizGroupHeader.defaultNumCorrectResponsesRequired)
 
     private[this] def parseUseMultipleChoiceUntil(str: String): Int =
-      StringUtil.parseValue(str, "useMultipleChoiceUntil=\"", "\"").getOrElse("4").toInt
+      StringUtil.parseInt(str, "useMultipleChoiceUntil=\"", "\"").
+        getOrElse(QuizGroupHeader.defaultUseMultipleChoiceUntil)
   }
 
   implicit object customFormatQuizGroupUserData
-      extends CustomFormat[QuizGroupUserData, NoParams, NoParams]
+      extends CustomFormat[QuizGroupUserData, ParamsNone, ParamsNone]
       with AppDependencyAccess {
-
-    def to(qgud: QuizGroupUserData, strBuilder: StringBuilder, params: NoParams) =
+    def to(qgud: QuizGroupUserData, strBuilder: StringBuilder, params: ParamsNone) =
       strBuilder
         .append(" isActive=\"")
         .append(qgud.isActive)
@@ -164,7 +165,7 @@ object CustomFormatForModelComponents {
         .append(qgud.currentPromptNumber)
         .append("\"")
 
-    def from(str: String, fromParams: NoParams) =
+    def from(str: String, fromParams: ParamsNone) =
       QuizGroupUserData(parseIsActive(str), parseCurrentPromptNumber(str))
 
     private[this] def parseIsActive(str: String): Boolean =
@@ -180,47 +181,54 @@ object CustomFormatForModelComponents {
       }.get
   }
 
-  implicit object customFormatQuizGroupWithHeader extends CustomFormat[QuizGroupWithHeader, NoParams, Separator] {
-
+  implicit object customFormatQuizGroupWithHeader extends CustomFormat[QuizGroupWithHeader, ParamsNone, ParamsSeparator] {
     /*
      * Example of custom format:
      *
-     * quizGroup type="WordMapping" promptType="English word" responseType="German word" currentPromptNumber="0" isActive="true"
+     * quizGroup type="WordMapping" promptType="English word" type="QuestionAndAnswer" numCorrectResponsesRequired="4" useMultipleChoiceUntil="1" responseType="German word" currentPromptNumber="0" isActive="true"
      *    against|wider
      *    entertain|unterhalten
      */
-    def to(qgwh: QuizGroupWithHeader, strBuilder: StringBuilder, extraParams: NoParams): StringBuilder = {
+    def to(qgwh: QuizGroupWithHeader, strBuilder: StringBuilder, extraParams: ParamsNone): StringBuilder = {
       customFormatQuizGroupHeader.to(qgwh.header, strBuilder, extraParams)
       customFormatQuizGroupUserData.to(qgwh.quizGroup.userData, strBuilder, extraParams)
       strBuilder.append('\n')
-      customFormatQuizGroup.to(qgwh.quizGroup, strBuilder, qgwh.header.mainSeparator)
+      val quizGroupHeaderToParams = QuizGroupHeaderToParams(qgwh.header.mainSeparator.separator)
+      customFormatQuizGroup.to(qgwh.quizGroup, strBuilder, quizGroupHeaderToParams)
     }
 
-    def from(text: String, fromParams: Separator): QuizGroupWithHeader = {
+    def from(text: String, fromParams: ParamsSeparator): QuizGroupWithHeader = {
       val headerLine = text.takeWhile(_ != '\n')
       val qgHeader   = QuizGroupHeader(headerLine)
       val qg = Util.stopwatch(
-        customFormatQuizGroup.from(text, Separator(fromParams.mainSeparator)),
+        customFormatQuizGroup.from(
+          text,
+          QuizGroupHeaderFromParams(
+            fromParams.separator,
+            qgHeader.numCorrectResponsesRequired,
+            qgHeader.useMultipleChoiceUntil
+          )
+        ),
         "QuizGroup.fromCustomFormat"
       )
       QuizGroupWithHeader(qgHeader, qg)
     }
   }
 
-  implicit object customFormatQuizItem extends CustomFormat[QuizItem, Separator, Separator] {
-    def to(qi: QuizItem, strBuilder: StringBuilder, extraParams: Separator): StringBuilder = {
+  implicit object customFormatQuizItem extends CustomFormat[QuizItem, ParamsSeparator, ParamsSeparator] {
+    def to(qi: QuizItem, strBuilder: StringBuilder, extraParams: ParamsSeparator): StringBuilder = {
       strBuilder
         .append(qi.prompt)
-        .append(extraParams.mainSeparator)
+        .append(extraParams.separator)
         .append(qi.correctResponse)
-        .append(extraParams.mainSeparator)
-      customFormatUserResponses.to(qi.userResponses, strBuilder, NoParams())
+        .append(extraParams.separator)
+      customFormatUserResponses.to(qi.userResponses, strBuilder, ParamsNone())
     }
 
-    def from(strPromptResponse: String, fromParams: Separator): QuizItem = {
-      val i                      = strPromptResponse.indexOf(fromParams.mainSeparator)
+    def from(strPromptResponse: String, fromParams: ParamsSeparator): QuizItem = {
+      val i                      = strPromptResponse.indexOf(fromParams.separator)
       val strPrompt              = strPromptResponse.substring(0, i).trim
-      val separatorLength        = fromParams.mainSeparator.length
+      val separatorLength        = fromParams.separator.length
       val strResponseAndUserInfo = strPromptResponse.substring(i + separatorLength)
 
       val wmv           = customFormatWordMappingValue.from(strResponseAndUserInfo, fromParams)
@@ -231,10 +239,9 @@ object CustomFormatForModelComponents {
 
   // Example: contract:696,697;698/treaty:796;798
   implicit object customFormatWordMappingValueSet
-      extends CustomFormat[WordMappingValueSet, Separator, Separator]
+      extends CustomFormat[WordMappingValueSet, ParamsSeparator, ParamsSeparator]
       with AppDependencyAccess {
-
-    def to(wmvs: WordMappingValueSet, strBuilder: StringBuilder, extraParams: Separator): StringBuilder = {
+    def to(wmvs: WordMappingValueSet, strBuilder: StringBuilder, extraParams: ParamsSeparator): StringBuilder = {
       def wmvToCustomFormat(strBuilder: StringBuilder, wmv: WordMappingValue): StringBuilder =
         customFormatWordMappingValue.to(wmv, strBuilder, extraParams)
 
@@ -242,7 +249,7 @@ object CustomFormatForModelComponents {
     }
 
     // Example: contract:696,697;698/treaty:796;798
-    def from(str: String, fromParams: Separator): WordMappingValueSet = {
+    def from(str: String, fromParams: ParamsSeparator): WordMappingValueSet = {
       val values       = new ListBuffer[WordMappingValue]()
       val wmvsSplitter = stringSplitterFactory.getSplitter('/')
 
@@ -262,14 +269,13 @@ object CustomFormatForModelComponents {
 
   // Example: nachlösen:1,7,9;6
   implicit object customFormatWordMappingValue
-      extends CustomFormat[WordMappingValue, Separator, Separator]
+      extends CustomFormat[WordMappingValue, ParamsSeparator, ParamsSeparator]
       with AppDependencyAccess {
-
-    def to(wmv: WordMappingValue, strBuilder: StringBuilder, extraParams: Separator): StringBuilder = {
+    def to(wmv: WordMappingValue, strBuilder: StringBuilder, extraParams: ParamsSeparator): StringBuilder = {
       strBuilder.append(wmv.value)
 
       if wmv.correctAnswersInARow.nonEmpty || !wmv.incorrectAnswers.isEmpty then
-        strBuilder.append(extraParams.mainSeparator)
+        strBuilder.append(extraParams.separator)
       if wmv.correctAnswersInARow.nonEmpty then
         StringUtil.mkString(strBuilder, wmv.correctAnswersInARow, wmv.answerPromptNumber, ',')
       if wmv.incorrectAnswers.nonEmpty then {
@@ -280,13 +286,12 @@ object CustomFormatForModelComponents {
     }
 
     // Example: text = "nachlösen|1,7,9;6"
-    def from(str: String, fromParams: Separator): WordMappingValue = {
-
+    def from(str: String, fromParams: ParamsSeparator): WordMappingValue = {
       import com.oranda.libanius.util.StringUtil.RichString
-      str.optionalIndex(fromParams.mainSeparator) match {
+      str.optionalIndex(fromParams.separator) match {
         case Some(index) =>
           val strResponse   = str.substring(0, index)
-          val strAllAnswers = str.substring(index + fromParams.mainSeparator.length)
+          val strAllAnswers = str.substring(index + fromParams.separator.length)
 
           val wmv = WordMappingValue(strResponse.trim)
           if strAllAnswers.isEmpty then wmv
@@ -318,14 +323,13 @@ object CustomFormatForModelComponents {
   }
 
   // Example: 1,7,9;6
-  implicit object customFormatUserResponses extends CustomFormat[UserResponsesAll, NoParams, Separator] {
-
-    def from(str: String, fromParams: Separator): UserResponsesAll = {
+  implicit object customFormatUserResponses extends CustomFormat[UserResponsesAll, ParamsNone, ParamsSeparator] {
+    def from(str: String, fromParams: ParamsSeparator): UserResponsesAll = {
       val wmv = customFormatWordMappingValue.from(str, fromParams)
       UserResponsesAll(wmv.correctAnswersInARow, wmv.incorrectAnswers)
     }
 
-    def to(ur: UserResponsesAll, strBuilder: StringBuilder, extraParams: NoParams): StringBuilder = {
+    def to(ur: UserResponsesAll, strBuilder: StringBuilder, extraParams: ParamsNone): StringBuilder = {
       if ur.correctResponsesInARow.nonEmpty then
         StringUtil.mkString(strBuilder, ur.correctResponsesInARow, ur.responsePromptNumber, ',')
       if ur.incorrectResponses.nonEmpty then {
@@ -336,9 +340,12 @@ object CustomFormatForModelComponents {
     }
   }
 
-  implicit object customFormatQuizGroup extends CustomFormat[QuizGroup, Separator, Separator] {
-
-    def to(qg: QuizGroup, strBuilder: StringBuilder, extraParams: Separator): StringBuilder = {
+  implicit object customFormatQuizGroup extends CustomFormat[
+    QuizGroup,
+    QuizGroupHeaderToParams,
+    QuizGroupHeaderFromParams
+  ] {
+    def to(qg: QuizGroup, strBuilder: StringBuilder, extraParams: QuizGroupHeaderToParams): StringBuilder = {
       qg.levels.zipWithIndex.to(LazyList).foreach { case (level, idx) =>
         customFormatQuizGroupMemoryLevel.to(level, strBuilder, extraParams.withIndex(idx))
       }
@@ -348,8 +355,7 @@ object CustomFormatForModelComponents {
     /*
      * Text includes header line
      */
-    def from(text: String, fromParams: Separator): QuizGroup = {
-
+    def from(text: String, fromParams: QuizGroupHeaderFromParams): QuizGroup = {
       val quizGroupParts  = text.split("#quizGroupPartition ")
       val headerLine      = quizGroupParts.head
       val quizGroupLevels = quizGroupParts.tail
@@ -361,23 +367,21 @@ object CustomFormatForModelComponents {
         val repetitionInterval = StringUtil.parseValue(headerLine, "repetitionInterval=\"", "\"").getOrElse("0").toInt
         val memLevel = customFormatQuizGroupMemoryLevel.from(
           mainMemLevelText,
-          fromParams.withIndexAndRepetitionInterval(index, repetitionInterval)
+          QuizGroupMemoryLevelFromParams(fromParams.separator, index, repetitionInterval)
         )
         (index, memLevel)
       }
 
       val levelsMap                          = quizGroupLevels.map(parseMemLevelText).toMap
-      val userData: QuizGroupUserData        = customFormatQuizGroupUserData.from(headerLine, NoParams())
-      val defaultNumCorrectResponsesRequired = 6
-      QuizGroup.createFromMemLevels(levelsMap, userData, defaultNumCorrectResponsesRequired)
+      val userData: QuizGroupUserData        = customFormatQuizGroupUserData.from(headerLine, ParamsNone())
+      QuizGroup.createFromMemLevels(levelsMap, userData, fromParams.numCorrectResponsesRequired)
     }
   }
 
   implicit object customFormatQuizGroupMemoryLevel
-      extends CustomFormat[QuizGroupMemoryLevel, SeparatorAndIndex, SeparatorIndexAndRepetitionInterval]
+      extends CustomFormat[QuizGroupMemoryLevel, QuizGroupMemoryLevelToParams, QuizGroupMemoryLevelFromParams]
       with AppDependencyAccess {
-
-    def to(qgml: QuizGroupMemoryLevel, strBuilder: StringBuilder, extraParams: SeparatorAndIndex) = {
+    def to(qgml: QuizGroupMemoryLevel, strBuilder: StringBuilder, extraParams: QuizGroupMemoryLevelToParams) = {
       strBuilder.append(
         "#quizGroupPartition numCorrectResponsesInARow=\"" +
           extraParams.index + "\" repetitionInterval=\"" + qgml.repetitionInterval + "\"" + '\n'
@@ -393,10 +397,9 @@ object CustomFormatForModelComponents {
     /*
      * Text does not include header line
      */
-    def from(text: String, fromParams: SeparatorIndexAndRepetitionInterval): QuizGroupMemoryLevel = {
-
+    def from(text: String, fromParams: QuizGroupMemoryLevelFromParams): QuizGroupMemoryLevel = {
       def parseQuizItem(strPromptResponse: String): Option[QuizItem] =
-        Try(Option(customFormatQuizItem.from(strPromptResponse, Separator(fromParams.separator.toString)))).recover {
+        Try(Option(customFormatQuizItem.from(strPromptResponse, ParamsSeparator(fromParams.separator.toString)))).recover {
           case e: Exception =>
             l.logError(
               "could not parse quiz item with text " +
@@ -421,13 +424,12 @@ object CustomFormatForModelComponents {
     }
   }
 
-  implicit object customFormatDictionary extends CustomFormat[Dictionary, Separator, NoParams] {
-
+  implicit object customFormatDictionary extends CustomFormat[Dictionary, ParamsSeparator, ParamsNone] {
     /*
      * Currently, dictionaries are written by external scripts, and are read-only within
      * a running Libanius app, so this function is not implemented.
      */
-    def to(component: Dictionary, strBuilder: StringBuilder, params: Separator) =
+    def to(component: Dictionary, strBuilder: StringBuilder, params: ParamsSeparator) =
       ???
 
     /*
@@ -437,7 +439,7 @@ object CustomFormatForModelComponents {
      *    against|wider
      *    entertain|unterhalten
      */
-    def from(str: String, fromParams: NoParams): Dictionary =
+    def from(str: String, fromParams: ParamsNone): Dictionary =
       new Dictionary() {
 
         def parseCustomFormat() = {
@@ -470,13 +472,13 @@ object CustomFormatForModelComponents {
   }
 
   implicit object customFormatWordMappingGroup
-      extends CustomFormat[WordMappingGroup, Separator, Separator]
+      extends CustomFormat[WordMappingGroup, ParamsSeparator, ParamsSeparator]
       with AppDependencyAccess {
 
     /*
      * Not used, as WordMappingGroup is only used within Dictionary, which is not written to.
      */
-    def to(component: WordMappingGroup, strBuilder: StringBuilder, params: Separator) =
+    def to(component: WordMappingGroup, strBuilder: StringBuilder, params: ParamsSeparator) =
       ???
 
     /*
@@ -486,7 +488,7 @@ object CustomFormatForModelComponents {
      *     against|wider
      *     entertain|unterhalten
      */
-    def from(str: String, fromParams: Separator): WordMappingGroup = {
+    def from(str: String, fromParams: ParamsSeparator): WordMappingGroup = {
 
       val splitterLineBreak   = stringSplitterFactory.getSplitter('\n')
       val wordMappingsMutable = new ListBuffer[WordMappingPair]()
@@ -499,15 +501,14 @@ object CustomFormatForModelComponents {
           val strPromptResponse = splitterLineBreak.next
 
           def parsePromptResponse = {
-
-            val i                      = strPromptResponse.indexOf(fromParams.mainSeparator)
+            val i                      = strPromptResponse.indexOf(fromParams.separator)
             val strPrompt              = strPromptResponse.substring(0, i).trim
-            val separatorLength        = fromParams.mainSeparator.length
+            val separatorLength        = fromParams.separator.length
             val strResponseAndUserInfo = strPromptResponse.substring(i + separatorLength)
 
             wordMappingsMutable += WordMappingPair(
               strPrompt,
-              WordMappingValueSetLazyProxy(strResponseAndUserInfo, fromParams.mainSeparator)
+              WordMappingValueSetLazyProxy(strResponseAndUserInfo, fromParams.separator)
             )
           }
 

@@ -4,7 +4,7 @@ organization := "com.github.oranda"
 
 name := "libanius"
 
-version := "0.9.9.1"
+version := "0.9.9.2"
 
 scalaVersion := "3.1.2"
 
@@ -26,7 +26,12 @@ developers := List(
   )
 )
 
+import xerial.sbt.Sonatype._
+
 publishMavenStyle := true
+
+sonatypeProfileName    := "com.github.oranda"
+sonatypeProjectHosting := Some(GitHubHosting(user = "oranda", repository = "libanius", email = "jjtmccabe@gmail.com"))
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"

@@ -97,7 +97,7 @@ class ConstructWrongChoicesSpec extends Specification with AppDependencyAccess {
       import CustomFormat.*
       import CustomFormatForModelComponents.*
 
-      val demoGroup: QuizGroup      = deserialize[QuizGroup, Separator](demoGroupText, Separator("|"))
+      val demoGroup: QuizGroup      = deserialize[QuizGroup, QuizGroupHeaderFromParams](demoGroupText, QuizGroupHeaderFromParams("|", 4, 2))
       val quizItemCorrect: QuizItem = demoGroup.quizItems.find(_.prompt.value == "treaty").get
 
       val (falseAnswers, _) =

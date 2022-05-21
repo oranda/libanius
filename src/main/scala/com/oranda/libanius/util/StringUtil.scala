@@ -31,8 +31,10 @@ object StringUtil {
     }
   }
 
-  /*
-   * The normal Scala mkString is too slow, so this is used instead.
+  def parseInt(str: String, beginStr: String, endStr: String): Option[Int] =
+    parseValue(str, beginStr, endStr).map(_.toInt)
+
+  /** The normal Scala mkString is too slow, so this is used instead.
    * It's necessary to pass in an existing StringBuilder.
    */
   def mkString[S <: StringBuilder, T](
